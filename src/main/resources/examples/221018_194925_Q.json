@@ -1,0 +1,23 @@
+{
+  "sessionType": "Q",
+  "trackName": "watkins_glen",
+  "sessionIndex": 0,
+  "raceWeekendIndex": -1,
+  "metaData": "watkins_glen",
+  "serverName": "MARKracing | FunCup powered by simraceshop.de | Discord: https://discord.gg/V5PgBHVmGF | markracing.de - Training",
+  "sessionType": "Q",
+  "sessionResult": {
+    "bestlap": 0,
+    "bestSplits": [
+      0,
+      0,
+      0
+    ],
+    "isWetSession": 0,
+    "type": 0,
+    "leaderBoardLines": []
+  },
+  "laps": [],
+  "penalties": [],
+  "post_race_penalties": []
+}
