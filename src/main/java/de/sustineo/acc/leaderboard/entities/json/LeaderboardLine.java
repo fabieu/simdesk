@@ -11,5 +11,5 @@ public class LeaderboardLine {
     private Integer currentDriverIndex;
     private Timing timing;
     private Integer missingMandatoryPitstop;
-    private List<?> driverTotalTimes;
+    private List<Long> driverTotalTimes;
 }

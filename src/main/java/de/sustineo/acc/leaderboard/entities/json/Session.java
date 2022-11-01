@@ -1,6 +1,8 @@
 package de.sustineo.acc.leaderboard.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
+import de.sustineo.acc.leaderboard.entities.enums.SessionType;
+import de.sustineo.acc.leaderboard.entities.enums.Track;
 import lombok.Data;
 
 import java.util.List;

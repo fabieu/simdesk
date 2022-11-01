@@ -1,5 +1,7 @@
 package de.sustineo.acc.leaderboard.entities.json;
 
+import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
+import de.sustineo.acc.leaderboard.entities.enums.CupCategory;
 import lombok.Data;
 
 import java.util.List;
@@ -9,7 +11,7 @@ public class Car {
     private Integer carId;
     private Integer raceNumber;
     private Integer carModel;
-    private Integer cupCategory;
+    private CupCategory cupCategory;
     private CarGroup carGroup;
     private String teamName;
     private Integer nationality;

@@ -7,9 +7,10 @@ import java.util.List;
 
 @Data
 public class SessionResult {
+    @JsonProperty("bestlap")
     private Long bestLap;
     private List<Long> bestSplits;
-    private boolean isWetSession;
+    private Boolean isWetSession;
     private Integer type;
     @JsonProperty("leaderBoardLines")
     private List<LeaderboardLine> leaderboardLines;
