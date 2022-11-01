@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboards.entities.json;
+package de.sustineo.acc.leaderboard.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -12,5 +12,5 @@ public class SessionResult {
     private boolean isWetSession;
     private Integer type;
     @JsonProperty("leaderBoardLines")
-    private List<LeadboardLine> leaderboardLines;
+    private List<LeaderboardLine> leaderboardLines;
 }

@@ -1,11 +1,11 @@
-package de.sustineo.acc.leaderboards.entities.json;
+package de.sustineo.acc.leaderboard.entities.json;
 
 import lombok.Data;
 
 import java.util.List;
 
 @Data
-public class LeadboardLine {
+public class LeaderboardLine {
     private Car car;
     private Driver currentDriver;
     private Integer currentDriverIndex;

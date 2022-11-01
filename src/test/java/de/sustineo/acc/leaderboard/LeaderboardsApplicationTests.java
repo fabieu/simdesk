@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboards;
+package de.sustineo.acc.leaderboard;
 
 import org.junit.jupiter.api.Test;
 import org.springframework.boot.test.context.SpringBootTest;

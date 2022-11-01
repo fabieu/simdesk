@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboards.entities.json;
+package de.sustineo.acc.leaderboard.entities.json;
 
 public class Driver {
     private String firstName;

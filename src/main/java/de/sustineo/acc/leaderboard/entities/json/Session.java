@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboards.entities.json;
+package de.sustineo.acc.leaderboard.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Result {
+public class Session {
     private SessionType sessionType;
     private Track trackName;
     private Integer sessionIndex;

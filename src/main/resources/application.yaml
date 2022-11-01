@@ -1,0 +1,26 @@
+spring:
+  application:
+    name: acc-leaderboard
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+  task:
+    scheduling:
+      pool:
+        size: 4
+  flyway:
+    create-schemas: true
+    schemas: main
+    default-schema: main
+
+management:
+  endpoints:
+    web:
+      exposure:
+        include: "info,health,metrics"
+    health:
+      show-details: when-authorized
+  info:
+    java:
+      enabled: true
