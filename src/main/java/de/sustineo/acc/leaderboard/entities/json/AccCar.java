@@ -7,7 +7,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Car {
+public class AccCar {
     private Integer carId;
     private Integer raceNumber;
     private Integer carModel;
@@ -17,5 +17,5 @@ public class Car {
     private Integer nationality;
     private Integer carGuid;
     private Integer teamGuid;
-    private List<Driver> drivers;
+    private List<AccDriver> drivers;
 }

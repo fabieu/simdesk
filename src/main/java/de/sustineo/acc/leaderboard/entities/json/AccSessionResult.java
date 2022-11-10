@@ -6,12 +6,12 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class SessionResult {
+public class AccSessionResult {
     @JsonProperty("bestlap")
     private Long bestLap;
     private List<Long> bestSplits;
     private Boolean isWetSession;
     private Integer type;
     @JsonProperty("leaderBoardLines")
-    private List<LeaderboardLine> leaderboardLines;
+    private List<AccLeaderboardLine> leaderboardLines;
 }

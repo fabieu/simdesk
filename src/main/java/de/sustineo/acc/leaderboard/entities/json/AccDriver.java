@@ -3,7 +3,7 @@ package de.sustineo.acc.leaderboard.entities.json;
 import lombok.Data;
 
 @Data
-public class Driver {
+public class AccDriver {
     private String firstName;
     private String lastName;
     private String shortName;

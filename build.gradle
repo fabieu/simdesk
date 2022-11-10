@@ -28,7 +28,7 @@ dependencies {
     implementation 'org.springframework.boot:spring-boot-starter-actuator'
     implementation 'org.springframework.boot:spring-boot-starter-jdbc'
 
-    implementation 'org.flywaydb:flyway-core:9.6.0'
+    implementation 'org.flywaydb:flyway-core:9.7.0'
     implementation 'org.mybatis:mybatis:3.5.11'
     implementation 'org.mybatis:mybatis-spring:2.0.7'
     implementation 'org.apache.commons:commons-lang3:3.12.0'

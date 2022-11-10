@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Lap {
+public class AccLap {
     private Integer carId;
     private Integer driverIndex;
     @JsonProperty("laptime")

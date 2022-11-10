@@ -11,4 +11,5 @@ public class Session {
     private String serverName;
     private Boolean wetSession;
     private Integer driverCount;
+    private String sessionHash;
 }

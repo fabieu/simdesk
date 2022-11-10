@@ -5,11 +5,11 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class LeaderboardLine {
-    private Car car;
-    private Driver currentDriver;
+public class AccLeaderboardLine {
+    private AccCar car;
+    private AccDriver currentDriver;
     private Integer currentDriverIndex;
-    private Timing timing;
+    private AccTiming timing;
     private Integer missingMandatoryPitstop;
     private List<Long> driverTotalTimes;
 }

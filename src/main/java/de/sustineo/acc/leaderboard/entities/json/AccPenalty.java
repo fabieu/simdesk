@@ -3,7 +3,7 @@ package de.sustineo.acc.leaderboard.entities.json;
 import lombok.Data;
 
 @Data
-public class Penalty {
+public class AccPenalty {
     private Integer carId;
     private Integer driverIndex;
     private String reason;
