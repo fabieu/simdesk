@@ -5,14 +5,10 @@ spring:
     default-property-inclusion: NON_NULL
     deserialization:
       fail-on-unknown-properties: false
-  task:
-    scheduling:
-      pool:
-        size: 4
   flyway:
     create-schemas: true
-    schemas: main
-    default-schema: main
+    schemas: acc_leaderboard
+    default-schema: acc_leaderboard
 
 management:
   endpoints:
@@ -29,5 +25,6 @@ spring:
     activate:
       on-profile: "production"
   datasource:
-    driver-class-name: "org.h2.Driver"
-    url: "jdbc:h2:file:./data/accLeaderboardsData"
+    url: "jdbc:mysql://localhost:3306/acc_leaderboard"
+    username: "root"
+    password: "my-secret-pw"
