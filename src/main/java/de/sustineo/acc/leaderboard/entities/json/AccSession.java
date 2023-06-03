@@ -4,10 +4,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import de.sustineo.acc.leaderboard.entities.enums.Track;
 import lombok.Data;
+import lombok.ToString;
 
 import java.util.List;
 
 @Data
+@ToString
 public class AccSession {
     private SessionType sessionType;
     private Track trackName;

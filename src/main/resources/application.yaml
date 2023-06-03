@@ -9,7 +9,6 @@ spring:
     create-schemas: true
     schemas: acc_leaderboard
     default-schema: acc_leaderboard
-
 management:
   endpoints:
     web:
@@ -18,6 +17,12 @@ management:
   info:
     java:
       enabled: true
+logging:
+  level:
+    de.sustineo.acc.leaderboard: DEBUG
+leaderboard:
+  results:
+    folder: "src/main/resources/examples"
 
 ---
 spring:
@@ -28,3 +33,6 @@ spring:
     url: "jdbc:mysql://localhost:3306/acc_leaderboard"
     username: "root"
     password: "my-secret-pw"
+logging:
+  level:
+    de.sustineo.acc.leaderboard: INFO
