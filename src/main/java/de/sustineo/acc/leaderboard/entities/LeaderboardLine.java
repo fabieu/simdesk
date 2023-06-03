@@ -3,9 +3,11 @@ package de.sustineo.acc.leaderboard.entities;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.enums.CupCategory;
 import de.sustineo.acc.leaderboard.entities.enums.DriverCategory;
+import lombok.Builder;
 import lombok.Data;
 
 @Data
+@Builder
 public class LeaderboardLine {
     private Integer id;
     private Integer sessionId;

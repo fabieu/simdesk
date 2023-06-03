@@ -1,54 +1,60 @@
 package de.sustineo.acc.leaderboard.services;
 
 import de.sustineo.acc.leaderboard.configuration.FileContentConfiguration;
+import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import de.sustineo.acc.leaderboard.utils.json.JsonUtils;
 import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
-import java.io.File;
-import java.io.FileInputStream;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.util.List;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 
 @Log
 @Service
 public class FileContentService {
     private final WatchService watchService;
+    private final SessionService sessionService;
+    private final FileService fileService;
     private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_8, StandardCharsets.UTF_16LE);
 
     @Autowired
-    public FileContentService(WatchService watchService) {
+    public FileContentService(WatchService watchService, SessionService sessionService, FileService fileService) {
         this.watchService = watchService;
+        this.sessionService = sessionService;
+        this.fileService = fileService;
     }
 
-    @Async
     @PostConstruct
-    public void startMonitoringFolders() {
+    public void createWatchServiceThreadPool() {
+        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
+        executor.submit(this::startWatchService);
+    }
+
+    public void startWatchService() {
         try {
             WatchKey key;
             while ((key = watchService.take()) != null) {
-                Path dir = FileContentConfiguration.watchKeyMap.get(key);
+                Path baseDirectory = FileContentConfiguration.watchKeyMap.get(key);
 
                 for (WatchEvent<?> event : key.pollEvents()) {
                     Path relativePath = (Path) event.context();
-                    Path fileName = dir.resolve(relativePath);
+                    Path absolutePath = baseDirectory.resolve(relativePath);
 
-                    if (StandardWatchEventKinds.ENTRY_MODIFY.equals(event.kind())) {
-                        log.fine(String.format("Processing event kind: %s; File affected: %s", event.kind(), fileName));
-                        handleSessionFile(fileName);
+                    if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+                        log.fine(String.format("Processing event kind: %s; File affected: %s", event.kind(), absolutePath));
+                        handleSessionFile(absolutePath);
                     } else {
-                        log.fine(String.format("Ignoring event kind: %s; File affected: %s", event.kind(), fileName));
+                        log.fine(String.format("Ignoring event kind: %s; File affected: %s", event.kind(), absolutePath));
                     }
                 }
                 key.reset();
@@ -59,7 +65,7 @@ public class FileContentService {
     }
 
     @PreDestroy
-    public void stopMonitoringFolders() {
+    public void stopWatchService() {
         if (watchService != null) {
             try {
                 watchService.close();
@@ -69,11 +75,13 @@ public class FileContentService {
         }
     }
 
-    public void handleSessionFile(Path path) {
+    public void handleSessionFile(Path filePath) {
         try {
-            String fileContent = readFile(path);
+            String fileContent = readFile(filePath);
             AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
-            log.fine(accSession.toString());
+            FileMetadata fileMetadata = new FileMetadata(filePath);
+
+            sessionService.handleSession(accSession, fileMetadata);
         } catch (IOException e) {
             log.log(Level.SEVERE, e.getMessage(), e);
         }
@@ -83,7 +91,7 @@ public class FileContentService {
         for (Charset charset : SUPPORTED_CHARSETS) {
             try {
                 String fileContent = Files.readString(path, charset);
-                fileContent = removeBOM(fileContent);
+                fileContent = fileService.removeBOM(fileContent);
                 log.fine(String.format("Successfully parsed %s with charset %s", path, charset));
 
                 return fileContent;
@@ -93,48 +101,5 @@ public class FileContentService {
         }
 
         throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", path.toAbsolutePath(), SUPPORTED_CHARSETS));
-    }
-
-    public String removeBOM(String s) {
-        final String BOM_MARKER = "\uFEFF";
-
-        if (s.startsWith(BOM_MARKER)) {
-            return s.substring(1);
-        } else {
-            return s;
-        }
-    }
-
-    public String getChecksum(File file) throws IOException, NoSuchAlgorithmException {
-        MessageDigest messageDigest = MessageDigest.getInstance("SHA-256");
-
-        //Get file input stream for reading the file content
-        FileInputStream fis = new FileInputStream(file);
-
-        //Create byte array to read data in chunks
-        byte[] byteArray = new byte[1024];
-        int bytesCount = 0;
-
-        //Read file data and update in message digest
-        while ((bytesCount = fis.read(byteArray)) != -1) {
-            messageDigest.update(byteArray, 0, bytesCount);
-        }
-        ;
-
-        //close the stream; We don't need it now.
-        fis.close();
-
-        //Get the hash's bytes
-        byte[] bytes = messageDigest.digest();
-
-        //This bytes[] has bytes in decimal format;
-        //Convert it to hexadecimal format
-        StringBuilder sb = new StringBuilder();
-        for (byte b : bytes) {
-            sb.append(Integer.toString((b & 0xff) + 0x100, 16).substring(1));
-        }
-
-        //return complete hash
-        return sb.toString();
     }
 }
