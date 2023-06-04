@@ -8,6 +8,8 @@ import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.boot.context.event.ApplicationReadyEvent;
+import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.io.IOException;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
+import java.util.stream.Stream;
 
 @Log
 @Service
@@ -75,6 +78,20 @@ public class FileContentService {
         }
     }
 
+    @EventListener(ApplicationReadyEvent.class)
+    public void readAllSessionFiles() throws IOException {
+        List<String> folderPaths = FileContentConfiguration.FOLDER_PATHS;
+
+        for (String folderPath : folderPaths) {
+            try (Stream<Path> pathStream = Files.walk(Paths.get(folderPath))) {
+                pathStream
+                        .filter(file -> !Files.isDirectory(file))
+                        .forEach(this::handleSessionFile);
+            }
+        }
+    }
+
+
     public void handleSessionFile(Path filePath) {
         try {
             String fileContent = readFile(filePath);
@@ -82,8 +99,9 @@ public class FileContentService {
             FileMetadata fileMetadata = new FileMetadata(filePath);
 
             sessionService.handleSession(accSession, fileMetadata);
+            log.info(String.format("Successfully processed session file %s", filePath));
         } catch (IOException e) {
-            log.log(Level.SEVERE, e.getMessage(), e);
+            log.log(Level.SEVERE, String.format("Could not process session file %s", filePath), e);
         }
     }
 
