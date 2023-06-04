@@ -80,10 +80,10 @@ public class FileContentService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void readAllSessionFiles() throws IOException {
-        List<String> folderPaths = FileContentConfiguration.FOLDER_PATHS;
+        List<String> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
 
-        for (String folderPath : folderPaths) {
-            try (Stream<Path> pathStream = Files.walk(Paths.get(folderPath))) {
+        for (String watchDirectory : watchDirectories) {
+            try (Stream<Path> pathStream = Files.walk(Paths.get(watchDirectory))) {
                 pathStream
                         .filter(file -> !Files.isDirectory(file))
                         .forEach(this::handleSessionFile);
@@ -92,32 +92,32 @@ public class FileContentService {
     }
 
 
-    public void handleSessionFile(Path filePath) {
+    public void handleSessionFile(Path file) {
         try {
-            String fileContent = readFile(filePath);
+            String fileContent = readFile(file);
             AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
-            FileMetadata fileMetadata = new FileMetadata(filePath);
+            FileMetadata fileMetadata = new FileMetadata(file);
 
             sessionService.handleSession(accSession, fileMetadata);
-            log.info(String.format("Successfully processed session file %s", filePath));
+            log.info(String.format("Successfully processed session file %s", file));
         } catch (IOException e) {
-            log.log(Level.SEVERE, String.format("Could not process session file %s", filePath), e);
+            log.log(Level.SEVERE, String.format("Could not process session file %s", file), e);
         }
     }
 
-    private String readFile(Path path) throws IOException {
+    private String readFile(Path file) throws IOException {
         for (Charset charset : SUPPORTED_CHARSETS) {
             try {
-                String fileContent = Files.readString(path, charset);
+                String fileContent = Files.readString(file, charset);
                 fileContent = fileService.removeBOM(fileContent);
-                log.fine(String.format("Successfully parsed %s with charset %s", path, charset));
+                log.fine(String.format("Successfully parsed %s with charset %s", file, charset));
 
                 return fileContent;
             } catch (IOException e) {
-                log.fine(String.format("Unable to parse %s with charset %s", path, charset));
+                log.fine(String.format("Unable to parse %s with charset %s", file, charset));
             }
         }
 
-        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", path.toAbsolutePath(), SUPPORTED_CHARSETS));
+        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", file.toAbsolutePath(), SUPPORTED_CHARSETS));
     }
 }
