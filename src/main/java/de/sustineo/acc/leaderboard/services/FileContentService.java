@@ -20,7 +20,6 @@ import java.util.List;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
-import java.util.regex.Matcher;
 import java.util.stream.Stream;
 
 @Log
@@ -87,6 +86,7 @@ public class FileContentService {
             try (Stream<Path> pathStream = Files.walk(Paths.get(watchDirectory))) {
                 pathStream
                         .filter(Files::isRegularFile)
+                        .filter(FileService::isSessionFile)
                         .forEach(this::handleSessionFile);
             }
         }
@@ -95,13 +95,6 @@ public class FileContentService {
 
     public void handleSessionFile(Path file) {
         try {
-            Matcher sessionFileMatcher = FileContentConfiguration.SESSION_FILE_PATTERN.matcher(file.getFileName().toString());
-
-            if (!sessionFileMatcher.matches()) {
-                log.warning(String.format("Ignoring file %s because it does not match the session file pattern", file));
-                return;
-            }
-
             String fileContent = readFile(file);
             AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
             FileMetadata fileMetadata = new FileMetadata(file);

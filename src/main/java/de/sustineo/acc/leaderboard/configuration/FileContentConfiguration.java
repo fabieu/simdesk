@@ -11,14 +11,12 @@ import java.nio.file.*;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
-import java.util.regex.Pattern;
 
 @Log
 @Configuration
 @Getter
 public class FileContentConfiguration {
     public static List<String> WATCH_DIRECTORIES;
-    public static final Pattern SESSION_FILE_PATTERN = Pattern.compile("^.*_((FP\\d*)|(Q\\d*)|(R\\d*)).json$");
     public static final Map<WatchKey, Path> watchKeyMap = new HashMap<>();
 
     @Value("${leaderboard.results.folder}")
