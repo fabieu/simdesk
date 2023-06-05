@@ -5,6 +5,7 @@ import de.sustineo.acc.leaderboard.entities.enums.CupCategory;
 import lombok.Data;
 
 import java.util.List;
+import java.util.Optional;
 
 @Data
 public class AccCar {
@@ -18,4 +19,8 @@ public class AccCar {
     private Integer carGuid;
     private Integer teamGuid;
     private List<AccDriver> drivers;
+
+    public Optional<AccDriver> getDriverByIndex(int index) {
+        return Optional.ofNullable(drivers.get(index));
+    }
 }

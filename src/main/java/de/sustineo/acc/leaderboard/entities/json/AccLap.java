@@ -10,7 +10,7 @@ public class AccLap {
     private Integer carId;
     private Integer driverIndex;
     @JsonProperty("laptime")
-    private Long lapTimeSec;
+    private Long lapTimeMillis;
     @JsonProperty("isValidForBest")
     private Boolean valid;
     private List<Long> splits;
