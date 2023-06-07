@@ -31,10 +31,10 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        persistSession(session);
+        //persistSession(session);
 
         List<Lap> laps = sessionConverter.convertToLaps(session.getId(), accSession);
-        laps.forEach(this::persistLap);
+        //laps.forEach(this::persistLap);
 
         log.fine(String.format("Successfully processed session %s with %s laps", fileMetadata.getName(), laps.size()));
     }
