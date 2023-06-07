@@ -1,7 +1,6 @@
 package de.sustineo.acc.leaderboard.services;
 
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
-import de.sustineo.acc.leaderboard.entities.Lap;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import de.sustineo.acc.leaderboard.entities.mapper.LapMapper;
@@ -11,20 +10,18 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.util.List;
-
 @Log
 @Service
 public class SessionService {
+    private final LapService lapService;
     private final SessionConverter sessionConverter;
     private final SessionMapper sessionMapper;
-    private final LapMapper lapMapper;
 
     @Autowired
-    public SessionService(SessionConverter sessionConverter, SessionMapper sessionMapper, LapMapper lapMapper) {
+    public SessionService(SessionConverter sessionConverter, SessionMapper sessionMapper, LapMapper lapMapper, LapService lapService) {
         this.sessionConverter = sessionConverter;
         this.sessionMapper = sessionMapper;
-        this.lapMapper = lapMapper;
+        this.lapService = lapService;
     }
 
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
@@ -39,20 +36,16 @@ public class SessionService {
             return;
         }
 
-        persistSession(session);
-        List<Lap> laps = sessionConverter.convertToLaps(session.getId(), accSession);
-        laps.forEach(this::persistLap);
-    }
-
-    private void persistLap(Lap lap) {
-        lapMapper.insert(lap);
-    }
-
-    private void persistSession(Session session) {
-        sessionMapper.insert(session);
+        // Insert session first to get the id (auto increment)
+        insertSession(session);
+        lapService.handleLaps(session.getId(), accSession);
     }
 
     private boolean sessionExists(Session session) {
         return sessionMapper.findByFileChecksum(session.getFileChecksum()) != null;
+    }
+
+    private void insertSession(Session session) {
+        sessionMapper.insert(session);
     }
 }
