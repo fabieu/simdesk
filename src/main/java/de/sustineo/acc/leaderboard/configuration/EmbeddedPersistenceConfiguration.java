@@ -12,7 +12,6 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseBuilder;
 import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 
 import javax.sql.DataSource;
-import java.util.Objects;
 import java.util.Properties;
 
 @Profile("local")
@@ -33,24 +32,26 @@ public class EmbeddedPersistenceConfiguration {
 
     @Bean("embeddedDataSource")
     public DataSource dataSource() {
-        if (Objects.isNull(dataSource)) {
+        if (dataSource == null) {
             dataSource = new EmbeddedDatabaseBuilder()
                     .setType(EmbeddedDatabaseType.H2)
                     .generateUniqueName(true)
                     .build();
         }
+
         return dataSource;
     }
 
     @Bean
     public SqlSessionFactory sqlSessionFactory(@Qualifier("embeddedDataSource") DataSource dataSource,
                                                @Qualifier("embeddedDatabaseIdProvider") VendorDatabaseIdProvider databaseIdProvider) throws Exception {
-        if (Objects.isNull(sqlSessionFactory)) {
-            SqlSessionFactoryBean factoryBean = new SqlSessionFactoryBean();
-            factoryBean.setDataSource(dataSource);
-            factoryBean.setDatabaseIdProvider(databaseIdProvider);
-            sqlSessionFactory = factoryBean.getObject();
+        if (sqlSessionFactory == null) {
+            SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+            sqlSessionFactoryBean.setDataSource(dataSource);
+            sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider);
+            sqlSessionFactory = sqlSessionFactoryBean.getObject();
         }
+
         return sqlSessionFactory;
     }
 }
