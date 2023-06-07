@@ -4,6 +4,5 @@ import './index';
 
 import 'Frontend/generated/jar-resources/vaadin-dev-tools/vaadin-dev-tools.js';
 
-import {applyTheme} from './theme.js';
-
+import { applyTheme } from './theme.js';
 applyTheme(document);
