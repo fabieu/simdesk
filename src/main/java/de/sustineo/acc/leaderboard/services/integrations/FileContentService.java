@@ -57,7 +57,7 @@ public class FileContentService {
                     Path relativePath = (Path) event.context();
                     Path absolutePath = baseDirectory.resolve(relativePath);
 
-                    if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind())) {
+                    if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind()) && FileService.isSessionFile(absolutePath)) {
                         log.fine(String.format("Processing event kind: %s; File affected: %s", event.kind(), absolutePath));
                         handleSessionFile(absolutePath);
                     } else {

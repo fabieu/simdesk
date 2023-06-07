@@ -50,7 +50,6 @@ public class SessionConverter {
 
         return Lap.builder()
                 .sessionId(sessionId)
-
                 .carGroup(accCar.get().getCarGroup())
                 .carModel(accCar.get().getCarModel())
                 .driver(convertToDriver(accDriver.get()))
