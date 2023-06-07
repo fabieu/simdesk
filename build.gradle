@@ -2,14 +2,14 @@ plugins {
     id "org.springframework.boot" version "3.1.0"
     id "io.spring.dependency-management" version "1.1.0"
     id "java"
+    id 'com.vaadin' version "${vaadinVersion}"
 }
 
 group = "de.sustineo.acc"
-version = "0.1.0"
 
 java {
     toolchain {
-        languageVersion.set(JavaLanguageVersion.of(20))
+        languageVersion.set(JavaLanguageVersion.of(17))
     }
 }
 
@@ -21,6 +21,7 @@ configurations {
 
 repositories {
     mavenCentral()
+    maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
 }
 
 dependencies {
@@ -28,12 +29,16 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
 
+    implementation "com.vaadin:vaadin-spring-boot-starter"
+
     implementation "org.flywaydb:flyway-core:9.19.1"
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2"
     implementation "org.apache.commons:commons-lang3:3.12.0"
 
     runtimeOnly "com.h2database:h2:2.1.214"
     runtimeOnly "com.mysql:mysql-connector-j:8.0.33"
+
+    developmentOnly 'org.springframework.boot:spring-boot-devtools'
 
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
@@ -47,4 +52,17 @@ springBoot {
 
 test {
     useJUnitPlatform()
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
 }
