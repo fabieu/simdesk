@@ -1,4 +1,4 @@
-import {ConnectionIndicator, ConnectionState} from '@vaadin/common-frontend';
+import { ConnectionIndicator, ConnectionState } from '@vaadin/common-frontend';
 class FlowUiInitializationError extends Error {
 }
 // flow uses body for keeping references
@@ -28,8 +28,8 @@ export class Flow {
         // Regular expression used to remove the app-context
         const elm = document.head.querySelector('base');
         this.baseRegex = new RegExp(`^${
-            // IE11 does not support document.baseURI
-            (document.baseURI || (elm && elm.href) || '/').replace(/^https?:\/\/[^/]+/i, '')}`);
+        // IE11 does not support document.baseURI
+        (document.baseURI || (elm && elm.href) || '/').replace(/^https?:\/\/[^/]+/i, '')}`);
         this.appShellTitle = document.title;
         // Put a vaadin-connection-indicator in the dom
         this.addConnectionIndicator();
@@ -70,16 +70,19 @@ export class Flow {
             if ($wnd.Vaadin.connectionState.online) {
                 try {
                     await this.flowInit();
-                } catch (error) {
+                }
+                catch (error) {
                     if (error instanceof FlowUiInitializationError) {
                         // error initializing Flow: assume connection lost
                         $wnd.Vaadin.connectionState.state = ConnectionState.CONNECTION_LOST;
                         return this.offlineStubAction();
-                    } else {
+                    }
+                    else {
                         throw error;
                     }
                 }
-            } else {
+            }
+            else {
                 // insert an offline stub
                 return this.offlineStubAction();
             }
@@ -94,7 +97,7 @@ export class Flow {
     // whether navigation has to be cancelled.
     async flowLeave(ctx, cmd) {
         // server -> server, viewing offline stub, or browser is offline
-        const {connectionState} = $wnd.Vaadin;
+        const { connectionState } = $wnd.Vaadin;
         if (this.pathname === ctx.pathname || !this.isFlowClientLoaded() || connectionState.offline) {
             return Promise.resolve({});
         }
@@ -120,9 +123,11 @@ export class Flow {
                 this.container.serverConnected = (cancel, redirectContext) => {
                     if (cmd && cancel) {
                         resolve(cmd.prevent());
-                    } else if (cmd && cmd.redirect && redirectContext) {
+                    }
+                    else if (cmd && cmd.redirect && redirectContext) {
                         resolve(cmd.redirect(redirectContext.pathname));
-                    } else {
+                    }
+                    else {
                         this.container.style.display = '';
                         resolve(this.container);
                     }
@@ -131,7 +136,8 @@ export class Flow {
                 // Call server side to navigate to the given route
                 flowRoot.$server.connectClient(this.container.localName, this.container.id, this.getFlowRoutePath(ctx), this.getFlowRouteQuery(ctx), this.appShellTitle, history.state);
             });
-        } else {
+        }
+        else {
             // No server response => offline or erroneous connection
             return Promise.resolve(this.container);
         }
@@ -152,11 +158,11 @@ export class Flow {
             this.response = await this.flowInitUi(serverSideRouting);
             // Enable or disable server side routing
             this.response.appConfig.clientRouting = !serverSideRouting;
-            const {pushScript, appConfig} = this.response;
+            const { pushScript, appConfig } = this.response;
             if (typeof pushScript === 'string') {
                 await this.loadScript(pushScript);
             }
-            const {appId} = appConfig;
+            const { appId } = appConfig;
             // Load bootstrap script with server side parameters
             const bootstrapMod = await import('./FlowBootstrap');
             await bootstrapMod.init(this.response);
@@ -243,7 +249,8 @@ export class Flow {
                 const contentType = httpRequest.getResponseHeader('content-type');
                 if (contentType && contentType.indexOf('application/json') !== -1) {
                     resolve(JSON.parse(httpRequest.responseText));
-                } else {
+                }
+                else {
                     httpRequest.onerror();
                 }
             };
