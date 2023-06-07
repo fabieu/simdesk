@@ -4,8 +4,6 @@ import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import lombok.Builder;
 import lombok.Data;
 
-import java.time.Duration;
-
 @Data
 @Builder
 public class Lap {
@@ -14,9 +12,9 @@ public class Lap {
     private CarGroup carGroup;
     private Integer carModel;
     private Driver driver;
-    private Duration lapTime;
-    private Duration split1;
-    private Duration split2;
-    private Duration split3;
+    private Long lapTimeMillis;
+    private Long split1Millis;
+    private Long split2Millis;
+    private Long split3Millis;
     private boolean valid;
 }

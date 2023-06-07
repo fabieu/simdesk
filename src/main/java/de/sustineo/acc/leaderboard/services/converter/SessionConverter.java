@@ -10,7 +10,6 @@ import de.sustineo.acc.leaderboard.entities.json.AccLap;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import org.springframework.stereotype.Service;
 
-import java.time.Duration;
 import java.util.List;
 import java.util.Optional;
 import java.util.stream.Collectors;
@@ -53,10 +52,10 @@ public class SessionConverter {
                 .carGroup(accCar.get().getCarGroup())
                 .carModel(accCar.get().getCarModel())
                 .driver(convertToDriver(accDriver.get()))
-                .lapTime(Duration.ofMillis(accLap.getLapTimeMillis()))
-                .split1(Duration.ofMillis(accLap.getSplits().get(0)))
-                .split2(Duration.ofMillis(accLap.getSplits().get(1)))
-                .split3(Duration.ofMillis(accLap.getSplits().get(2)))
+                .lapTimeMillis(accLap.getLapTimeMillis())
+                .split1Millis(accLap.getSplits().get(0))
+                .split2Millis(accLap.getSplits().get(1))
+                .split3Millis(accLap.getSplits().get(2))
                 .valid(accLap.getValid())
                 .build();
     }
