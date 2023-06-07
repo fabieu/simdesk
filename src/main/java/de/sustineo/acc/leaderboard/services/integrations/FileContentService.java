@@ -123,6 +123,6 @@ public class FileContentService {
             }
         }
 
-        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", file.toAbsolutePath(), SUPPORTED_CHARSETS));
+        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", file, SUPPORTED_CHARSETS));
     }
 }

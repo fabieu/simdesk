@@ -24,11 +24,13 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.laps (
     driver_last_name VARCHAR,
     driver_short_name VARCHAR,
     driver_player_id VARCHAR NOT NULL,
-    lap_time_millis INT NOT NULL,
-    split1_time_millis INT NOT NULL,
-    split2_time_millis INT NOT NULL,
-    split3_time_millis INT NOT NULL,
+    lap_time_millis BIGINT NOT NULL,
+    split1_millis BIGINT NOT NULL,
+    split2_millis BIGINT NOT NULL,
+    split3_millis BIGINT NOT NULL,
     valid BOOLEAN NOT NULL,
     PRIMARY KEY (id),
     FOREIGN KEY (session_id) REFERENCES acc_leaderboard.sessions (id)
 );
+
+CREATE UNIQUE INDEX ux_sessions_file_checksum ON acc_leaderboard.sessions (file_checksum);

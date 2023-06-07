@@ -14,19 +14,21 @@ import java.util.logging.Level;
 @Data
 @Log
 public class FileMetadata {
+    private Path file;
     private Path absolutePath;
     private Path directory;
     private String name;
     private String checksum;
 
     public FileMetadata(Path file) {
+        this.file = file;
         this.absolutePath = file.toAbsolutePath();
         this.directory = file.getParent();
         this.name = file.getFileName().toString();
-        this.checksum = calculateChecksum(file);
+        this.checksum = calculateChecksum();
     }
 
-    public String calculateChecksum(Path file) {
+    public String calculateChecksum() {
         MessageDigest messageDigest;
         String checksum;
 
@@ -41,7 +43,7 @@ public class FileMetadata {
             // This byte array has bytes in decimal format, convert it to hexadecimal format
             checksum = new BigInteger(1, hash).toString(16);
         } catch (NoSuchAlgorithmException | IOException e) {
-            log.log(Level.WARNING, String.format("Could not calculate checksum for file %s", file.toAbsolutePath()), e);
+            log.log(Level.WARNING, String.format("Could not calculate checksum for file %s", file), e);
             return null;
         }
 

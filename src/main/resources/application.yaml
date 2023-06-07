@@ -19,6 +19,7 @@ management:
       enabled: true
 logging:
   level:
+    de.sustineo.acc.leaderboard.entities.mapper: INFO
     de.sustineo.acc.leaderboard: DEBUG
 leaderboard:
   results:
