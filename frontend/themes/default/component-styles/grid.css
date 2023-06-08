@@ -1,15 +1,15 @@
-vaadin-grid::part(ranking-color-gt3) {
-    background-color: rgba(255, 255, 255, 0.5);
+vaadin-grid::part(ranking-car-group-gt3) {
+    background-color: var(--lumo-base-color);
 }
 
-vaadin-grid::part(ranking-color-gt4) {
-    background-color: rgba(38, 38, 96, 0.25)
+vaadin-grid::part(ranking-car-group-gt4) {
+    background-color: rgba(38, 38, 96, 0.2)
 }
 
-vaadin-grid::part(ranking-color-gtc, ranking-color-chl, ranking-color-cup, ranking-color-st) {
-    background-color: rgba(245, 126, 0,3);
+vaadin-grid::part(ranking-car-group-tcx) {
+    background-color: rgb(0, 124, 168, 0.25);
 }
 
-vaadin-grid::part(ranking-color-tcx) {
-    background-color: rgb(0, 124, 168, 0.3);
+vaadin-grid::part(ranking-car-group-gtc) {
+    background-color: rgba(245, 126, 0, 0.4);
 }

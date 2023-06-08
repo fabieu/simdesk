@@ -18,7 +18,7 @@ import de.sustineo.acc.leaderboard.entities.Ranking;
 import de.sustineo.acc.leaderboard.filter.RankingFilter;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
-import de.sustineo.acc.leaderboard.views.generators.RankingPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
 
 import java.util.List;
 import java.util.function.Consumer;
@@ -46,7 +46,7 @@ public class RankingGlobalView extends VerticalLayout {
         GridListDataView<Ranking> dataView = grid.setItems(rankings);
         RankingFilter rankingFilter = new RankingFilter(driverService, dataView);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setPartNameGenerator(new RankingPartNameGenerator());
+        grid.setPartNameGenerator(new CarGroupPartNameGenerator());
         grid.getHeaderRows().clear();
 
 
@@ -66,16 +66,17 @@ public class RankingGlobalView extends VerticalLayout {
                 .set("font-size", "var(--lumo-font-size-m)");
         VerticalLayout layout = new VerticalLayout(label);
 
-        boolean enabled = filterChangeConsumer != null;
-
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
         textField.setClearButtonVisible(true);
         textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
         textField.setWidthFull();
         textField.getStyle().set("max-width", "100%");
-        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        textField.setEnabled(enabled);
+        if (filterChangeConsumer != null) {
+            textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
+        } else {
+            textField.setEnabled(false);
+        }
         layout.add(textField);
 
         layout.getThemeList().clear();
