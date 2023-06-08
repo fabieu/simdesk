@@ -21,7 +21,7 @@ public interface DriverMapper {
 
     @ResultMap("driverResultMap")
     @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
-    Driver findById(String playerId);
+    Driver findByPlayerId(String playerId);
 
     @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name) " +
             "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}) " +

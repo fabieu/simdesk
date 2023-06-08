@@ -12,7 +12,7 @@ public class SessionConverter {
                 .sessionType(accSession.getSessionType())
                 .raceWeekendIndex(accSession.getRaceWeekendIndex())
                 .serverName(accSession.getServerName())
-                .trackName(accSession.getTrackName())
+                .trackId(accSession.getTrackName())
                 .wetSession(accSession.getSessionResult().getIsWetSession())
                 .driverCount(accSession.getSessionResult().getLeaderboardLines().size())
                 .fileChecksum(fileMetadata.getChecksum())

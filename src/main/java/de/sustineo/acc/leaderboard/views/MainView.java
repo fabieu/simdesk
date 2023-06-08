@@ -2,8 +2,10 @@ package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -11,9 +13,11 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.acc.leaderboard.configuration.VaadinAppShellConfiguration;
 
 import java.util.Optional;
@@ -29,7 +33,7 @@ public class MainView extends AppLayout {
 
     public MainView() {
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(true, createNavbarContent());
+        addToNavbar(true, createNavbarContent(), createThemeToggleButton());
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
@@ -92,6 +96,18 @@ public class MainView extends AppLayout {
         tab.add(new RouterLink(text, navigationTarget));
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
+    }
+
+    private Button createThemeToggleButton() {
+        return new Button("Toggle theme variant", click -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+            } else {
+                themeList.add(Lumo.DARK);
+            }
+        });
     }
 
     @Override

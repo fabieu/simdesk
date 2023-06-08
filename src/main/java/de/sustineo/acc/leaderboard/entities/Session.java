@@ -16,7 +16,7 @@ public class Session {
     private SessionType sessionType;
     private Integer raceWeekendIndex;
     private String serverName;
-    private Track trackName;
+    private Track trackId;
     private Boolean wetSession;
     private Integer driverCount;
     private String fileChecksum;

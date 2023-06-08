@@ -6,7 +6,6 @@ import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 
 /**
  * An interface to configure application features and the host page where the Vaadin application is running.
@@ -16,7 +15,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Meta(name = "Author", content = "Fabian Eulitz")
 @PageTitle("ACC Leaderboard")
 @PWA(name = "ACC Leaderboard", shortName = "Leaderboard")
-@Theme(value = "default", variant = Lumo.LIGHT)
+@Theme(value = "default")
 public class VaadinAppShellConfiguration implements AppShellConfigurator {
     public static final String APPLICATION_NAME = "ACC Leaderboard";
 }

@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.sessions (
     session_type VARCHAR(10) NOT NULL,
     race_weekend_index INT NOT NULL,
     server_name TEXT NOT NULL,
-    track_name VARCHAR(32) NOT NULL,
+    track_id VARCHAR(32) NOT NULL,
     wet_session BOOLEAN NOT NULL,
     driver_count INT NOT NULL,
     file_checksum VARCHAR(64) NOT NULL,
