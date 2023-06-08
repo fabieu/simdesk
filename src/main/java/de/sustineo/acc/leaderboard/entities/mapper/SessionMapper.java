@@ -7,9 +7,10 @@ import org.springframework.stereotype.Component;
 import java.util.List;
 
 @Component
+@Mapper
 public interface SessionMapper {
     @Results(id = "sessionResultMap", value = {
-            @Result(property = "id", column = "id"),
+            @Result(id = true, property = "id", column = "id"),
             @Result(property = "sessionType", column = "session_type"),
             @Result(property = "raceWeekendIndex", column = "race_weekend_index"),
             @Result(property = "serverName", column = "server_name"),

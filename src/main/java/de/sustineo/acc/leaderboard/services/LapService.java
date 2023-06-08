@@ -13,21 +13,31 @@ import java.util.List;
 @Log
 @Service
 public class LapService {
-    private final LapMapper lapMapper;
+    private final DriverService driverService;
     private final LapConverter lapConverter;
+    private final LapMapper lapMapper;
 
     @Autowired
-    public LapService(LapMapper lapMapper, LapConverter lapConverter) {
+    public LapService(DriverService driverService, LapMapper lapMapper, LapConverter lapConverter) {
+        this.driverService = driverService;
         this.lapMapper = lapMapper;
         this.lapConverter = lapConverter;
     }
 
     public void handleLaps(Integer sessionId, AccSession accSession) {
         List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession);
-        laps.forEach(this::insertLap);
+
+        for (Lap lap : laps) {
+            driverService.upsertDriver(lap.getDriver());
+            insertLap(lap);
+        }
     }
 
     public void insertLap(Lap lap) {
         lapMapper.insert(lap);
+    }
+
+    public List<Lap> findAll() {
+        return lapMapper.findAll();
     }
 }

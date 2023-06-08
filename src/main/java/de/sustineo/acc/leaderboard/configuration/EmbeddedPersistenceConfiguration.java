@@ -3,7 +3,6 @@ package de.sustineo.acc.leaderboard.configuration;
 import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
-import org.mybatis.spring.annotation.MapperScan;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
@@ -16,7 +15,6 @@ import java.util.Properties;
 
 @Profile("local")
 @Configuration
-@MapperScan(basePackages = {"de.sustineo.acc.leaderboard.entities.mapper"})
 public class EmbeddedPersistenceConfiguration {
     private static DataSource dataSource;
     private SqlSessionFactory sqlSessionFactory;
@@ -36,6 +34,7 @@ public class EmbeddedPersistenceConfiguration {
             dataSource = new EmbeddedDatabaseBuilder()
                     .setType(EmbeddedDatabaseType.H2)
                     .generateUniqueName(true)
+                    .addScript("db/local-h2/V0_0_1__config.sql")
                     .build();
         }
 

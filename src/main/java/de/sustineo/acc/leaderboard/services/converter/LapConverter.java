@@ -46,10 +46,10 @@ public class LapConverter {
 
     private Driver convertToDriver(AccDriver accDriver) {
         return Driver.builder()
+                .playerId(accDriver.getPlayerId())
                 .firstName(accDriver.getFirstName())
                 .lastName(accDriver.getLastName())
                 .shortName(accDriver.getShortName())
-                .playerId(accDriver.getPlayerId())
                 .build();
     }
 }

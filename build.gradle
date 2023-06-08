@@ -31,7 +31,7 @@ dependencies {
 
     implementation "com.vaadin:vaadin-spring-boot-starter"
 
-    implementation "org.flywaydb:flyway-core:9.19.1"
+    implementation "org.flywaydb:flyway-mysql:9.19.1"
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.2"
     implementation "org.apache.commons:commons-lang3:3.12.0"
 
