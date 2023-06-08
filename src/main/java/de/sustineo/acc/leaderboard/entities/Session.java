@@ -22,4 +22,5 @@ public class Session {
     private String fileChecksum;
     private String fileName;
     private String fileDirectory;
+    private Boolean importSuccess;
 }

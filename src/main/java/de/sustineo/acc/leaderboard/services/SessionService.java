@@ -31,7 +31,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        if (sessionExists(session)){
+        if (sessionImported(session)){
             log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }
@@ -39,13 +39,24 @@ public class SessionService {
         // Insert session first to get the id (auto increment)
         insertSession(session);
         lapService.handleLaps(session.getId(), accSession);
+        setImportSuccess(session);
     }
 
-    private boolean sessionExists(Session session) {
-        return sessionMapper.findByFileChecksum(session.getFileChecksum()) != null;
+    private boolean sessionImported(Session session) {
+        Session existingSession = sessionMapper.findByFileChecksum(session.getFileChecksum());
+
+        if (existingSession == null) {
+            return false;
+        }
+
+        return existingSession.getImportSuccess();
     }
 
     private void insertSession(Session session) {
         sessionMapper.insert(session);
+    }
+
+    private void setImportSuccess(Session session) {
+        sessionMapper.setImportSuccess(session);
     }
 }
