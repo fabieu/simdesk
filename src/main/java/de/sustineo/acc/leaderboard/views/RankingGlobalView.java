@@ -60,20 +60,13 @@ public class RankingGlobalView extends VerticalLayout {
         add(grid);
     }
 
-    private static VerticalLayout createLabelHeader(String labelText) {
+    private static Component createFilterHeader(String labelText, Consumer<String> filterChangeConsumer) {
         Label label = new Label(labelText);
         label.getStyle()
                 .set("font-size", "var(--lumo-font-size-m)");
         VerticalLayout layout = new VerticalLayout(label);
 
-        layout.getThemeList().clear();
-        layout.getThemeList().add("spacing-xs");
-
-        return layout;
-    }
-
-    private static Component createFilterHeader(String labelText, Consumer<String> filterChangeConsumer) {
-        VerticalLayout layout = createLabelHeader(labelText);
+        boolean enabled = filterChangeConsumer != null;
 
         TextField textField = new TextField();
         textField.setValueChangeMode(ValueChangeMode.EAGER);
@@ -82,7 +75,11 @@ public class RankingGlobalView extends VerticalLayout {
         textField.setWidthFull();
         textField.getStyle().set("max-width", "100%");
         textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
+        textField.setEnabled(enabled);
         layout.add(textField);
+
+        layout.getThemeList().clear();
+        layout.getThemeList().add("spacing-xs");
 
         return layout;
     }
