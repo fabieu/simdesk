@@ -76,12 +76,13 @@ public class MainView extends AppLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
         tabs.setId("tabs");
         tabs.add(createMenuTabs());
-        tabs.setSelectedTab(null);
         return tabs;
     }
 
     private Tab[] createMenuTabs() {
         return new Tab[]{
+                createTab("Home", MainView.class),
+                createTab("Global Ranking", RankingGlobalView.class),
                 createTab("Login", LoginView.class),
         };
     }
@@ -100,7 +101,7 @@ public class MainView extends AppLayout {
         if (getContent() != null) {
             // Select the tab corresponding to currently shown view
             getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
-            viewTitle.setText(getCurrentPageTitle());
+            viewTitle.setText(DEFAULT_VIEW_TITLE + " - "  + getCurrentPageTitle());
         } else {
             menu.setSelectedTab(null);
             viewTitle.setText(DEFAULT_VIEW_TITLE);
