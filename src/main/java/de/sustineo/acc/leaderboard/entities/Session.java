@@ -1,7 +1,6 @@
 package de.sustineo.acc.leaderboard.entities;
 
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
-import de.sustineo.acc.leaderboard.entities.enums.Track;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -16,7 +15,7 @@ public class Session {
     private SessionType sessionType;
     private Integer raceWeekendIndex;
     private String serverName;
-    private Track trackId;
+    private String trackId;
     private Boolean wetSession;
     private Integer driverCount;
     private String fileChecksum;

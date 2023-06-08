@@ -2,7 +2,6 @@ package de.sustineo.acc.leaderboard.entities.json;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
-import de.sustineo.acc.leaderboard.entities.enums.Track;
 import lombok.Data;
 import lombok.ToString;
 
@@ -13,7 +12,7 @@ import java.util.Optional;
 @ToString
 public class AccSession {
     private String sessionType;
-    private Track trackName;
+    private String trackName;
     private Integer sessionIndex;
     private Integer raceWeekendIndex;
     private String metaData;
