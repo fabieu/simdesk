@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Route(value = "ranking/all-time", layout = MainView.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Global Ranking")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
 @AnonymousAllowed
-public class AlltimeRankingView extends VerticalLayout {
-    public AlltimeRankingView(RankingService rankingService, DriverService driverService) {
+public class AllTimeRankingView extends VerticalLayout {
+    public AllTimeRankingView(RankingService rankingService, DriverService driverService) {
         addClassName("alltime-ranking-view");
         setSizeFull();
 
@@ -76,10 +76,10 @@ public class AlltimeRankingView extends VerticalLayout {
             Ranking selectedRanking = e.getValue();
 
             if (selectedRanking != null) {
-                getUI().ifPresent(ui -> ui.navigate(AlltimeRankingDetailedView.class,
+                getUI().ifPresent(ui -> ui.navigate(AllTimeRankingDetailedView.class,
                         new RouteParameters(
-                                new RouteParam(AlltimeRankingDetailedView.ROUTE_PARAMETER_CAR_GROUP, selectedRanking.getCarGroup().name().toLowerCase()),
-                                new RouteParam(AlltimeRankingDetailedView.ROUTE_PARAMETER_TRACK_ID, selectedRanking.getTrackId())
+                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_CAR_GROUP, selectedRanking.getCarGroup().name().toLowerCase()),
+                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_TRACK_ID, selectedRanking.getTrackId())
                         )
                 ));
             }

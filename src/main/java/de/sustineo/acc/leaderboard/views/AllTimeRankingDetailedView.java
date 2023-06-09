@@ -12,13 +12,13 @@ import lombok.extern.java.Log;
 
 @Log
 @Route(value = "ranking/all-time/:carGroup/:trackId", layout = MainView.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Global Ranking")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
 @AnonymousAllowed
-public class AlltimeRankingDetailedView extends VerticalLayout implements BeforeEnterObserver {
+public class AllTimeRankingDetailedView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
 
-    public AlltimeRankingDetailedView() {
+    public AllTimeRankingDetailedView() {
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
