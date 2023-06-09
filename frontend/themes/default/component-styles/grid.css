@@ -1,3 +1,7 @@
+vaadin-grid::part(font-weight-bold) {
+    font-weight: bold;
+}
+
 vaadin-grid::part(ranking-car-group-gt3) {
     background-color: var(--lumo-base-color);
 }

@@ -7,9 +7,10 @@ import com.vaadin.flow.router.BeforeEnterObserver;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 
 @Route(value = "login", layout = MainView.class)
-@PageTitle("Login")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Login")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginForm login = new LoginForm();

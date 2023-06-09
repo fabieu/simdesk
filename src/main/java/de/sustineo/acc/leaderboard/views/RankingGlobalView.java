@@ -14,6 +14,7 @@ import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Ranking;
 import de.sustineo.acc.leaderboard.filter.RankingFilter;
 import de.sustineo.acc.leaderboard.services.DriverService;
@@ -24,27 +25,37 @@ import java.util.List;
 import java.util.function.Consumer;
 
 @Route(value = "ranking/all-time", layout = MainView.class)
-@PageTitle("Global Ranking")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Global Ranking")
 @AnonymousAllowed
 public class RankingGlobalView extends VerticalLayout {
     public RankingGlobalView(RankingService rankingService, DriverService driverService) {
+        addClassName("ranking-alltime-view");
+        setSizeFull();
 
         Grid<Ranking> grid = new Grid<>(Ranking.class, false);
         Grid.Column<Ranking> carGroupColumn = grid.addColumn(Ranking::getCarGroup)
+                .setResizable(true)
                 .setAutoWidth(true)
                 .setFlexGrow(0);
         Grid.Column<Ranking> trackNameColumn = grid.addColumn(Ranking::getTrackName)
+                .setResizable(true)
                 .setAutoWidth(true)
                 .setFlexGrow(0);
         Grid.Column<Ranking> lapTimeColumn = grid.addColumn(Ranking::getLapTime)
+                .setResizable(true)
                 .setAutoWidth(true)
-                .setFlexGrow(0);
-        Grid.Column<Ranking> driverNameColumn = grid.addColumn((ValueProvider<Ranking, String>) ranking -> driverService.getDriverNameByPlayerId(ranking.getDriverId()));
-        Grid.Column<Ranking> carModelNameColumn = grid.addColumn(Ranking::getCarModelName);
+                .setFlexGrow(0)
+                .setPartNameGenerator(ranking -> "font-weight-bold");
+        Grid.Column<Ranking> driverNameColumn = grid.addColumn((ValueProvider<Ranking, String>) ranking -> driverService.getDriverNameByPlayerId(ranking.getDriverId()))
+                .setResizable(true);
+        Grid.Column<Ranking> carModelNameColumn = grid.addColumn(Ranking::getCarModelName)
+                .setResizable(true);
 
         List<Ranking> rankings = rankingService.getGlobalRanking();
         GridListDataView<Ranking> dataView = grid.setItems(rankings);
         RankingFilter rankingFilter = new RankingFilter(driverService, dataView);
+        grid.setHeightFull();
+        grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
         grid.getHeaderRows().clear();

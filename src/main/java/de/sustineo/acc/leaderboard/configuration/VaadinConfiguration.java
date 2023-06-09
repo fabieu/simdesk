@@ -16,6 +16,7 @@ import com.vaadin.flow.theme.Theme;
 @PageTitle("ACC Leaderboard")
 @PWA(name = "ACC Leaderboard", shortName = "Leaderboard")
 @Theme(value = "default")
-public class VaadinAppShellConfiguration implements AppShellConfigurator {
+public class VaadinConfiguration implements AppShellConfigurator {
     public static final String APPLICATION_NAME = "ACC Leaderboard";
+    public static final String APPLICATION_NAME_PREFIX = APPLICATION_NAME + " - ";
 }

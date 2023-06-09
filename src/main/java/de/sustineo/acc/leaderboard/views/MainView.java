@@ -18,7 +18,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
-import de.sustineo.acc.leaderboard.configuration.VaadinAppShellConfiguration;
+import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 
 import java.util.Optional;
 
@@ -26,10 +26,10 @@ import java.util.Optional;
  * The main view contains a button and a click listener.
  */
 @Route("")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME)
 public class MainView extends AppLayout {
     private final Tabs menu;
     private H1 viewTitle;
-    private static final String DEFAULT_VIEW_TITLE = VaadinAppShellConfiguration.APPLICATION_NAME;
 
     public MainView() {
         setPrimarySection(Section.NAVBAR);
@@ -52,7 +52,7 @@ public class MainView extends AppLayout {
 
         // Placeholder for the title of the current view.
         // The title will be set after navigation.
-        viewTitle = new H1(DEFAULT_VIEW_TITLE);
+        viewTitle = new H1(VaadinConfiguration.APPLICATION_NAME);
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
@@ -117,10 +117,10 @@ public class MainView extends AppLayout {
         if (getContent() != null) {
             // Select the tab corresponding to currently shown view
             getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
-            viewTitle.setText(DEFAULT_VIEW_TITLE + " - "  + getCurrentPageTitle());
+            viewTitle.setText(VaadinConfiguration.APPLICATION_NAME_PREFIX + getCurrentPageTitle());
         } else {
             menu.setSelectedTab(null);
-            viewTitle.setText(DEFAULT_VIEW_TITLE);
+            viewTitle.setText(VaadinConfiguration.APPLICATION_NAME);
         }
 
         // Close drawer when navigating to different view
