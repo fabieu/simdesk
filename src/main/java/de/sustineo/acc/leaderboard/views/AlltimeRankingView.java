@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Label;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
@@ -59,7 +60,7 @@ public class RankingGlobalView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
         grid.getHeaderRows().clear();
-
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(carGroupColumn).setComponent(createFilterHeader("Car Group", rankingFilter::setCarGroup));
@@ -67,6 +68,15 @@ public class RankingGlobalView extends VerticalLayout {
         headerRow.getCell(lapTimeColumn).setComponent(createFilterHeader("Lap Time", null));
         headerRow.getCell(driverNameColumn).setComponent(createFilterHeader("Driver Name", rankingFilter::setDriverName));
         headerRow.getCell(carModelNameColumn).setComponent(createFilterHeader("Car Model", rankingFilter::setCarModelName));
+
+        SingleSelect<Grid<Ranking>, Ranking> singleSelect = grid.asSingleSelect();
+        singleSelect.addValueChangeListener(e -> {
+           Ranking selectedRanking = e.getValue();
+
+           if (selectedRanking != null) {
+               getUI().ifPresent(ui -> ui.navigate(MainView.class));
+           }
+        });
 
         add(grid);
     }

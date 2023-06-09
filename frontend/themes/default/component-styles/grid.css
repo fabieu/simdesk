@@ -1,9 +1,13 @@
+vaadin-grid::part(row):hover {
+    background-color: var(--lumo-contrast-10pct);
+}
+
 vaadin-grid::part(font-weight-bold) {
     font-weight: bold;
 }
 
 vaadin-grid::part(ranking-car-group-gt3) {
-    background-color: var(--lumo-base-color);
+    background-color: var(--lumo-contrast-5pct);
 }
 
 vaadin-grid::part(ranking-car-group-gt4) {
@@ -11,9 +15,9 @@ vaadin-grid::part(ranking-car-group-gt4) {
 }
 
 vaadin-grid::part(ranking-car-group-tcx) {
-    background-color: rgb(0, 124, 168, 0.25);
+    background-color: rgb(0, 124, 168, 0.2);
 }
 
 vaadin-grid::part(ranking-car-group-gtc) {
-    background-color: rgba(245, 126, 0, 0.4);
+    background-color: rgba(245, 126, 0, 0.3);
 }
