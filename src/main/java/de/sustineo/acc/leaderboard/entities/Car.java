@@ -59,6 +59,10 @@ public class Car {
         carModels.put(61, "Porsche 718 Cayman GT4");
     }
 
+    public static boolean isCarModelValid(Integer carModel) {
+        return carModels.containsKey(carModel);
+    }
+
     public static String getCarNameById(Integer carModel) {
         return carModels.getOrDefault(carModel, DEFAULT_CAR_NAME);
     }

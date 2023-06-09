@@ -32,6 +32,10 @@ public class Track {
         tracks.put("valencia", "Valencia");
     }
 
+    public static boolean isTrackIdValid(String trackId) {
+        return tracks.containsKey(trackId);
+    }
+
     public static String getTrackNameById(String trackId) {
         return tracks.getOrDefault(trackId, DEFAULT_TRACK_NAME);
     }

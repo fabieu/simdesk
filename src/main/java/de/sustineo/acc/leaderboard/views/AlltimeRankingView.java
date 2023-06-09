@@ -28,9 +28,9 @@ import java.util.function.Consumer;
 @Route(value = "ranking/all-time", layout = MainView.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Global Ranking")
 @AnonymousAllowed
-public class RankingGlobalView extends VerticalLayout {
-    public RankingGlobalView(RankingService rankingService, DriverService driverService) {
-        addClassName("ranking-alltime-view");
+public class AlltimeRankingView extends VerticalLayout {
+    public AlltimeRankingView(RankingService rankingService, DriverService driverService) {
+        addClassName("alltime-ranking-view");
         setSizeFull();
 
         Grid<Ranking> grid = new Grid<>(Ranking.class, false);
