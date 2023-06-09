@@ -14,6 +14,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParam;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Ranking;
@@ -71,11 +73,16 @@ public class AlltimeRankingView extends VerticalLayout {
 
         SingleSelect<Grid<Ranking>, Ranking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
-           Ranking selectedRanking = e.getValue();
+            Ranking selectedRanking = e.getValue();
 
-           if (selectedRanking != null) {
-               getUI().ifPresent(ui -> ui.navigate(MainView.class));
-           }
+            if (selectedRanking != null) {
+                getUI().ifPresent(ui -> ui.navigate(AlltimeRankingDetailedView.class,
+                        new RouteParameters(
+                                new RouteParam(AlltimeRankingDetailedView.ROUTE_PARAMETER_CAR_GROUP, selectedRanking.getCarGroup().name().toLowerCase()),
+                                new RouteParam(AlltimeRankingDetailedView.ROUTE_PARAMETER_TRACK_ID, selectedRanking.getTrackId())
+                        )
+                ));
+            }
         });
 
         add(grid);

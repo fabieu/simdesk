@@ -32,8 +32,8 @@ public class Track {
         tracks.put("valencia", "Valencia");
     }
 
-    public static boolean isTrackIdValid(String trackId) {
-        return tracks.containsKey(trackId);
+    public static boolean isValid(String trackId) {
+        return tracks.containsKey(trackId.toLowerCase());
     }
 
     public static String getTrackNameById(String trackId) {
