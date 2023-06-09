@@ -11,15 +11,14 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.data.value.ValueChangeMode;
-import com.vaadin.flow.function.ValueProvider;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.entities.Ranking;
-import de.sustineo.acc.leaderboard.filter.RankingFilter;
+import de.sustineo.acc.leaderboard.entities.GroupRanking;
+import de.sustineo.acc.leaderboard.filter.GroupRankingFilter;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
@@ -35,28 +34,28 @@ public class AllTimeRankingView extends VerticalLayout {
         addClassName("alltime-ranking-view");
         setSizeFull();
 
-        Grid<Ranking> grid = new Grid<>(Ranking.class, false);
-        Grid.Column<Ranking> carGroupColumn = grid.addColumn(Ranking::getCarGroup)
+        Grid<GroupRanking> grid = new Grid<>(GroupRanking.class, false);
+        Grid.Column<GroupRanking> carGroupColumn = grid.addColumn(GroupRanking::getCarGroup)
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setFlexGrow(0);
-        Grid.Column<Ranking> trackNameColumn = grid.addColumn(Ranking::getTrackName)
+        Grid.Column<GroupRanking> trackNameColumn = grid.addColumn(GroupRanking::getTrackName)
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setFlexGrow(0);
-        Grid.Column<Ranking> lapTimeColumn = grid.addColumn(Ranking::getLapTime)
+        Grid.Column<GroupRanking> lapTimeColumn = grid.addColumn(GroupRanking::getLapTime)
                 .setResizable(true)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setPartNameGenerator(ranking -> "font-weight-bold");
-        Grid.Column<Ranking> driverNameColumn = grid.addColumn((ValueProvider<Ranking, String>) ranking -> driverService.getDriverNameByPlayerId(ranking.getDriverId()))
+        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullName())
                 .setResizable(true);
-        Grid.Column<Ranking> carModelNameColumn = grid.addColumn(Ranking::getCarModelName)
+        Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(GroupRanking::getCarModelName)
                 .setResizable(true);
 
-        List<Ranking> rankings = rankingService.getGlobalRanking();
-        GridListDataView<Ranking> dataView = grid.setItems(rankings);
-        RankingFilter rankingFilter = new RankingFilter(driverService, dataView);
+        List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking();
+        GridListDataView<GroupRanking> dataView = grid.setItems(groupRankings);
+        GroupRankingFilter groupRankingFilter = new GroupRankingFilter(driverService, dataView);
         grid.setHeightFull();
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -65,21 +64,21 @@ public class AllTimeRankingView extends VerticalLayout {
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(carGroupColumn).setComponent(createFilterHeader("Car Group", rankingFilter::setCarGroup));
-        headerRow.getCell(trackNameColumn).setComponent(createFilterHeader("Track name", rankingFilter::setTrackName));
+        headerRow.getCell(carGroupColumn).setComponent(createFilterHeader("Car Group", groupRankingFilter::setCarGroup));
+        headerRow.getCell(trackNameColumn).setComponent(createFilterHeader("Track name", groupRankingFilter::setTrackName));
         headerRow.getCell(lapTimeColumn).setComponent(createFilterHeader("Lap Time", null));
-        headerRow.getCell(driverNameColumn).setComponent(createFilterHeader("Driver Name", rankingFilter::setDriverName));
-        headerRow.getCell(carModelNameColumn).setComponent(createFilterHeader("Car Model", rankingFilter::setCarModelName));
+        headerRow.getCell(driverNameColumn).setComponent(createFilterHeader("Driver Name", groupRankingFilter::setDriverName));
+        headerRow.getCell(carModelNameColumn).setComponent(createFilterHeader("Car Model", groupRankingFilter::setCarModelName));
 
-        SingleSelect<Grid<Ranking>, Ranking> singleSelect = grid.asSingleSelect();
+        SingleSelect<Grid<GroupRanking>, GroupRanking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
-            Ranking selectedRanking = e.getValue();
+            GroupRanking selectedGroupRanking = e.getValue();
 
-            if (selectedRanking != null) {
+            if (selectedGroupRanking != null) {
                 getUI().ifPresent(ui -> ui.navigate(AllTimeRankingDetailedView.class,
                         new RouteParameters(
-                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_CAR_GROUP, selectedRanking.getCarGroup().name().toLowerCase()),
-                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_TRACK_ID, selectedRanking.getTrackId())
+                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
+                                new RouteParam(AllTimeRankingDetailedView.ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
                         )
                 ));
             }

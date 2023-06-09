@@ -11,30 +11,15 @@ import lombok.NoArgsConstructor;
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DetailedRanking {
+public class GroupRanking {
     private CarGroup carGroup;
     private String trackId;
     private Long lapTimeMillis;
-    private Long split1Millis;
-    private Long split2Millis;
-    private Long split3Millis;
-    private String driverId;
+    private Driver driver;
     private Integer carModelId;
 
     public String getLapTime() {
         return FormatUtils.formatLapTime(lapTimeMillis);
-    }
-
-    public String getSplit1() {
-        return FormatUtils.formatLapTime(split1Millis);
-    }
-
-    public String getSplit2() {
-        return FormatUtils.formatLapTime(split2Millis);
-    }
-
-    public String getSplit3() {
-        return FormatUtils.formatLapTime(split3Millis);
     }
 
     public String getCarModelName() {

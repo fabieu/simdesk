@@ -1,8 +1,9 @@
 package de.sustineo.acc.leaderboard.services;
 
-import de.sustineo.acc.leaderboard.entities.Driver;
-import de.sustineo.acc.leaderboard.entities.Ranking;
-import de.sustineo.acc.leaderboard.entities.comparator.RankingComparator;
+import de.sustineo.acc.leaderboard.entities.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.GroupRanking;
+import de.sustineo.acc.leaderboard.entities.comparator.DriverRankingComparator;
+import de.sustineo.acc.leaderboard.entities.comparator.GroupRankingComparator;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.mapper.RankingMapper;
 import org.apache.commons.lang3.tuple.Pair;
@@ -17,32 +18,43 @@ import java.util.stream.Collectors;
 @Service
 public class RankingService {
     private final RankingMapper rankingMapper;
-    private final DriverService driverService;
 
-    public RankingService(RankingMapper rankingMapper, DriverService driverService) {
+    public RankingService(RankingMapper rankingMapper) {
         this.rankingMapper = rankingMapper;
-        this.driverService = driverService;
     }
 
-    public List<Ranking> getGlobalRanking() {
-        List<Ranking> rankings = rankingMapper.findGlobalFastestLaps();
-        rankings = getRankingsGroupedByCarGroupAndTrackId(rankings);
+    public List<GroupRanking> getAllTimeGroupRanking() {
+        List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps();
+        groupRankings = getRankingsGroupedByCarGroupAndTrackId(groupRankings);
 
-        return sortRankings(rankings);
+        return sortGroupRankings(groupRankings);
     }
 
-    private List<Ranking> sortRankings(List<Ranking> rankings) {
-        return rankings.stream()
-                .sorted(new RankingComparator())
+    public List<DriverRanking> getAllTimeDriverRanking(String carGroup, String trackId) {
+        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId);
+        driverRankings = getRankingGroupedByDriverId(driverRankings);
+
+        return sortDriverRankings(driverRankings);
+    }
+
+    private List<GroupRanking> sortGroupRankings(List<GroupRanking> groupRankings) {
+        return groupRankings.stream()
+                .sorted(new GroupRankingComparator())
                 .toList();
     }
 
-    private List<Ranking> getRankingsGroupedByCarGroupAndTrackId(List<Ranking> rankings) {
-        Map<Pair<CarGroup, String>, Ranking> fastestLaps = rankings.stream()
+    private List<DriverRanking> sortDriverRankings(List<DriverRanking> driverRankings) {
+        return driverRankings.stream()
+                .sorted(new DriverRankingComparator())
+                .toList();
+    }
+
+    private List<GroupRanking> getRankingsGroupedByCarGroupAndTrackId(List<GroupRanking> groupRankings) {
+        Map<Pair<CarGroup, String>, GroupRanking> fastestLaps = groupRankings.stream()
                 .collect(Collectors.groupingBy(
                         r -> Pair.of(r.getCarGroup(), r.getTrackId()),
                         Collectors.collectingAndThen(
-                                Collectors.minBy(Comparator.comparing(Ranking::getLapTimeMillis)),
+                                Collectors.minBy(Comparator.comparing(GroupRanking::getLapTimeMillis)),
                                 Optional::get
                         ))
                 );
@@ -50,7 +62,16 @@ public class RankingService {
         return fastestLaps.values().stream().toList();
     }
 
-    private Driver getDriver(String playerId) {
-        return driverService.findByPlayerId(playerId);
+    private List<DriverRanking> getRankingGroupedByDriverId(List<DriverRanking> driverRankings) {
+        Map<String, DriverRanking> fastestLaps = driverRankings.stream()
+                .collect(Collectors.groupingBy(
+                        driverRanking -> driverRanking.getDriver().getPlayerId(),
+                        Collectors.collectingAndThen(
+                                Collectors.minBy(Comparator.comparing(DriverRanking::getLapTimeMillis)),
+                                Optional::get
+                        ))
+                );
+
+        return fastestLaps.values().stream().toList();
     }
 }

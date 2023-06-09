@@ -14,4 +14,18 @@ public class Driver {
     private String firstName;
     private String lastName;
     private String shortName;
+
+    public String getFullName() {
+        if (firstName == null || lastName== null) {
+            return null;
+        }
+
+        String driverFullName = String.join(" ", firstName, lastName);
+
+        if (shortName == null) {
+            return driverFullName;
+        } else {
+            return driverFullName + " (" + shortName + ")";
+        }
+    }
 }

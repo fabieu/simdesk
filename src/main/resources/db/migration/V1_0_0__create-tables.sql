@@ -45,5 +45,3 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.laps (
     FOREIGN KEY (session_id) REFERENCES acc_leaderboard.sessions (id),
     FOREIGN KEY (driver_id) REFERENCES acc_leaderboard.drivers (player_id)
 );
-
-CREATE UNIQUE INDEX ux_sessions_file_checksum ON acc_leaderboard.sessions (file_checksum);

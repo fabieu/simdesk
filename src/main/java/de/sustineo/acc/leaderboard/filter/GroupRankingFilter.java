@@ -1,21 +1,21 @@
 package de.sustineo.acc.leaderboard.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import de.sustineo.acc.leaderboard.entities.Ranking;
+import de.sustineo.acc.leaderboard.entities.GroupRanking;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import lombok.Data;
 
 @Data
-public class RankingFilter {
+public class GroupRankingFilter {
     private final DriverService driverService;
-    private final GridListDataView<Ranking> dataView;
+    private final GridListDataView<GroupRanking> dataView;
 
     private String carGroup;
     private String trackName;
     private String driverName;
     private String carModelName;
 
-    public RankingFilter(DriverService driverService, GridListDataView<Ranking> dataView) {
+    public GroupRankingFilter(DriverService driverService, GridListDataView<GroupRanking> dataView) {
         this.driverService = driverService;
         this.dataView = dataView;
         this.dataView.addFilter(this::test);
@@ -41,11 +41,11 @@ public class RankingFilter {
         this.dataView.refreshAll();
     }
 
-    public boolean test(Ranking ranking) {
-        boolean matchesCarGroup = matches(ranking.getCarGroup().name(), carGroup);
-        boolean matchesTrackName = matches(ranking.getTrackName(), trackName);
-        boolean matchesDriverId = matches(driverService.getDriverNameByPlayerId(ranking.getDriverId()), driverName);
-        boolean matchesCarModelName = matches(ranking.getCarModelName(), carModelName);
+    public boolean test(GroupRanking groupRanking) {
+        boolean matchesCarGroup = matches(groupRanking.getCarGroup().name(), carGroup);
+        boolean matchesTrackName = matches(groupRanking.getTrackName(), trackName);
+        boolean matchesDriverId = matches(groupRanking.getDriver().getFullName(), driverName);
+        boolean matchesCarModelName = matches(groupRanking.getCarModelName(), carModelName);
 
         return matchesCarGroup && matchesTrackName && matchesDriverId && matchesCarModelName;
     }

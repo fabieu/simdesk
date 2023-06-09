@@ -27,6 +27,10 @@ public interface SessionMapper {
     List<Session> findAll();
 
     @ResultMap("sessionResultMap")
+    @Select("SELECT * FROM acc_leaderboard.sessions WHERE id = #{id}")
+    Session findById(Integer id);
+
+    @ResultMap("sessionResultMap")
     @Select("SELECT * FROM acc_leaderboard.sessions WHERE file_checksum = #{fileChecksum}")
     Session findByFileChecksum(String fileChecksum);
 

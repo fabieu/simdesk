@@ -1,16 +1,16 @@
 package de.sustineo.acc.leaderboard.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
-import de.sustineo.acc.leaderboard.entities.Ranking;
+import de.sustineo.acc.leaderboard.entities.GroupRanking;
 
-public class CarGroupPartNameGenerator implements SerializableFunction<Ranking, String>{
+public class CarGroupPartNameGenerator implements SerializableFunction<GroupRanking, String>{
     @Override
-    public String apply(Ranking ranking) {
-        if (ranking == null || ranking.getCarGroup() == null) {
+    public String apply(GroupRanking groupRanking) {
+        if (groupRanking == null || groupRanking.getCarGroup() == null) {
             return null;
         }
 
-        String rankingColorGroup = switch (ranking.getCarGroup()) {
+        String rankingColorGroup = switch (groupRanking.getCarGroup()) {
             case GT3 -> "gt3";
             case GT4 -> "gt4";
             case CUP, ST, CHL  -> "gtc";

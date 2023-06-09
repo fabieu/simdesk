@@ -15,24 +15,4 @@ public class DriverService {
     public void upsertDriver(Driver driver) {
         driverMapper.upsert(driver);
     }
-
-    public Driver findByPlayerId(String playerId) {
-        return driverMapper.findByPlayerId(playerId);
-    }
-
-    public String getDriverNameByPlayerId(String playerId) {
-        Driver driver = findByPlayerId(playerId);
-
-        if (driver == null || driver.getFirstName() == null || driver.getLastName() == null) {
-            return null;
-        }
-
-        String driverFullName = String.join(" ", driver.getFirstName(), driver.getLastName());
-
-        if (driver.getShortName() == null) {
-            return driverFullName;
-        } else {
-            return driverFullName + " (" + driver.getShortName() + ")";
-        }
-    }
 }

@@ -1,0 +1,1 @@
+CREATE UNIQUE INDEX ux_sessions_file_checksum ON acc_leaderboard.sessions (file_checksum);
