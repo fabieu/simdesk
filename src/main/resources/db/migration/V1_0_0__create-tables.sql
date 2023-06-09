@@ -33,7 +33,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.laps (
     session_id INT NOT NULL,
     driver_id VARCHAR(18) NOT NULL,
     car_group VARCHAR(3) NOT NULL,
-    car_model INT NOT NULL,
+    car_model_id INT NOT NULL,
     lap_time_millis BIGINT NOT NULL,
     split1_millis BIGINT NOT NULL,
     split2_millis BIGINT NOT NULL,

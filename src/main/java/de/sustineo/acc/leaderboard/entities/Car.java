@@ -59,11 +59,11 @@ public class Car {
         carModels.put(61, "Porsche 718 Cayman GT4");
     }
 
-    public static boolean isCarModelValid(Integer carModel) {
-        return carModels.containsKey(carModel);
+    public static boolean isValid(Integer carModelId) {
+        return carModels.containsKey(carModelId);
     }
 
-    public static String getCarNameById(Integer carModel) {
-        return carModels.getOrDefault(carModel, DEFAULT_CAR_NAME);
+    public static String getCarNameById(Integer carModelId) {
+        return carModels.getOrDefault(carModelId, DEFAULT_CAR_NAME);
     }
 }

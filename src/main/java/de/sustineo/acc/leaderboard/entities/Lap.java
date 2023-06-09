@@ -15,7 +15,7 @@ public class Lap {
     private Integer sessionId;
     private Driver driver;
     private CarGroup carGroup;
-    private Integer carModel;
+    private Integer carModelId;
     private Long lapTimeMillis;
     private Long split1Millis;
     private Long split2Millis;

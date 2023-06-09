@@ -34,7 +34,7 @@ public class LapConverter {
         return Lap.builder()
                 .sessionId(sessionId)
                 .carGroup(accCar.get().getCarGroup())
-                .carModel(accCar.get().getCarModel())
+                .carModelId(accCar.get().getCarModel())
                 .driver(convertToDriver(accDriver.get()))
                 .lapTimeMillis(accLap.getLapTimeMillis())
                 .split1Millis(accLap.getSplits().get(0))
