@@ -117,7 +117,7 @@ public class MainView extends AppLayout {
         if (getContent() != null) {
             // Select the tab corresponding to currently shown view
             getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
-            viewTitle.setText(VaadinConfiguration.APPLICATION_NAME_PREFIX + getCurrentPageTitle());
+            viewTitle.setText(getCurrentPageTitle());
         } else {
             menu.setSelectedTab(null);
             viewTitle.setText(VaadinConfiguration.APPLICATION_NAME);
