@@ -9,11 +9,8 @@ import de.sustineo.acc.leaderboard.entities.mapper.RankingMapper;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.util.HashMap;
 import java.util.List;
-import java.util.Map;
-import java.util.Optional;
-import java.util.stream.Collectors;
 
 @Service
 public class RankingService {
@@ -25,53 +22,55 @@ public class RankingService {
 
     public List<GroupRanking> getAllTimeGroupRanking() {
         List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps();
-        groupRankings = getRankingsGroupedByCarGroupAndTrackId(groupRankings);
-
-        return sortGroupRankings(groupRankings);
+        return getRankingsByCarGroupAndTrackId(groupRankings);
     }
 
+    //TODO: Refactor to improve performance
     public List<DriverRanking> getAllTimeDriverRanking(String carGroup, String trackId) {
         List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId);
-        driverRankings = getRankingGroupedByDriverId(driverRankings);
+        driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);
+        addRanking(driverRankings);
 
-        return sortDriverRankings(driverRankings);
+        return driverRankings;
     }
 
-    private List<GroupRanking> sortGroupRankings(List<GroupRanking> groupRankings) {
-        return groupRankings.stream()
+    private void addRanking(List<DriverRanking> driverRankings) {
+        for (DriverRanking driverRanking : driverRankings){
+            driverRanking.setRanking(driverRankings.indexOf(driverRanking) + 1);
+        }
+    }
+
+    private List<GroupRanking> getRankingsByCarGroupAndTrackId(List<GroupRanking> groupRankings) {
+        HashMap<Pair<CarGroup, String>, GroupRanking> fastestLapsByCarGroupAndTrackId = new HashMap<>();
+
+        for (GroupRanking groupRanking : groupRankings) {
+            Pair<CarGroup, String> key = Pair.of(groupRanking.getCarGroup(), groupRanking.getTrackId());
+            GroupRanking value = fastestLapsByCarGroupAndTrackId.get(key);
+
+            if (value == null || value.getLapTimeMillis() >= groupRanking.getLapTimeMillis()) {
+                fastestLapsByCarGroupAndTrackId.put(key, groupRanking);
+            }
+        }
+
+        return fastestLapsByCarGroupAndTrackId.values().stream()
                 .sorted(new GroupRankingComparator())
                 .toList();
     }
 
-    private List<DriverRanking> sortDriverRankings(List<DriverRanking> driverRankings) {
-        return driverRankings.stream()
+    private List<DriverRanking> getRankingByPlayerIdAndCarModel(List<DriverRanking> driverRankings) {
+        HashMap<Pair<String, Integer>, DriverRanking> fastestLapsByDriverAndCarModel = new HashMap<>();
+
+        for (DriverRanking driverRanking : driverRankings) {
+            Pair<String, Integer> key = Pair.of(driverRanking.getDriver().getPlayerId(), driverRanking.getCarModelId());
+            DriverRanking value = fastestLapsByDriverAndCarModel.get(key);
+
+            if (value == null || value.getLapTimeMillis() >= driverRanking.getLapTimeMillis()) {
+                fastestLapsByDriverAndCarModel.put(key, driverRanking);
+            }
+        }
+
+        return fastestLapsByDriverAndCarModel.values().stream()
                 .sorted(new DriverRankingComparator())
                 .toList();
-    }
-
-    private List<GroupRanking> getRankingsGroupedByCarGroupAndTrackId(List<GroupRanking> groupRankings) {
-        Map<Pair<CarGroup, String>, GroupRanking> fastestLaps = groupRankings.stream()
-                .collect(Collectors.groupingBy(
-                        r -> Pair.of(r.getCarGroup(), r.getTrackId()),
-                        Collectors.collectingAndThen(
-                                Collectors.minBy(Comparator.comparing(GroupRanking::getLapTimeMillis)),
-                                Optional::get
-                        ))
-                );
-
-        return fastestLaps.values().stream().toList();
-    }
-
-    private List<DriverRanking> getRankingGroupedByDriverId(List<DriverRanking> driverRankings) {
-        Map<String, DriverRanking> fastestLaps = driverRankings.stream()
-                .collect(Collectors.groupingBy(
-                        driverRanking -> driverRanking.getDriver().getPlayerId(),
-                        Collectors.collectingAndThen(
-                                Collectors.minBy(Comparator.comparing(DriverRanking::getLapTimeMillis)),
-                                Optional::get
-                        ))
-                );
-
-        return fastestLaps.values().stream().toList();
     }
 }

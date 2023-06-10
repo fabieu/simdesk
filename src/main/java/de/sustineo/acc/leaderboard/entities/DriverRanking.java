@@ -12,6 +12,7 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class DriverRanking {
+    private Integer ranking;
     private CarGroup carGroup;
     private String trackId;
     private Long lapTimeMillis;
@@ -32,6 +33,14 @@ public class DriverRanking {
 
     public String getLapTime() {
         return FormatUtils.formatLapTime(lapTimeMillis);
+    }
+
+    public String getDriverFullName() {
+        return driver.getFullName();
+    }
+
+    public String getSessionDescription() {
+        return session.getDescription();
     }
 
     public String getSplit1() {

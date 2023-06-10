@@ -24,15 +24,18 @@ public interface RankingMapper {
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
-            @Result(property = "split1TimeMillis", column = "split_1_time_millis"),
-            @Result(property = "split2TimeMillis", column = "split_2_time_millis"),
-            @Result(property = "split3TimeMillis", column = "split_3_time_millis"),
+            @Result(property = "split1Millis", column = "split1_millis"),
+            @Result(property = "split2Millis", column = "split2_millis"),
+            @Result(property = "split3Millis", column = "split3_millis"),
             @Result(property = "driver", column = "driver_id", one = @One(select = "de.sustineo.acc.leaderboard.entities.mapper.DriverMapper.findById")),
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.acc.leaderboard.entities.mapper.SessionMapper.findById")),
     })
-    @Select("SELECT laps.car_group, sessions.track_id, laps.lap_time_millis, laps.split1_millis, laps.split2_millis, laps.split3_millis, laps.driver_id, laps.car_model_id, laps.session_id FROM acc_leaderboard.laps " +
-            "LEFT JOIN acc_leaderboard.sessions ON laps.session_id = sessions.id " +
-            "WHERE valid IS TRUE AND laps.car_group = #{carGroup} AND sessions.track_id = #{trackId}")
+    @Select("SELECT * FROM acc_leaderboard.laps INNER JOIN (" +
+            "SELECT laps.car_group, sessions.track_id, laps.driver_id, laps.car_model_id, MIN(laps.lap_time_millis) AS lap_time_millis FROM acc_leaderboard.laps LEFT JOIN acc_leaderboard.sessions ON laps.session_id = sessions.id " +
+            "WHERE valid IS TRUE AND laps.car_group = #{carGroup} AND sessions.track_id = #{trackId}" +
+            "GROUP BY laps.car_model_id, laps.driver_id, laps.car_group, sessions.track_id) fastest_laps " +
+            "ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND laps.lap_time_millis = fastest_laps.lap_time_millis AND laps.car_group = fastest_laps.car_group ORDER BY fastest_laps.lap_time_millis"
+    )
     List<DriverRanking> findAllTimeFastestLapsByTrack(String carGroup, String trackId);
 }

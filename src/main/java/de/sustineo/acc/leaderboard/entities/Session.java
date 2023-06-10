@@ -22,4 +22,8 @@ public class Session {
     private String fileName;
     private String fileDirectory;
     private Boolean importSuccess;
+
+    public String getDescription() {
+        return String.format("%s - %s", sessionType.getDescription(), serverName);
+    }
 }

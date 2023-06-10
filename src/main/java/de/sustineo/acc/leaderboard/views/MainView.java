@@ -86,7 +86,7 @@ public class MainView extends AppLayout {
     private Tab[] createMenuTabs() {
         return new Tab[]{
                 createTab("Home", MainView.class),
-                createTab("All Time Ranking", AllTimeRankingView.class),
+                createTab("All Time Ranking", AllTimeGroupRankingView.class),
                 createTab("Login", LoginView.class),
         };
     }

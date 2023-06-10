@@ -21,3 +21,15 @@ vaadin-grid::part(ranking-car-group-tcx) {
 vaadin-grid::part(ranking-car-group-gtc) {
     background-color: rgba(245, 126, 0, 0.3);
 }
+
+vaadin-grid::part(ranking-podium-first) {
+    background-color: rgba(254, 225, 1, 0.3);
+}
+
+vaadin-grid::part(ranking-podium-second) {
+    background-color: rgba(167, 167, 173, 0.3);
+}
+
+vaadin-grid::part(ranking-podium-third) {
+    background-color: rgba(167, 112, 68, 0.4);
+}
