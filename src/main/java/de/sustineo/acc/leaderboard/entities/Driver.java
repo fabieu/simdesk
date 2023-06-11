@@ -15,13 +15,11 @@ public class Driver extends Entity {
     private String lastName;
     private String shortName;
     private boolean locked;
-    private Integer totalLapsCount;
     private Integer validLapsCount;
     private Integer invalidLapsCount;
-    private Double lapsAccuracy;
     private Instant lastActivity;
 
-    public Double getLapsAccuracy() {
+    public Double getValidLapsPercentage() {
         if (validLapsCount == null || getTotalLapsCount() == null || getTotalLapsCount() <= 0) {
             return 0.0;
         }

@@ -2,6 +2,7 @@ package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
@@ -19,25 +20,47 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
+import org.springframework.boot.info.BuildProperties;
 
+import java.time.LocalDate;
 import java.util.Optional;
 
-/**
- * The main view contains a button and a click listener.
- */
 @Route("")
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
 public class MainView extends AppLayout {
+    private final BuildProperties buildProperties;
     private final Tabs menu;
     private H1 viewTitle;
 
-    public MainView() {
+    public MainView(BuildProperties buildProperties) {
+        this.buildProperties = buildProperties;
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createNavbarContent(), createThemeToggleButton());
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
         setDrawerOpened(false);
+
+        setContent(createMainContent());
+    }
+
+    private Component createMainContent() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+
+        layout.addAndExpand(new H1("Welcome to ACC Leaderboard"));
+        layout.add(createFooterContent(buildProperties));
+
+        return layout;
+    }
+
+    public static Component createFooterContent(BuildProperties buildProperties) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        layout.add(new Text("Made with ❤️ by Fabian Eulitz - © " + LocalDate.now().getYear() + " - Version " + buildProperties.getVersion()));
+        return layout;
     }
 
     private Component createNavbarContent() {

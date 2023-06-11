@@ -1,5 +1,6 @@
 package de.sustineo.acc.leaderboard.views;
 
+import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -11,9 +12,9 @@ import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.GroupRanking;
-import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
@@ -21,10 +22,18 @@ import java.util.List;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
 @AnonymousAllowed
 public class AllTimeGroupRankingView extends VerticalLayout {
-    public AllTimeGroupRankingView(RankingService rankingService, DriverService driverService) {
+    private final RankingService rankingService;
+
+    public AllTimeGroupRankingView(RankingService rankingService, BuildProperties buildProperties) {
+        this.rankingService = rankingService;
         addClassName("alltime-ranking-view");
         setSizeFull();
 
+        addAndExpand(createRankingGrid());
+        add(MainView.createFooterContent(buildProperties));
+    }
+
+    private Component createRankingGrid() {
         Grid<GroupRanking> grid = new Grid<>(GroupRanking.class, false);
         Grid.Column<GroupRanking> carGroupColumn = grid.addColumn(GroupRanking::getCarGroup)
                 .setHeader("Car Group")
@@ -71,6 +80,6 @@ public class AllTimeGroupRankingView extends VerticalLayout {
             }
         });
 
-        add(grid);
+        return grid;
     }
 }

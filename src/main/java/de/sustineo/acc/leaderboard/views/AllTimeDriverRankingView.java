@@ -6,6 +6,7 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -18,6 +19,7 @@ import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.generators.PodiumPartNameGenerator;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
@@ -29,10 +31,12 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
     private final DriverService driverService;
+    private final BuildProperties buildProperties;
 
-    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService) {
+    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService, BuildProperties buildProperties) {
         this.rankingService = rankingService;
         this.driverService = driverService;
+        this.buildProperties = buildProperties;
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
@@ -45,10 +49,26 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
 
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
-            add(createRankingGrid(carGroup, trackId));
+            add(createRankingHeader(carGroup, trackId));
+            addAndExpand(createRankingGrid(carGroup, trackId));
+            add(MainView.createFooterContent(buildProperties));
         } else {
             event.rerouteToError(NotFoundException.class);
         }
+    }
+
+    private Component createRankingHeader(String carGroup, String trackId) {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+
+        // Header displaying the car group and track name
+        H1 header = new H1();
+        header.setText(CarGroup.of(carGroup) + " - " + Track.getTrackNameById(trackId));
+        header.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+
+        layout.add(header);
+
+        return layout;
     }
 
     private Component createRankingGrid(String carGroup, String trackId) {
@@ -91,8 +111,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<DriverRanking> sessionColumn = grid.addColumn(DriverRanking::getSessionDescription)
-                .setHeader("Session")
-                .setResizable(true);
+                .setHeader("Session");
         Grid.Column<DriverRanking> lapCountColumn = grid.addColumn(DriverRanking::getLapCount)
                 .setHeader("Laps")
                 .setAutoWidth(true)
@@ -106,6 +125,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
         grid.setPartNameGenerator(new PodiumPartNameGenerator());
 
         HeaderRow headerRow = grid.appendHeaderRow();

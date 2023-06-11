@@ -15,6 +15,7 @@ import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.filter.DriverFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
@@ -24,13 +25,14 @@ import java.util.List;
 public class DriverView extends VerticalLayout {
     private final DriverService driverService;
 
-    public DriverView(DriverService driverService) {
+    public DriverView(DriverService driverService, BuildProperties buildProperties) {
         this.driverService = driverService;
 
         addClassName("drivers-view");
         setSizeFull();
 
-        add(createDriverGrid());
+        addAndExpand(createDriverGrid());
+        add(MainView.createFooterContent(buildProperties));
     }
 
     private Component createDriverGrid() {
@@ -61,8 +63,8 @@ public class DriverView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Driver> lapsAccuracyColumn = grid.addColumn(driver -> FormatUtils.formatPercentage(driver.getLapsAccuracy()))
-                .setHeader("Lap Accuracy")
+        Grid.Column<Driver> validLapsPercentageColumn = grid.addColumn(driver -> FormatUtils.formatPercentage(driver.getValidLapsPercentage()))
+                .setHeader("Valid Lap %")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);

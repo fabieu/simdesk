@@ -8,4 +8,8 @@ public enum CarGroup {
     public static boolean isValid(String carGroup) {
         return carGroup != null && EnumUtils.isValidEnum(CarGroup.class, carGroup.toUpperCase());
     }
+
+    public static CarGroup of(String carGroup) {
+        return CarGroup.valueOf(carGroup.toUpperCase());
+    }
 }
