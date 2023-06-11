@@ -64,7 +64,7 @@ public class DriverView extends VerticalLayout {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Driver> validLapsPercentageColumn = grid.addColumn(driver -> FormatUtils.formatPercentage(driver.getValidLapsPercentage()))
-                .setHeader("Valid Lap %")
+                .setHeader("Valid Laps %")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
