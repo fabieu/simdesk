@@ -23,6 +23,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.drivers (
     last_name VARCHAR (64),
     short_name VARCHAR(3),
     locked BOOLEAN NOT NULL DEFAULT FALSE,
+    last_activity DATETIME,
     insert_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (player_id)

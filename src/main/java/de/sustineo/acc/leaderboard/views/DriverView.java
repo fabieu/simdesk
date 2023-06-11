@@ -66,13 +66,8 @@ public class DriverView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Driver> firstSeenColumn = grid.addColumn(driver -> FormatUtils.formatDatetime(driver.getInsertDatetime()))
-                .setHeader("First Activity")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<Driver> lastActivity = grid.addColumn(driver -> FormatUtils.formatDatetime(driver.getUpdateDatetime()))
-                .setHeader("Latest Activity")
+        Grid.Column<Driver> lastActivity = grid.addColumn(driver -> FormatUtils.formatDatetime(driver.getLastActivity()))
+                .setHeader("Last Activity")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);

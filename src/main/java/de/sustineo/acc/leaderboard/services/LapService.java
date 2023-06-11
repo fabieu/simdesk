@@ -1,5 +1,6 @@
 package de.sustineo.acc.leaderboard.services;
 
+import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.Lap;
 import de.sustineo.acc.leaderboard.entities.LapCount;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
@@ -25,8 +26,8 @@ public class LapService {
         this.lapConverter = lapConverter;
     }
 
-    public void handleLaps(Integer sessionId, AccSession accSession) {
-        List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession);
+    public void handleLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+        List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
 
         for (Lap lap : laps) {
             driverService.upsertDriver(lap.getDriver());

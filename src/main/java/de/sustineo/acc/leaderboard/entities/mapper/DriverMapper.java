@@ -16,8 +16,7 @@ public interface DriverMapper {
             @Result(property = "lastName", column = "last_name"),
             @Result(property = "shortName", column = "short_name"),
             @Result(property = "locked", column = "locked"),
-            @Result(property = "insertDatetime", column = "insert_datetime"),
-            @Result(property = "updateDatetime", column = "update_datetime"),
+            @Result(property = "lastActivity", column = "last_activity")
     })
     @Select("SELECT * FROM acc_leaderboard.drivers")
     List<Driver> findAll();
@@ -26,15 +25,9 @@ public interface DriverMapper {
     @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
     Driver findById(String playerId);
 
-    @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name) " +
-            "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}) " +
-            "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name)"
+    @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name, last_activity) " +
+            "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity}) " +
+            "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name), last_activity = VALUES(last_activity)"
     )
     void upsert(Driver driver);
-
-    @Select("SELECT COUNT(*) FROM acc_leaderboard.laps WHERE driver_id = #{playerId} AND valid IS TRUE")
-    Integer getValidLapsCount(Driver driver);
-
-    @Select("SELECT COUNT(*) FROM acc_leaderboard.laps WHERE driver_id = #{playerId} AND valid IS FALSE")
-    Integer getInvalidLapsCount(Driver driver);
 }

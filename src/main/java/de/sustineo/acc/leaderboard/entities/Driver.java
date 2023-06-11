@@ -19,8 +19,7 @@ public class Driver extends Entity {
     private Integer validLapsCount;
     private Integer invalidLapsCount;
     private Double lapsAccuracy;
-    private Instant insertDatetime;
-    private Instant updateDatetime;
+    private Instant lastActivity;
 
     public Double getLapsAccuracy() {
         if (validLapsCount == null || getTotalLapsCount() == null || getTotalLapsCount() <= 0) {
