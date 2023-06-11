@@ -1,6 +1,7 @@
 package de.sustineo.acc.leaderboard.entities.mapper;
 
 import de.sustineo.acc.leaderboard.entities.Lap;
+import de.sustineo.acc.leaderboard.entities.LapCount;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -23,6 +24,13 @@ public interface LapMapper {
     })
     @Select("SELECT * FROM acc_leaderboard.laps")
     List<Lap> findAll();
+
+    @Results(id = "driverDetailsResultMap", value = {
+            @Result(property = "valid", column = "valid"),
+            @Result(property = "lapCount", column = "lap_count"),
+    })
+    @Select("SELECT valid, COUNT(valid) AS lap_count FROM acc_leaderboard.laps WHERE driver_id = #{driverId} GROUP BY valid;")
+    List<LapCount> findLapCounts(String driverId);
 
     @Insert("INSERT INTO acc_leaderboard.laps (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
             "VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})")

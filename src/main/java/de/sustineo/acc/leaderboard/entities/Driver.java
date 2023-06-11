@@ -2,6 +2,8 @@ package de.sustineo.acc.leaderboard.entities;
 
 import lombok.*;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -12,6 +14,29 @@ public class Driver extends Entity {
     private String firstName;
     private String lastName;
     private String shortName;
+    private boolean locked;
+    private Integer totalLapsCount;
+    private Integer validLapsCount;
+    private Integer invalidLapsCount;
+    private Double lapsAccuracy;
+    private Instant insertDatetime;
+    private Instant updateDatetime;
+
+    public Double getLapsAccuracy() {
+        if (validLapsCount == null || getTotalLapsCount() == null || getTotalLapsCount() <= 0) {
+            return 0.0;
+        }
+
+        return (double) validLapsCount / (double) getTotalLapsCount();
+    }
+
+    public Integer getTotalLapsCount() {
+        if (validLapsCount == null || invalidLapsCount == null) {
+            return 0;
+        }
+
+        return validLapsCount + invalidLapsCount;
+    }
 
     public String getFullName() {
         if (firstName == null || lastName == null) {

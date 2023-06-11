@@ -87,7 +87,7 @@ public class MainView extends AppLayout {
         return new Tab[]{
                 createTab("Home", MainView.class),
                 createTab("All Time Ranking", AllTimeGroupRankingView.class),
-                createTab("Login", LoginView.class),
+                createTab("Drivers", DriverView.class),
         };
     }
 

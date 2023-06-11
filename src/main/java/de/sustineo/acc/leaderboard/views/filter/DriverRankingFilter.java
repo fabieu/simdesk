@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboard.filter;
+package de.sustineo.acc.leaderboard.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.acc.leaderboard.entities.DriverRanking;
