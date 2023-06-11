@@ -2,9 +2,8 @@ package de.sustineo.acc.leaderboard.entities;
 
 import java.util.HashMap;
 
-public class Track {
+public class Track extends Entity {
     private static final HashMap<String, String> tracks = new HashMap<>();
-    private static final String DEFAULT_TRACK_NAME = "Unknown";
 
     static {
         tracks.put("monza", "Monza");
@@ -37,6 +36,6 @@ public class Track {
     }
 
     public static String getTrackNameById(String trackId) {
-        return tracks.getOrDefault(trackId, DEFAULT_TRACK_NAME);
+        return tracks.getOrDefault(trackId, UNKNOWN);
     }
 }

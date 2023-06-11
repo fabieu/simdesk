@@ -5,9 +5,8 @@ import lombok.Data;
 import java.util.HashMap;
 
 @Data
-public class Car {
+public class Car extends Entity {
     private static final HashMap<Integer, String> carModels = new HashMap<>();
-    private static final String DEFAULT_CAR_NAME = "Unknown";
 
     static {
         carModels.put(0, "Porsche 991 GT3 R");
@@ -64,6 +63,6 @@ public class Car {
     }
 
     public static String getCarNameById(Integer carModelId) {
-        return carModels.getOrDefault(carModelId, DEFAULT_CAR_NAME);
+        return carModels.getOrDefault(carModelId, UNKNOWN);
     }
 }

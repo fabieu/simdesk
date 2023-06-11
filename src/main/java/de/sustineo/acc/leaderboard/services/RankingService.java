@@ -25,7 +25,6 @@ public class RankingService {
         return getRankingsByCarGroupAndTrackId(groupRankings);
     }
 
-    //TODO: Refactor to improve performance
     public List<DriverRanking> getAllTimeDriverRanking(String carGroup, String trackId) {
         List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId);
         driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);

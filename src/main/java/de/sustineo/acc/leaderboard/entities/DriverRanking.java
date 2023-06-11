@@ -2,16 +2,14 @@ package de.sustineo.acc.leaderboard.entities;
 
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class DriverRanking {
+@EqualsAndHashCode(callSuper = false)
+public class DriverRanking extends Entity {
     private Integer ranking;
     private CarGroup carGroup;
     private String trackId;
@@ -22,6 +20,7 @@ public class DriverRanking {
     private Driver driver;
     private Integer carModelId;
     private Session session;
+    private Integer lapCount;
 
     public String getCarModelName() {
         return Car.getCarNameById(carModelId);
@@ -40,6 +39,10 @@ public class DriverRanking {
     }
 
     public String getSessionDescription() {
+        if (session == null) {
+            return PLACEHOLDER;
+        }
+
         return session.getDescription();
     }
 

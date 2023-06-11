@@ -1,16 +1,14 @@
 package de.sustineo.acc.leaderboard.entities;
 
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Lap {
+@EqualsAndHashCode(callSuper = false)
+public class Lap extends Entity {
     private String id;
     private Integer sessionId;
     private Driver driver;

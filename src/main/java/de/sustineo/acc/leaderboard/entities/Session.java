@@ -1,16 +1,14 @@
 package de.sustineo.acc.leaderboard.entities;
 
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Session {
+@EqualsAndHashCode(callSuper = false)
+public class Session extends Entity {
     private Integer id;
     private SessionType sessionType;
     private Integer raceWeekendIndex;

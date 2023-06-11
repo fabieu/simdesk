@@ -1,19 +1,29 @@
 package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.textfield.TextFieldVariant;
+import com.vaadin.flow.data.value.ValueChangeMode;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.DriverRanking;
 import de.sustineo.acc.leaderboard.entities.Track;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
+import de.sustineo.acc.leaderboard.filter.DriverRankingFilter;
+import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.generators.PodiumPartNameGenerator;
 
 import java.util.List;
+import java.util.function.Consumer;
 
 @Route(value = "ranking/all-time/:carGroup/:trackId", layout = MainView.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
@@ -22,9 +32,11 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
+    private final DriverService driverService;
 
-    public AllTimeDriverRankingView(RankingService rankingService) {
+    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService) {
         this.rankingService = rankingService;
+        this.driverService = driverService;
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
@@ -49,8 +61,9 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setHeader("#")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<DriverRanking> driverColumn = grid.addColumn(DriverRanking::getDriverFullName)
+                .setSortable(true)
+                .setTextAlign(ColumnTextAlign.CENTER);
+        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRanking::getDriverFullName)
                 .setHeader("Driver")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -84,15 +97,45 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         Grid.Column<DriverRanking> sessionColumn = grid.addColumn(DriverRanking::getSessionDescription)
                 .setHeader("Session")
                 .setResizable(true);
+        Grid.Column<DriverRanking> lapCountColumn = grid.addColumn(DriverRanking::getLapCount)
+                .setHeader("Laps")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END);
 
         List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
-        grid.setItems(driverRankings);
+        GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
+        DriverRankingFilter driverRankingFilter = new DriverRankingFilter(driverService, dataView);
         grid.setHeightFull();
-        grid.setMultiSort(true);
+        grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new PodiumPartNameGenerator());
 
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(driverNameColumn).setComponent(createFilterHeader(driverRankingFilter::setDriverName));
+        headerRow.getCell(carModelColumn).setComponent(createFilterHeader(driverRankingFilter::setCarModelName));
+        headerRow.getCell(sessionColumn).setComponent(createFilterHeader(driverRankingFilter::setSessionDescription));
+
         return grid;
+    }
+
+    private static Component createFilterHeader(Consumer<String> filterChangeConsumer) {
+        VerticalLayout layout = new VerticalLayout();
+
+        TextField textField = new TextField();
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
+        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
+        textField.setWidthFull();
+        textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
+        textField.setClearButtonVisible(true);
+        textField.setPlaceholder("Search");
+        textField.setPrefixComponent(VaadinIcon.SEARCH.create());
+        layout.add(textField);
+
+        layout.getThemeList().clear();
+        layout.getThemeList().add("spacing-xs");
+
+        return layout;
     }
 }

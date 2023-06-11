@@ -1,23 +1,21 @@
 package de.sustineo.acc.leaderboard.entities;
 
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class Driver {
+@EqualsAndHashCode(callSuper = false)
+public class Driver extends Entity {
     private String playerId;
     private String firstName;
     private String lastName;
     private String shortName;
 
     public String getFullName() {
-        if (firstName == null || lastName== null) {
-            return null;
+        if (firstName == null || lastName == null) {
+            return UNKNOWN;
         }
 
         String driverFullName = String.join(" ", firstName, lastName);

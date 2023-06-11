@@ -2,16 +2,14 @@ package de.sustineo.acc.leaderboard.entities;
 
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
-import lombok.AllArgsConstructor;
-import lombok.Builder;
-import lombok.Data;
-import lombok.NoArgsConstructor;
+import lombok.*;
 
 @Data
 @Builder
 @AllArgsConstructor
 @NoArgsConstructor
-public class GroupRanking {
+@EqualsAndHashCode(callSuper = false)
+public class GroupRanking extends Entity {
     private CarGroup carGroup;
     private String trackId;
     private Long lapTimeMillis;
