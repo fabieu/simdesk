@@ -38,14 +38,6 @@ public class DriverRanking extends Entity {
         return driver.getFullName();
     }
 
-    public String getSessionDescription() {
-        if (session == null) {
-            return PLACEHOLDER;
-        }
-
-        return session.getDescription();
-    }
-
     public String getSplit1() {
         return FormatUtils.formatLapTime(split1Millis);
     }

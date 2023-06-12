@@ -1,10 +1,12 @@
 package de.sustineo.acc.leaderboard.entities;
 
 import lombok.Data;
+import lombok.EqualsAndHashCode;
 
 import java.util.HashMap;
 
 @Data
+@EqualsAndHashCode(callSuper = false)
 public class Car extends Entity {
     private static final HashMap<Integer, String> carModels = new HashMap<>();
 

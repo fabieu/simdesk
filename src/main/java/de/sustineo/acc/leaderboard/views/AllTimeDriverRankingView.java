@@ -110,12 +110,19 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<DriverRanking> sessionColumn = grid.addColumn(DriverRanking::getSessionDescription)
-                .setHeader("Session");
+        Grid.Column<DriverRanking> sessionTypeDescriptionColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getSessionType().getDescription())
+                .setHeader("Session Type")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<DriverRanking> serverNameColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getServerName())
+                .setHeader("Server Name")
+                .setSortable(true);
         Grid.Column<DriverRanking> lapCountColumn = grid.addColumn(DriverRanking::getLapCount)
                 .setHeader("Laps")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
+                .setSortable(true)
                 .setTextAlign(ColumnTextAlign.END);
 
         List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
@@ -131,7 +138,8 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setDriverName));
         headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setCarModelName));
-        headerRow.getCell(sessionColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setSessionDescription));
+        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setServerName));
+        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setSessionTypeDescription));
 
         return grid;
     }

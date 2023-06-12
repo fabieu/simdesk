@@ -13,7 +13,8 @@ public class DriverRankingFilter {
 
     private String driverName;
     private String carModelName;
-    private String sessionDescription;
+    private String serverName;
+    private String sessionTypeDescription;
 
     public DriverRankingFilter(DriverService driverService, GridListDataView<DriverRanking> dataView) {
         this.driverService = driverService;
@@ -31,17 +32,23 @@ public class DriverRankingFilter {
         this.dataView.refreshAll();
     }
 
-    public void setSessionDescription(String sessionDescription) {
-        this.sessionDescription = sessionDescription;
+    public void setServerName(String serverName) {
+        this.serverName = serverName;
+        this.dataView.refreshAll();
+    }
+
+    public void setSessionTypeDescription(String sessionTypeDescription) {
+        this.sessionTypeDescription = sessionTypeDescription;
         this.dataView.refreshAll();
     }
 
     public boolean test(DriverRanking driverRanking) {
         boolean matchesDriverId = matches(driverRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(driverRanking.getCarModelName(), carModelName);
-        boolean matchesSessionDescription = matches(driverRanking.getSessionDescription(), sessionDescription);
+        boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
+        boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);
 
-        return matchesDriverId && matchesCarModelName && matchesSessionDescription;
+        return matchesDriverId && matchesCarModelName && matchesServerName && matchesSessionTypeDescription;
     }
 
     private boolean matches(String value, String searchTerm) {
