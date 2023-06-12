@@ -1,4 +1,4 @@
-FROM adoptopenjdk/openjdk17:alpine
-ARG JAR_FILE=build/libs/leaderboard-*.jar
-COPY ${JAR_FILE} app.jar
+FROM openjdk:17-jdk-slim
+COPY build/libs/leaderboard-*.jar app.jar
+EXPOSE 8080
 ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app.jar"]
