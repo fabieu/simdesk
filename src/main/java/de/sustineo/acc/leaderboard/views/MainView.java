@@ -16,7 +16,7 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
@@ -25,42 +25,19 @@ import org.springframework.boot.info.BuildProperties;
 import java.time.LocalDate;
 import java.util.Optional;
 
-@Route("")
+
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
-public class MainView extends AppLayout {
-    private final BuildProperties buildProperties;
+public class MainView extends AppLayout implements RouterLayout {
     private final Tabs menu;
     private H1 viewTitle;
 
-    public MainView(BuildProperties buildProperties) {
-        this.buildProperties = buildProperties;
+    public MainView() {
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createNavbarContent(), createThemeToggleButton());
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
         setDrawerOpened(false);
-
-        setContent(createMainContent());
-    }
-
-    private Component createMainContent() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-
-        layout.addAndExpand(new H1("Welcome to ACC Leaderboard"));
-        layout.add(createFooterContent(buildProperties));
-
-        return layout;
-    }
-
-    public static Component createFooterContent(BuildProperties buildProperties) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidthFull();
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        layout.add(new Text("Made with ❤️ by Fabian Eulitz - © " + LocalDate.now().getYear() + " - Version " + buildProperties.getVersion()));
-        return layout;
     }
 
     private Component createNavbarContent() {
@@ -108,7 +85,7 @@ public class MainView extends AppLayout {
 
     private Tab[] createMenuTabs() {
         return new Tab[]{
-                createTab("Home", MainView.class),
+                createTab("Dashboard", DashboardView.class),
                 createTab("All Time Ranking", AllTimeGroupRankingView.class),
                 createTab("Drivers", DriverView.class),
         };
@@ -131,6 +108,15 @@ public class MainView extends AppLayout {
                 themeList.add(Lumo.DARK);
             }
         });
+    }
+
+    public static Component createFooterContent(BuildProperties buildProperties) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        layout.add(new Text("Made with ❤️ by Fabian Eulitz - © " + LocalDate.now().getYear() + " - Version " + buildProperties.getVersion()));
+        return layout;
     }
 
     @Override
