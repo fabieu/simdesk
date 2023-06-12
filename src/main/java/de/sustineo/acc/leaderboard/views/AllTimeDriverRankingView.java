@@ -79,6 +79,10 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER);
+        Grid.Column<DriverRanking> weatherColumn = grid.addComponentColumn(driverRanking -> ComponentUtils.getWeatherIcon(driverRanking.getSession()))
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.CENTER);
         Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRanking::getDriverFullName)
                 .setHeader("Driver")
                 .setAutoWidth(true)
