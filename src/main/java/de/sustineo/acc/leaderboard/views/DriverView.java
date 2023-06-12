@@ -37,11 +37,11 @@ public class DriverView extends VerticalLayout {
 
     private Component createDriverGrid() {
         Grid<Driver> grid = new Grid<>(Driver.class, false);
-        Grid.Column<Driver> firstNameColumn = grid.addColumn(Driver::getFirstName)
-                .setHeader("First Name")
-                .setSortable(true);
         Grid.Column<Driver> lastNameColumn = grid.addColumn(Driver::getLastName)
                 .setHeader("Last Name")
+                .setSortable(true);
+        Grid.Column<Driver> firstNameColumn = grid.addColumn(Driver::getFirstName)
+                .setHeader("First Name")
                 .setSortable(true);
         Grid.Column<Driver> shortNameColumn = grid.addColumn(Driver::getShortName)
                 .setHeader("Short Name")
