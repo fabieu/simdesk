@@ -14,16 +14,16 @@ import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.DriverRanking;
 import de.sustineo.acc.leaderboard.entities.Track;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
+import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.generators.PodiumPartNameGenerator;
-import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
-@Route(value = "ranking/all-time/:carGroup/:trackId", layout = MainView.class)
+@Route(value = "ranking/all-time/:carGroup/:trackId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
 @AnonymousAllowed
 public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEnterObserver {
@@ -31,12 +31,10 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
     private final DriverService driverService;
-    private final BuildProperties buildProperties;
 
-    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService, BuildProperties buildProperties) {
+    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService) {
         this.rankingService = rankingService;
         this.driverService = driverService;
-        this.buildProperties = buildProperties;
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
@@ -51,7 +49,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
             add(createRankingHeader(carGroup, trackId));
             addAndExpand(createRankingGrid(carGroup, trackId));
-            add(MainView.createFooterContent(buildProperties));
+            add(ComponentUtils.createFooter());
         } else {
             event.rerouteToError(NotFoundException.class);
         }

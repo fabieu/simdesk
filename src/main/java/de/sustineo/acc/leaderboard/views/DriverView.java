@@ -11,28 +11,28 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Driver;
+import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.filter.DriverFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
-import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
-@Route(value = "drivers", layout = MainView.class)
+@Route(value = "drivers", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Drivers")
 @AnonymousAllowed
 public class DriverView extends VerticalLayout {
     private final DriverService driverService;
 
-    public DriverView(DriverService driverService, BuildProperties buildProperties) {
+    public DriverView(DriverService driverService) {
         this.driverService = driverService;
 
         addClassName("drivers-view");
         setSizeFull();
 
         addAndExpand(createDriverGrid());
-        add(MainView.createFooterContent(buildProperties));
+        add(ComponentUtils.createFooter());
     }
 
     private Component createDriverGrid() {

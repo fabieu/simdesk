@@ -12,25 +12,25 @@ import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.GroupRanking;
+import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
-import org.springframework.boot.info.BuildProperties;
 
 import java.util.List;
 
-@Route(value = "ranking/all-time", layout = MainView.class)
+@Route(value = "ranking/all-time", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
 @AnonymousAllowed
 public class AllTimeGroupRankingView extends VerticalLayout {
     private final RankingService rankingService;
 
-    public AllTimeGroupRankingView(RankingService rankingService, BuildProperties buildProperties) {
+    public AllTimeGroupRankingView(RankingService rankingService) {
         this.rankingService = rankingService;
         addClassName("alltime-ranking-view");
         setSizeFull();
 
         addAndExpand(createRankingGrid());
-        add(MainView.createFooterContent(buildProperties));
+        add(ComponentUtils.createFooter());
     }
 
     private Component createRankingGrid() {
