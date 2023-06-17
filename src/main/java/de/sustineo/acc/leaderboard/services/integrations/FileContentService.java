@@ -20,6 +20,7 @@ import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.*;
 import java.util.List;
+import java.util.Set;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
@@ -84,10 +85,10 @@ public class FileContentService {
 
     @EventListener(ApplicationReadyEvent.class)
     public void readAllSessionFiles() throws IOException {
-        List<String> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
+        Set<Path> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
 
-        for (String watchDirectory : watchDirectories) {
-            try (Stream<Path> pathStream = Files.walk(Paths.get(watchDirectory))) {
+        for (Path watchDirectory : watchDirectories) {
+            try (Stream<Path> pathStream = Files.walk(watchDirectory)) {
                 pathStream
                         .filter(Files::isRegularFile)
                         .filter(FileService::isSessionFile)

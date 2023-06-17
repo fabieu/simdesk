@@ -1,5 +1,6 @@
 package de.sustineo.acc.leaderboard.configuration;
 
+import de.sustineo.acc.leaderboard.services.FileService;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
@@ -8,20 +9,26 @@ import org.springframework.context.annotation.Configuration;
 
 import java.io.IOException;
 import java.nio.file.*;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log
 @Configuration
 @Getter
 public class FileContentConfiguration {
-    public static List<String> WATCH_DIRECTORIES;
+    private final FileService fileService;
+    public static Set<Path> WATCH_DIRECTORIES = new HashSet<>();
     public static final Map<WatchKey, Path> watchKeyMap = new HashMap<>();
+
+    public FileContentConfiguration(FileService fileService) {
+        this.fileService = fileService;
+    }
 
     @Value("${leaderboard.results.folder}")
     public void setWatchDirectories(List<String> folderPaths) {
-        FileContentConfiguration.WATCH_DIRECTORIES = folderPaths;
+        for (String folderPath :  folderPaths){
+            Set<Path> directories = fileService.listDirectories(Path.of(folderPath));
+            FileContentConfiguration.WATCH_DIRECTORIES.addAll(directories);
+        }
     }
 
     public List<Path> getRegisteredWatchDirectories() {
@@ -35,8 +42,7 @@ public class FileContentConfiguration {
         WatchService watchService = FileSystems.getDefault().newWatchService();
 
         if (WATCH_DIRECTORIES != null) {
-            for (String watchDirectory : WATCH_DIRECTORIES) {
-                Path path = Paths.get(watchDirectory);
+            for (Path path : WATCH_DIRECTORIES) {
 
                 if (!Files.isDirectory(path)) {
                     throw new RuntimeException("Incorrect monitoring folder: " + path);
