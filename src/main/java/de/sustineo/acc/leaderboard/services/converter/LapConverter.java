@@ -51,7 +51,7 @@ public class LapConverter {
                 .firstName(accDriver.getFirstName())
                 .lastName(accDriver.getLastName())
                 .shortName(accDriver.getShortName())
-                .lastActivity(fileMetadata.getCreationDatetime())
+                .lastActivity(fileMetadata.getModifiedDatetime())
                 .build();
     }
 }

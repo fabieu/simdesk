@@ -22,6 +22,7 @@ import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.views.AllTimeGroupRankingView;
 import de.sustineo.acc.leaderboard.views.DriverView;
 import de.sustineo.acc.leaderboard.views.MainView;
+import de.sustineo.acc.leaderboard.views.SessionView;
 
 import java.util.Optional;
 
@@ -86,7 +87,8 @@ public class MainLayout extends AppLayout implements RouterLayout {
     private Tab[] createMenuTabs() {
         return new Tab[]{
                 createTab("Dashboard", MainView.class),
-                createTab("All Time Ranking", AllTimeGroupRankingView.class),
+                createTab("Ranking (All-Time)", AllTimeGroupRankingView.class),
+                createTab("Sessions", SessionView.class),
                 createTab("Drivers", DriverView.class),
         };
     }

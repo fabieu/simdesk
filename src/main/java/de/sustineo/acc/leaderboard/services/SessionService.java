@@ -9,6 +9,8 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Log
 @Service
 public class SessionService {
@@ -21,6 +23,14 @@ public class SessionService {
         this.sessionConverter = sessionConverter;
         this.sessionMapper = sessionMapper;
         this.lapService = lapService;
+    }
+
+    public boolean sessionExists(Integer sessionId) {
+        return sessionMapper.findById(sessionId) != null;
+    }
+
+    public List<Session> getAllSessions() {
+        return sessionMapper.findAll();
     }
 
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
@@ -36,9 +46,9 @@ public class SessionService {
         }
 
         // Insert session first to get the id (auto increment)
-        insertSession(session);
+        sessionMapper.insert(session);
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
-        setImportSuccess(session);
+        sessionMapper.setImportSuccess(session);
     }
 
     private boolean sessionImported(Session session) {
@@ -49,13 +59,5 @@ public class SessionService {
         }
 
         return existingSession.getImportSuccess();
-    }
-
-    private void insertSession(Session session) {
-        sessionMapper.insert(session);
-    }
-
-    private void setImportSuccess(Session session) {
-        sessionMapper.setImportSuccess(session);
     }
 }

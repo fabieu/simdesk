@@ -3,6 +3,8 @@ package de.sustineo.acc.leaderboard.entities;
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import lombok.*;
 
+import java.time.Instant;
+
 @Data
 @Builder
 @NoArgsConstructor
@@ -16,8 +18,13 @@ public class Session extends Entity {
     private String trackId;
     private Boolean wetSession;
     private Integer driverCount;
+    private Instant sessionDatetime;
     private String fileChecksum;
     private String fileName;
     private String fileDirectory;
     private Boolean importSuccess;
+
+    public String getTrackName() {
+        return Track.getTrackNameById(trackId);
+    }
 }

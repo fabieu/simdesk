@@ -6,6 +6,7 @@ import lombok.extern.java.Log;
 import java.io.IOException;
 import java.math.BigInteger;
 import java.nio.file.Files;
+import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
 import java.security.MessageDigest;
@@ -21,7 +22,7 @@ public class FileMetadata {
     private Path directory;
     private String name;
     private String checksum;
-    private Instant creationDatetime;
+    private Instant modifiedDatetime;
 
     public FileMetadata(Path file) {
         this.file = file;
@@ -29,14 +30,14 @@ public class FileMetadata {
         this.directory = file.getParent();
         this.name = file.getFileName().toString();
         this.checksum = calculateChecksum();
-        this.creationDatetime = calculateCreationDatetime();
+        this.modifiedDatetime = calculateModifiedDatetime();
     }
 
-    private Instant calculateCreationDatetime() {
+    private Instant calculateModifiedDatetime() {
         try {
-            FileTime creationTime = (FileTime) Files.getAttribute(file, "creationTime");
-            return creationTime.toInstant();
-        } catch (IOException ignored) {
+            FileTime modifiedTime = Files.getLastModifiedTime(file, LinkOption.NOFOLLOW_LINKS);
+            return modifiedTime.toInstant();
+        } catch (IOException e) {
             return null;
         }
     }

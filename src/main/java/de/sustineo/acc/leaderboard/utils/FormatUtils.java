@@ -22,8 +22,7 @@ public class FormatUtils {
         return String.format("%.2f", value * 100) + "%";
     }
     public static String formatDatetime(Instant instant) {
-        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT)
-                .withZone(ZoneId.systemDefault());;
+        DateTimeFormatter formatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(ZoneId.systemDefault());;
         return formatter.format(instant);
     }
 }

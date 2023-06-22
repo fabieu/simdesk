@@ -8,6 +8,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.sessions (
     track_id VARCHAR(32) NOT NULL,
     wet_session BOOLEAN NOT NULL,
     driver_count INT NOT NULL,
+    session_datetime DATETIME NOT NULL DEFAULT CURRENT_TIMESTAMP,
     file_checksum VARCHAR(64) NOT NULL,
     file_name VARCHAR(64) NOT NULL,
     file_directory TEXT NOT NULL,
