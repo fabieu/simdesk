@@ -69,8 +69,10 @@ public class DriverRankingRenderer {
     private static String getTimeColor(Long gapMillis) {
         if (gapMillis < 0) {
             return "--lumo-success-text-color";
+        } else if (gapMillis == 0) {
+            return "--lumo-secondary-text-color";
         } else {
-            return "--lumo-error-color";
+            return "--lumo-error-text-color";
         }
     }
 }

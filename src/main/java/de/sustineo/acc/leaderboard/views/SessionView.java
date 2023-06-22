@@ -88,9 +88,6 @@ public class SessionView extends VerticalLayout {
             }
         });
 
-
-
-
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setServerName));
         headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setTrackName));
