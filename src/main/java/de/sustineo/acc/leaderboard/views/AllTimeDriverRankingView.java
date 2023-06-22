@@ -20,6 +20,7 @@ import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.generators.PodiumPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.renderers.DriverRankingRenderer;
 
 import java.util.List;
 
@@ -70,6 +71,9 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     }
 
     private Component createRankingGrid(String carGroup, String trackId) {
+        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
+        DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
+
         Grid<DriverRanking> grid = new Grid<>(DriverRanking.class, false);
         Grid.Column<DriverRanking> rankingColumn = grid.addColumn(DriverRanking::getRanking)
                 .setHeader("#")
@@ -86,27 +90,31 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<DriverRanking> lapTimeColumn = grid.addColumn(DriverRanking::getLapTime)
+        Grid.Column<DriverRanking> lapTimeColumn = grid.addColumn(DriverRankingRenderer.createLapTimeRenderer(topDriverRanking))
                 .setHeader("Lap Time")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setPartNameGenerator(ranking -> "font-weight-bold")
-                .setSortable(true);
-        Grid.Column<DriverRanking> split1Column = grid.addColumn(DriverRanking::getSplit1)
+                .setSortable(true)
+                .setComparator(DriverRanking::getLapTimeMillis);
+        Grid.Column<DriverRanking> split1Column = grid.addColumn(DriverRankingRenderer.createSplit1Renderer(topDriverRanking))
                 .setHeader("Split 1")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<DriverRanking> split2Column = grid.addColumn(DriverRanking::getSplit2)
+                .setSortable(true)
+                .setComparator(DriverRanking::getSplit1Millis);
+        Grid.Column<DriverRanking> split2Column = grid.addColumn(DriverRankingRenderer.createSplit2Renderer(topDriverRanking))
                 .setHeader("Split 2")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<DriverRanking> split3Column = grid.addColumn(DriverRanking::getSplit3)
+                .setSortable(true)
+                .setComparator(DriverRanking::getSplit2Millis);
+        Grid.Column<DriverRanking> split3Column = grid.addColumn(DriverRankingRenderer.createSplit3Renderer(topDriverRanking))
                 .setHeader("Split 3")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(DriverRanking::getSplit3Millis);
         Grid.Column<DriverRanking> carModelColumn = grid.addColumn(DriverRanking::getCarModelName)
                 .setHeader("Car Model")
                 .setAutoWidth(true)
@@ -127,7 +135,6 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.END);
 
-        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
         DriverRankingFilter driverRankingFilter = new DriverRankingFilter(driverService, dataView);
         grid.setHeightFull();

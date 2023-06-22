@@ -11,7 +11,11 @@ public class FormatUtils {
     private final static String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
 
     public static String formatLapTime(Long millis) {
-        return DurationFormatUtils.formatDuration(millis, LAP_TIME_FORMAT, true);
+        if (millis >= 0) {
+            return DurationFormatUtils.formatDuration(millis, LAP_TIME_FORMAT, true);
+        } else {
+            return "-" + DurationFormatUtils.formatDuration(millis * -1, LAP_TIME_FORMAT, true);
+        }
     }
 
     public static String formatPercentage(Double value) {
