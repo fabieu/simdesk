@@ -1,6 +1,5 @@
 package de.sustineo.acc.leaderboard.services.converter;
 
-import de.sustineo.acc.leaderboard.entities.Driver;
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.Lap;
 import de.sustineo.acc.leaderboard.entities.json.AccCar;
@@ -15,6 +14,12 @@ import java.util.stream.Collectors;
 
 @Service
 public class LapConverter {
+    private final DriverConverter driverConverter;
+
+    public LapConverter(DriverConverter driverConverter) {
+        this.driverConverter = driverConverter;
+    }
+
     public List<Lap> convertToLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
         return accSession.getLaps().stream()
                 .map(accLap -> convertToLap(sessionId, accLap, accSession, fileMetadata))
@@ -36,22 +41,12 @@ public class LapConverter {
                 .sessionId(sessionId)
                 .carGroup(accCar.get().getCarGroup())
                 .carModelId(accCar.get().getCarModel())
-                .driver(convertToDriver(accDriver.get(), fileMetadata))
+                .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
                 .lapTimeMillis(accLap.getLapTimeMillis())
                 .split1Millis(accLap.getSplits().get(0))
                 .split2Millis(accLap.getSplits().get(1))
                 .split3Millis(accLap.getSplits().get(2))
                 .valid(accLap.getValid())
-                .build();
-    }
-
-    private Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {
-        return Driver.builder()
-                .playerId(accDriver.getPlayerId())
-                .firstName(accDriver.getFirstName())
-                .lastName(accDriver.getLastName())
-                .shortName(accDriver.getShortName())
-                .lastActivity(fileMetadata.getModifiedDatetime())
                 .build();
     }
 }

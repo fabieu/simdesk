@@ -19,6 +19,10 @@ public class DriverService {
         this.lapService = lapService;
     }
 
+    public void upsertDrivers(List<Driver> drivers) {
+        drivers.forEach(this::upsertDriver);
+    }
+
     public void upsertDriver(Driver driver) {
         driverMapper.upsert(driver);
     }

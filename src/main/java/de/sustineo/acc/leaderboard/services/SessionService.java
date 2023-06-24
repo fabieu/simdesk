@@ -15,14 +15,16 @@ import java.util.List;
 @Service
 public class SessionService {
     private final LapService lapService;
+    private final LeaderboardService leaderboardService;
     private final SessionConverter sessionConverter;
     private final SessionMapper sessionMapper;
 
     @Autowired
-    public SessionService(SessionConverter sessionConverter, SessionMapper sessionMapper, LapService lapService) {
+    public SessionService(SessionConverter sessionConverter, SessionMapper sessionMapper, LapService lapService, LeaderboardService leaderboardService) {
         this.sessionConverter = sessionConverter;
         this.sessionMapper = sessionMapper;
         this.lapService = lapService;
+        this.leaderboardService = leaderboardService;
     }
 
     public boolean sessionExists(Integer sessionId) {
@@ -47,7 +49,12 @@ public class SessionService {
 
         // Insert session first to get the id (auto increment)
         sessionMapper.insert(session);
+
+        // Actual processing of the session results
+        leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
+
+        // Mark session as successfully imported
         sessionMapper.setImportSuccess(session);
     }
 

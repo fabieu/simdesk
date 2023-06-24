@@ -25,6 +25,10 @@ public interface DriverMapper {
     @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
     Driver findById(String playerId);
 
+    @ResultMap("driverResultMap")
+    @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id IN (SELECT player_id FROM acc_leaderboard.leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId})")
+    List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
+
     @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name, last_activity) " +
             "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity}) " +
             "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name), last_activity = VALUES(last_activity)"
