@@ -21,7 +21,6 @@ public interface SessionMapper {
             @Result(property = "fileChecksum", column = "file_checksum"),
             @Result(property = "fileName", column = "file_name"),
             @Result(property = "fileDirectory", column = "file_directory"),
-            @Result(property = "importSuccess", column = "import_success"),
     })
     @Select("SELECT * FROM acc_leaderboard.sessions ORDER BY session_datetime DESC")
     List<Session> findAll();
@@ -38,7 +37,4 @@ public interface SessionMapper {
             "VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{driverCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Session session);
-
-    @Update("UPDATE acc_leaderboard.sessions SET import_success = 1 WHERE id = #{id}")
-    void setImportSuccess(Session session);
 }

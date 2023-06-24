@@ -22,7 +22,6 @@ public class Session extends Entity {
     private String fileChecksum;
     private String fileName;
     private String fileDirectory;
-    private Boolean importSuccess;
 
     public String getTrackName() {
         return Track.getTrackNameById(trackId);

@@ -8,6 +8,7 @@ import de.sustineo.acc.leaderboard.services.converter.SessionConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -35,6 +36,7 @@ public class SessionService {
         return sessionMapper.findAll();
     }
 
+    @Transactional
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
         if (accSession.getLaps().isEmpty()) {
             log.info(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
@@ -42,7 +44,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        if (sessionImported(session)){
+        if (sessionExists(session)){
             log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }
@@ -53,18 +55,10 @@ public class SessionService {
         // Actual processing of the session results
         leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
-
-        // Mark session as successfully imported
-        sessionMapper.setImportSuccess(session);
     }
 
-    private boolean sessionImported(Session session) {
+    private boolean sessionExists(Session session) {
         Session existingSession = sessionMapper.findByFileChecksum(session.getFileChecksum());
-
-        if (existingSession == null) {
-            return false;
-        }
-
-        return existingSession.getImportSuccess();
+        return existingSession != null;
     }
 }

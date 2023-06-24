@@ -13,7 +13,6 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.sessions
     file_checksum      VARCHAR(64) NOT NULL,
     file_name          VARCHAR(64) NOT NULL,
     file_directory     TEXT        NOT NULL,
-    import_success     BOOLEAN     NOT NULL DEFAULT FALSE,
     insert_datetime    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
     update_datetime    DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
     PRIMARY KEY (id)
