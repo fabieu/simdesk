@@ -17,7 +17,7 @@ public class Session extends Entity {
     private String serverName;
     private String trackId;
     private Boolean wetSession;
-    private Integer driverCount;
+    private Integer carCount;
     private Instant sessionDatetime;
     private String fileChecksum;
     private String fileName;

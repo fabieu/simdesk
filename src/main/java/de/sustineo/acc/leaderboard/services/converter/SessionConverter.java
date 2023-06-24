@@ -14,7 +14,7 @@ public class SessionConverter {
                 .serverName(accSession.getServerName())
                 .trackId(accSession.getTrackName())
                 .wetSession(accSession.getSessionResult().getIsWetSession())
-                .driverCount(accSession.getSessionResult().getLeaderboardLines().size())
+                .carCount(accSession.getSessionResult().getLeaderboardLines().size())
                 .sessionDatetime(fileMetadata.getModifiedDatetime())
                 .fileChecksum(fileMetadata.getChecksum())
                 .fileName(fileMetadata.getName())

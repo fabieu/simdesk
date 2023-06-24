@@ -68,6 +68,11 @@ public class SessionView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
+        Grid.Column<Session> carCountColumn = grid.addColumn(Session::getCarCount)
+                .setHeader("Cars")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
 
         grid.setHeightFull();
         grid.setMultiSort(true, true);

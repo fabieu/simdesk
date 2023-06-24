@@ -16,7 +16,7 @@ public interface SessionMapper {
             @Result(property = "serverName", column = "server_name"),
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "wetSession", column = "wet_session"),
-            @Result(property = "driverCount", column = "driver_count"),
+            @Result(property = "carCount", column = "car_count"),
             @Result(property = "sessionDatetime", column = "session_datetime"),
             @Result(property = "fileChecksum", column = "file_checksum"),
             @Result(property = "fileName", column = "file_name"),
@@ -33,8 +33,8 @@ public interface SessionMapper {
     @Select("SELECT * FROM acc_leaderboard.sessions WHERE file_checksum = #{fileChecksum}")
     Session findByFileChecksum(String fileChecksum);
 
-    @Insert("INSERT INTO acc_leaderboard.sessions (session_type, race_weekend_index, server_name, track_id, wet_session, driver_count, session_datetime, file_checksum, file_name, file_directory) " +
-            "VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{driverCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory})")
+    @Insert("INSERT INTO acc_leaderboard.sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory) " +
+            "VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Session session);
 }
