@@ -25,20 +25,22 @@ public class LeaderboardService {
 
     public void handleLeaderboard(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<LeaderboardLine> leaderboardLines = leaderboardConverter.convertToLeaderboardLines(sessionId, accSession, fileMetadata);
+        leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLineAsync(sessionId, leaderboardLine));
+    }
 
-        for (LeaderboardLine leaderboardLine : leaderboardLines) {
-            driverService.upsertDrivers(leaderboardLine.getDrivers());
-            insertLeaderboardDrivers(sessionId, leaderboardLine.getDrivers(), leaderboardLine.getCarId());
-            insertLeaderboardLine(leaderboardLine);
-        }
+    @Async
+    protected void insertLeaderboardLineAsync(Integer sessionId, LeaderboardLine leaderboardLine) {
+        insertLeaderboardDrivers(sessionId, leaderboardLine.getDrivers(), leaderboardLine.getCarId());
+
+        leaderboardMapper.insertLeaderboardLine(leaderboardLine);
     }
 
     @Async
     protected void insertLeaderboardDrivers(Integer sessionId, List<Driver> drivers, Integer carId) {
-        drivers.forEach(driver -> leaderboardMapper.insertLeaderboardDriver(sessionId, carId, driver.getPlayerId()));
+        for (Driver driver : drivers) {
+            driverService.upsertDriver(driver);
+            leaderboardMapper.insertLeaderboardDriver(sessionId, carId, driver.getPlayerId());
+        }
     }
 
-    protected void insertLeaderboardLine(LeaderboardLine leaderboardLine) {
-        leaderboardMapper.insertLeaderboardLine(leaderboardLine);
-    }
 }

@@ -8,6 +8,7 @@ import de.sustineo.acc.leaderboard.entities.mapper.LapMapper;
 import de.sustineo.acc.leaderboard.services.converter.LapConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -28,14 +29,12 @@ public class LapService {
 
     public void handleLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
-
-        for (Lap lap : laps) {
-            driverService.upsertDriver(lap.getDriver());
-            insertLap(lap);
-        }
+        laps.forEach(this::insertLapAsync);
     }
 
-    public void insertLap(Lap lap) {
+    @Async
+    public void insertLapAsync(Lap lap) {
+        driverService.upsertDriver(lap.getDriver());
         lapMapper.insert(lap);
     }
 
