@@ -17,6 +17,7 @@ public class Driver extends Entity {
     private boolean locked;
     private Integer validLapsCount;
     private Integer invalidLapsCount;
+    private Long driveTimeMillis;
     private Instant lastActivity;
 
     public Double getValidLapsPercentage() {

@@ -34,7 +34,7 @@ public interface LeaderboardMapper {
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insertLeaderboardLine(LeaderboardLine leaderboardLines);
 
-    @Insert("INSERT INTO acc_leaderboard.leaderboard_drivers (session_id, car_id, player_id) " +
-            "VALUES (#{sessionId}, #{carId}, #{playerId})")
-    void insertLeaderboardDriver(Integer sessionId, Integer carId, String playerId);
+    @Insert("INSERT INTO acc_leaderboard.leaderboard_drivers (session_id, car_id, player_id, drive_time_millis) " +
+            "VALUES (#{sessionId}, #{carId}, #{playerId}, #{driveTimeMillis})")
+    void insertLeaderboardDriver(Integer sessionId, Integer carId, String playerId, Long driveTimeMillis);
 }

@@ -38,7 +38,7 @@ public class LeaderboardConverter {
                 .carGroup(accLeaderboardLine.getCar().getCarGroup())
                 .carModelId(accLeaderboardLine.getCar().getCarModel())
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())
-                .drivers(accLeaderboardLine.getCar().getDrivers().stream().map(driver -> driverConverter.convertToDriver(driver, fileMetadata)).toList())
+                .drivers(accLeaderboardLine.getCar().getDrivers().stream().map(driver -> driverConverter.convertToLeaderboardDriver(driver, fileMetadata, accLeaderboardLine)).toList())
                 .bestLapTimeMillis(accLeaderboardLine.getTiming().getBestLap())
                 .bestSplit1Millis(accLeaderboardLine.getTiming().getBestSplits().get(0))
                 .bestSplit2Millis(accLeaderboardLine.getTiming().getBestSplits().get(1))

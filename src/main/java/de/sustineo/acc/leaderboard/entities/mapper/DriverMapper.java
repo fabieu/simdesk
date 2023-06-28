@@ -16,6 +16,7 @@ public interface DriverMapper {
             @Result(property = "lastName", column = "last_name"),
             @Result(property = "shortName", column = "short_name"),
             @Result(property = "locked", column = "locked"),
+            @Result(property = "driveTimeMillis", column = "drive_time_millis"),
             @Result(property = "lastActivity", column = "last_activity")
     })
     @Select("SELECT * FROM acc_leaderboard.drivers")
@@ -26,7 +27,7 @@ public interface DriverMapper {
     Driver findById(String playerId);
 
     @ResultMap("driverResultMap")
-    @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id IN (SELECT player_id FROM acc_leaderboard.leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId})")
+    @Select("SELECT drivers.*, leaderboard_drivers.drive_time_millis FROM acc_leaderboard.drivers INNER JOIN acc_leaderboard.leaderboard_drivers on drivers.player_id = leaderboard_drivers.player_id WHERE leaderboard_drivers.car_id = #{carId} and leaderboard_drivers.session_id = #{sessionId}")
     List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 
     @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name, last_activity) " +

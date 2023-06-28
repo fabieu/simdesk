@@ -28,19 +28,17 @@ public class LeaderboardService {
         leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLineAsync(sessionId, leaderboardLine));
     }
 
+    public List<LeaderboardLine> getLeaderboardLinesBySessionId(Integer sessionId) {
+        return leaderboardMapper.findBySessionId(sessionId);
+    }
+
     @Async
     protected void insertLeaderboardLineAsync(Integer sessionId, LeaderboardLine leaderboardLine) {
-        insertLeaderboardDrivers(sessionId, leaderboardLine.getDrivers(), leaderboardLine.getCarId());
+        for (Driver driver : leaderboardLine.getDrivers()) {
+            driverService.upsertDriver(driver);
+            leaderboardMapper.insertLeaderboardDriver(sessionId, leaderboardLine.getCarId(), driver.getPlayerId(), driver.getDriveTimeMillis());
+        }
 
         leaderboardMapper.insertLeaderboardLine(leaderboardLine);
     }
-
-    @Async
-    protected void insertLeaderboardDrivers(Integer sessionId, List<Driver> drivers, Integer carId) {
-        for (Driver driver : drivers) {
-            driverService.upsertDriver(driver);
-            leaderboardMapper.insertLeaderboardDriver(sessionId, carId, driver.getPlayerId());
-        }
-    }
-
 }

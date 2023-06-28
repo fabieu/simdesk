@@ -75,10 +75,11 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.leaderboard_lines
 
 CREATE TABLE IF NOT EXISTS acc_leaderboard.leaderboard_drivers
 (
-    id         INT AUTO_INCREMENT,
-    session_id INT         NOT NULL,
-    player_id  VARCHAR(18) NOT NULL,
-    car_id     INT         NOT NULL,
+    id                INT AUTO_INCREMENT,
+    session_id        INT         NOT NULL,
+    player_id         VARCHAR(18) NOT NULL,
+    car_id            INT         NOT NULL,
+    drive_time_millis BIGINT,
     PRIMARY KEY (id),
     FOREIGN KEY (session_id) REFERENCES acc_leaderboard.sessions (id),
     FOREIGN KEY (player_id) REFERENCES acc_leaderboard.drivers (player_id)
