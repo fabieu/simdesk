@@ -41,7 +41,11 @@ public class Driver extends Entity {
             return UNKNOWN;
         }
 
-        String driverFullName = String.join(" ", firstName, lastName);
+        return String.join(" ", firstName, lastName);
+    }
+
+    public String getEntireName() {
+        String driverFullName = getFullName();
 
         if (shortName == null) {
             return driverFullName;

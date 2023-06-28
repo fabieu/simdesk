@@ -11,15 +11,15 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
 import de.sustineo.acc.leaderboard.entities.Track;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
-import de.sustineo.acc.leaderboard.views.generators.PodiumPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.DriverRankingRenderer;
 
 import java.util.List;
@@ -85,7 +85,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRanking::getDriverFullName)
+        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getEntireName())
                 .setHeader("Driver")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -142,7 +142,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
-        grid.setPartNameGenerator(new PodiumPartNameGenerator());
+        grid.setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
 
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setDriverName));

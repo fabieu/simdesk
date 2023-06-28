@@ -1,11 +1,12 @@
 package de.sustineo.acc.leaderboard.services;
 
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
-import de.sustineo.acc.leaderboard.entities.GroupRanking;
 import de.sustineo.acc.leaderboard.entities.comparator.DriverRankingComparator;
 import de.sustineo.acc.leaderboard.entities.comparator.GroupRankingComparator;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.mapper.RankingMapper;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.stereotype.Service;
 
@@ -31,6 +32,10 @@ public class RankingService {
         addRanking(driverRankings);
 
         return driverRankings;
+    }
+
+    public List<SessionRanking> getSessionRanking(Integer sessionId) {
+        return rankingMapper.findLeaderboardLinesBySessionId(sessionId);
     }
 
     private void addRanking(List<DriverRanking> driverRankings) {

@@ -2,7 +2,7 @@ package de.sustineo.acc.leaderboard.views.renderers;
 
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 
 import java.util.Optional;

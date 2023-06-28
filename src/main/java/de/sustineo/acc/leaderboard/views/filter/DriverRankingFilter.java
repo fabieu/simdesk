@@ -1,7 +1,7 @@
 package de.sustineo.acc.leaderboard.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.services.DriverService;
 import lombok.Data;
 
@@ -43,7 +43,7 @@ public class DriverRankingFilter {
     }
 
     public boolean test(DriverRanking driverRanking) {
-        boolean matchesDriverId = matches(driverRanking.getDriver().getFullName(), driverName);
+        boolean matchesDriverId = matches(driverRanking.getDriver().getEntireName(), driverName);
         boolean matchesCarModelName = matches(driverRanking.getCarModelName(), carModelName);
         boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
         boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);

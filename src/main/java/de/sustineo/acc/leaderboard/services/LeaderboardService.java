@@ -28,10 +28,6 @@ public class LeaderboardService {
         leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLineAsync(sessionId, leaderboardLine));
     }
 
-    public List<LeaderboardLine> getLeaderboardLinesBySessionId(Integer sessionId) {
-        return leaderboardMapper.findBySessionId(sessionId);
-    }
-
     @Async
     protected void insertLeaderboardLineAsync(Integer sessionId, LeaderboardLine leaderboardLine) {
         for (Driver driver : leaderboardLine.getDrivers()) {

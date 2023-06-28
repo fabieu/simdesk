@@ -1,9 +1,9 @@
 package de.sustineo.acc.leaderboard.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 
-public class PodiumPartNameGenerator implements SerializableFunction<DriverRanking, String> {
+public class DriverRankingPodiumPartNameGenerator implements SerializableFunction<DriverRanking, String> {
     @Override
     public String apply(DriverRanking driverRanking) {
         return switch (driverRanking.getRanking()){

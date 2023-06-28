@@ -1,6 +1,6 @@
 package de.sustineo.acc.leaderboard.entities.comparator;
 
-import de.sustineo.acc.leaderboard.entities.DriverRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import org.apache.commons.lang3.builder.CompareToBuilder;
 
 import java.util.Comparator;

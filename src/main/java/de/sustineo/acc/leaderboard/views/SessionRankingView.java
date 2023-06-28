@@ -4,18 +4,19 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.entities.Session;
+import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
+import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
-import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
-import de.sustineo.acc.leaderboard.views.filter.SessionsFilter;
+import de.sustineo.acc.leaderboard.views.generators.SessionRankingPodiumPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.renderers.SessionRankingRenderer;
 
 import java.util.List;
 
@@ -24,41 +25,66 @@ import java.util.List;
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_SESSION_ID = "sessionId";
-
+    private final RankingService rankingService;
     private final SessionService sessionService;
 
-    public SessionRankingView(SessionService sessionService) {
+    public SessionRankingView(RankingService rankingService, SessionService sessionService) {
+        this.rankingService = rankingService;
         this.sessionService = sessionService;
         addClassName("sessions-view");
         setSizeFull();
     }
 
-    private Component createSessionGrid(Integer sessionId) {
-        Grid<Session> grid = new Grid<>(Session.class, false);
 
-        List<Session> sessions = sessionService.getAllSessions();
-        GridListDataView<Session> dataView = grid.setItems(sessions);
-        SessionsFilter sessionsFilter = new SessionsFilter(dataView);
+    private Component createSessionInformation(Integer sessionId) {
+        return new Div();
+    }
 
-        Grid.Column<Session> weatherColumn = grid.addComponentColumn(ComponentUtils::getWeatherIcon)
+    private Component createLeaderboardGrid(Integer sessionId) {
+        Grid<SessionRanking> grid = new Grid<>(SessionRanking.class, false);
+
+        List<SessionRanking> sessionRankings = rankingService.getSessionRanking(sessionId);
+        GridListDataView<SessionRanking> dataView = grid.setItems(sessionRankings);
+
+        Grid.Column<SessionRanking> rankingColumn = grid.addColumn(SessionRanking::getRanking)
+                .setHeader("#")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
+                .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
-                .setHeader("Session Time")
+        Grid.Column<SessionRanking> raceNumberColumn = grid.addColumn(SessionRankingRenderer.createRaceNumberRenderer())
+                .setHeader("Race Number")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(SessionRanking::getRaceNumber);
+        Grid.Column<SessionRanking> carGroupColumn = grid.addColumn(SessionRanking::getCarGroup)
+                .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
-                .setHeader("Server Name")
-                .setSortable(true);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
-                .setHeader("Track Name")
+        Grid.Column<SessionRanking> carModelColumn = grid.addColumn(SessionRanking::getCarModelName)
+                .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
-                .setHeader("Session Type")
+        Grid.Column<SessionRanking> driversColumn = grid.addColumn(SessionRankingRenderer.createDriversRenderer())
+                .setHeader("Drivers")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<SessionRanking> lapCountColumn = grid.addColumn(SessionRanking::getLapCount)
+                .setHeader("Lap Count")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<SessionRanking> totalTimeColumn = grid.addColumn(sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getTotalTimeMillis()))
+                .setHeader("Total Time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<SessionRanking> fastestLapColumn = grid.addColumn(sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis()))
+                .setHeader("Fastest Lap")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
@@ -68,11 +94,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-
-        HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setSessionDescription));
+        grid.setPartNameGenerator(new SessionRankingPodiumPartNameGenerator());
 
         return grid;
     }
@@ -90,9 +112,10 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 throw new IllegalArgumentException("Session with id " + sessionId + " does not exist.");
             }
 
-            addAndExpand(createSessionGrid(sessionId));
+            add(createSessionInformation(sessionId));
+            addAndExpand(createLeaderboardGrid(sessionId));
             add(ComponentUtils.createFooter());
-        } catch (Exception e){
+        } catch (IllegalArgumentException e){
             event.rerouteToError(NotFoundException.class);
         }
     }

@@ -1,7 +1,7 @@
 package de.sustineo.acc.leaderboard.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
-import de.sustineo.acc.leaderboard.entities.GroupRanking;
+import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 
 public class CarGroupPartNameGenerator implements SerializableFunction<GroupRanking, String>{
     @Override

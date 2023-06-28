@@ -2,16 +2,20 @@ package de.sustineo.acc.leaderboard.utils;
 
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
 
 public class FormatUtils {
     private final static String LAP_TIME_FORMAT = "mm:ss.SSS";
+    private final static String LAP_TIME_FORMAT_LONG = "HH:mm:ss.SSS";
     private final static String DATE_FORMAT = "dd.MM.yyyy HH:mm:ss";
 
     public static String formatLapTime(Long millis) {
-        if (millis >= 0) {
+        if (millis > Duration.ofHours(1).toMillis()) {
+            return DurationFormatUtils.formatDuration(millis, LAP_TIME_FORMAT_LONG, true);
+        } else if (millis >= 0) {
             return DurationFormatUtils.formatDuration(millis, LAP_TIME_FORMAT, true);
         } else {
             return "-" + DurationFormatUtils.formatDuration(millis * -1, LAP_TIME_FORMAT, true);
