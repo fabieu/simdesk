@@ -55,6 +55,6 @@ public interface RankingMapper {
             @Result(property = "totalTimeMillis", column = "total_time_millis"),
             @Result(property = "lapCount", column = "lap_count")
     })
-    @Select("SELECT * FROM acc_leaderboard.leaderboard_lines WHERE session_id = #{sessionId}")
+    @Select("SELECT * FROM acc_leaderboard.leaderboard_lines WHERE session_id = #{sessionId} ORDER BY ranking")
     List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
 }

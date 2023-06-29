@@ -20,7 +20,7 @@ import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.generators.DriverRankingPodiumPartNameGenerator;
-import de.sustineo.acc.leaderboard.views.renderers.DriverRankingRenderer;
+import de.sustineo.acc.leaderboard.views.renderers.ranking.DriverRankingRenderer;
 
 import java.util.List;
 
