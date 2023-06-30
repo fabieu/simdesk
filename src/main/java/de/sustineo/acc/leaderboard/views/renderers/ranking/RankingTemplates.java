@@ -18,11 +18,12 @@ public class RankingTemplates {
                         ${item.time}
                      </span>
                     <span style="font-size: var(--lumo-font-size-s); color: var(${item.color});">
-                        ${item.gap}
+                        ${item.lapGap && item.lapGap > 0 ? item.lapGap + " lap(s) " : ""} ${item.timeGap}
                     </span>
                 </vaadin-vertical-layout>
             """;
     static final String TIMING_TEMPLATE_TIME = "time";
-    static final String TIMING_TEMPLATE_GAP = "gap";
+    static final String TIMING_TEMPLATE_TIME_GAP = "timeGap";
+    static final String TIMING_TEMPLATE_LAP_GAP = "lapGap";
     static final String TIMING_TEMPLATE_COLOR = "color";
 }

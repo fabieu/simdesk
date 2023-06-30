@@ -31,7 +31,7 @@ public class FormatUtils {
         } else if (millis >= 0) {
             return DurationFormatUtils.formatDuration(millis, TIMING_FORMAT, true);
         } else {
-            return Entity.PLACEHOLDER;
+            return Entity.EMPTY;
         }
     }
 

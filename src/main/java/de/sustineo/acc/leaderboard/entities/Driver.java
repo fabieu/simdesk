@@ -1,5 +1,6 @@
 package de.sustineo.acc.leaderboard.entities;
 
+import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import lombok.*;
 
 import java.time.Instant;
@@ -52,5 +53,10 @@ public class Driver extends Entity {
         } else {
             return driverFullName + " (" + shortName + ")";
         }
+    }
+
+    @SuppressWarnings("unused")
+    public String getPrettyDriveTime() {
+        return FormatUtils.formatDriveTime(driveTimeMillis);
     }
 }

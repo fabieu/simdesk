@@ -21,24 +21,29 @@ public class SessionRankingRenderer {
     }
 
     public static Renderer<SessionRanking> createLapTimeRenderer(SessionRanking bestLapSessionRanking) {
-        Long bestLapTimeMillis = Optional.ofNullable(bestLapSessionRanking)
+        long bestLapTimeMillis = Optional.ofNullable(bestLapSessionRanking)
                 .map(SessionRanking::getBestLapTimeMillis)
                 .orElse(0L);
 
         return LitRenderer.<SessionRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis()))
-                .withProperty(TIMING_TEMPLATE_GAP, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
                 .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> RankingRenderer.getTimeColor(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis));
     }
 
     public static Renderer<SessionRanking> createTotalTimeRenderer(SessionRanking bestTotalTimeSessionRanking) {
-        Long bestTotalTimeMillis = Optional.ofNullable(bestTotalTimeSessionRanking)
+        long bestTotalTimeMillis = Optional.ofNullable(bestTotalTimeSessionRanking)
                 .map(SessionRanking::getTotalTimeMillis)
                 .orElse(0L);
 
+        int bestLapCount = Optional.ofNullable(bestTotalTimeSessionRanking)
+                .map(SessionRanking::getLapCount)
+                .orElse(0);
+
         return LitRenderer.<SessionRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, sessionRanking -> FormatUtils.formatTotalTime(sessionRanking.getTotalTimeMillis()))
-                .withProperty(TIMING_TEMPLATE_GAP, sessionRanking -> FormatUtils.formatTotalTime(sessionRanking.getTotalTimeMillis() - bestTotalTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> RankingRenderer.getTimeColor(sessionRanking.getTotalTimeMillis() - bestTotalTimeMillis));
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> FormatUtils.formatTotalTime(sessionRanking.getTotalTimeMillis() - bestTotalTimeMillis))
+                .withProperty(TIMING_TEMPLATE_LAP_GAP, sessionRanking -> bestLapCount - sessionRanking.getLapCount())
+                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> "--lumo-secondary-text-color");
     }
 }
