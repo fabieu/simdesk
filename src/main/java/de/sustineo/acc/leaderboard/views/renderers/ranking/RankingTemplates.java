@@ -4,11 +4,14 @@ public class RankingTemplates {
     static final String RACE_NUMBER_TEMPLATE = "#${item.raceNumber}";
     static final String RACE_NUMBER_TEMPLATE_NUMBER = "raceNumber";
     static final String DRIVERS_TEMPLATE = """
-            <vaadin-vertical-layout>
+            <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
                 ${item.drivers.map(driver => html`
-                <span>${driver.fullName} - ${driver.prettyDriveTime}</span>
+                <vaadin-vertical-layout style="justify-content: center; align-items: center;">
+                    <vaadin-button theme="tertiary">${driver.fullName}</vaadin-button>
+                    <span>${driver.prettyDriveTime}</span>
+                </vaadin-vertical-layout>
                 `)}
-            </vaadin-vertical-layout>
+            </vaadin-horizontal-layout>
             """;
     static final String DRIVERS_TEMPLATE_DRIVERS = "drivers";
 
