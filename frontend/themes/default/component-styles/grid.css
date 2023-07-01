@@ -33,3 +33,11 @@ vaadin-grid::part(ranking-podium-second) {
 vaadin-grid::part(ranking-podium-third) {
     background-color: rgba(167, 112, 68, 0.4);
 }
+
+vaadin-grid::part(ranking-dnf) {
+    background-color: var(--lumo-error-color-10pct);
+}
+
+vaadin-grid::part(ranking-dns) {
+    color: var(--lumo-shade-70pct);
+}

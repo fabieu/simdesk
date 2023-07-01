@@ -10,7 +10,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Service
-public class LeaderboardConverter {
+public class LeaderboardConverter extends BaseConverter {
     private final DriverConverter driverConverter;
 
     public LeaderboardConverter(DriverConverter driverConverter) {
@@ -39,11 +39,11 @@ public class LeaderboardConverter {
                 .carModelId(accLeaderboardLine.getCar().getCarModel())
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())
                 .drivers(accLeaderboardLine.getCar().getDrivers().stream().map(driver -> driverConverter.convertToLeaderboardDriver(driver, fileMetadata, accLeaderboardLine)).toList())
-                .bestLapTimeMillis(accLeaderboardLine.getTiming().getBestLap())
-                .bestSplit1Millis(accLeaderboardLine.getTiming().getBestSplits().get(0))
-                .bestSplit2Millis(accLeaderboardLine.getTiming().getBestSplits().get(1))
-                .bestSplit3Millis(accLeaderboardLine.getTiming().getBestSplits().get(2))
-                .totalTimeMillis(accLeaderboardLine.getTiming().getTotalTime())
+                .bestLapTimeMillis(filterBadTiming(accLeaderboardLine.getTiming().getBestLap()))
+                .bestSplit1Millis(filterBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(0)))
+                .bestSplit2Millis(filterBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(1)))
+                .bestSplit3Millis(filterBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(2)))
+                .totalTimeMillis(filterBadTiming(accLeaderboardLine.getTiming().getTotalTime()))
                 .lapCount(accLeaderboardLine.getTiming().getLapCount())
                 .build();
     }

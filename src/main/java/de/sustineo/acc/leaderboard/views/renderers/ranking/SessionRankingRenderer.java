@@ -43,7 +43,8 @@ public class SessionRankingRenderer {
         return LitRenderer.<SessionRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, sessionRanking -> FormatUtils.formatTotalTime(sessionRanking.getTotalTimeMillis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> FormatUtils.formatTotalTime(sessionRanking.getTotalTimeMillis() - bestTotalTimeMillis))
-                .withProperty(TIMING_TEMPLATE_LAP_GAP, sessionRanking -> bestLapCount - sessionRanking.getLapCount())
+                .withProperty(TIMING_TEMPLATE_LAP_COUNT, SessionRanking::getLapCount)
+                .withProperty(TIMING_TEMPLATE_BEST_LAP_COUNT, sessionRanking -> bestLapCount)
                 .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> "--lumo-secondary-text-color");
     }
 }

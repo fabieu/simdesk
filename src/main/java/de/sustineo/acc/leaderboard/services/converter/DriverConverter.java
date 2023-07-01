@@ -7,7 +7,7 @@ import de.sustineo.acc.leaderboard.entities.json.AccLeaderboardLine;
 import org.springframework.stereotype.Service;
 
 @Service
-public class DriverConverter {
+public class DriverConverter extends BaseConverter {
     public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {
         return Driver.builder()
                 .playerId(accDriver.getPlayerId())
@@ -21,7 +21,7 @@ public class DriverConverter {
     public Driver convertToLeaderboardDriver(AccDriver accDriver, FileMetadata fileMetadata, AccLeaderboardLine accLeaderboardLine) {
         Driver driver = convertToDriver(accDriver, fileMetadata);
 
-        if (accLeaderboardLine.getDriverTotalTimes().isEmpty()){
+        if (accLeaderboardLine.getDriverTotalTimes().isEmpty()) {
             return driver;
         }
 

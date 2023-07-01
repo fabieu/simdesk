@@ -21,12 +21,13 @@ public class RankingTemplates {
                         ${item.time}
                      </span>
                     <span style="font-size: var(--lumo-font-size-s); color: var(${item.color});">
-                        ${item.lapGap && item.lapGap > 0 ? item.lapGap + " lap(s) " : ""} ${item.timeGap}
+                        ${item.lapCount && item.lapCount > 0 && (item.bestLapCount - item.lapCount) > 0 ? (item.bestLapCount - item.lapCount) + " lap(s) " : ""} ${item.timeGap}
                     </span>
                 </vaadin-vertical-layout>
             """;
     static final String TIMING_TEMPLATE_TIME = "time";
     static final String TIMING_TEMPLATE_TIME_GAP = "timeGap";
-    static final String TIMING_TEMPLATE_LAP_GAP = "lapGap";
+    static final String TIMING_TEMPLATE_BEST_LAP_COUNT = "bestLapCount";
+    static final String TIMING_TEMPLATE_LAP_COUNT = "lapCount";
     static final String TIMING_TEMPLATE_COLOR = "color";
 }

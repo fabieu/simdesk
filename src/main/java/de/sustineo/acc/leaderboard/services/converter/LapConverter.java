@@ -13,7 +13,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Service
-public class LapConverter {
+public class LapConverter extends BaseConverter {
     private final DriverConverter driverConverter;
 
     public LapConverter(DriverConverter driverConverter) {
@@ -42,10 +42,10 @@ public class LapConverter {
                 .carGroup(accCar.get().getCarGroup())
                 .carModelId(accCar.get().getCarModel())
                 .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
-                .lapTimeMillis(accLap.getLapTimeMillis())
-                .split1Millis(accLap.getSplits().get(0))
-                .split2Millis(accLap.getSplits().get(1))
-                .split3Millis(accLap.getSplits().get(2))
+                .lapTimeMillis(filterBadTiming(accLap.getLapTimeMillis()))
+                .split1Millis(filterBadTiming(accLap.getSplits().get(0)))
+                .split2Millis(filterBadTiming(accLap.getSplits().get(1)))
+                .split3Millis(filterBadTiming(accLap.getSplits().get(2)))
                 .valid(accLap.getValid())
                 .build();
     }

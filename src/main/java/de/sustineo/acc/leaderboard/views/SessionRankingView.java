@@ -15,7 +15,8 @@ import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.services.SessionService;
-import de.sustineo.acc.leaderboard.views.generators.SessionRankingPodiumPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.generators.SessionRankingPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.renderers.ranking.RankingRenderer;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.SessionRankingRenderer;
 
 import java.util.List;
@@ -73,7 +74,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.addColumn(SessionRankingRenderer.createDriversRenderer())
                 .setHeader("Drivers")
                 .setSortable(true);
-        grid.addColumn(SessionRanking::getLapCount)
+        grid.addColumn(sessionRanking -> sessionRanking.getLapCount() > 0 ? sessionRanking.getLapCount() : RankingRenderer.DNS)
                 .setHeader("Laps")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -98,7 +99,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setPartNameGenerator(new SessionRankingPodiumPartNameGenerator());
+        grid.setPartNameGenerator(new SessionRankingPartNameGenerator(bestTotalTimeSessionRanking));
 
         return grid;
     }

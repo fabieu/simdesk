@@ -6,7 +6,7 @@ import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import org.springframework.stereotype.Service;
 
 @Service
-public class SessionConverter {
+public class SessionConverter extends BaseConverter {
     public Session convertToSession(AccSession accSession, FileMetadata fileMetadata) {
         return Session.builder()
                 .sessionType(accSession.getSessionType())
