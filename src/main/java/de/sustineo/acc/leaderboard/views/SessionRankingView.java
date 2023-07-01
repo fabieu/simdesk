@@ -4,13 +4,13 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.comparator.SessionRankingLapTimeComparator;
+import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
@@ -44,47 +44,49 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         Grid<SessionRanking> grid = new Grid<>(SessionRanking.class, false);
 
         List<SessionRanking> sessionRankings = rankingService.getSessionRanking(sessionId);
-        SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream().findFirst().orElse(null);
-        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream().min(new SessionRankingLapTimeComparator()).orElse(null);
-        GridListDataView<SessionRanking> dataView = grid.setItems(sessionRankings);
+        SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream().findFirst().orElse(new SessionRanking());
+        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream().min(new SessionRankingLapTimeComparator()).orElse(new SessionRanking());
+        grid.setItems(sessionRankings);
 
-        Grid.Column<SessionRanking> rankingColumn = grid.addColumn(SessionRanking::getRanking)
+        grid.addColumn(SessionRanking::getRanking)
                 .setHeader("#")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<SessionRanking> raceNumberColumn = grid.addColumn(SessionRankingRenderer.createRaceNumberRenderer())
+        grid.addColumn(SessionRankingRenderer.createRaceNumberRenderer())
                 .setHeader("Race Number")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(SessionRanking::getRaceNumber);
-        Grid.Column<SessionRanking> carGroupColumn = grid.addColumn(SessionRanking::getCarGroup)
+        grid.addColumn(SessionRanking::getCarGroup)
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<SessionRanking> carModelColumn = grid.addColumn(SessionRanking::getCarModelName)
+        grid.addColumn(SessionRanking::getCarModelName)
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<SessionRanking> driversColumn = grid.addColumn(SessionRankingRenderer.createDriversRenderer())
+        grid.addColumn(SessionRankingRenderer.createDriversRenderer())
                 .setHeader("Drivers")
                 .setSortable(true);
-        Grid.Column<SessionRanking> lapCountColumn = grid.addColumn(SessionRanking::getLapCount)
+        grid.addColumn(SessionRanking::getLapCount)
                 .setHeader("Laps")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<SessionRanking> totalTimeColumn = grid.addColumn(SessionRankingRenderer.createTotalTimeRenderer(bestTotalTimeSessionRanking))
-                .setHeader("Total Time")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true)
-                .setComparator(SessionRanking::getTotalTimeMillis);
-        Grid.Column<SessionRanking> fastestLapColumn = grid.addColumn(SessionRankingRenderer.createLapTimeRenderer(bestLapTimeSessionRanking))
+        if (SessionType.R.equals(bestTotalTimeSessionRanking.getSession().getSessionType())) {
+            grid.addColumn(SessionRankingRenderer.createTotalTimeRenderer(bestTotalTimeSessionRanking))
+                    .setHeader("Total Time")
+                    .setAutoWidth(true)
+                    .setFlexGrow(0)
+                    .setSortable(true)
+                    .setComparator(SessionRanking::getTotalTimeMillis);
+        }
+        grid.addColumn(SessionRankingRenderer.createLapTimeRenderer(bestLapTimeSessionRanking))
                 .setHeader("Fastest Lap")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -117,7 +119,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
             add(createSessionInformation(sessionId));
             addAndExpand(createLeaderboardGrid(sessionId));
             add(ComponentUtils.createFooter());
-        } catch (IllegalArgumentException e){
+        } catch (IllegalArgumentException e) {
             event.rerouteToError(NotFoundException.class);
         }
     }
