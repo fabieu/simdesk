@@ -19,15 +19,13 @@ public class SessionRankingPartNameGenerator implements SerializableFunction<Ses
         List<String> partNames = new ArrayList<>();
 
         applyPodiumClass(partNames, sessionRanking);
-        applyDNSOrDNFClass(partNames, sessionRanking);
+        applyDNFClass(partNames, sessionRanking);
 
         return String.join(" ", partNames);
     }
 
-    private void applyDNSOrDNFClass(List<String> partNames, SessionRanking sessionRanking) {
-        if (sessionRanking.getLapCount() <= 0) {
-            partNames.add("ranking-dns");
-        } else if (sessionRanking.getTotalTimeMillis() < bestTotalTimeSessionRanking.getTotalTimeMillis() * DNF_THRESHOLD) {
+    private void applyDNFClass(List<String> partNames, SessionRanking sessionRanking) {
+        if (sessionRanking.getTotalTimeMillis() < bestTotalTimeSessionRanking.getTotalTimeMillis() * DNF_THRESHOLD) {
             partNames.add("ranking-dnf");
         }
     }
