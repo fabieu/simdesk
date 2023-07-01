@@ -16,6 +16,10 @@ public class FormatUtils {
     private static final DateTimeFormatter dateTimeFormatter =  DateTimeFormatter.ofPattern(DATETIME_FORMAT).withZone(ZoneId.systemDefault());
 
     public static String formatLapTime(Long millis) {
+        if (millis == null) {
+            return Entity.EMPTY;
+        }
+
         if (millis > Duration.ofHours(1).toMillis()) {
             return DurationFormatUtils.formatDuration(millis, TIMING_FORMAT_LONG, true);
         } else if (millis >= 0) {
@@ -26,6 +30,10 @@ public class FormatUtils {
     }
 
     public static String formatTotalTime(Long millis) {
+        if (millis == null) {
+            return Entity.EMPTY;
+        }
+
         if (millis > Duration.ofHours(1).toMillis()) {
             return DurationFormatUtils.formatDuration(millis, TIMING_FORMAT_LONG, true);
         } else if (millis >= 0) {
@@ -36,13 +44,25 @@ public class FormatUtils {
     }
 
     public static String formatDriveTime(Long millis) {
+        if (millis == null) {
+            return Entity.EMPTY;
+        }
+
         return DurationFormatUtils.formatDuration(millis, DRIVE_TIME_FORMAT, true);
     }
 
     public static String formatPercentage(Double value) {
+        if (value == null) {
+            return Entity.EMPTY;
+        }
+
         return String.format("%.2f", value * 100) + "%";
     }
     public static String formatDatetime(Instant instant) {
+        if (instant == null) {
+            return Entity.EMPTY;
+        }
+
         return dateTimeFormatter.format(instant);
     }
 }
