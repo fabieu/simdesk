@@ -21,6 +21,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.sessions
 CREATE TABLE IF NOT EXISTS acc_leaderboard.drivers
 (
     player_id       VARCHAR(18) NOT NULL,
+    id              INT AUTO_INCREMENT,
     first_name      VARCHAR(64),
     last_name       VARCHAR(64),
     short_name      VARCHAR(3),

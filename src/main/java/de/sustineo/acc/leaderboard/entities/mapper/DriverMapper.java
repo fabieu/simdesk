@@ -12,6 +12,7 @@ import java.util.List;
 public interface DriverMapper {
     @Results(id = "driverResultMap", value = {
             @Result(id = true, property = "playerId", column = "player_id"),
+            @Result(property = "id", column = "id"),
             @Result(property = "firstName", column = "first_name"),
             @Result(property = "lastName", column = "last_name"),
             @Result(property = "shortName", column = "short_name"),
@@ -24,8 +25,9 @@ public interface DriverMapper {
 
     @ResultMap("driverResultMap")
     @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
-    Driver findById(String playerId);
+    Driver findByPlayerId(String playerId);
 
+    @SuppressWarnings("unused")
     @ResultMap("driverResultMap")
     @Select("SELECT drivers.*, leaderboard_drivers.drive_time_millis FROM acc_leaderboard.drivers INNER JOIN acc_leaderboard.leaderboard_drivers on drivers.player_id = leaderboard_drivers.player_id WHERE leaderboard_drivers.car_id = #{carId} and leaderboard_drivers.session_id = #{sessionId}")
     List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
