@@ -13,7 +13,7 @@ import org.springframework.jdbc.datasource.embedded.EmbeddedDatabaseType;
 import javax.sql.DataSource;
 import java.util.Properties;
 
-@Profile("local")
+@Profile("h2")
 @Configuration
 public class EmbeddedPersistenceConfiguration {
     private static DataSource dataSource;

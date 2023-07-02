@@ -26,7 +26,7 @@ import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-@Profile("integration-file")
+@Profile("file-integration")
 @Log
 @Service
 public class FileContentService {
