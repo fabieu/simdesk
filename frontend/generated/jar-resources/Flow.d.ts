@@ -5,7 +5,6 @@ interface AppConfig {
     productionMode: boolean;
     appId: string;
     uidl: any;
-    clientRouting: boolean;
 }
 interface AppInitResponse {
     appConfig: AppConfig;
@@ -44,6 +43,7 @@ export declare class Flow {
     private isActive;
     private baseRegex;
     private appShellTitle;
+    private navigation;
     constructor(config?: FlowConfig);
     /**
      * Return a `route` object for vaadin-router in an one-element array.
