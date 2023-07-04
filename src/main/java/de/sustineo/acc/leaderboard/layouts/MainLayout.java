@@ -7,6 +7,8 @@ import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -101,17 +103,26 @@ public class MainLayout extends AppLayout implements RouterLayout {
     }
 
     private Button createThemeToggleButton() {
-        return new Button("Toggle theme variant", click -> {
+        Icon darkThemeIcon = VaadinIcon.MOON_O.create();
+        Icon lightThemeIcon = VaadinIcon.SUN_O.create();
+
+        Button themeButton = new Button();
+        themeButton.setId("theme-toggle-button");
+        themeButton.setIcon(darkThemeIcon);
+        themeButton.addClickListener(e -> {
             ThemeList themeList = UI.getCurrent().getElement().getThemeList();
 
             if (themeList.contains(Lumo.DARK)) {
                 themeList.remove(Lumo.DARK);
+                themeButton.setIcon(darkThemeIcon);
             } else {
                 themeList.add(Lumo.DARK);
+                themeButton.setIcon(lightThemeIcon);
             }
         });
-    }
 
+        return themeButton;
+    }
     @Override
     protected void afterNavigation() {
         super.afterNavigation();

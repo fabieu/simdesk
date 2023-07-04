@@ -50,6 +50,7 @@ public class MainView extends VerticalLayout {
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
         notification.setPosition(Notification.Position.BOTTOM_END);
+        notification.setDuration(10000); // 10 seconds
 
         Icon icon = VaadinIcon.WARNING.create();
         Div info = new Div(new Text(VaadinConfiguration.APPLICATION_NAME + " is currently under development and not yet finished."));

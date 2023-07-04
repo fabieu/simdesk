@@ -1,6 +1,7 @@
 /* Import your application global css files here or add the styles directly to this file */
 @import 'component-styles/input-files.css';
 @import "component-styles/grid.css";
+@import "component-styles/button.css";
 
 html {
     --acc-color-gt3: rgb(255, 255, 255);
