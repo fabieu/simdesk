@@ -23,6 +23,9 @@ management:
     prometheus:
       enabled: true
 leaderboard:
+  links:
+    impressum: ${IMPRESSUM_URL:}
+    privacy: ${PRIVACY_URL:}
   results:
     folder: "src/main/resources/examples"
 

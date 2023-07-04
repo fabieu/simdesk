@@ -32,10 +32,12 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
     private final DriverService driverService;
+    private final ComponentUtils componentUtils;
 
-    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService) {
+    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
         this.driverService = driverService;
+        this.componentUtils = componentUtils;
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
@@ -50,7 +52,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
             add(createRankingHeader(carGroup, trackId));
             addAndExpand(createRankingGrid(carGroup, trackId));
-            add(ComponentUtils.createFooter());
+            add(componentUtils.createFooter());
         } else {
             event.rerouteToError(NotFoundException.class);
         }

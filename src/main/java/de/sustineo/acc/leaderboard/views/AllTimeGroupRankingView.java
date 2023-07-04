@@ -24,13 +24,13 @@ import java.util.List;
 public class AllTimeGroupRankingView extends VerticalLayout {
     private final RankingService rankingService;
 
-    public AllTimeGroupRankingView(RankingService rankingService) {
+    public AllTimeGroupRankingView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
         addClassName("alltime-ranking-view");
         setSizeFull();
 
         addAndExpand(createRankingGrid());
-        add(ComponentUtils.createFooter());
+        add(componentUtils.createFooter());
     }
 
     private Component createRankingGrid() {

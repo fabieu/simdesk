@@ -24,12 +24,12 @@ import de.sustineo.acc.leaderboard.layouts.MainLayout;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
 public class MainView extends VerticalLayout {
 
-    public MainView() {
+    public MainView(ComponentUtils componentUtils) {
         addClassName("dashboard-view");
         setSizeFull();
 
         addAndExpand(createMainContent());
-        add(ComponentUtils.createFooter());
+        add(componentUtils.createFooter());
     }
 
     private Component createMainContent() {

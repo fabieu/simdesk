@@ -1,26 +1,54 @@
 package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.utils.CustomContext;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
+import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
 
+@Service
 public class ComponentUtils {
     private static final BuildProperties buildProperties = CustomContext.getBean(BuildProperties.class);
 
-    public static Component createFooter() {
+    private final String impressumUrl;
+    private final String privacyUrl;
+
+    public ComponentUtils(@Value("${leaderboard.links.privacy}") String privacyUrl,
+                          @Value("${leaderboard.links.impressum}") String impressumUrl) {
+        this.privacyUrl = privacyUrl;
+        this.impressumUrl = impressumUrl;
+    }
+
+    public Component createFooter() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        layout.add(new Text("Made with ❤️ by Fabian Eulitz - © " + LocalDate.now().getYear() + " - Version " + buildProperties.getVersion()));
+        layout.add(new Paragraph("Made with ❤️ by Fabian Eulitz"));
+        layout.add(new Paragraph("© " + LocalDate.now().getYear()));
+        layout.add(new Paragraph("Version: " + buildProperties.getVersion()));
+
+        if (impressumUrl != null && !impressumUrl.isEmpty()) {
+            Anchor impressum = new Anchor(impressumUrl, "Impressum");
+            impressum.setTarget("_blank");
+            layout.add(new Paragraph(impressum));
+        }
+
+        if (privacyUrl != null && !privacyUrl.isEmpty()) {
+            Anchor privacy = new Anchor(privacyUrl, "Privacy policy");
+            privacy.setTarget("_blank");
+            layout.add(new Paragraph(privacy));
+        }
+
         return layout;
     }
 

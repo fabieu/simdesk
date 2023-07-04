@@ -28,10 +28,12 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     public static final String ROUTE_PARAMETER_SESSION_ID = "sessionId";
     private final RankingService rankingService;
     private final SessionService sessionService;
+    private final ComponentUtils componentUtils;
 
-    public SessionRankingView(RankingService rankingService, SessionService sessionService) {
+    public SessionRankingView(RankingService rankingService, SessionService sessionService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
         this.sessionService = sessionService;
+        this.componentUtils = componentUtils;
         addClassName("sessions-view");
         setSizeFull();
     }
@@ -122,7 +124,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
 
             add(createSessionInformation(sessionId));
             addAndExpand(createLeaderboardGrid(sessionId));
-            add(ComponentUtils.createFooter());
+            add(componentUtils.createFooter());
         } catch (IllegalArgumentException e) {
             event.rerouteToError(NotFoundException.class);
         }
