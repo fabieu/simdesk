@@ -58,3 +58,7 @@ spring:
 logging:
   level:
     ROOT: WARN
+vaadin:
+  productionMode: true
+  heartbeatInterval: 60
+  closeIdleSessions: true
