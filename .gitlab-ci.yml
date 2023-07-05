@@ -1,0 +1,102 @@
+workflow:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG'
+      when: never
+    - if: '$CI_PIPELINE_SOURCE == "push"'
+      when: always
+
+.build_conditions:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - gradle.properties
+
+stages:
+  - prepare
+  - test
+  - build
+  - release
+
+default:
+  image: gradle:7.6-jdk17-alpine
+  tags:
+    - gitlab-org-docker
+
+prepare-environment:
+  stage: prepare
+  needs: [ ]
+  script:
+    - echo "Expanding environment variables"
+    - VERSION=`cat gradle.properties | grep "version" | cut -d'=' -f2`
+    - IMAGE_NAME="$CI_REGISTRY_IMAGE:$VERSION"
+    - echo "VERSION=$VERSION" >> .env
+    - echo "IMAGE_NAME=$IMAGE_NAME" >> .env
+    - cat .env
+  artifacts:
+    reports:
+      dotenv: .env
+    expire_in: 1 week
+
+test:
+  stage: test
+  needs: [ ]
+  script:
+    - echo "Running unit tests"
+    - gradle test
+  artifacts:
+    when: always
+    reports:
+      junit: build/test-results/test/**/TEST-*.xml
+
+build-jar:
+  stage: build
+  needs:
+    - job: test
+  rules:
+    - !reference [ .build_conditions, rules ]
+  script:
+    - echo "Building application"
+    - gradle clean vaadinBuildFrontend bootJar
+    - echo "Application build successfully."
+  artifacts:
+    paths:
+      - build/libs/*.jar
+    expire_in: 1h
+
+build-docker:
+  stage: build
+  needs:
+    - job: prepare-environment
+    - job: build-jar
+  rules:
+    - !reference [ .build_conditions, rules ]
+  image: docker:24.0
+  services:
+    - docker:24.0-dind
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+  script:
+    - echo "Publishing application"
+    - docker build --pull -t $IMAGE_NAME .
+    - docker push $IMAGE_NAME
+    - echo "Application published to container registry successfully."
+
+create release:
+  stage: release
+  needs:
+    - job: prepare-environment
+    - job: build-jar
+    - job: build-docker
+  rules:
+    - !reference [ .build_conditions, rules ]
+  image: registry.gitlab.com/gitlab-org/release-cli:latest
+  script:
+    - echo "Creating release for version $VERSION"
+  release:
+    name: "Release $VERSION"
+    tag_name: "$VERSION"
+    description: "$CI_COMMIT_MESSAGE"
+    ref: "$CI_COMMIT_SHA"
+  allow_failure: true
