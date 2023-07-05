@@ -1,11 +1,11 @@
 package de.sustineo.acc.leaderboard.configuration;
 
 import de.sustineo.acc.leaderboard.services.FileService;
-import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Profile;
 
 import java.io.IOException;
 import java.nio.file.*;
@@ -13,7 +13,7 @@ import java.util.*;
 
 @Log
 @Configuration
-@Getter
+@Profile("file-integration")
 public class FileContentConfiguration {
     private final FileService fileService;
     public static Set<Path> WATCH_DIRECTORIES = new HashSet<>();
