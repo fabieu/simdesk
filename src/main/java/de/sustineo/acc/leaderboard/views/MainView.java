@@ -15,7 +15,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
-import de.sustineo.acc.leaderboard.configuration.PropertyConfiguration;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 
@@ -33,20 +32,17 @@ public class MainView extends VerticalLayout {
     }
 
     private Component createMainContent() {
+        showUnderDevelopmentNotification();
+
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
         layout.addAndExpand(new H1("Welcome to ACC Leaderboard"));
 
-        if ("development".equals(System.getenv(PropertyConfiguration.PROPERTY_ENVIRONMENT))){
-            createUnderDevelopmentNotification();
-        }
-
-
         return layout;
     }
 
-    private void createUnderDevelopmentNotification() {
+    private void showUnderDevelopmentNotification() {
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
         notification.setPosition(Notification.Position.BOTTOM_END);

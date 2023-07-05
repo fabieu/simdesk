@@ -7,7 +7,6 @@ import org.springframework.core.convert.support.DefaultConversionService;
 
 @Configuration
 public class PropertyConfiguration {
-    public static final String PROPERTY_ENVIRONMENT = "ENVIRONMENT";
     @Bean // Activates new configuration service which supports converting String to Collection types.
     public ConversionService conversionService() {
         return new DefaultConversionService();

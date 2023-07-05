@@ -12,7 +12,6 @@ import java.time.Instant;
 @EqualsAndHashCode(callSuper = false)
 public class Driver extends Entity {
     private String playerId;
-    private Integer id;
     private String firstName;
     private String lastName;
     private String shortName;

@@ -12,7 +12,6 @@ import java.util.List;
 public interface DriverMapper {
     @Results(id = "driverResultMap", value = {
             @Result(id = true, property = "playerId", column = "player_id"),
-            @Result(property = "id", column = "id"),
             @Result(property = "firstName", column = "first_name"),
             @Result(property = "lastName", column = "last_name"),
             @Result(property = "shortName", column = "short_name"),
