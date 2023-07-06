@@ -30,9 +30,15 @@ prepare-environment:
   script:
     - echo "Expanding environment variables"
     - VERSION=`cat gradle.properties | grep "version" | cut -d'=' -f2`
-    - IMAGE_NAME="$CI_REGISTRY_IMAGE:$VERSION"
+    - VERSION="${VERSION#[vV]}"
+    - VERSION_MAJOR="${VERSION%%\.*}"
+    - VERSION_MINOR="${VERSION#*.}"
+    - VERSION_MINOR="${VERSION_MINOR%.*}"
+    - VERSION_PATCH="${VERSION##*.}"
     - echo "VERSION=$VERSION" >> .env
-    - echo "IMAGE_NAME=$IMAGE_NAME" >> .env
+    - echo "VERSION_MAJOR=$VERSION_MAJOR" >> .env
+    - echo "VERSION_MINOR=$VERSION_MINOR" >> .env
+    - echo "VERSION_PATCH=$VERSION_PATCH" >> .env
     - cat .env
   artifacts:
     reports:
@@ -79,8 +85,8 @@ build-docker:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
   script:
     - echo "Publishing application"
-    - docker build --pull -t $IMAGE_NAME .
-    - docker push $IMAGE_NAME
+    - docker build --pull -t $CI_REGISTRY_IMAGE:latest -t $CI_REGISTRY_IMAGE:$VERSION -t $CI_REGISTRY_IMAGE:$VERSION_MAJOR -t $CI_REGISTRY_IMAGE:$VERSION_MAJOR.$VERSION_MINOR .
+    - docker push --all-tags $CI_REGISTRY_IMAGE
     - echo "Application published to container registry successfully."
 
 create release:
