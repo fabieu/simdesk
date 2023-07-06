@@ -8,7 +8,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import de.sustineo.acc.leaderboard.entities.Session;
-import de.sustineo.acc.leaderboard.utils.CustomContext;
+import de.sustineo.acc.leaderboard.utils.ApplicationContextProvider;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Service;
@@ -17,7 +17,7 @@ import java.time.LocalDate;
 
 @Service
 public class ComponentUtils {
-    private static final BuildProperties buildProperties = CustomContext.getBean(BuildProperties.class);
+    private static final BuildProperties buildProperties = ApplicationContextProvider.getBean(BuildProperties.class);
 
     private final String impressumUrl;
     private final String privacyUrl;
