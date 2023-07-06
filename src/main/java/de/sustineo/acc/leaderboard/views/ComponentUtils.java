@@ -17,15 +17,17 @@ import java.time.LocalDate;
 
 @Service
 public class ComponentUtils {
-    private static final BuildProperties buildProperties = ApplicationContextProvider.getBean(BuildProperties.class);
+    private final BuildProperties buildProperties;
 
     private final String impressumUrl;
     private final String privacyUrl;
 
-    public ComponentUtils(@Value("${leaderboard.links.privacy}") String privacyUrl,
+    public ComponentUtils(ApplicationContextProvider applicationContextProvider,
+                          @Value("${leaderboard.links.privacy}") String privacyUrl,
                           @Value("${leaderboard.links.impressum}") String impressumUrl) {
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
+        this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
     }
 
     public Component createFooter() {
