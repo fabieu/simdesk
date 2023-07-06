@@ -1,6 +1,7 @@
 package de.sustineo.acc.leaderboard.configuration;
 
 import de.sustineo.acc.leaderboard.services.FileService;
+import de.sustineo.acc.leaderboard.utils.ApplicationContextProvider;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
@@ -15,19 +16,26 @@ import java.util.*;
 @Configuration
 @Profile("file-integration")
 public class FileContentConfiguration {
+    private final ApplicationContextProvider applicationContextProvider;
     private final FileService fileService;
     public static Set<Path> WATCH_DIRECTORIES = new HashSet<>();
     public static final Map<WatchKey, Path> watchKeyMap = new HashMap<>();
 
-    public FileContentConfiguration(FileService fileService) {
+    public FileContentConfiguration(ApplicationContextProvider applicationContextProvider, FileService fileService) {
+        this.applicationContextProvider = applicationContextProvider;
         this.fileService = fileService;
     }
 
     @Value("${leaderboard.results.folder}")
     public void setWatchDirectories(List<String> folderPaths) {
-        for (String folderPath :  folderPaths){
-            Set<Path> directories = fileService.listDirectories(Path.of(folderPath));
-            FileContentConfiguration.WATCH_DIRECTORIES.addAll(directories);
+        if (folderPaths == null || folderPaths.isEmpty()) {
+            log.severe("No results folder configured. Please set a folder via 'LEADERBOARD_RESULTS_FOLDER' environment variable.");
+            applicationContextProvider.exitApplication(1);
+        } else {
+            for (String folderPath :  folderPaths){
+                Set<Path> directories = fileService.listDirectories(Path.of(folderPath));
+                FileContentConfiguration.WATCH_DIRECTORIES.addAll(directories);
+            }
         }
     }
 

@@ -24,10 +24,10 @@ management:
       enabled: true
 leaderboard:
   links:
-    impressum: ${IMPRESSUM_URL:}
-    privacy: ${PRIVACY_URL:}
+    impressum: ${LEADERBOARD_IMPRESSUM_URL:}
+    privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
-    folder: "src/main/resources/examples"
+    folder: ${LEADERBOARD_RESULTS_FOLDER:}
 
 ---
 spring:

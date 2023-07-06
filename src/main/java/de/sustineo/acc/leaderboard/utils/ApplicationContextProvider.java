@@ -1,5 +1,6 @@
 package de.sustineo.acc.leaderboard.utils;
 
+import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.lang.NonNull;
@@ -20,5 +21,10 @@ public class ApplicationContextProvider implements ApplicationContextAware {
 
     public <T> T getBean(Class<T> clazz) {
         return this.applicationContext.getBean(clazz);
+    }
+
+    public void exitApplication(int exitCode) {
+        SpringApplication.exit(applicationContext, () -> exitCode);
+        System.exit(exitCode);
     }
 }
