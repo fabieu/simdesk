@@ -28,13 +28,30 @@ public class FileContentConfiguration {
 
     @Value("${leaderboard.results.folder}")
     public void setWatchDirectories(List<String> folderPaths) {
-        if (folderPaths == null || folderPaths.isEmpty()) {
+        validateResultsFolderPaths(folderPaths);
+
+        for (String folderPath : folderPaths) {
+            Set<Path> directories = fileService.listDirectories(Path.of(folderPath));
+            FileContentConfiguration.WATCH_DIRECTORIES.addAll(directories);
+        }
+    }
+
+    private void validateResultsFolderPaths(List<String> folders) {
+        if (folders == null || folders.isEmpty()) {
             log.severe("No results folder configured. Please set a folder via 'LEADERBOARD_RESULTS_FOLDER' environment variable.");
             applicationContextProvider.exitApplication(1);
         } else {
-            for (String folderPath :  folderPaths){
-                Set<Path> directories = fileService.listDirectories(Path.of(folderPath));
-                FileContentConfiguration.WATCH_DIRECTORIES.addAll(directories);
+            for (String folder : folders) {
+                try {
+                    Path folderPath = Path.of(folder);
+                    if (!Files.isDirectory(folderPath)) {
+                        log.severe(String.format("Configured results folder '%s' is not a directory.", folder));
+                        applicationContextProvider.exitApplication(1);
+                    }
+                } catch (InvalidPathException e) {
+                    log.severe(String.format("Configured results folder '%s' is not a valid path.", folder));
+                    applicationContextProvider.exitApplication(1);
+                }
             }
         }
     }

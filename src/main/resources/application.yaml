@@ -27,7 +27,7 @@ leaderboard:
     impressum: ${LEADERBOARD_IMPRESSUM_URL:}
     privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
-    folder: ${LEADERBOARD_RESULTS_FOLDER:}
+    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-leaderboard/results}
 
 ---
 spring:
