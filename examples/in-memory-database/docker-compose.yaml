@@ -1,0 +1,11 @@
+version: "3.9"
+services:
+  app:
+    image: registry.gitlab.com/markracing/acc-leaderboard:latest
+    ports:
+      - "8088:8080"
+    environment:
+        SPRING_PROFILES_ACTIVE: "production,h2,file-integration"
+        LEADERBOARD_IMPRESSUM_URL: "https://example.com" # optional
+        LEADERBOARD_PRIVACY_URL: "https://example.com" # optional
+    restart: unless-stopped

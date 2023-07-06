@@ -35,9 +35,9 @@ spring:
     activate:
       on-profile: "mysql"
   datasource:
-    url: "jdbc:mysql://localhost:3306/acc_leaderboard"
-    username: "root"
-    password: "my-secret-pw"
+    url: ${LEADERBOARD_DATASOURCE_URL}
+    username: ${LEADERBOARD_DATASOURCE_USERNAME:root}
+    password: ${LEADERBOARD_DATASOURCE_PASSWORD}
 
 ---
 spring:

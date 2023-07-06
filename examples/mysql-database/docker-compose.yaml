@@ -1,0 +1,30 @@
+version: "3.9"
+services:
+  app:
+    image: acc-leaderboard:latest
+    ports:
+      - "8088:8080"
+    environment:
+        - SPRING_PROFILES_ACTIVE=production,mysql,file-integration
+        - LEADERBOARD_DATASOURCE_URL=jdbc:mysql://database:3306/acc_leaderboard
+        - LEADERBOARD_DATASOURCE_PASSWORD=my-secret-pw
+        - LEADERBOARD_IMPRESSUM_URL=https://example.com # optional
+        - LEADERBOARD_PRIVACY_URL=https://example.com # optional
+    restart: unless-stopped
+    depends_on:
+      database:
+        condition: service_healthy
+
+  database:
+    image: mysql:8.0.31
+    ports:
+      - "3306:3306"
+    environment:
+      - MYSQL_DATABASE=acc_leaderboard
+      - MYSQL_ROOT_PASSWORD=my-secret-pw
+    healthcheck:
+      test: [ "CMD", "mysqladmin" ,"ping", "-h", "localhost" ]
+      interval: 5s
+      timeout: 10s
+      retries: 10
+    restart: unless-stopped
