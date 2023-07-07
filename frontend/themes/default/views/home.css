@@ -1,0 +1,26 @@
+#home-header {
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    width: 100%;
+    height: 40vh;
+    background-image: url("images/audi_r8_markracing.png");
+    background-position: center;
+    background-repeat: no-repeat;
+    background-size: cover;
+    background-color: var(--lumo-contrast);
+}
+
+#home-header h1 {
+    width: 100%;
+    color: white;
+    background-color: rgba(0, 0, 0, 0.6);
+    text-align: center;
+    padding: 0.4em 0;
+}
+
+#home-tabs vaadin-tab {
+    color: white;
+    background-color: var(--lumo-primary-color);
+    margin: 0 var(--lumo-space-s);
+}

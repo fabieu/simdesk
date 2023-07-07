@@ -86,10 +86,10 @@ public class MainLayout extends AppLayout implements RouterLayout {
         return tabs;
     }
 
-    private Tab[] createMenuTabs() {
+    public static Tab[] createMenuTabs() {
         return new Tab[]{
-                createTab("Dashboard", MainView.class),
-                createTab("Ranking (All-Time)", AllTimeGroupRankingView.class),
+                createTab("Home", MainView.class),
+                createTab("Lap Times", AllTimeGroupRankingView.class),
                 createTab("Sessions", SessionView.class),
                 createTab("Drivers", DriverView.class),
         };
@@ -98,6 +98,7 @@ public class MainLayout extends AppLayout implements RouterLayout {
     private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
         tab.add(new RouterLink(text, navigationTarget));
+        tab.setId("tab-" + text.toLowerCase());
         ComponentUtil.setData(tab, Class.class, navigationTarget);
         return tab;
     }

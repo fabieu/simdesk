@@ -140,7 +140,7 @@
   "lit-html": "2.7.4",
   "mobile-drag-drop": "2.3.0-rc.2",
   "strip-css-comments": "5.0.0",
-  "tslib": "2.5.3"
+  "tslib": "2.6.0"
  },
  "bundleImports": [
   "@vaadin/accordion/theme/lumo/vaadin-accordion-panel.js",
@@ -192,7 +192,6 @@
   "@vaadin/scroller/theme/lumo/vaadin-scroller.js",
   "@vaadin/select/theme/lumo/vaadin-select.js",
   "@vaadin/side-nav/theme/lumo/vaadin-side-nav-item.js",
-  "@vaadin/side-nav/theme/lumo/vaadin-side-nav.js",
   "@vaadin/split-layout/theme/lumo/vaadin-split-layout.js",
   "@vaadin/tabs/theme/lumo/vaadin-tab.js",
   "@vaadin/tabs/theme/lumo/vaadin-tabs.js",
@@ -226,9 +225,15 @@
   "Frontend/generated/jar-resources/vaadin-big-decimal-field.js",
   "Frontend/generated/jar-resources/vaadin-grid-flow-selection-column.js",
   "Frontend/generated/jar-resources/vaadin-time-picker/timepickerConnector.js",
-  "Frontend/generated/jar-resources/virtualListConnector.js"
+  "Frontend/generated/jar-resources/virtualListConnector.js",
+  "Frontend/src/initVanta.js",
+  "Frontend/src/vendor/three.r134.min.js",
+  "Frontend/src/vendor/vanta.net.min.js"
  ],
  "frontendHashes": {
+  "src/vendor/three.r134.min.js": "4891edffd52cdf84a28bcf3b1e05e06d14b9defd568c9521031b3022b98bfc6c",
+  "src/vendor/vanta.net.min.js": "76fe5829c73c27aa4f357200997c160523277c0ddb81f35d5cfb818cc3cb96c6",
+  "src/initVanta.js": "80bf200c1a7280d1a8e4b937a077eb1a2048431eb42febddba64bd555a1e5e21",
   "buttonFunctions.js": "c852123f9b2c44eb75e555119d3e05a7dbe78b91d0ab616feb9df1654474707d",
   "comboBoxConnector.js": "1d004c3dae9c76f8bcc68678abe1b8f7bdc8b456f5c9c4c7f190df8ed25d66cd",
   "contextMenuConnector.js": "25a200f8086461635ddd92316ebeb5a868294c8650a190efbae120edb1088f4f",
@@ -249,12 +254,12 @@
  },
  "themeJsonContents": {},
  "entryScripts": [
-  "VAADIN/build/indexhtml-116e6f3d.js"
+  "VAADIN/build/indexhtml-9bb6a0e4.js"
  ],
  "webComponents": [],
  "cvdlModules": {},
  "packageJsonHash": "ac742c530068af609ec2dda5282edd6388f5d0ffc7aa910e709ffae99e688521",
  "indexHtmlGenerated": [
-  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-116e6f3d.js\"></script>"
+  "  <script type=\"module\" crossorigin src=\"./VAADIN/build/indexhtml-9bb6a0e4.js\"></script>"
  ]
 }
