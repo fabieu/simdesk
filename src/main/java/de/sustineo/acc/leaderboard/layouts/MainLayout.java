@@ -36,7 +36,7 @@ public class MainLayout extends AppLayout implements RouterLayout {
 
     public MainLayout() {
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(true, createNavbarContent(), createThemeToggleButton());
+        addToNavbar(true, createNavbarContent(), createNavbarButtons());
 
         menu = createMenu();
         addToDrawer(createDrawerContent(menu));
@@ -62,6 +62,53 @@ public class MainLayout extends AppLayout implements RouterLayout {
         layout.add(viewTitle);
 
         return layout;
+    }
+
+    private Component createNavbarButtons() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.getStyle().set("margin", "0 var(--lumo-space-m)");
+
+        layout.add(createHomeButton(), createThemeToggleButton(), createHelpButton());
+
+        return layout;
+    }
+
+    private Component createHomeButton() {
+        Icon homeIcon = VaadinIcon.HOME_O.create();
+
+        Button homeButton = new Button(homeIcon);
+        homeButton.addClickListener(e -> UI.getCurrent().navigate(MainView.class));
+
+        return homeButton;
+    }
+
+    private Button createThemeToggleButton() {
+        Icon darkThemeIcon = VaadinIcon.MOON_O.create();
+        Icon lightThemeIcon = VaadinIcon.SUN_O.create();
+
+        Button themeButton = new Button(darkThemeIcon);
+        themeButton.addClickListener(e -> {
+            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+
+            if (themeList.contains(Lumo.DARK)) {
+                themeList.remove(Lumo.DARK);
+                themeButton.setIcon(darkThemeIcon);
+            } else {
+                themeList.add(Lumo.DARK);
+                themeButton.setIcon(lightThemeIcon);
+            }
+        });
+
+        return themeButton;
+    }
+
+    private Component createHelpButton() {
+        Icon helpIcon = VaadinIcon.QUESTION_CIRCLE_O.create();
+
+        Button helpButton = new Button(helpIcon);
+        helpButton.addClickListener(e -> UI.getCurrent().getPage().setLocation("https://gitlab.com/markracing/acc-leaderboard/-/wikis/home"));
+
+        return helpButton;
     }
 
     private Component createDrawerContent(Tabs menu) {
@@ -103,27 +150,6 @@ public class MainLayout extends AppLayout implements RouterLayout {
         return tab;
     }
 
-    private Button createThemeToggleButton() {
-        Icon darkThemeIcon = VaadinIcon.MOON_O.create();
-        Icon lightThemeIcon = VaadinIcon.SUN_O.create();
-
-        Button themeButton = new Button();
-        themeButton.setId("theme-toggle-button");
-        themeButton.setIcon(darkThemeIcon);
-        themeButton.addClickListener(e -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-
-            if (themeList.contains(Lumo.DARK)) {
-                themeList.remove(Lumo.DARK);
-                themeButton.setIcon(darkThemeIcon);
-            } else {
-                themeList.add(Lumo.DARK);
-                themeButton.setIcon(lightThemeIcon);
-            }
-        });
-
-        return themeButton;
-    }
     @Override
     protected void afterNavigation() {
         super.afterNavigation();
