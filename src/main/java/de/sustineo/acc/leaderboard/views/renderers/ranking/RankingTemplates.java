@@ -20,7 +20,8 @@ public class RankingTemplates {
     static final String TIMING_TEMPLATE = """
                 <vaadin-vertical-layout style="align-items: end;">
                     <div>
-                        ${item.fastestLap ? html`<span theme="badge success pill small" title="Fastest lap">FL</span>` : ""} ${item.time}
+                        ${item.fastestLap ? html`<span theme="badge success pill small" title="Fastest lap">FL</span>` : ""}
+                        <span>${item.time}</span>
                      </div>
                     <span style="font-size: var(--lumo-font-size-s); color: var(${item.color});">
                         ${item.lapCount && item.lapCount > 0 && (item.bestLapCount - item.lapCount) > 0 ? (item.bestLapCount - item.lapCount) + " lap(s) " : ""} ${item.timeGap}

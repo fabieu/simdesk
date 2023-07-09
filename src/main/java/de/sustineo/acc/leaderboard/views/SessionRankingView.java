@@ -20,7 +20,8 @@ import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
-import de.sustineo.acc.leaderboard.views.generators.SessionRankingPartNameGenerator;
+import de.sustineo.acc.leaderboard.views.generators.SessionRankingDNFNameGenerator;
+import de.sustineo.acc.leaderboard.views.generators.SessionRankingPodiumPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.RankingRenderer;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.SessionRankingRenderer;
 
@@ -81,7 +82,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setTextAlign(ColumnTextAlign.CENTER);
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setPartNameGenerator(new SessionRankingPodiumPartNameGenerator());
         grid.addColumn(SessionRankingRenderer.createRaceNumberRenderer())
                 .setHeader("Race Number")
                 .setAutoWidth(true)
@@ -127,7 +129,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setPartNameGenerator(new SessionRankingPartNameGenerator(bestTotalTimeSessionRanking));
+        grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
 
         return grid;
     }

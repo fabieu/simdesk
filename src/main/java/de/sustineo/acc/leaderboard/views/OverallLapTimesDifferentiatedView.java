@@ -78,7 +78,8 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setTextAlign(ColumnTextAlign.CENTER);
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
         Grid.Column<DriverRanking> weatherColumn = grid.addComponentColumn(driverRanking -> ComponentUtils.getWeatherIcon(driverRanking.getSession()))
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -138,7 +139,6 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
 
         DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
