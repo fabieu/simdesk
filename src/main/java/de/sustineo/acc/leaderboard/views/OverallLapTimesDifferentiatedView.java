@@ -23,19 +23,18 @@ import de.sustineo.acc.leaderboard.views.renderers.ranking.DriverRankingRenderer
 
 import java.util.List;
 
-@Route(value = "ranking/all-time/:carGroup/:trackId", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
+@Route(value = "lap-times/overall/:carGroup/:trackId", layout = MainLayout.class)
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Overall lap times by car group and track")
 @AnonymousAllowed
-public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEnterObserver {
+public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
     private final ComponentUtils componentUtils;
 
-    public AllTimeDriverRankingView(RankingService rankingService, ComponentUtils componentUtils) {
+    public OverallLapTimesDifferentiatedView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
         this.componentUtils = componentUtils;
-        addClassName("alltime-ranking-detailed-view");
         setSizeFull();
     }
 
@@ -84,7 +83,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getEntireName())
+        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getFullName())
                 .setHeader("Driver")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -120,7 +119,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<DriverRanking> sessionTypeDescriptionColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getSessionType().getDescription())
-                .setHeader("Session Type")
+                .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
@@ -135,11 +134,10 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setTextAlign(ColumnTextAlign.END);
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
-        grid.setHeightFull();
+        grid.setSizeFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
         grid.setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
 
         DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);

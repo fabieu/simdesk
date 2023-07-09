@@ -41,7 +41,7 @@ public class MainView extends VerticalLayout {
 
     public MainView(ComponentUtils componentUtils, SessionService sessionService) {
         this.sessionService = sessionService;
-        addClassName("home-view");
+
         setSizeFull();
         setPadding(false);
 
@@ -53,7 +53,7 @@ public class MainView extends VerticalLayout {
         initializeDevelopmentNotification();
     }
 
-    private Component createHeader(){
+    private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
         header.add(new H1(Environment.COMMUNITY_NAME + " Leaderboard"));
@@ -110,7 +110,7 @@ public class MainView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0);
         grid.addColumn(session -> session.getSessionType().getDescription())
-                .setHeader("Session Type")
+                .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0);
         grid.addColumn(Session::getCarCount)
@@ -118,9 +118,10 @@ public class MainView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0);
 
+        grid.setWidthFull();
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
             Session selectedSession = e.getValue();

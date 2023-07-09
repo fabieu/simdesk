@@ -22,15 +22,14 @@ import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
 
 import java.util.List;
 
-@Route(value = "ranking/all-time", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "All Time Ranking")
+@Route(value = "lap-times/overall", layout = MainLayout.class)
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Overall lap times")
 @AnonymousAllowed
-public class AllTimeGroupRankingView extends VerticalLayout {
+public class OverallLapTimesView extends VerticalLayout {
     private final RankingService rankingService;
 
-    public AllTimeGroupRankingView(RankingService rankingService, ComponentUtils componentUtils) {
+    public OverallLapTimesView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
-        addClassName("alltime-ranking-view");
         setSizeFull();
 
         addAndExpand(createRankingGrid());
@@ -56,7 +55,7 @@ public class AllTimeGroupRankingView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setPartNameGenerator(ranking -> "font-weight-bold");
-        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getEntireName())
+        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullName())
                 .setHeader("Driver")
                 .setSortable(true);
         Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(GroupRanking::getCarModelName)
@@ -65,7 +64,7 @@ public class AllTimeGroupRankingView extends VerticalLayout {
 
 
         GridListDataView<GroupRanking> dataView = grid.setItems(groupRankings);
-        grid.setHeightFull();
+        grid.setSizeFull();
         grid.setColumnReorderingAllowed(true);
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
@@ -84,10 +83,10 @@ public class AllTimeGroupRankingView extends VerticalLayout {
             GroupRanking selectedGroupRanking = e.getValue();
 
             if (selectedGroupRanking != null) {
-                getUI().ifPresent(ui -> ui.navigate(AllTimeDriverRankingView.class,
+                getUI().ifPresent(ui -> ui.navigate(OverallLapTimesDifferentiatedView.class,
                         new RouteParameters(
-                                new RouteParam(AllTimeDriverRankingView.ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
-                                new RouteParam(AllTimeDriverRankingView.ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
+                                new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
+                                new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
                         )
                 ));
             }

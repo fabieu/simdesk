@@ -21,9 +21,9 @@ import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.views.AllTimeGroupRankingView;
 import de.sustineo.acc.leaderboard.views.DriverView;
 import de.sustineo.acc.leaderboard.views.MainView;
+import de.sustineo.acc.leaderboard.views.OverallLapTimesView;
 import de.sustineo.acc.leaderboard.views.SessionView;
 
 import java.util.Optional;
@@ -136,7 +136,7 @@ public class MainLayout extends AppLayout implements RouterLayout {
     public static Tab[] createMenuTabs() {
         return new Tab[]{
                 createTab("Home", MainView.class),
-                createTab("Lap Times", AllTimeGroupRankingView.class),
+                createTab("Lap Times", OverallLapTimesView.class),
                 createTab("Sessions", SessionView.class),
                 createTab("Drivers", DriverView.class),
         };

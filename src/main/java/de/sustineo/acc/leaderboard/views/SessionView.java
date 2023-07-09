@@ -32,7 +32,6 @@ public class SessionView extends VerticalLayout {
     public SessionView(SessionService sessionService, ComponentUtils componentUtils) {
         this.sessionService = sessionService;
 
-        addClassName("sessions-view");
         setSizeFull();
 
         addAndExpand(createSessionGrid());
@@ -61,7 +60,7 @@ public class SessionView extends VerticalLayout {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
-                .setHeader("Session Type")
+                .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);

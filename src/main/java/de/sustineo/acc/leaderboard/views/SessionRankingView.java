@@ -34,7 +34,6 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         this.rankingService = rankingService;
         this.sessionService = sessionService;
         this.componentUtils = componentUtils;
-        addClassName("sessions-view");
         setSizeFull();
     }
 

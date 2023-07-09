@@ -28,7 +28,6 @@ public class DriverView extends VerticalLayout {
     public DriverView(DriverService driverService, ComponentUtils componentUtils) {
         this.driverService = driverService;
 
-        addClassName("drivers-view");
         setSizeFull();
 
         addAndExpand(createDriverGrid());
