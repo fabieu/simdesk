@@ -10,3 +10,19 @@ html {
     --weather-sunny-color: #ffb600;
     --weather-rainy-color: #00aeff;
 }
+
+[theme~=light] {
+    --lumo-primary-color-10pct: hsla(46, 95%, 45%, 0.2);
+    --lumo-primary-color-50pct: hsla(46, 95%, 60%, 0.59);
+    --lumo-primary-color: hsl(46, 95%, 58%);
+    --lumo-primary-text-color: hsl(46, 95%, 45%);
+    --lumo-primary-contrast-color: hsl(214, 35%, 15%);
+}
+
+[theme~="dark"] {
+    --lumo-primary-color-10pct: hsla(46, 95%, 45%, 0.2);
+    --lumo-primary-color-50pct: hsla(46, 95%, 60%, 0.59);
+    --lumo-primary-color: hsl(46, 95%, 58%);
+    --lumo-primary-text-color: hsl(46, 95%, 70%);
+    --lumo-primary-contrast-color: hsl(214, 35%, 15%);
+}

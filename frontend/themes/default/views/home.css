@@ -3,12 +3,12 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    height: 40vh;
-    background-color: var(--lumo-contrast);
+    height: 30vh;
+    background-color: var(--lumo-primary-contrast-color);
 }
 
 #home-header h1 {
-    color: var(--lumo-base-color);
+    color: var(--lumo-primary-color);
     font-size: 4em;
     text-align: center;
 }
