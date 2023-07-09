@@ -42,7 +42,7 @@ public class SessionView extends VerticalLayout {
         List<Session> sessions = sessionService.getAllSessions();
 
         Grid<Session> grid = new Grid<>(Session.class, false);
-        Grid.Column<Session> weatherColumn = grid.addComponentColumn(ComponentUtils::getWeatherIcon)
+        Grid.Column<Session> weatherColumn = grid.addComponentColumn(ComponentUtils::createWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);

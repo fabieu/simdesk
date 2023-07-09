@@ -1,5 +1,4 @@
 /* Import your application global css files here or add the styles directly to this file */
-@import 'component-styles/input-files.css';
 @import "component-styles/grid.css";
 @import "views/home.css";
 

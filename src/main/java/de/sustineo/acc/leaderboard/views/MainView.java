@@ -68,7 +68,7 @@ public class MainView extends VerticalLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
 
-        Tab[] filteredTabArray = Arrays.stream(MainLayout.createMenuTabs())
+        Tab[] filteredTabArray = Arrays.stream(MainLayout.createLeaderboardMenuTabs())
                 .filter(tab -> !List.of("tab-home").contains(tab.getId().orElse(null)))
                 .toArray(Tab[]::new);
         tabs.add(filteredTabArray);
@@ -95,7 +95,7 @@ public class MainView extends VerticalLayout {
         List<Session> truncatedSessions = sessions.stream().limit(MAX_SESSIONS).toList();
         grid.setItems(truncatedSessions);
 
-        grid.addComponentColumn(ComponentUtils::getWeatherIcon)
+        grid.addComponentColumn(ComponentUtils::createWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
@@ -141,20 +141,21 @@ public class MainView extends VerticalLayout {
     private void initializeDevelopmentNotification() {
         Notification notification = new Notification();
         notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
-        notification.setPosition(Notification.Position.BOTTOM_END);
-        notification.setDuration(10000); // 10 seconds
+        notification.setPosition(Notification.Position.BOTTOM_STRETCH);
+        notification.setDuration(5000); // 5 seconds
 
         Icon icon = VaadinIcon.WARNING.create();
-        Div info = new Div(new Text(VaadinConfiguration.APPLICATION_NAME + " is currently under development."));
+        Div text = new Div(new Text(VaadinConfiguration.APPLICATION_NAME + " is currently under development."));
 
         Button closeButton = new Button(VaadinIcon.CLOSE.create());
         closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        closeButton.getElement().setAttribute("aria-label", "Close");
         closeButton.addClickListener(event -> {
             notification.close();
         });
 
-        HorizontalLayout layout = new HorizontalLayout(icon, info, closeButton);
+        HorizontalLayout layout = new HorizontalLayout(icon, text, closeButton);
+        layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         layout.setAlignItems(Alignment.CENTER);
 
         notification.add(layout);

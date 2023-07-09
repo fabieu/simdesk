@@ -6,7 +6,10 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.Hr;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -14,32 +17,31 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.views.DriverView;
-import de.sustineo.acc.leaderboard.views.MainView;
-import de.sustineo.acc.leaderboard.views.OverallLapTimesView;
-import de.sustineo.acc.leaderboard.views.SessionView;
+import de.sustineo.acc.leaderboard.views.*;
 
 import java.util.Optional;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
 public class MainLayout extends AppLayout implements RouterLayout {
-    private final Tabs menu;
+    private final Tabs leaderboardMenu;
+    private final Tabs toolsMenu;
     private H1 viewTitle;
 
     public MainLayout() {
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createNavbarContent(), createNavbarButtons());
 
-        menu = createMenu();
-        addToDrawer(createDrawerContent(menu));
+        leaderboardMenu = createMenuTabs(createLeaderboardMenuTabs());
+        toolsMenu = createMenuTabs(createToolsMenuTabs());
+        addToDrawer(createDrawerContent(leaderboardMenu, toolsMenu));
         setDrawerOpened(false);
     }
 
@@ -111,42 +113,65 @@ public class MainLayout extends AppLayout implements RouterLayout {
         return helpButton;
     }
 
-    private Component createDrawerContent(Tabs menu) {
+    private Component createDrawerContent(Tabs leaderboardMenu, Tabs toolsMenu) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setSpacing(false);
-        layout.getThemeList().set("spacing-s", true);
-        layout.setAlignItems(FlexComponent.Alignment.STRETCH);
 
-        // Add the menu to the drawer
-        layout.add(menu);
+        Hr spacer = ComponentUtils.createSpacer();
+
+        layout.add(leaderboardMenu);
+        layout.add(spacer);
+        layout.add(toolsMenu);
+
         return layout;
     }
 
-    private Tabs createMenu() {
-        final Tabs tabs = new Tabs();
-        tabs.setOrientation(Tabs.Orientation.VERTICAL);
-        tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
-        tabs.setId("tabs");
-        tabs.add(createMenuTabs());
-        return tabs;
-    }
-
-    public static Tab[] createMenuTabs() {
+    public static Tab[] createLeaderboardMenuTabs() {
         return new Tab[]{
-                createTab("Home", MainView.class),
-                createTab("Lap Times", OverallLapTimesView.class),
-                createTab("Sessions", SessionView.class),
-                createTab("Drivers", DriverView.class),
+                createTab("Home", VaadinIcon.HOME.create(), MainView.class),
+                createTab("Lap Times", VaadinIcon.CLOCK.create(), OverallLapTimesView.class),
+                createTab("Sessions", LumoIcon.ORDERED_LIST.create(), SessionView.class),
+                createTab("Drivers", VaadinIcon.USERS.create(), DriverView.class),
         };
     }
 
-    private static Tab createTab(String text, Class<? extends Component> navigationTarget) {
+    private Tab[] createToolsMenuTabs() {
+        return new Tab[]{
+                createExternalTab("Entrylist Validator", VaadinIcon.COG.create(), "https://acc.sustineo.de/entrylist"),
+        };
+    }
+
+    private Tabs createMenuTabs(Tab[] tabEntries) {
+        final Tabs tabs = new Tabs();
+        tabs.setOrientation(Tabs.Orientation.VERTICAL);
+        tabs.add(tabEntries);
+        return tabs;
+    }
+
+    private static Tab createTab(String text, Icon icon, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
-        tab.add(new RouterLink(text, navigationTarget));
+        tab.add(icon, new RouterLink(text, navigationTarget));
         tab.setId("tab-" + text.toLowerCase());
-        ComponentUtil.setData(tab, Class.class, navigationTarget);
+        ComponentUtil.setData(tab, Class.class, navigationTarget); // important for setting selected tab
+
+        return tab;
+    }
+
+    private static Tab createExternalTab(String text, Icon icon, String navigationTarget) {
+        Anchor link = new Anchor(navigationTarget, text);
+        link.setTarget("_blank");
+
+        Span badge = new Span();
+        badge.setText("external");
+        badge.getElement().getThemeList().add("badge pill error small");
+
+        final Tab tab = new Tab();
+        tab.add(icon, link, badge);
+        tab.setId("tab-" + text.toLowerCase());
+        tab.setSelected(false);
+
         return tab;
     }
 
@@ -156,10 +181,12 @@ public class MainLayout extends AppLayout implements RouterLayout {
 
         if (getContent() != null) {
             // Select the tab corresponding to currently shown view
-            getTabForComponent(getContent()).ifPresent(menu::setSelectedTab);
+            getLeaderboardTabForComponent(getContent()).ifPresentOrElse(leaderboardMenu::setSelectedTab, () -> leaderboardMenu.setSelectedTab(null));
+            getToolsTabForComponent(getContent()).ifPresentOrElse(toolsMenu::setSelectedTab, () -> toolsMenu.setSelectedTab(null));
             viewTitle.setText(getCurrentPageTitle());
         } else {
-            menu.setSelectedTab(null);
+            leaderboardMenu.setSelectedTab(null);
+            toolsMenu.setSelectedTab(null);
             viewTitle.setText(VaadinConfiguration.APPLICATION_NAME);
         }
 
@@ -167,9 +194,16 @@ public class MainLayout extends AppLayout implements RouterLayout {
         setDrawerOpened(false);
     }
 
-    private Optional<Tab> getTabForComponent(Component component) {
-        return menu.getChildren()
-                .filter(tab -> ComponentUtil.getData(tab, Class.class).equals(component.getClass()))
+    private Optional<Tab> getLeaderboardTabForComponent(Component component) {
+        return leaderboardMenu.getChildren()
+                .filter(tab -> component.getClass().equals(ComponentUtil.getData(tab, Class.class)))
+                .findFirst()
+                .map(Tab.class::cast);
+    }
+
+    private Optional<Tab> getToolsTabForComponent(Component component) {
+        return toolsMenu.getChildren()
+                .filter(tab -> component.getClass().equals(ComponentUtil.getData(tab, Class.class)))
                 .findFirst()
                 .map(Tab.class::cast);
     }

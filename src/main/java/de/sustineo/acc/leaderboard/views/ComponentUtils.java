@@ -2,6 +2,7 @@ package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -54,7 +55,15 @@ public class ComponentUtils {
         return layout;
     }
 
-    public static Icon getWeatherIcon(Session session) {
+    public static Hr createSpacer() {
+        Hr hr = new Hr();
+        hr.getStyle()
+                .set("border-top", "1px solid var(--lumo-contrast-10pct)");
+
+        return hr;
+    }
+
+    public static Icon createWeatherIcon(Session session) {
         Icon icon;
 
         if (session.getWetSession()) {

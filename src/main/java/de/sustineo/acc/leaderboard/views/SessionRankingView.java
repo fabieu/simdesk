@@ -54,7 +54,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         H3 heading = new H3();
         heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
 
-        Icon weatherIcon = ComponentUtils.getWeatherIcon(session);
+        Icon weatherIcon = ComponentUtils.createWeatherIcon(session);
 
         Span sessionDatetimeBadge = new Span();
         sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));

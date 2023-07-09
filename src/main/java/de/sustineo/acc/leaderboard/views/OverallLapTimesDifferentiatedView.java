@@ -80,7 +80,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
-        Grid.Column<DriverRanking> weatherColumn = grid.addComponentColumn(driverRanking -> ComponentUtils.getWeatherIcon(driverRanking.getSession()))
+        Grid.Column<DriverRanking> weatherColumn = grid.addComponentColumn(driverRanking -> ComponentUtils.createWeatherIcon(driverRanking.getSession()))
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
