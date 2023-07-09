@@ -6,10 +6,12 @@ public class RankingTemplates {
     static final String DRIVERS_TEMPLATE = """
             <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
                 ${item.drivers.map(driver => html`
-                <vaadin-vertical-layout style="justify-content: center; align-items: center;">
-                    <vaadin-button theme="tertiary">${driver.fullName}</vaadin-button>
-                    <span>${driver.prettyDriveTime}</span>
-                </vaadin-vertical-layout>
+                <vaadin-horizontal-layout">
+                    <div>
+                        <vaadin-button theme="tertiary">${driver.fullName}</vaadin-button>
+                        ${driver.prettyDriveTime ? html`<span theme="badge contrast pill" title="Driving time">${driver.prettyDriveTime}</span>` : ""}
+                    </div>
+                </vaadin-horizontal-layout>
                 `)}
             </vaadin-horizontal-layout>
             """;
