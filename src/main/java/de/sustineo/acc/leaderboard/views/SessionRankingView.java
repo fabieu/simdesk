@@ -4,17 +4,22 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
+import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.services.SessionService;
+import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.generators.SessionRankingPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.RankingRenderer;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.SessionRankingRenderer;
@@ -39,7 +44,24 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
 
 
     private Component createSessionInformation(Integer sessionId) {
-        return new Div();
+        Session session = sessionService.getSession(sessionId);
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
+
+        H3 heading = new H3();
+        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+
+        Icon weatherIcon = ComponentUtils.getWeatherIcon(session);
+
+        Span sessionDatetimeBadge = new Span();
+        sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
+        sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
+
+        layout.add(weatherIcon, heading, sessionDatetimeBadge);
+
+        return layout;
     }
 
     private Component createLeaderboardGrid(Integer sessionId) {

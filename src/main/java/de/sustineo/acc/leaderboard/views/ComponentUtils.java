@@ -59,10 +59,10 @@ public class ComponentUtils {
 
         if (session.getWetSession()) {
             icon = VaadinIcon.DROP.create();
-            icon.setColor("#00aeff");
+            icon.setColor("var(--weather-rainy-color)");
         } else {
             icon = VaadinIcon.SUN_O.create();
-            icon.setColor("#ffb600");
+            icon.setColor("var(--weather-sunny-color)");
         }
 
         return icon;

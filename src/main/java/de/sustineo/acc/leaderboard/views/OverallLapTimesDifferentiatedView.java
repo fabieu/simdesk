@@ -6,7 +6,8 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -55,15 +56,14 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     }
 
     private Component createRankingHeader(String carGroup, String trackId) {
-        VerticalLayout layout = new VerticalLayout();
+        HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
 
         // Header displaying the car group and track name
-        H1 header = new H1();
-        header.setText(CarGroup.of(carGroup) + " - " + Track.getTrackNameById(trackId));
-        header.getStyle().set("font-size", "var(--lumo-font-size-xxl)");
+        H3 heading = new H3();
+        heading.setText(CarGroup.of(carGroup) + " - " + Track.getTrackNameById(trackId));
 
-        layout.add(header);
+        layout.add(heading);
 
         return layout;
     }

@@ -36,6 +36,10 @@ public class SessionService {
         return sessionMapper.findAll();
     }
 
+    public Session getSession(Integer sessionId) {
+        return sessionMapper.findById(sessionId);
+    }
+
     @Transactional
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
         if (accSession.getLaps().isEmpty()) {
