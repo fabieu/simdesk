@@ -13,6 +13,7 @@ import com.vaadin.flow.theme.Theme;
  */
 @Viewport("width=device-width, initial-scale=1")
 @Meta(name = "Author", content = "Fabian Eulitz")
+@Meta(name = "robots", content = "noindex, nofollow")
 @PageTitle("ACC Leaderboard")
 @PWA(name = "ACC Leaderboard", shortName = "Leaderboard")
 @Theme(value = "default")
