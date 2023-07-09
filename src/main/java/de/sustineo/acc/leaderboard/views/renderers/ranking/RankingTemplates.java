@@ -19,9 +19,9 @@ public class RankingTemplates {
 
     static final String TIMING_TEMPLATE = """
                 <vaadin-vertical-layout style="align-items: end;">
-                    <span>
-                        ${item.time}
-                     </span>
+                    <div>
+                        ${item.fastestLap ? html`<span theme="badge success pill small" title="Fastest lap">FL</span>` : ""} ${item.time}
+                     </div>
                     <span style="font-size: var(--lumo-font-size-s); color: var(${item.color});">
                         ${item.lapCount && item.lapCount > 0 && (item.bestLapCount - item.lapCount) > 0 ? (item.bestLapCount - item.lapCount) + " lap(s) " : ""} ${item.timeGap}
                     </span>
@@ -32,4 +32,5 @@ public class RankingTemplates {
     static final String TIMING_TEMPLATE_BEST_LAP_COUNT = "bestLapCount";
     static final String TIMING_TEMPLATE_LAP_COUNT = "lapCount";
     static final String TIMING_TEMPLATE_COLOR = "color";
+    static final String TIMING_TEMPLATE_FASTEST_LAP = "fastestLap";
 }

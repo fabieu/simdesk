@@ -70,7 +70,10 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 .filter(sessionRanking -> sessionRanking.getLapCount() > 0)
                 .toList();
         SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream().findFirst().orElse(new SessionRanking());
-        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream().min(new SessionRankingLapTimeComparator()).orElse(new SessionRanking());
+        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream()
+                .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
+                .min(new SessionRankingLapTimeComparator())
+                .orElse(new SessionRanking());
 
         Grid<SessionRanking> grid = new Grid<>(SessionRanking.class, false);
         grid.addColumn(SessionRanking::getRanking)
