@@ -68,7 +68,7 @@ public class MainLayout extends AppLayout implements RouterLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.getStyle().set("margin", "0 var(--lumo-space-m)");
 
-        layout.add(createHomeButton(), createThemeToggleButton(), createHelpButton());
+        layout.add(createHomeButton(), createThemeToggleButton());
 
         return layout;
     }
