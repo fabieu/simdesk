@@ -3,6 +3,8 @@ package de.sustineo.acc.leaderboard.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.PageTitle;
@@ -14,6 +16,8 @@ import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
+import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
+import de.sustineo.acc.leaderboard.views.filter.GroupRankingFilter;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
 
 import java.util.List;
@@ -34,6 +38,8 @@ public class AllTimeGroupRankingView extends VerticalLayout {
     }
 
     private Component createRankingGrid() {
+        List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking();
+
         Grid<GroupRanking> grid = new Grid<>(GroupRanking.class, false);
         Grid.Column<GroupRanking> carGroupColumn = grid.addColumn(GroupRanking::getCarGroup)
                 .setHeader("Car Group")
@@ -57,15 +63,22 @@ public class AllTimeGroupRankingView extends VerticalLayout {
                 .setHeader("Car Model")
                 .setSortable(true);
 
-        List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking();
-        grid.setItems(groupRankings);
+
+        GridListDataView<GroupRanking> dataView = grid.setItems(groupRankings);
         grid.setHeightFull();
         grid.setColumnReorderingAllowed(true);
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
+        GroupRankingFilter groupRankingFilter = new GroupRankingFilter(dataView);
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(carGroupColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setCarGroup));
+        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setTrackName));
+        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setDriverName));
+        headerRow.getCell(carModelNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setCarModelName));
+
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<GroupRanking>, GroupRanking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
             GroupRanking selectedGroupRanking = e.getValue();

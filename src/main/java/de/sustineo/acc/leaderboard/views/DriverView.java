@@ -36,6 +36,8 @@ public class DriverView extends VerticalLayout {
     }
 
     private Component createDriverGrid() {
+        List<Driver> drivers = driverService.getWithDetails();
+
         Grid<Driver> grid = new Grid<>(Driver.class, false);
         Grid.Column<Driver> lastNameColumn = grid.addColumn(Driver::getLastName)
                 .setHeader("Last Name")
@@ -74,15 +76,14 @@ public class DriverView extends VerticalLayout {
                 .setFlexGrow(0)
                 .setSortable(true);
 
-        List<Driver> drivers = driverService.getWithDetails();
         GridListDataView<Driver> dataView = grid.setItems(drivers);
-        DriverFilter driverFilter = new DriverFilter(dataView);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
 
+        DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(firstNameColumn).setComponent(FilterUtils.createFilterHeader(driverFilter::setFirstName));
         headerRow.getCell(lastNameColumn).setComponent(FilterUtils.createFilterHeader(driverFilter::setLastName));

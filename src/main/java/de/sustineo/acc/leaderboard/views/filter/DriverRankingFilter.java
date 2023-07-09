@@ -2,22 +2,18 @@ package de.sustineo.acc.leaderboard.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
-import de.sustineo.acc.leaderboard.services.DriverService;
 import lombok.Data;
 
 @Data
 public class DriverRankingFilter {
-    private final DriverService driverService;
     private final GridListDataView<DriverRanking> dataView;
-
 
     private String driverName;
     private String carModelName;
     private String serverName;
     private String sessionTypeDescription;
 
-    public DriverRankingFilter(DriverService driverService, GridListDataView<DriverRanking> dataView) {
-        this.driverService = driverService;
+    public DriverRankingFilter(GridListDataView<DriverRanking> dataView) {
         this.dataView = dataView;
         this.dataView.addFilter(this::test);
     }

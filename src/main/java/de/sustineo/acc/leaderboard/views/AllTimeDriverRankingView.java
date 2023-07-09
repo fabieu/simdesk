@@ -15,7 +15,6 @@ import de.sustineo.acc.leaderboard.entities.Track;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.DriverService;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
@@ -31,12 +30,10 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
-    private final DriverService driverService;
     private final ComponentUtils componentUtils;
 
-    public AllTimeDriverRankingView(RankingService rankingService, DriverService driverService, ComponentUtils componentUtils) {
+    public AllTimeDriverRankingView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
-        this.driverService = driverService;
         this.componentUtils = componentUtils;
         addClassName("alltime-ranking-detailed-view");
         setSizeFull();
@@ -138,7 +135,6 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
                 .setTextAlign(ColumnTextAlign.END);
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
-        DriverRankingFilter driverRankingFilter = new DriverRankingFilter(driverService, dataView);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
@@ -146,6 +142,7 @@ public class AllTimeDriverRankingView extends VerticalLayout implements BeforeEn
         grid.addThemeVariants(GridVariant.LUMO_WRAP_CELL_CONTENT);
         grid.setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
 
+        DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setDriverName));
         headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setCarModelName));

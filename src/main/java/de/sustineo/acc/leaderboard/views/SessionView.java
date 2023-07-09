@@ -40,12 +40,9 @@ public class SessionView extends VerticalLayout {
     }
 
     private Component createSessionGrid() {
-        Grid<Session> grid = new Grid<>(Session.class, false);
-
         List<Session> sessions = sessionService.getAllSessions();
-        GridListDataView<Session> dataView = grid.setItems(sessions);
-        SessionsFilter sessionsFilter = new SessionsFilter(dataView);
 
+        Grid<Session> grid = new Grid<>(Session.class, false);
         Grid.Column<Session> weatherColumn = grid.addComponentColumn(ComponentUtils::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -74,12 +71,19 @@ public class SessionView extends VerticalLayout {
                 .setFlexGrow(0)
                 .setSortable(true);
 
+        GridListDataView<Session> dataView = grid.setItems(sessions);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
+        SessionsFilter sessionsFilter = new SessionsFilter(dataView);
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setTrackName));
+        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setSessionDescription));
+
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
             Session selectedSession = e.getValue();
@@ -92,11 +96,6 @@ public class SessionView extends VerticalLayout {
                 ));
             }
         });
-
-        HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setSessionDescription));
 
         return grid;
     }
