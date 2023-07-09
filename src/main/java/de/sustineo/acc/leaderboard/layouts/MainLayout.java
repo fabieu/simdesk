@@ -19,23 +19,37 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.RouterLayout;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import de.sustineo.acc.leaderboard.configuration.Reference;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
+import de.sustineo.acc.leaderboard.utils.ApplicationContextProvider;
 import de.sustineo.acc.leaderboard.views.*;
+import org.springframework.boot.info.BuildProperties;
 
+import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
-public class MainLayout extends AppLayout implements RouterLayout {
+public class MainLayout extends AppLayout {
+    private static final String DEFAULT_THEME = Lumo.LIGHT;
+    private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
+    private final BuildProperties buildProperties;
     private final Tabs leaderboardMenu;
     private final Tabs toolsMenu;
     private H1 viewTitle;
 
-    public MainLayout() {
+    public MainLayout(ApplicationContextProvider applicationContextProvider) {
+        this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
+
+        // Read and apply theme from session attribute if available
+        String themeFromAttributes = (String) VaadinSession.getCurrent().getAttribute(SESSION_ATTRIBUTE_THEME);
+        setTheme(Objects.requireNonNullElse(themeFromAttributes, DEFAULT_THEME));
+
         setPrimarySection(Section.NAVBAR);
         addToNavbar(true, createNavbarContent(), createNavbarButtons());
 
@@ -77,53 +91,92 @@ public class MainLayout extends AppLayout implements RouterLayout {
 
     private Component createHomeButton() {
         Icon homeIcon = VaadinIcon.HOME_O.create();
+        String label = "Back to Home";
 
         Button homeButton = new Button(homeIcon);
+        homeButton.setTooltipText(label);
+        homeButton.setAriaLabel(label);
         homeButton.addClickListener(e -> UI.getCurrent().navigate(MainView.class));
 
         return homeButton;
     }
 
     private Button createThemeToggleButton() {
+        String currentTheme = getTheme();
+
         Icon darkThemeIcon = VaadinIcon.MOON_O.create();
         Icon lightThemeIcon = VaadinIcon.SUN_O.create();
+        String darkThemeLabel = "Enable dark theme";
+        String lightThemeLabel = "Enable light theme";
+        Icon themeButtonIcon = Lumo.DARK.equals(currentTheme) ? lightThemeIcon : darkThemeIcon;
+        String label = Lumo.DARK.equals(currentTheme) ? lightThemeLabel : darkThemeLabel;
 
-        Button themeButton = new Button(darkThemeIcon);
+        Button themeButton = new Button(themeButtonIcon);
+        themeButton.setTooltipText(label);
+        themeButton.setAriaLabel(label);
         themeButton.addClickListener(e -> {
-            ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-
-            if (themeList.contains(Lumo.DARK)) {
-                themeList.remove(Lumo.DARK);
+            if (Lumo.DARK.equals(getTheme())) {
+                setTheme(Lumo.LIGHT);
                 themeButton.setIcon(darkThemeIcon);
+                themeButton.setTooltipText(darkThemeLabel);
+                themeButton.setAriaLabel(darkThemeLabel);
             } else {
-                themeList.add(Lumo.DARK);
+                setTheme(Lumo.DARK);
                 themeButton.setIcon(lightThemeIcon);
+                themeButton.setTooltipText(lightThemeLabel);
+                themeButton.setAriaLabel(lightThemeLabel);
             }
         });
 
         return themeButton;
     }
 
+    private void setTheme(String theme){
+        VaadinSession vaadinSession = UI.getCurrent().getSession();
+        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+        themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));
+        themeList.add(theme);
+        vaadinSession.setAttribute(SESSION_ATTRIBUTE_THEME, theme);
+    }
+
+    private String getTheme() {
+        return UI.getCurrent().getElement().getThemeList().stream()
+                .findFirst()
+                .orElse(DEFAULT_THEME);
+    }
+
     private Component createHelpButton() {
         Icon helpIcon = VaadinIcon.QUESTION_CIRCLE_O.create();
 
         Button helpButton = new Button(helpIcon);
-        helpButton.addClickListener(e -> UI.getCurrent().getPage().setLocation("https://gitlab.com/markracing/acc-leaderboard/-/wikis/home"));
+        helpButton.addClickListener(e -> UI.getCurrent().getPage().setLocation(Reference.PROJECT_WIKI));
 
         return helpButton;
     }
 
     private Component createDrawerContent(Tabs leaderboardMenu, Tabs toolsMenu) {
+        Hr spacer = ComponentUtils.createSpacer();
+
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setPadding(false);
-        layout.setSpacing(false);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.AROUND);
 
-        Hr spacer = ComponentUtils.createSpacer();
+        VerticalLayout menuLayout = new VerticalLayout();
+        menuLayout.setPadding(false);
+        menuLayout.setSpacing(false);
+        menuLayout.add(leaderboardMenu);
+        menuLayout.add(spacer);
+        menuLayout.add(toolsMenu);
 
-        layout.add(leaderboardMenu);
-        layout.add(spacer);
-        layout.add(toolsMenu);
+        VerticalLayout infoLayout = new VerticalLayout();
+        infoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+        Span version = new Span("Version " + buildProperties.getVersion());
+        version.getElement().getThemeList().add("badge");
+        infoLayout.add(version);
+
+        layout.addAndExpand(menuLayout);
+        layout.add(infoLayout);
 
         return layout;
     }
@@ -139,7 +192,7 @@ public class MainLayout extends AppLayout implements RouterLayout {
 
     private Tab[] createToolsMenuTabs() {
         return new Tab[]{
-                createExternalTab("Entrylist Validator", VaadinIcon.COG.create(), "https://acc.sustineo.de/entrylist"),
+                createExternalTab("Entrylist Validator", VaadinIcon.COG.create(), Reference.SUSTINEO_ENTRYLIST_VALIDATOR),
         };
     }
 

@@ -22,8 +22,8 @@ import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.Environment;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
-import de.sustineo.acc.leaderboard.entities.Environment;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.SessionService;
@@ -69,7 +69,7 @@ public class MainView extends VerticalLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
 
         Tab[] filteredTabArray = Arrays.stream(MainLayout.createLeaderboardMenuTabs())
-                .filter(tab -> !List.of("tab-home").contains(tab.getId().orElse(null)))
+                .filter(tab -> !"tab-home".equals(tab.getId().orElse(null)))
                 .toArray(Tab[]::new);
         tabs.add(filteredTabArray);
 
@@ -80,7 +80,7 @@ public class MainView extends VerticalLayout {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        layout.add(new H3("Latest Sessions"));
+        layout.add(new H3("Latest sessions"));
         layout.add(createSessionGrid());
 
         return layout;

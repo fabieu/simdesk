@@ -1,4 +1,4 @@
-package de.sustineo.acc.leaderboard.entities;
+package de.sustineo.acc.leaderboard.configuration;
 
 public class Environment {
     private static final String PREFIX = "LEADERBOARD_";
