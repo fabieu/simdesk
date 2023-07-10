@@ -26,6 +26,7 @@
           "nationality": 0,
           "carGuid": -1,
           "teamGuid": -1,
+          "ballastKg": 10,
           "drivers": [
             {
               "firstName": "Siggi",
