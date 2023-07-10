@@ -46,4 +46,8 @@ public class FileService {
             return false;
         }
     }
+
+    public String removeControlCharacters(String fileContent) {
+        return fileContent.replaceAll("[\\x00-\\x09\\x11\\x12\\x14-\\x1F\\x7F]", "");
+    }
 }

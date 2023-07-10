@@ -116,6 +116,7 @@ public class FileContentService {
             try {
                 String fileContent = Files.readString(file, charset);
                 fileContent = fileService.removeBOM(fileContent);
+                fileContent = fileService.removeControlCharacters(fileContent);
                 log.fine(String.format("Successfully parsed %s with charset %s", file, charset));
 
                 return fileContent;
