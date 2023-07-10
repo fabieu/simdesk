@@ -22,7 +22,6 @@ import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.generators.SessionRankingDNFNameGenerator;
 import de.sustineo.acc.leaderboard.views.generators.SessionRankingPodiumPartNameGenerator;
-import de.sustineo.acc.leaderboard.views.renderers.ranking.RankingRenderer;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.SessionRankingRenderer;
 
 import java.util.List;
@@ -103,7 +102,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.addColumn(SessionRankingRenderer.createDriversRenderer())
                 .setHeader("Drivers")
                 .setSortable(true);
-        grid.addColumn(sessionRanking -> sessionRanking.getLapCount() > 0 ? sessionRanking.getLapCount() : RankingRenderer.DNS)
+        grid.addColumn(SessionRanking::getLapCount)
                 .setHeader("Laps")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
