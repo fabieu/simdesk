@@ -50,7 +50,8 @@ public class SessionView extends VerticalLayout {
                 .setHeader("Session Time")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(Session::getSessionDatetime);
         Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
                 .setHeader("Server Name")
                 .setSortable(true);

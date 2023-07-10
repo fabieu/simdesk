@@ -73,7 +73,8 @@ public class DriverView extends VerticalLayout {
                 .setHeader("Last Activity")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(Driver::getLastActivity);
 
         GridListDataView<Driver> dataView = grid.setItems(drivers);
         grid.setHeightFull();
