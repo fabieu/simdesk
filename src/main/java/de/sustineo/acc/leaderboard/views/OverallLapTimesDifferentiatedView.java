@@ -61,7 +61,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
 
         // Header displaying the car group and track name
         H3 heading = new H3();
-        heading.setText(CarGroup.of(carGroup) + " - " + Track.getTrackNameById(trackId));
+        heading.setText(carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId));
 
         layout.add(heading);
 
