@@ -1,7 +1,7 @@
 package de.sustineo.acc.leaderboard.entities.enums;
 
 public enum SessionType {
-    FP("Free Practise"),
+    FP("Free Practice"),
     Q("Qualifying"),
     R("Race"),
     UNKNOWN("Unknown");
