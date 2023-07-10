@@ -68,15 +68,9 @@ public class FileContentConfiguration {
 
         if (WATCH_DIRECTORIES != null) {
             for (Path path : WATCH_DIRECTORIES) {
-
-                if (!Files.isDirectory(path)) {
-                    throw new RuntimeException("Incorrect monitoring folder: " + path);
-                }
-
                 WatchKey watchKey = path.register(
                         watchService,
-                        StandardWatchEventKinds.ENTRY_CREATE,
-                        StandardWatchEventKinds.ENTRY_DELETE
+                        StandardWatchEventKinds.ENTRY_CREATE
                 );
                 watchKeyMap.put(watchKey, path);
             }
