@@ -13,7 +13,7 @@ public class CarGroupPartNameGenerator implements SerializableFunction<GroupRank
         String rankingColorGroup = switch (groupRanking.getCarGroup()) {
             case GT3 -> "gt3";
             case GT4 -> "gt4";
-            case CUP, ST, CHL  -> "gtc";
+            case Cup, ST, CHL  -> "gtc";
             case TCX -> "tcx";
         };
 
