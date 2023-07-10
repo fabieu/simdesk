@@ -37,6 +37,7 @@ public class LeaderboardConverter extends BaseConverter {
                 .carId(accLeaderboardLine.getCar().getCarId())
                 .carGroup(accLeaderboardLine.getCar().getCarGroup())
                 .carModelId(accLeaderboardLine.getCar().getCarModel())
+                .ballastKg(accLeaderboardLine.getCar().getBallastKg())
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())
                 .drivers(accLeaderboardLine.getCar().getDrivers().stream().map(driver -> driverConverter.convertToLeaderboardDriver(driver, fileMetadata, accLeaderboardLine)).toList())
                 .bestLapTimeMillis(filterBadTiming(accLeaderboardLine.getTiming().getBestLap()))

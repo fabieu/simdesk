@@ -59,6 +59,7 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.leaderboard_lines
     car_id               INT         NOT NULL,
     car_group            VARCHAR(3)  NOT NULL,
     car_model_id         INT         NOT NULL,
+    ballast_kg           INT,
     race_number          INT         NOT NULL,
     best_lap_time_millis BIGINT      NOT NULL,
     best_split1_millis   BIGINT      NOT NULL,

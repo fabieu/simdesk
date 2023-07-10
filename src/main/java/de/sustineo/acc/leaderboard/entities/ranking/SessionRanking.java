@@ -21,6 +21,7 @@ public class SessionRanking {
     private Integer ranking;
     private CarGroup carGroup;
     private Integer carModelId;
+    private Integer ballastKg;
     private Integer raceNumber;
     private List<Driver> drivers;
     private Long bestLapTimeMillis;

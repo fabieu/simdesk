@@ -1,8 +1,12 @@
 package de.sustineo.acc.leaderboard.views.renderers.ranking;
 
 public class RankingTemplates {
-    static final String RACE_NUMBER_TEMPLATE = "#${item.raceNumber}";
+    static final String RACE_NUMBER_TEMPLATE = """
+                #${item.raceNumber}
+                ${item.ballastKg ? html`<span theme="badge pill" title="Ballast in kg">+${item.ballastKg}kg</span>` : ""}
+            """;
     static final String RACE_NUMBER_TEMPLATE_NUMBER = "raceNumber";
+    static final String RACE_NUMBER_TEMPLATE_BALLAST = "ballastKg";
     static final String DRIVERS_TEMPLATE = """
             <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
                 ${item.drivers.map(driver => html`

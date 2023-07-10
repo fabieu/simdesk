@@ -12,7 +12,8 @@ import static de.sustineo.acc.leaderboard.views.renderers.ranking.RankingTemplat
 public class SessionRankingRenderer {
     public static Renderer<SessionRanking> createRaceNumberRenderer() {
         return LitRenderer.<SessionRanking>of(RACE_NUMBER_TEMPLATE)
-                .withProperty(RACE_NUMBER_TEMPLATE_NUMBER, SessionRanking::getRaceNumber);
+                .withProperty(RACE_NUMBER_TEMPLATE_NUMBER, SessionRanking::getRaceNumber)
+                .withProperty(RACE_NUMBER_TEMPLATE_BALLAST, SessionRanking::getBallastKg);
     }
 
     public static Renderer<SessionRanking> createDriversRenderer() {

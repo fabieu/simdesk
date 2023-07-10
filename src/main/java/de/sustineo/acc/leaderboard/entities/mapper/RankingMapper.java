@@ -46,6 +46,7 @@ public interface RankingMapper {
             @Result(property = "ranking", column = "ranking"),
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "carModelId", column = "car_model_id"),
+            @Result(property = "ballastKg", column = "ballast_kg"),
             @Result(property = "raceNumber", column = "race_number"),
             @Result(property = "drivers", column = "{sessionId=session_id, carId=car_id}", many = @Many(select = "de.sustineo.acc.leaderboard.entities.mapper.DriverMapper.findDriversBySessionAndCarId")),
             @Result(property = "bestLapTimeMillis", column = "best_lap_time_millis"),

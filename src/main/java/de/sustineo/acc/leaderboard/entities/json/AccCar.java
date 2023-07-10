@@ -18,6 +18,7 @@ public class AccCar {
     private Integer nationality;
     private Integer carGuid;
     private Integer teamGuid;
+    private Integer ballastKg;
     private List<AccDriver> drivers;
 
     public Optional<AccDriver> getDriverByIndex(int index) {
