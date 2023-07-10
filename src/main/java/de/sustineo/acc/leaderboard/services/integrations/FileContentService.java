@@ -105,8 +105,7 @@ public class FileContentService {
             FileMetadata fileMetadata = new FileMetadata(file);
 
             sessionService.handleSession(accSession, fileMetadata);
-            log.info(String.format("Successfully processed session file %s", file));
-        } catch (IOException e) {
+        } catch (Exception e) {
             log.log(Level.SEVERE, String.format("Could not process session file %s", file), e);
         }
     }

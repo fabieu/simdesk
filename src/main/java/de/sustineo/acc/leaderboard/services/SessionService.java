@@ -59,6 +59,8 @@ public class SessionService {
         // Actual processing of the session results
         leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
+
+        log.info(String.format("Successfully processed session file %s", fileMetadata.getFile()));
     }
 
     private boolean sessionExists(Session session) {
