@@ -59,7 +59,7 @@ spring:
     banner-mode: off
 logging:
   level:
-    ROOT: WARN
+    ROOT: INFO
 vaadin:
   productionMode: true
   heartbeatInterval: 60
