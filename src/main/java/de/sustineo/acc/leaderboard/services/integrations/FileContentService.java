@@ -6,7 +6,6 @@ import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import de.sustineo.acc.leaderboard.services.FileService;
 import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.json.JsonUtils;
-import jakarta.annotation.PostConstruct;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -42,7 +41,7 @@ public class FileContentService {
         this.fileService = fileService;
     }
 
-    @PostConstruct
+    @EventListener(ApplicationReadyEvent.class)
     public void createWatchServiceThreadPool() {
         ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
         executor.submit(this::startWatchService);
