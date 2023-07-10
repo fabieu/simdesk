@@ -75,7 +75,12 @@ public class MainLayout extends AppLayout {
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
-        layout.add(viewTitle);
+
+        Span betaBadge = new Span("BETA");
+        betaBadge.getElement().getThemeList().add("badge pill");
+        betaBadge.getStyle().set("margin-left", "var(--lumo-space-s)");
+
+        layout.add(viewTitle, betaBadge);
 
         return layout;
     }
@@ -131,7 +136,7 @@ public class MainLayout extends AppLayout {
         return themeButton;
     }
 
-    private void setTheme(String theme){
+    private void setTheme(String theme) {
         VaadinSession vaadinSession = UI.getCurrent().getSession();
         ThemeList themeList = UI.getCurrent().getElement().getThemeList();
         themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));

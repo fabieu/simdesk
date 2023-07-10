@@ -1,20 +1,12 @@
 package de.sustineo.acc.leaderboard.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
@@ -49,8 +41,6 @@ public class MainView extends VerticalLayout {
         add(createNavigationTabs());
         addAndExpand(createMainContent());
         add(componentUtils.createFooter());
-
-        initializeDevelopmentNotification();
     }
 
     private Component createHeader() {
@@ -136,29 +126,5 @@ public class MainView extends VerticalLayout {
         });
 
         return grid;
-    }
-
-    private void initializeDevelopmentNotification() {
-        Notification notification = new Notification();
-        notification.addThemeVariants(NotificationVariant.LUMO_WARNING);
-        notification.setPosition(Notification.Position.BOTTOM_STRETCH);
-        notification.setDuration(5000); // 5 seconds
-
-        Icon icon = VaadinIcon.WARNING.create();
-        Div text = new Div(new Text(VaadinConfiguration.APPLICATION_NAME + " is currently under development."));
-
-        Button closeButton = new Button(VaadinIcon.CLOSE.create());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-        closeButton.addClickListener(event -> {
-            notification.close();
-        });
-
-        HorizontalLayout layout = new HorizontalLayout(icon, text, closeButton);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        layout.setAlignItems(Alignment.CENTER);
-
-        notification.add(layout);
-        notification.open();
     }
 }
