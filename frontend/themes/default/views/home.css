@@ -14,12 +14,13 @@
 }
 
 #home-tabs vaadin-tab {
-    color: var(--lumo-body-text-color);
+    color: var(--lumo-primary-contrast-color);
+    background-color: var(--lumo-primary-color);
     border: 1px solid var(--lumo-primary-color);
     margin: 0 var(--lumo-space-s);
 }
 
 #home-tabs vaadin-tab:hover {
-    color: var(--lumo-primary-contrast-color);
-    background-color: var(--lumo-primary-color);
+    color: var(--lumo-body-text-color);
+    background-color: var(--lumo-base-color);
 }
