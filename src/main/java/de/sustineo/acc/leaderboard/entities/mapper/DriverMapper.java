@@ -33,7 +33,7 @@ public interface DriverMapper {
 
     @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name, last_activity) " +
             "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity}) " +
-            "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name), last_activity = VALUES(last_activity)"
+            "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name), last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < VALUES(last_activity) THEN VALUES(last_activity) ELSE last_activity END)"
     )
     void upsert(Driver driver);
 }
