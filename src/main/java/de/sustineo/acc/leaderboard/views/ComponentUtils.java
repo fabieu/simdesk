@@ -4,8 +4,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Hr;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -31,21 +31,27 @@ public class ComponentUtils {
     public Component createFooter() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
+        layout.setPadding(true);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        layout.add(new Paragraph("© " + LocalDate.now().getYear()));
-        layout.add(new Paragraph(new Text("Made with ❤️ by "), new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK)));
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        layout.getStyle()
+                .setBackground("var(--lumo-base-color)");
 
+        Div creatorContainer = new Div();
+        creatorContainer.add(new Text("Made with ❤️ by "));
+        creatorContainer.add(new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK));
+        creatorContainer.add(new Text(" © " + LocalDate.now().getYear()));
+
+        HorizontalLayout referenceLayout = new HorizontalLayout();
         if (impressumUrl != null && !impressumUrl.isEmpty()) {
-            Anchor impressum = new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK);
-            layout.add(new Paragraph(impressum));
+            referenceLayout.add(new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK));
         }
 
         if (privacyUrl != null && !privacyUrl.isEmpty()) {
-            Anchor privacy = new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK);
-            layout.add(new Paragraph(privacy));
+            referenceLayout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
         }
 
+        layout.add(creatorContainer, referenceLayout);
         return layout;
     }
 
