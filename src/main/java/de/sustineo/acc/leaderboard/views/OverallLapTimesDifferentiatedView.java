@@ -36,6 +36,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     public OverallLapTimesDifferentiatedView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
         this.componentUtils = componentUtils;
+
         setSizeFull();
         setPadding(false);
     }
@@ -59,6 +60,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     private Component createRankingHeader(String carGroup, String trackId) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
+        layout.setPadding(true);
 
         // Header displaying the car group and track name
         H3 heading = new H3();
@@ -140,8 +142,6 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.getStyle()
-                .setMargin("var(--lumo-space-m) 0");
 
         DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

@@ -35,7 +35,7 @@ public class ComponentUtils {
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         layout.getStyle()
                 .setBackground("var(--lumo-base-color)")
-                .setPadding("var(--lumo-space-s) var(--lumo-space-m)");
+                .setPadding("0 var(--lumo-space-m) var(--lumo-space-m) var(--lumo-space-m)"); // top right bottom left
 
         Div creatorContainer = new Div();
         creatorContainer.add(new Text("Made with ❤️ by "));

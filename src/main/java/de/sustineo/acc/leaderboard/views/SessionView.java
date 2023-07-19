@@ -77,8 +77,6 @@ public class SessionView extends VerticalLayout {
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.getStyle()
-                .setMargin("var(--lumo-space-m) 0");
 
         SessionsFilter sessionsFilter = new SessionsFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

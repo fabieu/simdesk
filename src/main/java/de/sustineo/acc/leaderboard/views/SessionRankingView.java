@@ -50,6 +50,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
 
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
+        layout.setPadding(true);
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
@@ -130,8 +131,6 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
-        grid.getStyle()
-                .setMargin("var(--lumo-space-m) 0");
 
         return grid;
     }

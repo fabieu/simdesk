@@ -71,8 +71,6 @@ public class OverallLapTimesView extends VerticalLayout {
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
-        grid.getStyle()
-                .setMargin("var(--lumo-space-m) 0");
 
         GroupRankingFilter groupRankingFilter = new GroupRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

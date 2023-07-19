@@ -83,8 +83,6 @@ public class DriverView extends VerticalLayout {
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.getStyle()
-                .setMargin("var(--lumo-space-m) 0");
 
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
