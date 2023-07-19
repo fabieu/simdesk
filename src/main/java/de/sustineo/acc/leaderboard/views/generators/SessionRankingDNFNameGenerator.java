@@ -1,6 +1,7 @@
 package de.sustineo.acc.leaderboard.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
+import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 
 public class SessionRankingDNFNameGenerator implements SerializableFunction<SessionRanking, String> {
@@ -13,6 +14,11 @@ public class SessionRankingDNFNameGenerator implements SerializableFunction<Sess
 
     @Override
     public String apply(SessionRanking sessionRanking) {
+        // Only apply for race sessions
+        if (sessionRanking.getSession().getSessionType() != SessionType.R){
+            return null;
+        }
+
         if (sessionRanking.getTotalTimeMillis() < bestTotalTimeSessionRanking.getTotalTimeMillis() * DNF_THRESHOLD) {
             return "ranking-dnf";
         }
