@@ -37,6 +37,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         this.rankingService = rankingService;
         this.componentUtils = componentUtils;
         setSizeFull();
+        setPadding(false);
     }
 
     @Override
@@ -139,6 +140,8 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.getStyle()
+                .setMargin("var(--lumo-space-m) 0");
 
         DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

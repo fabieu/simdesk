@@ -30,7 +30,9 @@ public class OverallLapTimesView extends VerticalLayout {
 
     public OverallLapTimesView(RankingService rankingService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
+
         setSizeFull();
+        setPadding(false);
 
         addAndExpand(createRankingGrid());
         add(componentUtils.createFooter());
@@ -69,6 +71,8 @@ public class OverallLapTimesView extends VerticalLayout {
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
+        grid.getStyle()
+                .setMargin("var(--lumo-space-m) 0");
 
         GroupRankingFilter groupRankingFilter = new GroupRankingFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

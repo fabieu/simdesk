@@ -39,7 +39,9 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         this.rankingService = rankingService;
         this.sessionService = sessionService;
         this.componentUtils = componentUtils;
+
         setSizeFull();
+        setPadding(false);
     }
 
 
@@ -128,6 +130,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
+        grid.getStyle()
+                .setMargin("var(--lumo-space-m) 0");
 
         return grid;
     }
