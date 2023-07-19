@@ -7,6 +7,7 @@ import org.springframework.transaction.annotation.EnableTransactionManagement;
 import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.ZoneOffset;
+import java.util.Locale;
 import java.util.TimeZone;
 
 @SpringBootApplication
@@ -16,6 +17,7 @@ import java.util.TimeZone;
 public class LeaderboardApplication {
     public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));
+        Locale.setDefault(Locale.ENGLISH);
 
         SpringApplication.run(LeaderboardApplication.class);
     }

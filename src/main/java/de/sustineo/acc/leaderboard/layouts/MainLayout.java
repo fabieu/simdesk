@@ -51,7 +51,7 @@ public class MainLayout extends AppLayout {
         setTheme(Objects.requireNonNullElse(themeFromAttributes, DEFAULT_THEME));
 
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(true, createNavbarContent(), createNavbarButtons());
+        addToNavbar(false, createNavbarContent(), createNavbarButtons());
 
         leaderboardMenu = createMenuTabs(createLeaderboardMenuTabs());
         toolsMenu = createMenuTabs(createToolsMenuTabs());
@@ -197,7 +197,7 @@ public class MainLayout extends AppLayout {
 
     private Tab[] createToolsMenuTabs() {
         return new Tab[]{
-                createExternalTab("Entrylist Validator", VaadinIcon.COG.create(), Reference.SUSTINEO_ENTRYLIST_VALIDATOR),
+                createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidationView.class),
         };
     }
 

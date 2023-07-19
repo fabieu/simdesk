@@ -2,15 +2,29 @@ package de.sustineo.acc.leaderboard.utils.json;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import org.springframework.stereotype.Service;
 
+import java.io.IOException;
+import java.io.InputStream;
+
+@Service
 public class JsonUtils {
-    private final static ObjectMapper OBJECT_MAPPER = new ObjectMapper();
+    private final ObjectMapper objectMapper;
 
-    public static String toJson(Object entity) throws JsonProcessingException {
-        return OBJECT_MAPPER.writeValueAsString(entity);
+    public JsonUtils(ObjectMapper objectMapper) {
+        this.objectMapper = objectMapper;
     }
 
-    public static <T> T fromJson(String json, Class<T> clazz) throws JsonProcessingException {
-        return OBJECT_MAPPER.readValue(json, clazz);
+
+    public String toJson(Object entity) throws JsonProcessingException {
+        return objectMapper.writeValueAsString(entity);
+    }
+
+    public <T> T fromJson(String json, Class<T> clazz) throws JsonProcessingException {
+        return objectMapper.readValue(json, clazz);
+    }
+
+    public <T> T fromJson(InputStream inputStream, Class<T> clazz) throws IOException {
+        return objectMapper.readValue(inputStream, clazz);
     }
 }

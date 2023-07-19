@@ -31,11 +31,11 @@ public class ComponentUtils {
     public Component createFooter() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
-        layout.setPadding(true);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         layout.getStyle()
-                .setBackground("var(--lumo-base-color)");
+                .setBackground("var(--lumo-base-color)")
+                .setPadding("var(--lumo-space-s) var(--lumo-space-m)");
 
         Div creatorContainer = new Div();
         creatorContainer.add(new Text("Made with ❤️ by "));
