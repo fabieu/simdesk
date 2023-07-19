@@ -67,11 +67,10 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     private Component createLeaderboardGrid(Integer sessionId) {
         List<SessionRanking> sessionRankings = rankingService.getSessionRanking(sessionId);
         List<SessionRanking> filteredSessionRankings = sessionRankings.stream()
-                .filter(sessionRanking -> sessionRanking.getLapCount() > 0)
+                .filter(sessionRanking -> sessionRanking.getLapCount() > 0 && sessionRanking.getBestLapTimeMillis() > 0)
                 .toList();
-        SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream().findFirst().orElse(new SessionRanking());
-        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream()
-                .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
+        SessionRanking bestTotalTimeSessionRanking = filteredSessionRankings.stream().findFirst().orElse(new SessionRanking());
+        SessionRanking bestLapTimeSessionRanking = filteredSessionRankings.stream()
                 .min(new SessionRankingLapTimeComparator())
                 .orElse(new SessionRanking());
 
