@@ -36,7 +36,7 @@ import java.util.Optional;
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
 public class MainLayout extends AppLayout {
-    private static final String DEFAULT_THEME = Lumo.DARK;
+    private static final String DEFAULT_THEME = Lumo.LIGHT;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
     private final Tabs leaderboardMenu;
