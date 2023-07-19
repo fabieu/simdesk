@@ -45,13 +45,13 @@ public class LapConverter extends BaseConverter {
 
         return Lap.builder()
                 .sessionId(sessionId)
-                .carGroup(accCar.get().getCarGroup())
+                .carGroup(fixBadCarGroup(accCar.get().getCarGroup(), accCar.get().getCarModel()))
                 .carModelId(accCar.get().getCarModel())
                 .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
-                .lapTimeMillis(filterBadTiming(accLap.getLapTimeMillis()))
-                .split1Millis(filterBadTiming(accLap.getSplits().get(0)))
-                .split2Millis(filterBadTiming(accLap.getSplits().get(1)))
-                .split3Millis(filterBadTiming(accLap.getSplits().get(2)))
+                .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))
+                .split1Millis(fixBadTiming(accLap.getSplits().get(0)))
+                .split2Millis(fixBadTiming(accLap.getSplits().get(1)))
+                .split3Millis(fixBadTiming(accLap.getSplits().get(2)))
                 .valid(accLap.getValid())
                 .build();
     }
