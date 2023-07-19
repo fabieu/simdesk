@@ -32,13 +32,15 @@ public class FileContentService {
     private final WatchService watchService;
     private final SessionService sessionService;
     private final FileService fileService;
+    private final JsonUtils jsonUtils;
     private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_8, StandardCharsets.UTF_16LE);
 
     @Autowired
-    public FileContentService(WatchService watchService, SessionService sessionService, FileService fileService) {
+    public FileContentService(WatchService watchService, SessionService sessionService, FileService fileService, JsonUtils jsonUtils) {
         this.watchService = watchService;
         this.sessionService = sessionService;
         this.fileService = fileService;
+        this.jsonUtils = jsonUtils;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -100,7 +102,7 @@ public class FileContentService {
     public void handleSessionFile(Path file) {
         try {
             String fileContent = readFile(file);
-            AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
+            AccSession accSession = jsonUtils.fromJson(fileContent, AccSession.class);
             FileMetadata fileMetadata = new FileMetadata(file);
 
             sessionService.handleSession(accSession, fileMetadata);
