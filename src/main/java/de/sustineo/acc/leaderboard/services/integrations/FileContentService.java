@@ -8,20 +8,27 @@ import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.json.JsonUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
+import org.apache.commons.io.monitor.FileAlterationListener;
+import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
+import org.apache.commons.io.monitor.FileAlterationMonitor;
+import org.apache.commons.io.monitor.FileAlterationObserver;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
+import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
+import java.io.File;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.nio.file.*;
+import java.nio.file.Files;
+import java.nio.file.Path;
+import java.time.Duration;
 import java.util.List;
 import java.util.Set;
-import java.util.concurrent.Executors;
-import java.util.concurrent.ThreadPoolExecutor;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
@@ -29,56 +36,64 @@ import java.util.stream.Stream;
 @Log
 @Service
 public class FileContentService {
-    private final WatchService watchService;
+    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_8, StandardCharsets.UTF_16LE);
+
     private final SessionService sessionService;
     private final FileService fileService;
     private final JsonUtils jsonUtils;
-    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_8, StandardCharsets.UTF_16LE);
+
+    private final FileAlterationMonitor monitor;
+
+
 
     @Autowired
-    public FileContentService(WatchService watchService, SessionService sessionService, FileService fileService, JsonUtils jsonUtils) {
-        this.watchService = watchService;
+    public FileContentService(SessionService sessionService, FileService fileService, JsonUtils jsonUtils, @Value("${leaderboard.results.scan_interval}") String scanInterval) {
         this.sessionService = sessionService;
         this.fileService = fileService;
         this.jsonUtils = jsonUtils;
+        this.monitor = new FileAlterationMonitor(Duration.parse(scanInterval).toMillis());
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void createWatchServiceThreadPool() {
-        ThreadPoolExecutor executor = (ThreadPoolExecutor) Executors.newFixedThreadPool(8);
-        executor.submit(this::startWatchService);
-    }
+    public void startFileAlterationMonitor() {
+        Set<Path> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
 
-    public void startWatchService() {
         try {
-            WatchKey key;
-            while ((key = watchService.take()) != null) {
-                Path baseDirectory = FileContentConfiguration.watchKeyMap.get(key);
-
-                for (WatchEvent<?> event : key.pollEvents()) {
-                    Path relativePath = (Path) event.context();
-                    Path absolutePath = baseDirectory.resolve(relativePath);
-
-                    if (StandardWatchEventKinds.ENTRY_CREATE.equals(event.kind()) && FileService.isSessionFile(absolutePath)) {
-                        log.fine(String.format("Processing event kind: %s; File affected: %s", event.kind(), absolutePath));
-                        handleSessionFile(absolutePath);
-                    } else {
-                        log.fine(String.format("Ignoring event kind: %s; File affected: %s", event.kind(), absolutePath));
+            for (Path path : watchDirectories) {
+                FileAlterationObserver observer = new FileAlterationObserver(path.toFile());
+                FileAlterationListener listener = new FileAlterationListenerAdaptor(){
+                    @Override
+                    public void onFileCreate(File file) {
+                        log.fine(String.format("Processing file create event; File affected: %s", file.getAbsolutePath()));
+                        handleSessionFile(file.toPath().toAbsolutePath());
                     }
-                }
-                key.reset();
+
+                    @Override
+                    public void onFileDelete(File file) {
+                        log.fine(String.format("Ignoring file delete event; File affected: %s", file.getAbsolutePath()));
+                    }
+
+                    @Override
+                    public void onFileChange(File file) {
+                        log.fine(String.format("Ignoring file change event; File affected: %s", file.getAbsolutePath()));
+                    }
+                };
+                observer.addListener(listener);
+                monitor.addObserver(observer);
             }
-        } catch (InterruptedException e) {
-            log.warning("interrupted exception for monitoring service");
+
+            monitor.start();
+        } catch (Exception e) {
+            log.log(Level.SEVERE, "exception while creating the monitoring service", e);
         }
     }
 
     @PreDestroy
     public void stopWatchService() {
-        if (watchService != null) {
+        if (monitor != null) {
             try {
-                watchService.close();
-            } catch (IOException e) {
+                monitor.stop();
+            } catch (Exception e) {
                 log.severe("exception while closing the monitoring service");
             }
         }
@@ -89,18 +104,20 @@ public class FileContentService {
         Set<Path> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
 
         for (Path watchDirectory : watchDirectories) {
-            try (Stream<Path> pathStream = Files.walk(watchDirectory)) {
-                pathStream
-                        .filter(Files::isRegularFile)
-                        .filter(FileService::isSessionFile)
-                        .forEach(this::handleSessionFile);
+            try (Stream<Path> pathStream = Files.list(watchDirectory)) {
+                pathStream.forEach(this::handleSessionFile);
             }
         }
     }
 
-
+    @Async
     public void handleSessionFile(Path file) {
         try {
+            if (!Files.isRegularFile(file) || !FileService.isSessionFile(file)) {
+                log.warning(String.format("Ignoring file %s because it is not a valid session file", file));
+                return;
+            }
+
             String fileContent = readFile(file);
             AccSession accSession = jsonUtils.fromJson(fileContent, AccSession.class);
             FileMetadata fileMetadata = new FileMetadata(file);

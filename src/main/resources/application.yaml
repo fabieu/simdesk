@@ -32,6 +32,7 @@ leaderboard:
     privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-leaderboard/results}
+    scan_interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
 
 ---
 spring:
