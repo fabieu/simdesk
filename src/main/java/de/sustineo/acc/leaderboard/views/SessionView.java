@@ -19,7 +19,7 @@ import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
-import de.sustineo.acc.leaderboard.views.filter.SessionsFilter;
+import de.sustineo.acc.leaderboard.views.filter.SessionFilter;
 
 import java.util.List;
 
@@ -78,11 +78,11 @@ public class SessionView extends VerticalLayout {
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        SessionsFilter sessionsFilter = new SessionsFilter(dataView);
+        SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionsFilter::setSessionDescription));
+        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setTrackName));
+        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setSessionDescription));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();

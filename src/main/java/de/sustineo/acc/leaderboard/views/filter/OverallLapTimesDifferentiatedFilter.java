@@ -5,7 +5,7 @@ import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import lombok.Data;
 
 @Data
-public class DriverRankingFilter {
+public class OverallLapTimesDifferentiatedFilter {
     private final GridListDataView<DriverRanking> dataView;
 
     private String driverName;
@@ -13,7 +13,7 @@ public class DriverRankingFilter {
     private String serverName;
     private String sessionTypeDescription;
 
-    public DriverRankingFilter(GridListDataView<DriverRanking> dataView) {
+    public OverallLapTimesDifferentiatedFilter(GridListDataView<DriverRanking> dataView) {
         this.dataView = dataView;
         this.dataView.addFilter(this::test);
     }
@@ -39,12 +39,12 @@ public class DriverRankingFilter {
     }
 
     public boolean test(DriverRanking driverRanking) {
-        boolean matchesDriverId = matches(driverRanking.getDriver().getEntireName(), driverName);
+        boolean matchesDriverFullName = matches(driverRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(driverRanking.getCarModelName(), carModelName);
         boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
         boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);
 
-        return matchesDriverId && matchesCarModelName && matchesServerName && matchesSessionTypeDescription;
+        return matchesDriverFullName && matchesCarModelName && matchesServerName && matchesSessionTypeDescription;
     }
 
     private boolean matches(String value, String searchTerm) {

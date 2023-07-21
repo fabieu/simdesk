@@ -3,7 +3,7 @@ package de.sustineo.acc.leaderboard.views.filter;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 
-public class GroupRankingFilter {
+public class OverallLapTimesFilter {
     private final GridListDataView<GroupRanking> dataView;
 
     private String carGroup;
@@ -11,7 +11,7 @@ public class GroupRankingFilter {
     private String driverName;
     private String carModelName;
 
-    public GroupRankingFilter(GridListDataView<GroupRanking> dataView) {
+    public OverallLapTimesFilter(GridListDataView<GroupRanking> dataView) {
         this.dataView = dataView;
         this.dataView.addFilter(this::test);
     }

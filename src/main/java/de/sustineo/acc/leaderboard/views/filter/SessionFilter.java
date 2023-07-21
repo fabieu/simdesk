@@ -5,14 +5,14 @@ import de.sustineo.acc.leaderboard.entities.Session;
 import lombok.Data;
 
 @Data
-public class SessionsFilter {
+public class SessionFilter {
     private final GridListDataView<Session> dataView;
 
     private String serverName;
     private String trackName;
     private String sessionDescription;
 
-    public SessionsFilter(GridListDataView<Session> dataView) {
+    public SessionFilter(GridListDataView<Session> dataView) {
         this.dataView = dataView;
         this.dataView.addFilter(this::test);
     }

@@ -17,8 +17,8 @@ import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
-import de.sustineo.acc.leaderboard.views.filter.DriverRankingFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
+import de.sustineo.acc.leaderboard.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.acc.leaderboard.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.DriverRankingRenderer;
 
@@ -143,12 +143,12 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
-        DriverRankingFilter driverRankingFilter = new DriverRankingFilter(dataView);
+        OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setDriverName));
-        headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setCarModelName));
-        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setServerName));
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(driverRankingFilter::setSessionTypeDescription));
+        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setDriverName));
+        headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
+        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setServerName));
+        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setSessionTypeDescription));
 
         return grid;
     }

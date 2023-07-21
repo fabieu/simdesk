@@ -17,7 +17,7 @@ import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
 import de.sustineo.acc.leaderboard.services.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
-import de.sustineo.acc.leaderboard.views.filter.GroupRankingFilter;
+import de.sustineo.acc.leaderboard.views.filter.OverallLapTimesFilter;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
 
 import java.util.List;
@@ -72,12 +72,12 @@ public class OverallLapTimesView extends VerticalLayout {
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new CarGroupPartNameGenerator());
 
-        GroupRankingFilter groupRankingFilter = new GroupRankingFilter(dataView);
+        OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(carGroupColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setCarGroup));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setTrackName));
-        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setDriverName));
-        headerRow.getCell(carModelNameColumn).setComponent(FilterUtils.createFilterHeader(groupRankingFilter::setCarModelName));
+        headerRow.getCell(carGroupColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setCarGroup));
+        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setTrackName));
+        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setDriverName));
+        headerRow.getCell(carModelNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setCarModelName));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<GroupRanking>, GroupRanking> singleSelect = grid.asSingleSelect();
