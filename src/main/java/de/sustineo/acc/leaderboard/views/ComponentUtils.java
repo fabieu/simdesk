@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.dom.Style;
 import de.sustineo.acc.leaderboard.configuration.Reference;
@@ -30,14 +31,15 @@ public class ComponentUtils {
     }
 
     public Component createFooter() {
-        HorizontalLayout layout = new HorizontalLayout();
+        FlexLayout layout = new FlexLayout();
         layout.setWidthFull();
-        layout.setPadding(true);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
+        layout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
         layout.getStyle()
                 .setPosition(Style.Position.FIXED)
                 .setBottom("0")
+                .setPadding("var(--lumo-space-m)")
                 .setBackground("var(--lumo-base-color)");
 
         Div creatorContainer = new Div();
