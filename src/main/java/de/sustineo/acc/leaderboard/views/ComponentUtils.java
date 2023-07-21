@@ -10,6 +10,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.dom.Style;
 import de.sustineo.acc.leaderboard.configuration.Reference;
 import de.sustineo.acc.leaderboard.entities.Session;
 import org.springframework.beans.factory.annotation.Value;
@@ -31,11 +32,13 @@ public class ComponentUtils {
     public Component createFooter() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
+        layout.setPadding(true);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         layout.getStyle()
-                .setBackground("var(--lumo-base-color)")
-                .setPadding("0 var(--lumo-space-m) var(--lumo-space-m) var(--lumo-space-m)"); // top right bottom left
+                .setPosition(Style.Position.FIXED)
+                .setBottom("0")
+                .setBackground("var(--lumo-base-color)");
 
         Div creatorContainer = new Div();
         creatorContainer.add(new Text("Made with ❤️ by "));

@@ -45,7 +45,6 @@ public class FileContentService {
     private final FileAlterationMonitor monitor;
 
 
-
     @Autowired
     public FileContentService(SessionService sessionService, FileService fileService, JsonUtils jsonUtils, @Value("${leaderboard.results.scan_interval}") String scanInterval) {
         this.sessionService = sessionService;
@@ -61,7 +60,7 @@ public class FileContentService {
         try {
             for (Path path : watchDirectories) {
                 FileAlterationObserver observer = new FileAlterationObserver(path.toFile());
-                FileAlterationListener listener = new FileAlterationListenerAdaptor(){
+                FileAlterationListener listener = new FileAlterationListenerAdaptor() {
                     @Override
                     public void onFileCreate(File file) {
                         log.fine(String.format("Processing file create event; File affected: %s", file.getAbsolutePath()));
@@ -94,7 +93,7 @@ public class FileContentService {
             try {
                 monitor.stop();
             } catch (Exception e) {
-                log.severe("exception while closing the monitoring service");
+                log.log(Level.SEVERE, "exception while closing the monitoring service", e);
             }
         }
     }
