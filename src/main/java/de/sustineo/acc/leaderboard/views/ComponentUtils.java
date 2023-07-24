@@ -63,6 +63,7 @@ public class ComponentUtils {
     public static Hr createSpacer() {
         Hr hr = new Hr();
         hr.getStyle()
+                .setMargin("var(--lumo-space-m) calc(var(--lumo-border-radius-m) / 2)")
                 .set("border-top", "1px solid var(--lumo-contrast-10pct)");
 
         return hr;
