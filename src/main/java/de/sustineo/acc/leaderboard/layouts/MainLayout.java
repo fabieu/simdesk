@@ -17,6 +17,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
@@ -29,9 +30,10 @@ import de.sustineo.acc.leaderboard.utils.ApplicationContextProvider;
 import de.sustineo.acc.leaderboard.views.*;
 import org.springframework.boot.info.BuildProperties;
 
+import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
-import java.util.Optional;
+import java.util.SortedMap;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
@@ -39,8 +41,7 @@ public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
-    private final Tabs leaderboardMenu;
-    private final Tabs toolsMenu;
+    private final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
     private H1 viewTitle;
 
     public MainLayout(ApplicationContextProvider applicationContextProvider) {
@@ -53,9 +54,9 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.NAVBAR);
         addToNavbar(false, createNavbarContent(), createNavbarButtons());
 
-        leaderboardMenu = createMenuTabs(createLeaderboardMenuTabs());
-        toolsMenu = createMenuTabs(createToolsMenuTabs());
-        addToDrawer(createDrawerContent(leaderboardMenu, toolsMenu));
+        menuMap.put("leaderboard", createMenuTabs(createLeaderboardMenuTabs()));
+        menuMap.put("entrylist", createMenuTabs(createEntrylistMenuTabs()));
+        addToDrawer(createDrawerContent());
         setDrawerOpened(false);
     }
 
@@ -159,22 +160,34 @@ public class MainLayout extends AppLayout {
         return helpButton;
     }
 
-    private Component createDrawerContent(Tabs leaderboardMenu, Tabs toolsMenu) {
+    private Component createDrawerContent() {
         Hr spacer = ComponentUtils.createSpacer();
 
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setPadding(false);
         layout.setJustifyContentMode(FlexComponent.JustifyContentMode.AROUND);
+        layout.getStyle()
+                .setPadding("var(--lumo-space-m) 0");
 
         VerticalLayout menuLayout = new VerticalLayout();
         menuLayout.setPadding(false);
         menuLayout.setSpacing(false);
-        menuLayout.add(leaderboardMenu);
-        menuLayout.add(spacer);
-        menuLayout.add(toolsMenu);
+
+        int menuMapCounter = 0;
+        for (SortedMap.Entry<String, Tabs> entry : menuMap.entrySet()) {
+            menuLayout.add(createMenuHeader(entry.getKey()));
+            menuLayout.add(entry.getValue());
+
+            if (menuMapCounter < menuMap.size() - 1) {
+                menuLayout.add(spacer);
+            }
+
+            menuMapCounter++;
+        }
 
         VerticalLayout infoLayout = new VerticalLayout();
+        infoLayout.setPadding(false);
         infoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
         Span version = new Span("Version " + buildProperties.getVersion());
         version.getElement().getThemeList().add("badge");
@@ -186,6 +199,23 @@ public class MainLayout extends AppLayout {
         return layout;
     }
 
+    private Component createMenuHeader(String title) {
+        Span span = new Span(title.toUpperCase());
+        span.setWidthFull();
+        span.getStyle()
+                .setTextAlign(Style.TextAlign.CENTER)
+                .set("font-weight", "bold");
+
+        return span;
+    }
+
+    private Tabs createMenuTabs(Tab[] tabEntries) {
+        final Tabs tabs = new Tabs();
+        tabs.setOrientation(Tabs.Orientation.VERTICAL);
+        tabs.add(tabEntries);
+        return tabs;
+    }
+
     public static Tab[] createLeaderboardMenuTabs() {
         return new Tab[]{
                 createTab("Home", VaadinIcon.HOME.create(), MainView.class),
@@ -195,17 +225,10 @@ public class MainLayout extends AppLayout {
         };
     }
 
-    private Tab[] createToolsMenuTabs() {
+    private Tab[] createEntrylistMenuTabs() {
         return new Tab[]{
                 createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidationView.class),
         };
-    }
-
-    private Tabs createMenuTabs(Tab[] tabEntries) {
-        final Tabs tabs = new Tabs();
-        tabs.setOrientation(Tabs.Orientation.VERTICAL);
-        tabs.add(tabEntries);
-        return tabs;
     }
 
     private static Tab createTab(String text, Icon icon, Class<? extends Component> navigationTarget) {
@@ -238,32 +261,23 @@ public class MainLayout extends AppLayout {
         super.afterNavigation();
 
         if (getContent() != null) {
-            // Select the tab corresponding to currently shown view
-            getLeaderboardTabForComponent(getContent()).ifPresentOrElse(leaderboardMenu::setSelectedTab, () -> leaderboardMenu.setSelectedTab(null));
-            getToolsTabForComponent(getContent()).ifPresentOrElse(toolsMenu::setSelectedTab, () -> toolsMenu.setSelectedTab(null));
+            for (Tabs menu : menuMap.values()) {
+                menu.getChildren()
+                        .filter(tab -> getContent().getClass().equals(ComponentUtil.getData(tab, Class.class)))
+                        .findFirst()
+                        .map(Tab.class::cast)
+                        .ifPresentOrElse(menu::setSelectedTab, () -> menu.setSelectedTab(null));
+            }
             viewTitle.setText(getCurrentPageTitle());
         } else {
-            leaderboardMenu.setSelectedTab(null);
-            toolsMenu.setSelectedTab(null);
+            for (Tabs menu : menuMap.values()) {
+                menu.setSelectedTab(null);
+            }
             viewTitle.setText(VaadinConfiguration.APPLICATION_NAME);
         }
 
         // Close drawer when navigating to different view
         setDrawerOpened(false);
-    }
-
-    private Optional<Tab> getLeaderboardTabForComponent(Component component) {
-        return leaderboardMenu.getChildren()
-                .filter(tab -> component.getClass().equals(ComponentUtil.getData(tab, Class.class)))
-                .findFirst()
-                .map(Tab.class::cast);
-    }
-
-    private Optional<Tab> getToolsTabForComponent(Component component) {
-        return toolsMenu.getChildren()
-                .filter(tab -> component.getClass().equals(ComponentUtil.getData(tab, Class.class)))
-                .findFirst()
-                .map(Tab.class::cast);
     }
 
     private String getCurrentPageTitle() {
