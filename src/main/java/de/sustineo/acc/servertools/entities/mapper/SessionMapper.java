@@ -4,6 +4,7 @@ import de.sustineo.acc.servertools.entities.Session;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Component
@@ -25,13 +26,21 @@ public interface SessionMapper {
     @Select("SELECT * FROM acc_leaderboard.sessions ORDER BY session_datetime DESC")
     List<Session> findAll();
 
+    @Select("SELECT COUNT(id) FROM acc_leaderboard.sessions")
+    @ResultType(long.class)
+    long count();
+
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM acc_leaderboard.sessions WHERE id = #{id}")
+    @Select("SELECT * FROM acc_leaderboard.sessions WHERE id = #{id} LIMIT 1")
     Session findById(Integer id);
 
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM acc_leaderboard.sessions WHERE file_checksum = #{fileChecksum}")
+    @Select("SELECT * FROM acc_leaderboard.sessions WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);
+
+    @ResultMap("sessionResultMap")
+    @Select("SELECT * FROM acc_leaderboard.sessions WHERE session_datetime > #{untilDatetime} ORDER BY session_datetime DESC")
+    List<Session> findRecentSessions(Instant untilDatetime);
 
     @Insert("INSERT INTO acc_leaderboard.sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory) " +
             "VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory})")

@@ -22,6 +22,10 @@ public interface DriverMapper {
     @Select("SELECT * FROM acc_leaderboard.drivers")
     List<Driver> findAll();
 
+    @Select("SELECT COUNT(player_id) FROM acc_leaderboard.drivers")
+    @ResultType(long.class)
+    long count();
+
     @ResultMap("driverResultMap")
     @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
     Driver findByPlayerId(String playerId);

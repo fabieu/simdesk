@@ -13,7 +13,7 @@ public class FormatUtils {
     private static final String TIMING_FORMAT = "mm:ss.SSS";
     private static final String TIMING_FORMAT_LONG = "HH:mm:ss.SSS";
     private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
-    private static final DateTimeFormatter dateTimeFormatter =  DateTimeFormatter.ofPattern(DATETIME_FORMAT).withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT).withZone(ZoneId.systemDefault());
 
     public static String formatLapTime(Long millis) {
         if (millis == null) {
@@ -58,11 +58,16 @@ public class FormatUtils {
 
         return String.format("%.2f", value * 100) + "%";
     }
+
     public static String formatDatetime(Instant instant) {
         if (instant == null) {
             return Entity.EMPTY;
         }
 
         return dateTimeFormatter.format(instant);
+    }
+
+    public static String formatLargeNumber(long number) {
+        return String.format("%,d", number).replace(",", ".");
     }
 }

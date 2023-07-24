@@ -12,6 +12,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -43,6 +45,20 @@ public class SessionService {
         return sessionMapper.findById(sessionId);
     }
 
+    public long getSessionCount() {
+        return sessionMapper.count();
+    }
+
+    private boolean sessionExists(Session session) {
+        Session existingSession = sessionMapper.findByFileChecksum(session.getFileChecksum());
+        return existingSession != null;
+    }
+
+    public List<Session> getRecentSessions(int recentDays) {
+        Instant untilDatetime = Instant.now().minus(recentDays, ChronoUnit.DAYS);
+        return sessionMapper.findRecentSessions(untilDatetime);
+    }
+
     @Transactional
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
         if (accSession.getLaps().isEmpty()) {
@@ -64,10 +80,5 @@ public class SessionService {
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
 
         log.info(String.format("Successfully processed session file %s", fileMetadata.getFile()));
-    }
-
-    private boolean sessionExists(Session session) {
-        Session existingSession = sessionMapper.findByFileChecksum(session.getFileChecksum());
-        return existingSession != null;
     }
 }

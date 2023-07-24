@@ -7,6 +7,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
@@ -14,10 +15,13 @@ import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.servertools.configuration.EnvironmentConfiguration;
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.Session;
+import de.sustineo.acc.servertools.entities.Stats;
 import de.sustineo.acc.servertools.layouts.MainLayout;
 import de.sustineo.acc.servertools.services.leaderboard.SessionService;
+import de.sustineo.acc.servertools.services.leaderboard.StatsService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 
 import java.util.List;
@@ -28,15 +32,18 @@ import java.util.List;
 @AnonymousAllowed
 public class MainView extends VerticalLayout {
     private final SessionService sessionService;
+    private final StatsService statsService;
 
-    public MainView(ComponentUtils componentUtils, SessionService sessionService) {
+    public MainView(ComponentUtils componentUtils, SessionService sessionService, StatsService statsService) {
         this.sessionService = sessionService;
+        this.statsService = statsService;
 
         setSizeFull();
         setPadding(false);
 
         add(createHeader());
         add(createNavigationTabs());
+
         addAndExpand(createMainContent());
         add(componentUtils.createFooter());
     }
@@ -65,21 +72,63 @@ public class MainView extends VerticalLayout {
     private Component createMainContent() {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
+        layout.getStyle().set("padding-bottom", "3rem");
 
-        layout.add(new H3("Latest sessions"));
-        layout.add(createSessionGrid());
+        if (ProfileManager.isLeaderboardProfileEnabled()) {
+            layout.add(new H3("Recent sessions (last 7 days)"));
+            layout.add(createSessionGrid(7));
+
+            layout.add(new H3("Leaderboard stats"));
+            layout.add(createLeaderboardStatsContainer());
+        }
 
         return layout;
     }
 
-    private Component createSessionGrid() {
-        final int MAX_SESSIONS = 10;
+    private Component createLeaderboardStatsContainer() {
+        Div row = new Div();
+        row.setClassName("row");
+        row.add(createStatsBoxes());
 
+        Div container = new Div();
+        container.setId("home-stats");
+        container.setClassName("container-fluid");
+        container.setWidthFull();
+
+        container.add(row);
+
+        return container;
+    }
+
+    private Div[] createStatsBoxes() {
+        Stats stats = statsService.getStats();
+
+        return new Div[] {
+                createStatsBox("Total sessions", stats.getTotalSessions()),
+                createStatsBox("Total laps", stats.getTotalLaps()),
+                createStatsBox("Unique drivers", stats.getTotalDrivers()),
+        };
+    }
+
+    private static Div createStatsBox(String title, String value) {
+        Div statsBox = new Div();
+        statsBox.addClassNames("stats-box", "noselect", "col-12", "col-md-6", "col-lg-3");
+
+        Paragraph titleElement = new Paragraph(title);
+        titleElement.addClassName("stats-title");
+
+        Paragraph valueElement = new Paragraph(value);
+        valueElement.addClassName("stats-value");
+
+        statsBox.add(titleElement, valueElement);
+        return statsBox;
+    }
+
+    private Component createSessionGrid(int recentDays) {
         Grid<Session> grid = new Grid<>(Session.class, false);
 
-        List<Session> sessions = sessionService.getAllSessions();
-        List<Session> truncatedSessions = sessions.stream().limit(MAX_SESSIONS).toList();
-        grid.setItems(truncatedSessions);
+        List<Session> sessions = sessionService.getRecentSessions(recentDays);
+        grid.setItems(sessions);
 
         grid.addComponentColumn(ComponentUtils::createWeatherIcon)
                 .setAutoWidth(true)
