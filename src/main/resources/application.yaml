@@ -52,8 +52,8 @@ spring:
 logging:
   level:
     ROOT: INFO
-    de.sustineo.acc.leaderboard: DEBUG
-    de.sustineo.acc.leaderboard.entities.mapper: INFO
+    de.sustineo.acc.servertools: DEBUG
+    de.sustineo.acc.servertools.entities.mapper: INFO
 
 ---
 spring:
