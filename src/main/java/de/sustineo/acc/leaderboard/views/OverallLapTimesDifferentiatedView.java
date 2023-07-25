@@ -11,20 +11,23 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Track;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
 import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.RankingService;
+import de.sustineo.acc.leaderboard.services.leaderboard.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.acc.leaderboard.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.DriverRankingRenderer;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
-@Route(value = "lap-times/overall/:carGroup/:trackId", layout = MainLayout.class)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Route(value = "/leaderboard/lap-times/overall/:carGroup/:trackId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Overall lap times by car group and track")
 @AnonymousAllowed
 public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver {

@@ -1,14 +1,17 @@
-package de.sustineo.acc.leaderboard.services;
+package de.sustineo.acc.leaderboard.services.leaderboard;
 
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.Driver;
 import de.sustineo.acc.leaderboard.entities.LapCount;
 import de.sustineo.acc.leaderboard.entities.comparator.DriverComparator;
 import de.sustineo.acc.leaderboard.entities.mapper.DriverMapper;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class DriverService {
     private final DriverMapper driverMapper;

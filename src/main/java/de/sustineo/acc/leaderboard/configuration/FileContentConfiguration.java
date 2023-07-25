@@ -16,7 +16,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Configuration
-@Profile(ProfileManager.PROFILE_FILE_INTEGRATION)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 public class FileContentConfiguration {
     private final ApplicationContextProvider applicationContextProvider;
     public static Set<Path> WATCH_DIRECTORIES = new HashSet<>();

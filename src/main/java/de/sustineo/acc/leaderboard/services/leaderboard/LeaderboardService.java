@@ -1,16 +1,19 @@
-package de.sustineo.acc.leaderboard.services;
+package de.sustineo.acc.leaderboard.services.leaderboard;
 
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.Driver;
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.LeaderboardLine;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import de.sustineo.acc.leaderboard.entities.mapper.LeaderboardMapper;
 import de.sustineo.acc.leaderboard.services.converter.LeaderboardConverter;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class LeaderboardService {
     private final LeaderboardConverter leaderboardConverter;

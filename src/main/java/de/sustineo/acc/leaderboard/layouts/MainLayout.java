@@ -8,7 +8,6 @@ import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -24,16 +23,14 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoIcon;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.Reference;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.utils.ApplicationContextProvider;
 import de.sustineo.acc.leaderboard.views.*;
 import org.springframework.boot.info.BuildProperties;
 
-import java.util.LinkedHashMap;
-import java.util.List;
-import java.util.Objects;
-import java.util.SortedMap;
+import java.util.*;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
@@ -41,7 +38,8 @@ public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
-    private final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
+    private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
+    private static final List<Tab> menuTabs = new LinkedList<>();
     private H1 viewTitle;
 
     public MainLayout(ApplicationContextProvider applicationContextProvider) {
@@ -54,10 +52,27 @@ public class MainLayout extends AppLayout {
         setPrimarySection(Section.NAVBAR);
         addToNavbar(false, createNavbarContent(), createNavbarButtons());
 
-        menuMap.put("leaderboard", createMenuTabs(createLeaderboardMenuTabs()));
-        menuMap.put("entrylist", createMenuTabs(createEntrylistMenuTabs()));
+        createMenuTabs();
         addToDrawer(createDrawerContent());
         setDrawerOpened(false);
+    }
+
+    private void createMenuTabs() {
+        Tab[] defaultMenuTabs = createDefaultMenuTabs();
+        menuMap.put("main", createMenuTabs(defaultMenuTabs));
+        // Intentionally not adding defaultMenuTabs to menuTabs because they should not be included in the additional navigation
+
+        if (ProfileManager.isLeaderboardProfileEnabled()) {
+            Tab[] leaderboardMenuTabs = createLeaderboardMenuTabs();
+            menuMap.put("leaderboard", createMenuTabs(leaderboardMenuTabs));
+            menuTabs.addAll(List.of(leaderboardMenuTabs));
+        }
+
+        if (ProfileManager.isEntrylistProfileEnabled()) {
+            Tab[] entrylistMenuTabs = createEntrylistMenuTabs();
+            menuMap.put("entrylist", createMenuTabs(entrylistMenuTabs));
+            menuTabs.addAll(List.of(entrylistMenuTabs));
+        }
     }
 
     private Component createNavbarContent() {
@@ -161,8 +176,6 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createDrawerContent() {
-        Hr spacer = ComponentUtils.createSpacer();
-
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setPadding(false);
@@ -180,7 +193,7 @@ public class MainLayout extends AppLayout {
             menuLayout.add(entry.getValue());
 
             if (menuMapCounter < menuMap.size() - 1) {
-                menuLayout.add(spacer);
+                menuLayout.add(ComponentUtils.createSpacer());
             }
 
             menuMapCounter++;
@@ -216,9 +229,14 @@ public class MainLayout extends AppLayout {
         return tabs;
     }
 
-    public static Tab[] createLeaderboardMenuTabs() {
+    private Tab[] createDefaultMenuTabs() {
         return new Tab[]{
                 createTab("Home", VaadinIcon.HOME.create(), MainView.class),
+        };
+    }
+
+    public static Tab[] createLeaderboardMenuTabs() {
+        return new Tab[]{
                 createTab("Lap Times", VaadinIcon.CLOCK.create(), OverallLapTimesView.class),
                 createTab("Sessions", LumoIcon.ORDERED_LIST.create(), SessionView.class),
                 createTab("Drivers", VaadinIcon.USERS.create(), DriverView.class),
@@ -282,5 +300,9 @@ public class MainLayout extends AppLayout {
 
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
+    }
+
+    public static List<Tab> getMenuTabs() {
+        return menuTabs;
     }
 }

@@ -25,24 +25,27 @@ import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.entrylist.Entrylist;
 import de.sustineo.acc.leaderboard.entities.validation.ValidationData;
 import de.sustineo.acc.leaderboard.entities.validation.ValidationError;
 import de.sustineo.acc.leaderboard.entities.validation.ValidationRule;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.EntrylistService;
 import de.sustineo.acc.leaderboard.services.ValidationService;
+import de.sustineo.acc.leaderboard.services.entrylist.EntrylistService;
 import de.sustineo.acc.leaderboard.utils.json.JsonUtils;
 import de.sustineo.acc.leaderboard.views.i18n.UploadI18NDefaults;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Profile;
 import org.springframework.validation.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Route(value = "/entrylist/validation", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Entrylist Validation")

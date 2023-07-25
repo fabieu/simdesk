@@ -11,22 +11,25 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.acc.leaderboard.entities.enums.SessionType;
 import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.RankingService;
-import de.sustineo.acc.leaderboard.services.SessionService;
+import de.sustineo.acc.leaderboard.services.leaderboard.RankingService;
+import de.sustineo.acc.leaderboard.services.leaderboard.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.generators.SessionRankingDNFNameGenerator;
 import de.sustineo.acc.leaderboard.views.generators.SessionRankingPodiumPartNameGenerator;
 import de.sustineo.acc.leaderboard.views.renderers.ranking.SessionRankingRenderer;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
-@Route(value = "sessions/:sessionId", layout = MainLayout.class)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Route(value = "/leaderboard/sessions/:sessionId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Session")
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {

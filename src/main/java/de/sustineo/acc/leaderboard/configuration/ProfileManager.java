@@ -3,20 +3,36 @@ package de.sustineo.acc.leaderboard.configuration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Configuration
 public class ProfileManager {
     public static final String PROFILE_H2 = "h2";
-    public static final String PROFILE_FILE_INTEGRATION = "file-integration";
     public static final String PROFILE_DEVELOPMENT = "development";
-    private final List<String> activeProfiles;
+    public static final String PROFILE_PRODUCTION = "production";
+    public static final String PROFILE_LEADERBOARD = "acc-leaderboard";
+    public static final String PROFILE_ENTRYLIST = "acc-entrylist";
+    public static final String PROFILE_WEATHER = "acc-weather";
+    private static List<String> activeProfiles = new ArrayList<>();
 
     public ProfileManager(Environment environment) {
-        this.activeProfiles = List.of(environment.getActiveProfiles());
+        activeProfiles = List.of(environment.getActiveProfiles());
     }
 
-    public boolean isActive(String profile) {
+    public static boolean isActive(String profile) {
         return activeProfiles.contains(profile);
+    }
+
+    public static boolean isLeaderboardProfileEnabled() {
+        return isActive(PROFILE_LEADERBOARD);
+    }
+
+    public static boolean isEntrylistProfileEnabled() {
+        return isActive(PROFILE_ENTRYLIST);
+    }
+
+    public static boolean isWeatherProfileEnabled() {
+        return isActive(PROFILE_WEATHER);
     }
 }

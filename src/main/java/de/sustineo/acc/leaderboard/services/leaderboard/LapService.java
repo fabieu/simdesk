@@ -1,5 +1,6 @@
-package de.sustineo.acc.leaderboard.services;
+package de.sustineo.acc.leaderboard.services.leaderboard;
 
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.Lap;
 import de.sustineo.acc.leaderboard.entities.LapCount;
@@ -8,11 +9,13 @@ import de.sustineo.acc.leaderboard.entities.mapper.LapMapper;
 import de.sustineo.acc.leaderboard.services.converter.LapConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Profile;
 import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
 public class LapService {

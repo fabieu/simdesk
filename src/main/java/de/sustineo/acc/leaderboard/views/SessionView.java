@@ -13,17 +13,20 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.SessionService;
+import de.sustineo.acc.leaderboard.services.leaderboard.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.filter.SessionFilter;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
-@Route(value = "sessions", layout = MainLayout.class)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Route(value = "/leaderboard/sessions", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Sessions")
 @AnonymousAllowed
 public class SessionView extends VerticalLayout {

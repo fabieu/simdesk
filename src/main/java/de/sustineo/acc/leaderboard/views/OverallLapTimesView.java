@@ -12,17 +12,20 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.RankingService;
+import de.sustineo.acc.leaderboard.services.leaderboard.RankingService;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
 import de.sustineo.acc.leaderboard.views.filter.OverallLapTimesFilter;
 import de.sustineo.acc.leaderboard.views.generators.CarGroupPartNameGenerator;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
-@Route(value = "lap-times/overall", layout = MainLayout.class)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Route(value = "/leaderboard/lap-times/overall", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Overall lap times")
 @AnonymousAllowed
 public class OverallLapTimesView extends VerticalLayout {

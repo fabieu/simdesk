@@ -18,10 +18,9 @@ import de.sustineo.acc.leaderboard.configuration.EnvironmentConfiguration;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.SessionService;
+import de.sustineo.acc.leaderboard.services.leaderboard.SessionService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 
-import java.util.Arrays;
 import java.util.List;
 
 @Route(value = "", layout = MainLayout.class)
@@ -58,8 +57,7 @@ public class MainView extends VerticalLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
 
-        Tab[] filteredTabArray = Arrays.stream(MainLayout.createLeaderboardMenuTabs())
-                .filter(tab -> !"tab-home".equals(tab.getId().orElse(null)))
+        Tab[] filteredTabArray = MainLayout.getMenuTabs()
                 .toArray(Tab[]::new);
         tabs.add(filteredTabArray);
 

@@ -1,5 +1,6 @@
-package de.sustineo.acc.leaderboard.services;
+package de.sustineo.acc.leaderboard.services.leaderboard;
 
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.comparator.DriverRankingComparator;
 import de.sustineo.acc.leaderboard.entities.comparator.GroupRankingComparator;
 import de.sustineo.acc.leaderboard.entities.enums.CarGroup;
@@ -8,11 +9,13 @@ import de.sustineo.acc.leaderboard.entities.ranking.DriverRanking;
 import de.sustineo.acc.leaderboard.entities.ranking.GroupRanking;
 import de.sustineo.acc.leaderboard.entities.ranking.SessionRanking;
 import org.apache.commons.lang3.tuple.Pair;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.HashMap;
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class RankingService {
     private final RankingMapper rankingMapper;

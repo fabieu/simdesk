@@ -1,11 +1,9 @@
-package de.sustineo.acc.leaderboard.services.integrations;
+package de.sustineo.acc.leaderboard.services.leaderboard;
 
 import de.sustineo.acc.leaderboard.configuration.FileContentConfiguration;
 import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
-import de.sustineo.acc.leaderboard.services.FileService;
-import de.sustineo.acc.leaderboard.services.SessionService;
 import de.sustineo.acc.leaderboard.utils.json.JsonUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
@@ -33,7 +31,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-@Profile(ProfileManager.PROFILE_FILE_INTEGRATION)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
 public class FileContentService {

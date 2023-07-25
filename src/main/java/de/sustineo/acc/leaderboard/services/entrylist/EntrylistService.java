@@ -1,5 +1,6 @@
-package de.sustineo.acc.leaderboard.services;
+package de.sustineo.acc.leaderboard.services.entrylist;
 
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.entrylist.Driver;
 import de.sustineo.acc.leaderboard.entities.entrylist.Entry;
 import de.sustineo.acc.leaderboard.entities.entrylist.Entrylist;
@@ -8,6 +9,7 @@ import de.sustineo.acc.leaderboard.entities.validation.ValidationError;
 import de.sustineo.acc.leaderboard.entities.validation.ValidationRule;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
@@ -18,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
+@Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Service
 public class EntrylistService {

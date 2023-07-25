@@ -9,17 +9,20 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Driver;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
-import de.sustineo.acc.leaderboard.services.DriverService;
+import de.sustineo.acc.leaderboard.services.leaderboard.DriverService;
 import de.sustineo.acc.leaderboard.utils.FormatUtils;
 import de.sustineo.acc.leaderboard.views.filter.DriverFilter;
 import de.sustineo.acc.leaderboard.views.filter.FilterUtils;
+import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
-@Route(value = "drivers", layout = MainLayout.class)
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Route(value = "/leaderboard/drivers", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Drivers")
 @AnonymousAllowed
 public class DriverView extends VerticalLayout {
