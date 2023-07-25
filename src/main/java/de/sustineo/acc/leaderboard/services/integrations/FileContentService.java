@@ -1,6 +1,7 @@
 package de.sustineo.acc.leaderboard.services.integrations;
 
 import de.sustineo.acc.leaderboard.configuration.FileContentConfiguration;
+import de.sustineo.acc.leaderboard.configuration.ProfileManager;
 import de.sustineo.acc.leaderboard.entities.FileMetadata;
 import de.sustineo.acc.leaderboard.entities.json.AccSession;
 import de.sustineo.acc.leaderboard.services.FileService;
@@ -32,7 +33,7 @@ import java.util.Set;
 import java.util.logging.Level;
 import java.util.stream.Stream;
 
-@Profile("file-integration")
+@Profile(ProfileManager.PROFILE_FILE_INTEGRATION)
 @Log
 @Service
 public class FileContentService {

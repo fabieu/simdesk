@@ -14,7 +14,7 @@ import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.acc.leaderboard.configuration.Environment;
+import de.sustineo.acc.leaderboard.configuration.EnvironmentConfiguration;
 import de.sustineo.acc.leaderboard.configuration.VaadinConfiguration;
 import de.sustineo.acc.leaderboard.entities.Session;
 import de.sustineo.acc.leaderboard.layouts.MainLayout;
@@ -46,7 +46,7 @@ public class MainView extends VerticalLayout {
     private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
-        header.add(new H1(Environment.COMMUNITY_NAME + " Leaderboard"));
+        header.add(new H1(EnvironmentConfiguration.getCommunityName() + " Server Tools"));
         return header;
     }
 
