@@ -28,10 +28,12 @@ import de.sustineo.acc.servertools.configuration.Reference;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.utils.ApplicationContextProvider;
 import de.sustineo.acc.servertools.views.*;
-import lombok.Getter;
 import org.springframework.boot.info.BuildProperties;
 
-import java.util.*;
+import java.util.LinkedHashMap;
+import java.util.List;
+import java.util.Objects;
+import java.util.SortedMap;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
@@ -40,8 +42,6 @@ public class MainLayout extends AppLayout {
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
     private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
-    @Getter
-    private static final List<Tab> menuTabs = new LinkedList<>();
     private H1 viewTitle;
 
     public MainLayout(ApplicationContextProvider applicationContextProvider) {
@@ -60,19 +60,14 @@ public class MainLayout extends AppLayout {
     }
 
     private void createMenuTabs() {
-        menuMap.put("main", createMenuTabs(MainLayout.createDefaultMenuTabs()));
-        // Intentionally not adding defaultMenuTabs to menuTabs because they should not be included in the additional navigation
+        menuMap.put("main", createMenuTabs(createDefaultMenuTabs()));
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            // Make sure to create a new tab array for each data structure, otherwise the tabs will be reused
             menuMap.put("leaderboard", createMenuTabs(MainLayout.createLeaderboardMenuTabs()));
-            menuTabs.addAll(List.of(MainLayout.createLeaderboardMenuTabs()));
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            // Make sure to create a new tab array for each data structure, otherwise the tabs will be reused
             menuMap.put("entrylist", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
-            menuTabs.addAll(List.of(MainLayout.createEntrylistMenuTabs()));
         }
     }
 
@@ -244,7 +239,7 @@ public class MainLayout extends AppLayout {
         };
     }
 
-    private static Tab[] createEntrylistMenuTabs() {
+    public static Tab[] createEntrylistMenuTabs() {
         return new Tab[]{
                 createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidatorView.class),
         };

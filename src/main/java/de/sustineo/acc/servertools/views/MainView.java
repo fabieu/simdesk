@@ -8,7 +8,6 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.component.tabs.TabsVariant;
 import com.vaadin.flow.data.selection.SingleSelect;
@@ -57,9 +56,8 @@ public class MainView extends VerticalLayout {
         tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
         tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
 
-        Tab[] filteredTabArray = MainLayout.getMenuTabs()
-                .toArray(Tab[]::new);
-        tabs.add(filteredTabArray);
+        tabs.add(MainLayout.createLeaderboardMenuTabs());
+        tabs.add(MainLayout.createEntrylistMenuTabs());
 
         return tabs;
     }
