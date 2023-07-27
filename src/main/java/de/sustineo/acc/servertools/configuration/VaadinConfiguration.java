@@ -3,7 +3,6 @@ package de.sustineo.acc.servertools.configuration;
 import com.vaadin.flow.component.page.AppShellConfigurator;
 import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.component.page.Viewport;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
 
@@ -14,8 +13,8 @@ import com.vaadin.flow.theme.Theme;
 @Viewport("width=device-width, initial-scale=1")
 @Meta(name = "Author", content = "Fabian Eulitz")
 @Meta(name = "robots", content = "noindex, nofollow")
-@PageTitle("ACC Leaderboard")
-@PWA(name = "ACC Leaderboard", shortName = "Leaderboard")
+@Meta(name= "theme-color", content= "#1a1a1a")
+@PWA(name = "ACC Server Tools", shortName = "ACC Tools")
 @Theme(value = "default")
 public class VaadinConfiguration implements AppShellConfigurator {
     public static final String APPLICATION_NAME = "ACC Server Tools";
