@@ -246,7 +246,7 @@ public class MainLayout extends AppLayout {
 
     private static Tab[] createEntrylistMenuTabs() {
         return new Tab[]{
-                createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidationView.class),
+                createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidatorView.class),
         };
     }
 

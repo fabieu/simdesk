@@ -47,10 +47,10 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
-@Route(value = "/entrylist/validation", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Entrylist Validation")
+@Route(value = "/entrylist/validator", layout = MainLayout.class)
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Entrylist - Validator")
 @AnonymousAllowed
-public class EntrylistValidationView extends VerticalLayout {
+public class EntrylistValidatorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";
     private static final int NOTIFICATION_DURATION = 10000;
 
@@ -58,7 +58,7 @@ public class EntrylistValidationView extends VerticalLayout {
     private final JsonUtils jsonUtils;
     private final ValidationService validationService;
 
-    public EntrylistValidationView(ComponentUtils componentUtils, EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService) {
+    public EntrylistValidatorView(ComponentUtils componentUtils, EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService) {
         this.entrylistService = entrylistService;
         this.jsonUtils = jsonUtils;
         this.validationService = validationService;

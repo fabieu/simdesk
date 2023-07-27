@@ -27,7 +27,7 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Sessions")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Sessions")
 @AnonymousAllowed
 public class SessionView extends VerticalLayout {
     private final SessionService sessionService;

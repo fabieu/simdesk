@@ -28,7 +28,7 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times/overall/:carGroup/:trackId", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Overall lap times by car group and track")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Lap times by track")
 @AnonymousAllowed
 public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";

@@ -30,7 +30,7 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:sessionId", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Session")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_SESSION_ID = "sessionId";
