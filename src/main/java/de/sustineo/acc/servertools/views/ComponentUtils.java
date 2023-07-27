@@ -40,6 +40,7 @@ public class ComponentUtils {
                 .setPosition(Style.Position.FIXED)
                 .setBottom("0")
                 .setPadding("var(--lumo-space-m)")
+                .setBoxSizing(Style.BoxSizing.BORDER_BOX)
                 .setBackground("var(--lumo-base-color)");
 
         Div creatorContainer = new Div();
