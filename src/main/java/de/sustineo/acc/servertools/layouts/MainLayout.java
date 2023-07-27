@@ -28,6 +28,7 @@ import de.sustineo.acc.servertools.configuration.Reference;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.utils.ApplicationContextProvider;
 import de.sustineo.acc.servertools.views.*;
+import lombok.Getter;
 import org.springframework.boot.info.BuildProperties;
 
 import java.util.*;
@@ -39,6 +40,7 @@ public class MainLayout extends AppLayout {
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
     private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
+    @Getter
     private static final List<Tab> menuTabs = new LinkedList<>();
     private H1 viewTitle;
 
@@ -58,20 +60,19 @@ public class MainLayout extends AppLayout {
     }
 
     private void createMenuTabs() {
-        Tab[] defaultMenuTabs = createDefaultMenuTabs();
-        menuMap.put("main", createMenuTabs(defaultMenuTabs));
+        menuMap.put("main", createMenuTabs(MainLayout.createDefaultMenuTabs()));
         // Intentionally not adding defaultMenuTabs to menuTabs because they should not be included in the additional navigation
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            Tab[] leaderboardMenuTabs = createLeaderboardMenuTabs();
-            menuMap.put("leaderboard", createMenuTabs(leaderboardMenuTabs));
-            menuTabs.addAll(List.of(leaderboardMenuTabs));
+            // Make sure to create a new tab array for each data structure, otherwise the tabs will be reused
+            menuMap.put("leaderboard", createMenuTabs(MainLayout.createLeaderboardMenuTabs()));
+            menuTabs.addAll(List.of(MainLayout.createLeaderboardMenuTabs()));
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            Tab[] entrylistMenuTabs = createEntrylistMenuTabs();
-            menuMap.put("entrylist", createMenuTabs(entrylistMenuTabs));
-            menuTabs.addAll(List.of(entrylistMenuTabs));
+            // Make sure to create a new tab array for each data structure, otherwise the tabs will be reused
+            menuMap.put("entrylist", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
+            menuTabs.addAll(List.of(MainLayout.createEntrylistMenuTabs()));
         }
     }
 
@@ -229,7 +230,7 @@ public class MainLayout extends AppLayout {
         return tabs;
     }
 
-    private Tab[] createDefaultMenuTabs() {
+    private static Tab[] createDefaultMenuTabs() {
         return new Tab[]{
                 createTab("Home", VaadinIcon.HOME.create(), MainView.class),
         };
@@ -243,7 +244,7 @@ public class MainLayout extends AppLayout {
         };
     }
 
-    private Tab[] createEntrylistMenuTabs() {
+    private static Tab[] createEntrylistMenuTabs() {
         return new Tab[]{
                 createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidationView.class),
         };
@@ -302,7 +303,4 @@ public class MainLayout extends AppLayout {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
 
-    public static List<Tab> getMenuTabs() {
-        return menuTabs;
-    }
 }
