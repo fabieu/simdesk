@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   app:
-    image: registry.gitlab.com/markracing/acc-leaderboard:latest
+    image: registry.gitlab.com/markracing/acc-server-tools:latest
     ports:
       - "8088:8080"
     environment:

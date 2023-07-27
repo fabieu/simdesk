@@ -1,6 +1,6 @@
 spring:
   application:
-    name: acc-leaderboard
+    name: acc-server-tools
   jackson:
     default-property-inclusion: NON_NULL
     deserialization:
@@ -31,7 +31,7 @@ leaderboard:
     impressum: ${LEADERBOARD_IMPRESSUM_URL:}
     privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
-    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-leaderboard/results}
+    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
     scan_interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
 
 ---
