@@ -13,7 +13,7 @@ public interface LapMapper {
     @Results(id = "lapResultMap", value = {
             @Result(id = true, property = "id", column = "id"),
             @Result(property = "sessionId", column = "session_id"),
-            @Result(property = "driver", column = "driver_id", one = @One(select = "de.sustineo.acc.leaderboard.entities.mapper.DriverMapper.findByPlayerId")),
+            @Result(property = "driver", column = "driver_id", one = @One(select = "de.sustineo.acc.servertools.entities.mapper.DriverMapper.findByPlayerId")),
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
