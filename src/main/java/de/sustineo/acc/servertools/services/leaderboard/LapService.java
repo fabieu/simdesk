@@ -44,4 +44,8 @@ public class LapService {
     public List<LapCount> findLapCountsByPlayerId(String playerId) {
         return lapMapper.findLapCounts(playerId);
     }
+
+    public long getLapCount() {
+        return lapMapper.count();
+    }
 }

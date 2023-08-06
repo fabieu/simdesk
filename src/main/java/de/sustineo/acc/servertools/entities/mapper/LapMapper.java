@@ -25,6 +25,10 @@ public interface LapMapper {
     @Select("SELECT * FROM acc_leaderboard.laps")
     List<Lap> findAll();
 
+    @Select("SELECT COUNT(id) FROM acc_leaderboard.laps")
+    @ResultType(long.class)
+    long count();
+
     @Results(id = "driverDetailsResultMap", value = {
             @Result(property = "valid", column = "valid"),
             @Result(property = "lapCount", column = "lap_count"),

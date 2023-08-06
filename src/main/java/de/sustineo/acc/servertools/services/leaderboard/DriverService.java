@@ -39,5 +39,9 @@ public class DriverService {
                 .sorted(new DriverComparator())
                 .toList();
     }
+
+    public long getDriverCount() {
+        return driverMapper.count();
+    }
 }
 

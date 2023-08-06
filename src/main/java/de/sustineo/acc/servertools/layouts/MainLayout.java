@@ -6,6 +6,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.Span;
@@ -37,6 +38,7 @@ import java.util.SortedMap;
 
 
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
+@StyleSheet(value = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap-grid.min.css")
 public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
