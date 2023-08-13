@@ -14,6 +14,7 @@ public class ProfileManager {
     public static final String PROFILE_LEADERBOARD = "acc-leaderboard";
     public static final String PROFILE_ENTRYLIST = "acc-entrylist";
     public static final String PROFILE_WEATHER = "acc-weather";
+    public static final String PROFILE_RACEAPP = "acc-raceapp";
     private static List<String> activeProfiles = new ArrayList<>();
 
     public ProfileManager(Environment environment) {
