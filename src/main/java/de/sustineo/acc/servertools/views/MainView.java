@@ -25,6 +25,7 @@ import de.sustineo.acc.servertools.services.leaderboard.StatsService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 
 import java.util.List;
+import java.util.Optional;
 
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "/home", layout = MainLayout.class)
@@ -76,7 +77,12 @@ public class MainView extends VerticalLayout {
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
             layout.add(new H3("Recent sessions (last 7 days)"));
-            layout.add(createSessionGrid(7));
+            Optional<Component> sessionGrid = createSessionGrid(7);
+            if (sessionGrid.isPresent()) {
+                layout.add(sessionGrid.get());
+            } else {
+                layout.add(new Paragraph("No sessions found"));
+            }
 
             layout.add(new H3("Leaderboard stats"));
             layout.add(createLeaderboardStatsContainer());
@@ -103,7 +109,7 @@ public class MainView extends VerticalLayout {
     private Div[] createStatsBoxes() {
         Stats stats = statsService.getStats();
 
-        return new Div[] {
+        return new Div[]{
                 createStatsBox("Total sessions", stats.getTotalSessions()),
                 createStatsBox("Total laps", stats.getTotalLaps()),
                 createStatsBox("Unique drivers", stats.getTotalDrivers()),
@@ -124,12 +130,13 @@ public class MainView extends VerticalLayout {
         return statsBox;
     }
 
-    private Component createSessionGrid(int recentDays) {
-        Grid<Session> grid = new Grid<>(Session.class, false);
-
+    private Optional<Component> createSessionGrid(int recentDays) {
         List<Session> sessions = sessionService.getRecentSessions(recentDays);
-        grid.setItems(sessions);
+        if (sessions.isEmpty()) {
+            return Optional.empty();
+        }
 
+        Grid<Session> grid = new Grid<>(Session.class, false);
         grid.addComponentColumn(ComponentUtils::createWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -153,9 +160,9 @@ public class MainView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setFlexGrow(0);
 
+        grid.setItems(sessions);
         grid.setWidthFull();
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
@@ -170,6 +177,6 @@ public class MainView extends VerticalLayout {
             }
         });
 
-        return grid;
+        return Optional.of(grid);
     }
 }
