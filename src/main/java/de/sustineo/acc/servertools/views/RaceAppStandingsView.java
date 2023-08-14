@@ -14,12 +14,13 @@ import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.raceapp.RaceAppResult;
 import de.sustineo.acc.servertools.entities.raceapp.RaceAppSeries;
 import de.sustineo.acc.servertools.layouts.MainLayout;
+import de.sustineo.acc.servertools.services.NotificationService;
 import de.sustineo.acc.servertools.services.raceapp.RaceAppService;
 import de.sustineo.acc.servertools.views.filter.FilterUtils;
 import de.sustineo.acc.servertools.views.filter.RaceAppStandingsFilter;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.client.HttpClientErrorException;
+import org.springframework.web.client.HttpStatusCodeException;
 
 import java.util.List;
 
@@ -30,10 +31,12 @@ import java.util.List;
 public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_SERIES_ID = "seriesId";
     private final RaceAppService raceAppService;
+    private final NotificationService notificationService;
     private final ComponentUtils componentUtils;
 
-    public RaceAppStandingsView(RaceAppService raceAppService, ComponentUtils componentUtils) {
+    public RaceAppStandingsView(RaceAppService raceAppService, NotificationService notificationService, ComponentUtils componentUtils) {
         this.raceAppService = raceAppService;
+        this.notificationService = notificationService;
         this.componentUtils = componentUtils;
 
         setSizeFull();
@@ -119,9 +122,8 @@ public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterO
             add(createStandingsInformation(raceAppSeries));
             addAndExpand(createStandingsGrid(raceAppSeries));
             add(componentUtils.createFooter());
-        } catch (HttpClientErrorException.NotFound e) {
-            log.warning(String.format("Could not fetch series with id %s from RaceApp API", seriesIdParameter));
-            event.rerouteToError(NotFoundException.class);
+        } catch (HttpStatusCodeException e) {
+            notificationService.showErrorNotification("HTTP " + e.getStatusCode() + " - Could not fetch series from RaceApp API");
         }
     }
 }

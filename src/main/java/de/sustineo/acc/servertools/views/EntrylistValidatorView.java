@@ -32,6 +32,7 @@ import de.sustineo.acc.servertools.entities.validation.ValidationData;
 import de.sustineo.acc.servertools.entities.validation.ValidationError;
 import de.sustineo.acc.servertools.entities.validation.ValidationRule;
 import de.sustineo.acc.servertools.layouts.MainLayout;
+import de.sustineo.acc.servertools.services.NotificationService;
 import de.sustineo.acc.servertools.services.ValidationService;
 import de.sustineo.acc.servertools.services.entrylist.EntrylistService;
 import de.sustineo.acc.servertools.utils.json.JsonUtils;
@@ -43,6 +44,7 @@ import org.springframework.validation.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
+import java.time.Duration;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
@@ -52,16 +54,18 @@ import java.util.List;
 @AnonymousAllowed
 public class EntrylistValidatorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";
-    private static final int NOTIFICATION_DURATION = 10000;
+    private static final Duration NOTIFICATION_DURATION = Duration.ofSeconds(10);
 
     private final EntrylistService entrylistService;
     private final JsonUtils jsonUtils;
     private final ValidationService validationService;
+    private final NotificationService notificationService;
 
-    public EntrylistValidatorView(ComponentUtils componentUtils, EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService) {
+    public EntrylistValidatorView(ComponentUtils componentUtils, EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService, NotificationService notificationService) {
         this.entrylistService = entrylistService;
         this.jsonUtils = jsonUtils;
         this.validationService = validationService;
+        this.notificationService = notificationService;
 
         setSizeFull();
         setPadding(false);
@@ -127,10 +131,10 @@ public class EntrylistValidatorView extends VerticalLayout {
             }
         });
         fileUpload.addFileRejectedListener(event -> {
-            createErrorNotification(event.getErrorMessage());
+            notificationService.showErrorNotification(event.getErrorMessage(), NOTIFICATION_DURATION);
         });
         fileUpload.addFailedListener(event -> {
-            createErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage());
+            notificationService.showErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage(), NOTIFICATION_DURATION);
         });
 
         fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload, fileUploadExplanation);
@@ -172,20 +176,10 @@ public class EntrylistValidatorView extends VerticalLayout {
         return i18n;
     }
 
-    private void createErrorNotification(String errorMessage) {
-        Notification notification = new Notification();
-        notification.setPosition(Notification.Position.TOP_CENTER);
-        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        notification.setDuration(NOTIFICATION_DURATION);
-
-        notification.add(new Text(errorMessage));
-        notification.open();
-    }
-
     private void createValidationSuccessNotification(String fileName) {
         Notification notification = new Notification();
         notification.setPosition(Notification.Position.BOTTOM_STRETCH);
-        notification.setDuration(NOTIFICATION_DURATION);
+        notification.setDuration((int) NOTIFICATION_DURATION.toMillis());
         notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
 
         Icon icon = VaadinIcon.CHECK_CIRCLE_O.create();
