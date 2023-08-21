@@ -67,4 +67,12 @@ public class Car extends Entity {
     public static String getCarNameById(Integer carModelId) {
         return carModels.getOrDefault(carModelId, UNKNOWN);
     }
+
+    public static Integer getCarIdByName(String carModelName) {
+        return carModels.entrySet().stream()
+                .filter(entry -> entry.getValue().equals(carModelName))
+                .map(HashMap.Entry::getKey)
+                .findFirst()
+                .orElse(null);
+    }
 }

@@ -1,15 +1,24 @@
 package de.sustineo.acc.servertools.views;
 
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
@@ -24,10 +33,17 @@ import de.sustineo.acc.servertools.utils.FormatUtils;
 import de.sustineo.acc.servertools.views.generators.SessionRankingDNFNameGenerator;
 import de.sustineo.acc.servertools.views.generators.SessionRankingPodiumPartNameGenerator;
 import de.sustineo.acc.servertools.views.renderers.ranking.SessionRankingRenderer;
+import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Stream;
 
+@Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:sessionId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Session")
@@ -37,6 +53,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     private final RankingService rankingService;
     private final SessionService sessionService;
     private final ComponentUtils componentUtils;
+    private GridListDataView<SessionRanking> dataView;
 
     public SessionRankingView(RankingService rankingService, SessionService sessionService, ComponentUtils componentUtils) {
         this.rankingService = rankingService;
@@ -51,10 +68,14 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     private Component createSessionInformation(Integer sessionId) {
         Session session = sessionService.getSession(sessionId);
 
-        HorizontalLayout layout = new HorizontalLayout();
+        VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
         layout.setPadding(true);
-        layout.setAlignItems(Alignment.CENTER);
+
+        // Session Information Layout
+        HorizontalLayout sessionInformationLayout = new HorizontalLayout();
+        sessionInformationLayout.setWidthFull();
+        sessionInformationLayout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
         heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
@@ -65,8 +86,29 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
         sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
 
-        layout.add(weatherIcon, heading, sessionDatetimeBadge);
+        sessionInformationLayout.add(weatherIcon, heading, sessionDatetimeBadge);
 
+        // Action Layout
+        HorizontalLayout actionLayout = new HorizontalLayout();
+        actionLayout.setWidthFull();
+        actionLayout.setAlignItems(Alignment.CENTER);
+
+        StreamResource csvResource = new StreamResource(
+                String.format("session_export_%s.csv", sessionId),
+                () -> {
+                    String csv = this.exportCSV();
+                    return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                }
+        );
+
+        Anchor exportAnchor = new Anchor(csvResource, "");
+        exportAnchor.getElement().setAttribute("download", true);
+        exportAnchor.removeAll();
+        exportAnchor.add(new Button("Download CSV", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O)));
+
+        actionLayout.add(exportAnchor);
+
+        layout.add(sessionInformationLayout, actionLayout);
         return layout;
     }
 
@@ -127,7 +169,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 .setSortable(true)
                 .setComparator(SessionRanking::getBestLapTimeMillis);
 
-        grid.setItems(filteredSessionRankings);
+        dataView = grid.setItems(filteredSessionRankings);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
@@ -136,6 +178,23 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
 
         return grid;
+    }
+
+    private String exportCSV() {
+        Stream<SessionRanking> sessionRows = dataView.getItems();
+
+        try (StringWriter writer = new StringWriter()) {
+            StatefulBeanToCsv<SessionRanking> sbc = new StatefulBeanToCsvBuilder<SessionRanking>(writer)
+                    .withSeparator(';')
+                    .build();
+
+            sbc.write(sessionRows);
+
+            return writer.toString();
+        } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
+            log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
+            return null;
+        }
     }
 
     @Override

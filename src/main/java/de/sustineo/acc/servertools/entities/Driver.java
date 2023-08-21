@@ -5,7 +5,8 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Data
+@Getter
+@Setter
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
@@ -58,5 +59,9 @@ public class Driver extends Entity {
     @SuppressWarnings("unused")
     public String getPrettyDriveTime() {
         return FormatUtils.formatDriveTime(driveTimeMillis);
+    }
+    
+    public String toString() {
+        return getFullName();
     }
 }
