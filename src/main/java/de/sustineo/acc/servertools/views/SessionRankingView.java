@@ -45,11 +45,11 @@ import java.util.stream.Stream;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/sessions/:sessionId", layout = MainLayout.class)
+@Route(value = "/leaderboard/sessions/:fileChecksum", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
-    public static final String ROUTE_PARAMETER_SESSION_ID = "sessionId";
+    public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     private final RankingService rankingService;
     private final SessionService sessionService;
     private final ComponentUtils componentUtils;
@@ -65,8 +65,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     }
 
 
-    private Component createSessionInformation(Integer sessionId) {
-        Session session = sessionService.getSession(sessionId);
+    private Component createSessionInformation(String fileChecksum) {
+        Session session = sessionService.getSession(fileChecksum);
 
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
@@ -94,7 +94,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         actionLayout.setAlignItems(Alignment.CENTER);
 
         StreamResource csvResource = new StreamResource(
-                String.format("session_export_%s.csv", sessionId),
+                String.format("session_export_%s.csv", fileChecksum),
                 () -> {
                     String csv = this.exportCSV();
                     return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
@@ -112,8 +112,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         return layout;
     }
 
-    private Component createLeaderboardGrid(Integer sessionId) {
-        List<SessionRanking> sessionRankings = rankingService.getSessionRanking(sessionId);
+    private Component createLeaderboardGrid(String fileChecksum) {
+        List<SessionRanking> sessionRankings = rankingService.getSessionRanking(fileChecksum);
         List<SessionRanking> filteredSessionRankings = sessionRankings.stream()
                 .filter(sessionRanking -> sessionRanking.getLapCount() > 0 && sessionRanking.getBestLapTimeMillis() > 0)
                 .toList();
@@ -201,17 +201,15 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     public void beforeEnter(BeforeEnterEvent event) {
         final RouteParameters routeParameters = event.getRouteParameters();
 
-        String sessionIdParameter = routeParameters.get(ROUTE_PARAMETER_SESSION_ID).orElseThrow();
+        String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
         try {
-            Integer sessionId = Integer.valueOf(sessionIdParameter);
-
-            if (!sessionService.sessionExists(sessionId)) {
-                throw new IllegalArgumentException("Session with id " + sessionId + " does not exist.");
+            if (!sessionService.sessionExistsByFileChecksum(fileChecksum)) {
+                throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }
 
-            add(createSessionInformation(sessionId));
-            addAndExpand(createLeaderboardGrid(sessionId));
+            add(createSessionInformation(fileChecksum));
+            addAndExpand(createLeaderboardGrid(fileChecksum));
             add(componentUtils.createFooter());
         } catch (IllegalArgumentException e) {
             event.rerouteToError(NotFoundException.class);

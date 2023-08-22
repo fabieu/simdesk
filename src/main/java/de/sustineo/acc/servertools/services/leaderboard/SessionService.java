@@ -33,25 +33,20 @@ public class SessionService {
         this.leaderboardService = leaderboardService;
     }
 
-    public boolean sessionExists(Integer sessionId) {
-        return sessionMapper.findById(sessionId) != null;
+    public boolean sessionExistsByFileChecksum(String fileChecksum) {
+        return sessionMapper.findByFileChecksum(fileChecksum) != null;
     }
 
     public List<Session> getAllSessions() {
         return sessionMapper.findAll();
     }
 
-    public Session getSession(Integer sessionId) {
-        return sessionMapper.findById(sessionId);
+    public Session getSession(String fileChecksum) {
+        return sessionMapper.findByFileChecksum(fileChecksum);
     }
 
     public long getSessionCount() {
         return sessionMapper.count();
-    }
-
-    private boolean sessionExists(Session session) {
-        Session existingSession = sessionMapper.findByFileChecksum(session.getFileChecksum());
-        return existingSession != null;
     }
 
     public List<Session> getRecentSessions(int recentDays) {
@@ -67,7 +62,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        if (sessionExists(session)){
+        if (sessionExistsByFileChecksum(session.getFileChecksum())){
             log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }

@@ -1,6 +1,7 @@
 package de.sustineo.acc.servertools.services.leaderboard;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
+import de.sustineo.acc.servertools.entities.Session;
 import de.sustineo.acc.servertools.entities.comparator.DriverRankingComparator;
 import de.sustineo.acc.servertools.entities.comparator.GroupRankingComparator;
 import de.sustineo.acc.servertools.entities.enums.CarGroup;
@@ -18,9 +19,11 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class RankingService {
+    private final SessionService sessionService;
     private final RankingMapper rankingMapper;
 
-    public RankingService(RankingMapper rankingMapper) {
+    public RankingService(SessionService sessionService, RankingMapper rankingMapper) {
+        this.sessionService = sessionService;
         this.rankingMapper = rankingMapper;
     }
 
@@ -37,8 +40,13 @@ public class RankingService {
         return driverRankings;
     }
 
-    public List<SessionRanking> getSessionRanking(Integer sessionId) {
-        return rankingMapper.findLeaderboardLinesBySessionId(sessionId);
+    public List<SessionRanking> getSessionRanking(String fileChecksum) {
+        Session session = sessionService.getSession(fileChecksum);
+        if (session == null) {
+            return null;
+        }
+
+        return rankingMapper.findLeaderboardLinesBySessionId(session.getId());
     }
 
     private void addRanking(List<DriverRanking> driverRankings) {

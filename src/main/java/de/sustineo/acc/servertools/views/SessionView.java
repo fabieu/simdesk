@@ -95,7 +95,7 @@ public class SessionView extends VerticalLayout {
             if (selectedSession != null) {
                 getUI().ifPresent(ui -> ui.navigate(SessionRankingView.class,
                         new RouteParameters(
-                                new RouteParam(SessionRankingView.ROUTE_PARAMETER_SESSION_ID, selectedSession.getId().toString())
+                                new RouteParam(SessionRankingView.ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )
                 ));
             }

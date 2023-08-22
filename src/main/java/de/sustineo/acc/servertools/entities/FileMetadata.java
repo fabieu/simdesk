@@ -2,15 +2,13 @@ package de.sustineo.acc.servertools.entities;
 
 import lombok.Data;
 import lombok.extern.java.Log;
+import org.apache.commons.codec.digest.DigestUtils;
 
 import java.io.IOException;
-import java.math.BigInteger;
 import java.nio.file.Files;
 import java.nio.file.LinkOption;
 import java.nio.file.Path;
 import java.nio.file.attribute.FileTime;
-import java.security.MessageDigest;
-import java.security.NoSuchAlgorithmException;
 import java.time.Instant;
 import java.util.logging.Level;
 
@@ -43,24 +41,14 @@ public class FileMetadata {
     }
 
     public String calculateChecksum() {
-        MessageDigest messageDigest;
-        String checksum;
-
         try {
-            messageDigest = MessageDigest.getInstance("SHA-256");
-
             byte[] data = Files.readAllBytes(file);
+            checksum = DigestUtils.sha1Hex(data);
 
-            // Get the hash's bytes
-            byte[] hash = messageDigest.digest(data);
-
-            // This byte array has bytes in decimal format, convert it to hexadecimal format
-            checksum = new BigInteger(1, hash).toString(16);
-        } catch (NoSuchAlgorithmException | IOException e) {
+            return checksum;
+        } catch (IOException e) {
             log.log(Level.WARNING, String.format("Could not calculate checksum for file %s", file), e);
             return null;
         }
-
-        return checksum;
     }
 }
