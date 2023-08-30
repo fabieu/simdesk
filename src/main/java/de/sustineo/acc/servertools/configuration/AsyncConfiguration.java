@@ -11,10 +11,14 @@ import java.util.concurrent.Executor;
 @EnableAsync
 public class AsyncConfiguration {
 
+    /**
+     * This represents essentially a fixed thread pool executor with additional configuration
+     * @return Default executor for @Async
+     */
     @Bean
     public Executor taskExecutor() {
-        /* This represents essentially a fixed thread pool executor with additional configuration */
-        int poolSize = 6;
+        int numOfCores = Runtime.getRuntime().availableProcessors();
+        int poolSize = numOfCores * 4;
         int awaitTerminationSeconds = 5;
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
