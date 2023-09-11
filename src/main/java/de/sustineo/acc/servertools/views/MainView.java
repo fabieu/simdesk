@@ -9,8 +9,7 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.tabs.Tabs;
-import com.vaadin.flow.component.tabs.TabsVariant;
+import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -24,6 +23,8 @@ import de.sustineo.acc.servertools.services.leaderboard.SessionService;
 import de.sustineo.acc.servertools.services.leaderboard.StatsService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 
+import java.util.ArrayList;
+import java.util.Arrays;
 import java.util.List;
 import java.util.Optional;
 
@@ -57,17 +58,31 @@ public class MainView extends VerticalLayout {
     }
 
     private Component createNavigationTabs() {
-        final Tabs tabs = new Tabs();
-        tabs.setId("home-tabs");
-        tabs.setWidthFull();
-        tabs.setOrientation(Tabs.Orientation.HORIZONTAL);
-        tabs.addThemeVariants(TabsVariant.LUMO_EQUAL_WIDTH_TABS);
-        tabs.addThemeVariants(TabsVariant.LUMO_MINIMAL);
+        List<Tab> tabs = new ArrayList<>();
+        tabs.addAll(Arrays.stream(MainLayout.createLeaderboardMenuTabs()).toList());
+        tabs.addAll(Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
 
-        tabs.add(MainLayout.createLeaderboardMenuTabs());
-        tabs.add(MainLayout.createEntrylistMenuTabs());
+        // Add custom styling to navigation tabs
+        List<Div> tabDivs = new ArrayList<>();
+        for (Tab tab : tabs) {
+            Div tabDiv = new Div();
+            tabDiv.addClassNames("col-12", "col-md-6", "col-lg-3");
+            tabDiv.add(tab);
 
-        return tabs;
+            tabDivs.add(tabDiv);
+        }
+
+        Div container = new Div();
+        container.addClassNames("container-fluid");
+
+        final Div row = new Div();
+        row.setId("home-tabs");
+        row.addClassNames("row", "justify-content-center", "g-3");
+        row.setWidthFull();
+        row.add(tabDivs.toArray(new Div[0]));
+        container.add(row);
+
+        return container;
     }
 
     private Component createMainContent() {
