@@ -158,6 +158,9 @@ export class Flow {
                     }
                     this.loadingFinished();
                 };
+                this.container.serverPaused = () => {
+                    this.loadingFinished();
+                };
                 // Call server side to navigate to the given route
                 flowRoot.$server.connectClient(this.getFlowRoutePath(ctx), this.getFlowRouteQuery(ctx), this.appShellTitle, history.state, this.navigation);
                 // Default to history navigation trigger.

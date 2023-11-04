@@ -17,6 +17,7 @@ interface HTMLRouterContainer extends HTMLElement {
     onBeforeEnter?: (ctx: NavigationParameters, cmd: PreventAndRedirectCommands, router: Router) => void | Promise<any>;
     onBeforeLeave?: (ctx: NavigationParameters, cmd: PreventCommands, router: Router) => void | Promise<any>;
     serverConnected?: (cancel: boolean, url?: NavigationParameters) => void;
+    serverPaused?: () => void;
 }
 interface FlowRoute {
     action: (params: NavigationParameters) => Promise<HTMLRouterContainer>;
