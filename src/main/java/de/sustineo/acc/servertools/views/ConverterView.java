@@ -4,7 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.H4;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextField;
@@ -39,7 +39,7 @@ public class ConverterView extends VerticalLayout {
         layout.setWidthFull();
         layout.setSpacing(false);
 
-        H4 header = new H4(title);
+        H3 header = new H3(title);
 
         FormLayout formLayout = new FormLayout();
         formLayout.add(components);

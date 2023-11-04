@@ -52,4 +52,8 @@ public class SessionRanking {
     public String getTrackName() {
         return Track.getTrackNameById(session.getTrackId());
     }
+
+    public boolean isValid() {
+        return bestLapTimeMillis > 0 && lapCount > 0;
+    }
 }

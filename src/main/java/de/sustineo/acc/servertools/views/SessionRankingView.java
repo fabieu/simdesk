@@ -60,20 +60,17 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
 
         setSizeFull();
         setPadding(false);
+        setSpacing(false);
     }
 
 
     private Component createSessionInformation(String fileChecksum) {
         Session session = sessionService.getSession(fileChecksum);
 
-        VerticalLayout layout = new VerticalLayout();
-        layout.setWidthFull();
+        HorizontalLayout layout = new HorizontalLayout();
         layout.setPadding(true);
-
-        // Session Information Layout
-        HorizontalLayout sessionInformationLayout = new HorizontalLayout();
-        sessionInformationLayout.setWidthFull();
-        sessionInformationLayout.setAlignItems(Alignment.CENTER);
+        layout.setWidthFull();
+        layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
         heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
@@ -84,13 +81,6 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
         sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
 
-        sessionInformationLayout.add(weatherIcon, heading, sessionDatetimeBadge);
-
-        // Action Layout
-        HorizontalLayout actionLayout = new HorizontalLayout();
-        actionLayout.setWidthFull();
-        actionLayout.setAlignItems(Alignment.CENTER);
-
         StreamResource csvResource = new StreamResource(
                 String.format("session_export_%s.csv", fileChecksum),
                 () -> {
@@ -99,24 +89,22 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 }
         );
 
-        Anchor exportAnchor = new Anchor(csvResource, "");
-        exportAnchor.getElement().setAttribute("download", true);
-        exportAnchor.removeAll();
-        exportAnchor.add(new Button("Download CSV", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O)));
+        Anchor csvAnchor = new Anchor(csvResource, "");
+        csvAnchor.getElement().setAttribute("download", true);
+        csvAnchor.removeAll();
+        csvAnchor.add(new Button("CSV", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O)));
 
-        actionLayout.add(exportAnchor);
-
-        layout.add(sessionInformationLayout, actionLayout);
+        layout.add(weatherIcon, heading, sessionDatetimeBadge, csvAnchor);
         return layout;
     }
 
     private Component createLeaderboardGrid(String fileChecksum) {
         List<SessionRanking> sessionRankings = rankingService.getSessionRanking(fileChecksum);
-        List<SessionRanking> filteredSessionRankings = sessionRankings.stream()
-                .filter(sessionRanking -> sessionRanking.getLapCount() > 0 && sessionRanking.getBestLapTimeMillis() > 0)
+        List<SessionRanking> validSessionRankings = sessionRankings.stream()
+                .filter(SessionRanking::isValid)
                 .toList();
-        SessionRanking bestTotalTimeSessionRanking = filteredSessionRankings.stream().findFirst().orElse(new SessionRanking());
-        SessionRanking bestLapTimeSessionRanking = filteredSessionRankings.stream()
+        SessionRanking bestTotalTimeSessionRanking = validSessionRankings.stream().findFirst().orElse(new SessionRanking());
+        SessionRanking bestLapTimeSessionRanking = validSessionRankings.stream()
                 .min(new SessionRankingLapTimeComparator())
                 .orElse(new SessionRanking());
 
@@ -167,7 +155,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                 .setSortable(true)
                 .setComparator(SessionRanking::getBestLapTimeMillis);
 
-        dataView = grid.setItems(filteredSessionRankings);
+        dataView = grid.setItems(validSessionRankings);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);

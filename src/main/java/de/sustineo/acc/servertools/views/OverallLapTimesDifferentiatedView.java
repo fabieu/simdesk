@@ -40,6 +40,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
 
         setSizeFull();
         setPadding(false);
+        setSpacing(false);
     }
 
     @Override
@@ -63,11 +64,9 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         layout.setPadding(true);
 
         // Header displaying the car group and track name
-        H3 heading = new H3();
-        heading.setText(carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId));
+        H3 heading = new H3(carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId));
 
         layout.add(heading);
-
         return layout;
     }
 
