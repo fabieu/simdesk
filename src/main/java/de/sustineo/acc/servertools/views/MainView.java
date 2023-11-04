@@ -36,7 +36,7 @@ public class MainView extends VerticalLayout {
     private final SessionService sessionService;
     private final StatsService statsService;
 
-    public MainView(ComponentUtils componentUtils, SessionService sessionService, StatsService statsService) {
+    public MainView(SessionService sessionService, StatsService statsService) {
         this.sessionService = sessionService;
         this.statsService = statsService;
 
@@ -47,7 +47,6 @@ public class MainView extends VerticalLayout {
         add(createNavigationTabs());
 
         addAndExpand(createMainContent());
-        add(componentUtils.createFooter());
     }
 
     private Component createHeader() {

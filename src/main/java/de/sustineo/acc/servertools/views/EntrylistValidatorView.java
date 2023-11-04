@@ -61,7 +61,7 @@ public class EntrylistValidatorView extends VerticalLayout {
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
-    public EntrylistValidatorView(ComponentUtils componentUtils, EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService, NotificationService notificationService) {
+    public EntrylistValidatorView(EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService, NotificationService notificationService) {
         this.entrylistService = entrylistService;
         this.jsonUtils = jsonUtils;
         this.validationService = validationService;
@@ -71,7 +71,6 @@ public class EntrylistValidatorView extends VerticalLayout {
         setPadding(false);
 
         addAndExpand(createEntrylistValidationForm());
-        add(componentUtils.createFooter());
     }
 
     private Component createEntrylistValidationForm() {

@@ -21,14 +21,13 @@ import java.util.List;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Converter")
 @AnonymousAllowed
 public class ConverterView extends VerticalLayout {
-    public ConverterView(ComponentUtils componentUtils) {
+    public ConverterView() {
         setSizeFull();
         setPadding(false);
 
         VerticalLayout lapTimeConverterLayout = createConverterLayout(createLapTimeConverterComponents(), "Lap Time Converter");
 
         addAndExpand(lapTimeConverterLayout);
-        add(componentUtils.createFooter());
     }
 
     private VerticalLayout createConverterLayout(List<Component> components, String title) {

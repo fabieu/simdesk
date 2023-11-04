@@ -28,14 +28,13 @@ import java.util.List;
 public class DriverView extends VerticalLayout {
     private final DriverService driverService;
 
-    public DriverView(DriverService driverService, ComponentUtils componentUtils) {
+    public DriverView(DriverService driverService) {
         this.driverService = driverService;
 
         setSizeFull();
         setPadding(false);
 
         addAndExpand(createDriverGrid());
-        add(componentUtils.createFooter());
     }
 
     private Component createDriverGrid() {

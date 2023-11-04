@@ -2,14 +2,13 @@ package de.sustineo.acc.servertools.layouts;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.dependency.StyleSheet;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H1;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -29,8 +28,10 @@ import de.sustineo.acc.servertools.configuration.Reference;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.utils.ApplicationContextProvider;
 import de.sustineo.acc.servertools.views.*;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
+import java.time.Year;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Objects;
@@ -43,11 +44,17 @@ public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
     private final BuildProperties buildProperties;
+    private final String privacyUrl;
+    private final String impressumUrl;
     private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
     private H1 viewTitle;
 
-    public MainLayout(ApplicationContextProvider applicationContextProvider) {
+    public MainLayout(ApplicationContextProvider applicationContextProvider,
+                      @Value("${leaderboard.links.privacy}") String privacyUrl,
+                      @Value("${leaderboard.links.impressum}") String impressumUrl) {
         this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
+        this.privacyUrl = privacyUrl;
+        this.impressumUrl = impressumUrl;
 
         // Read and apply theme from session attribute if available
         String themeFromAttributes = (String) VaadinSession.getCurrent().getAttribute(SESSION_ATTRIBUTE_THEME);
@@ -197,16 +204,59 @@ public class MainLayout extends AppLayout {
             menuMapCounter++;
         }
 
-        VerticalLayout infoLayout = new VerticalLayout();
-        infoLayout.setPadding(false);
-        infoLayout.setAlignItems(FlexComponent.Alignment.CENTER);
-        Span version = new Span("Version " + buildProperties.getVersion());
-        version.getElement().getThemeList().add("badge");
-        infoLayout.add(version);
+        Component infoLayout = createDrawerFooter();
 
         layout.addAndExpand(menuLayout);
         layout.add(infoLayout);
 
+        return layout;
+    }
+
+    private Component createDrawerFooter() {
+        VerticalLayout footerLayout = new VerticalLayout();
+        footerLayout.setPadding(false);
+
+        // Layout for custom links
+        VerticalLayout linkLayout = getDrawerLayout();
+
+        if (impressumUrl != null && !impressumUrl.isEmpty()) {
+            linkLayout.add(new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK));
+        }
+
+        if (privacyUrl != null && !privacyUrl.isEmpty()) {
+            linkLayout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
+        }
+
+        // Layout for creator information
+        VerticalLayout creatorLayout = getDrawerLayout();
+
+        Div creatorContainer = new Div();
+        creatorContainer.add(new Text("Made with ❤️ by "));
+        creatorContainer.add(new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK));
+
+        Span copyright = new Span("Copyright © 2022 - " + Year.now().getValue());
+
+        creatorLayout.add(creatorContainer, copyright);
+
+        // Layout for build information
+        VerticalLayout buildLayout = getDrawerLayout();
+
+        Span version = new Span("Version " + buildProperties.getVersion());
+        version.getElement().getThemeList().add("badge");
+
+        buildLayout.add(version);
+
+        // Combine layouts
+        footerLayout.add(linkLayout, creatorLayout, buildLayout);
+        return footerLayout;
+    }
+
+    private static VerticalLayout getDrawerLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(false);
+        layout.setPadding(false);
+        layout.getThemeList().add("spacing-xs");
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
         return layout;
     }
 

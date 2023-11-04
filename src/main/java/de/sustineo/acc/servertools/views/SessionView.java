@@ -32,14 +32,13 @@ import java.util.List;
 public class SessionView extends VerticalLayout {
     private final SessionService sessionService;
 
-    public SessionView(SessionService sessionService, ComponentUtils componentUtils) {
+    public SessionView(SessionService sessionService) {
         this.sessionService = sessionService;
 
         setSizeFull();
         setPadding(false);
 
         addAndExpand(createSessionGrid());
-        add(componentUtils.createFooter());
     }
 
     private Component createSessionGrid() {

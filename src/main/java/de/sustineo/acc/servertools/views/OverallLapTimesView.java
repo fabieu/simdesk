@@ -31,14 +31,13 @@ import java.util.List;
 public class OverallLapTimesView extends VerticalLayout {
     private final RankingService rankingService;
 
-    public OverallLapTimesView(RankingService rankingService, ComponentUtils componentUtils) {
+    public OverallLapTimesView(RankingService rankingService) {
         this.rankingService = rankingService;
 
         setSizeFull();
         setPadding(false);
 
         addAndExpand(createRankingGrid());
-        add(componentUtils.createFooter());
     }
 
     private Component createRankingGrid() {

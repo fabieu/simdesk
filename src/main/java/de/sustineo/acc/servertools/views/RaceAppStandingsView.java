@@ -32,12 +32,10 @@ public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterO
     public static final String ROUTE_PARAMETER_SERIES_ID = "seriesId";
     private final RaceAppService raceAppService;
     private final NotificationService notificationService;
-    private final ComponentUtils componentUtils;
 
-    public RaceAppStandingsView(RaceAppService raceAppService, NotificationService notificationService, ComponentUtils componentUtils) {
+    public RaceAppStandingsView(RaceAppService raceAppService, NotificationService notificationService) {
         this.raceAppService = raceAppService;
         this.notificationService = notificationService;
-        this.componentUtils = componentUtils;
 
         setSizeFull();
         setPadding(false);
@@ -121,7 +119,6 @@ public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterO
 
             add(createStandingsInformation(raceAppSeries));
             addAndExpand(createStandingsGrid(raceAppSeries));
-            add(componentUtils.createFooter());
         } catch (HttpStatusCodeException e) {
             notificationService.showErrorNotification("HTTP " + e.getStatusCode() + " - Could not fetch series from RaceApp API");
         }

@@ -52,13 +52,11 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     private final RankingService rankingService;
     private final SessionService sessionService;
-    private final ComponentUtils componentUtils;
     private GridListDataView<SessionRanking> dataView;
 
-    public SessionRankingView(RankingService rankingService, SessionService sessionService, ComponentUtils componentUtils) {
+    public SessionRankingView(RankingService rankingService, SessionService sessionService) {
         this.rankingService = rankingService;
         this.sessionService = sessionService;
-        this.componentUtils = componentUtils;
 
         setSizeFull();
         setPadding(false);
@@ -210,7 +208,6 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
 
             add(createSessionInformation(fileChecksum));
             addAndExpand(createLeaderboardGrid(fileChecksum));
-            add(componentUtils.createFooter());
         } catch (IllegalArgumentException e) {
             event.rerouteToError(NotFoundException.class);
         }

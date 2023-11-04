@@ -34,11 +34,9 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     private final RankingService rankingService;
-    private final ComponentUtils componentUtils;
 
-    public OverallLapTimesDifferentiatedView(RankingService rankingService, ComponentUtils componentUtils) {
+    public OverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
-        this.componentUtils = componentUtils;
 
         setSizeFull();
         setPadding(false);
@@ -54,7 +52,6 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
             add(createRankingHeader(carGroup, trackId));
             addAndExpand(createRankingGrid(carGroup, trackId));
-            add(componentUtils.createFooter());
         } else {
             event.rerouteToError(NotFoundException.class);
         }
