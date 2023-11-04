@@ -22,20 +22,20 @@ public class LeaderboardConverter extends BaseConverter {
         List<AccLeaderboardLine> accLeaderboardLines = accSession.getSessionResult().getLeaderboardLines();
 
         for (int i = 0; i < accLeaderboardLines.size(); i++) {
-            LeaderboardLine leaderboardLine = convertToLeaderBoardLine(i, sessionId, accLeaderboardLines.get(i), fileMetadata);
+            LeaderboardLine leaderboardLine = convertToLeaderboardLine(i, sessionId, accLeaderboardLines.get(i), fileMetadata);
             leaderboardLines.add(leaderboardLine);
         }
 
         return leaderboardLines;
     }
 
-    private LeaderboardLine convertToLeaderBoardLine(Integer index, Integer sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
+    private LeaderboardLine convertToLeaderboardLine(Integer index, Integer sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
         return LeaderboardLine.builder()
                 .sessionId(sessionId)
                 .ranking(index + 1)
                 .cupCategory(accLeaderboardLine.getCar().getCupCategory())
                 .carId(accLeaderboardLine.getCar().getCarId())
-                .carGroup(fixBadCarGroup(accLeaderboardLine.getCar().getCarGroup(), accLeaderboardLine.getCar().getCarModel()))
+                .carGroup(accLeaderboardLine.getCar().getCarGroup())
                 .carModelId(accLeaderboardLine.getCar().getCarModel())
                 .ballastKg(accLeaderboardLine.getCar().getBallastKg())
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())

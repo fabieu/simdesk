@@ -24,4 +24,37 @@ public class AccCar {
     public Optional<AccDriver> getDriverByIndex(int index) {
         return Optional.ofNullable(drivers.get(index));
     }
+
+    /**
+     * Override car group based on car model id, because Kunos can't set the car group correctly.
+     *
+     * @return Corrected car group
+     */
+    public CarGroup getCarGroup() {
+        if (carModel == null) {
+            return CarGroup.UNKNOWN;
+        }
+
+        if (carModel >= 50 && carModel <= 61) {
+            return CarGroup.GT4;
+        }
+
+        if (carModel == 27) {
+            return CarGroup.TCX;
+        }
+
+        if (carModel == 9 || carModel == 28) {
+            return CarGroup.CUP;
+        }
+
+        if (carModel == 18 || carModel == 29) {
+            return CarGroup.ST;
+        }
+
+        if (carModel == 26) {
+            return CarGroup.CHL;
+        }
+
+        return CarGroup.GT3;
+    }
 }

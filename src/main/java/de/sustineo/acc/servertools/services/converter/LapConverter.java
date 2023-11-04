@@ -45,7 +45,7 @@ public class LapConverter extends BaseConverter {
 
         return Lap.builder()
                 .sessionId(sessionId)
-                .carGroup(fixBadCarGroup(accCar.get().getCarGroup(), accCar.get().getCarModel()))
+                .carGroup(accCar.get().getCarGroup())
                 .carModelId(accCar.get().getCarModel())
                 .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))
