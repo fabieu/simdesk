@@ -9,18 +9,18 @@ import org.springframework.stereotype.Service;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
-public class StatsService {
+public class StatisticsService {
     private final SessionService sessionService;
     private final DriverService driverService;
     private final LapService lapService;
 
-    public StatsService(SessionService sessionService, DriverService driverService, LapService lapService) {
+    public StatisticsService(SessionService sessionService, DriverService driverService, LapService lapService) {
         this.sessionService = sessionService;
         this.driverService = driverService;
         this.lapService = lapService;
     }
 
-    public Stats getStats() {
+    public Stats getLeaderboardStatistics() {
         return Stats.builder()
                 .totalSessions(FormatUtils.formatLargeNumber(sessionService.getSessionCount()))
                 .totalDrivers(FormatUtils.formatLargeNumber(driverService.getDriverCount()))

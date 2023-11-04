@@ -17,10 +17,8 @@ import de.sustineo.acc.servertools.configuration.EnvironmentConfiguration;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.Session;
-import de.sustineo.acc.servertools.entities.Stats;
 import de.sustineo.acc.servertools.layouts.MainLayout;
 import de.sustineo.acc.servertools.services.leaderboard.SessionService;
-import de.sustineo.acc.servertools.services.leaderboard.StatsService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 
 import java.util.ArrayList;
@@ -34,11 +32,10 @@ import java.util.Optional;
 @AnonymousAllowed
 public class MainView extends VerticalLayout {
     private final SessionService sessionService;
-    private final StatsService statsService;
+    private static final Integer RECENT_SESSION_DAYS = 7;
 
-    public MainView(SessionService sessionService, StatsService statsService) {
+    public MainView(SessionService sessionService) {
         this.sessionService = sessionService;
-        this.statsService = statsService;
 
         setSizeFull();
         setPadding(false);
@@ -90,58 +87,16 @@ public class MainView extends VerticalLayout {
         layout.getStyle().set("padding-bottom", "3rem");
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            layout.add(new H3("Recent sessions (last 7 days)"));
-            Optional<Component> sessionGrid = createSessionGrid(7);
+            layout.add(new H3(String.format("Recent sessions (last %s days)", RECENT_SESSION_DAYS)));
+            Optional<Component> sessionGrid = createSessionGrid(RECENT_SESSION_DAYS);
             if (sessionGrid.isPresent()) {
                 layout.add(sessionGrid.get());
             } else {
                 layout.add(new Paragraph("No sessions found"));
             }
-
-            layout.add(new H3("Leaderboard stats"));
-            layout.add(createLeaderboardStatsContainer());
         }
 
         return layout;
-    }
-
-    private Component createLeaderboardStatsContainer() {
-        Div row = new Div();
-        row.setClassName("row");
-        row.add(createStatsBoxes());
-
-        Div container = new Div();
-        container.setId("home-stats");
-        container.setClassName("container-fluid");
-        container.setWidthFull();
-
-        container.add(row);
-
-        return container;
-    }
-
-    private Div[] createStatsBoxes() {
-        Stats stats = statsService.getStats();
-
-        return new Div[]{
-                createStatsBox("Total sessions", stats.getTotalSessions()),
-                createStatsBox("Total laps", stats.getTotalLaps()),
-                createStatsBox("Unique drivers", stats.getTotalDrivers()),
-        };
-    }
-
-    private static Div createStatsBox(String title, String value) {
-        Div statsBox = new Div();
-        statsBox.addClassNames("stats-box", "noselect", "col-12", "col-md-6", "col-lg-3");
-
-        Paragraph titleElement = new Paragraph(title);
-        titleElement.addClassName("stats-title");
-
-        Paragraph valueElement = new Paragraph(value);
-        valueElement.addClassName("stats-value");
-
-        statsBox.add(titleElement, valueElement);
-        return statsBox;
     }
 
     private Optional<Component> createSessionGrid(int recentDays) {
