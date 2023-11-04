@@ -13,7 +13,7 @@ public class AccCar {
     private Integer raceNumber;
     private Integer carModel;
     private CupCategory cupCategory;
-    private CarGroup carGroup;
+    private String carGroup; // unused
     private String teamName;
     private Integer nationality;
     private Integer carGuid;
