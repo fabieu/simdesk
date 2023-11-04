@@ -35,7 +35,7 @@ import java.util.stream.Stream;
 @Log
 @Service
 public class FileContentService {
-    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_8, StandardCharsets.UTF_16LE);
+    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
 
     private final SessionService sessionService;
     private final FileService fileService;
