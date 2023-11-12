@@ -56,8 +56,15 @@ public class SessionService {
 
     @Transactional
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
+        // Ignore session without any laps
         if (accSession.getLaps().isEmpty()) {
             log.info(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
+            return;
+        }
+
+        // Ignore session based on specific characters in server name
+        if (accSession.getServerName() != null && accSession.getServerName().contains("§")) {
+            log.info(String.format("Ignoring session %s because server name '%s' is ignored", fileMetadata.getFile(), accSession.getServerName()));
             return;
         }
 
