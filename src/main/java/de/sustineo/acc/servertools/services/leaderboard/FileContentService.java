@@ -120,6 +120,12 @@ public class FileContentService {
             AccSession accSession = jsonUtils.fromJson(fileContent, AccSession.class);
             FileMetadata fileMetadata = new FileMetadata(file);
 
+            // Ignore sessions based on specific characters
+            if (accSession.getServerName() != null && accSession.getServerName().contains("§")) {
+                log.warning(String.format("Ignoring file %s because server name '%s' is ignored", file, accSession.getServerName()));
+                return;
+            }
+
             sessionService.handleSession(accSession, fileMetadata);
         } catch (Exception e) {
             log.log(Level.SEVERE, String.format("Could not process session file %s", file), e);
