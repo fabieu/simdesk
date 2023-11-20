@@ -8,6 +8,7 @@ import de.sustineo.acc.servertools.entities.mapper.SessionMapper;
 import de.sustineo.acc.servertools.services.converter.SessionConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
@@ -15,6 +16,7 @@ import org.springframework.transaction.annotation.Transactional;
 import java.time.Instant;
 import java.time.temporal.ChronoUnit;
 import java.util.List;
+import java.util.regex.Pattern;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
@@ -24,13 +26,28 @@ public class SessionService {
     private final LeaderboardService leaderboardService;
     private final SessionConverter sessionConverter;
     private final SessionMapper sessionMapper;
+    private List<Pattern> ignorePatterns;
 
     @Autowired
-    public SessionService(SessionConverter sessionConverter, SessionMapper sessionMapper, LapService lapService, LeaderboardService leaderboardService) {
+    public SessionService(SessionConverter sessionConverter,
+                          SessionMapper sessionMapper,
+                          LapService lapService,
+                          LeaderboardService leaderboardService) {
         this.sessionConverter = sessionConverter;
         this.sessionMapper = sessionMapper;
         this.lapService = lapService;
         this.leaderboardService = leaderboardService;
+    }
+
+    @Value("#{${leaderboard.results.ignore_patterns}}")
+    private void setIgnorePatterns(List<String> ignorePatterns) {
+        if (ignorePatterns == null) {
+            return;
+        }
+
+        this.ignorePatterns = ignorePatterns.stream()
+                .map(Pattern::compile)
+                .toList();
     }
 
     public boolean sessionExistsByFileChecksum(String fileChecksum) {
@@ -63,13 +80,17 @@ public class SessionService {
         }
 
         // Ignore session based on specific characters in server name
-        if (accSession.getServerName() != null && accSession.getServerName().contains("§")) {
-            log.info(String.format("Ignoring session %s because server name '%s' is ignored", fileMetadata.getFile(), accSession.getServerName()));
-            return;
+        if (accSession.getServerName() != null && ignorePatterns != null) {
+            for (Pattern ignorePattern : ignorePatterns) {
+                if (ignorePattern.matcher(accSession.getServerName()).find()) {
+                    log.info(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
+                    return;
+                }
+            }
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        if (sessionExistsByFileChecksum(session.getFileChecksum())){
+        if (sessionExistsByFileChecksum(session.getFileChecksum())) {
             log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }

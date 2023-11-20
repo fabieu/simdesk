@@ -33,6 +33,7 @@ leaderboard:
   results:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
     scan_interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
+    ignore_patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS}
 
 ---
 spring:
