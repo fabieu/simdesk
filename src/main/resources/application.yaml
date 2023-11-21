@@ -39,16 +39,6 @@ leaderboard:
 spring:
   config:
     activate:
-      on-profile: "mysql"
-  datasource:
-    url: ${LEADERBOARD_DATASOURCE_URL}
-    username: ${LEADERBOARD_DATASOURCE_USERNAME:root}
-    password: ${LEADERBOARD_DATASOURCE_PASSWORD}
-
----
-spring:
-  config:
-    activate:
       on-profile: "development"
 logging:
   level:

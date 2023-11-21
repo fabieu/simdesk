@@ -16,9 +16,6 @@ import java.util.Properties;
 @Profile(ProfileManager.PROFILE_H2)
 @Configuration
 public class EmbeddedPersistenceConfiguration {
-    private static DataSource dataSource;
-    private SqlSessionFactory sqlSessionFactory;
-
     @Bean("embeddedDatabaseIdProvider")
     public VendorDatabaseIdProvider databaseIdProvider() {
         VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
@@ -30,27 +27,20 @@ public class EmbeddedPersistenceConfiguration {
 
     @Bean("embeddedDataSource")
     public DataSource dataSource() {
-        if (dataSource == null) {
-            dataSource = new EmbeddedDatabaseBuilder()
-                    .setType(EmbeddedDatabaseType.H2)
-                    .generateUniqueName(true)
-                    .addScript("db/local-h2/V0_0_1__config.sql")
-                    .build();
-        }
-
-        return dataSource;
+        return new EmbeddedDatabaseBuilder()
+                .setType(EmbeddedDatabaseType.H2)
+                .generateUniqueName(true)
+                .addScript("db/local-h2/V0_0_1__config.sql")
+                .build();
     }
 
     @Bean
     public SqlSessionFactory sqlSessionFactory(@Qualifier("embeddedDataSource") DataSource dataSource,
                                                @Qualifier("embeddedDatabaseIdProvider") VendorDatabaseIdProvider databaseIdProvider) throws Exception {
-        if (sqlSessionFactory == null) {
-            SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
-            sqlSessionFactoryBean.setDataSource(dataSource);
-            sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider);
-            sqlSessionFactory = sqlSessionFactoryBean.getObject();
-        }
+        SqlSessionFactoryBean sqlSessionFactoryBean = new SqlSessionFactoryBean();
+        sqlSessionFactoryBean.setDataSource(dataSource);
+        sqlSessionFactoryBean.setDatabaseIdProvider(databaseIdProvider);
 
-        return sqlSessionFactory;
+        return sqlSessionFactoryBean.getObject();
     }
 }
