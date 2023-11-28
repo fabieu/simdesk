@@ -7,9 +7,7 @@ import de.sustineo.acc.servertools.utils.FormatUtils;
 
 import java.util.Optional;
 
-import static de.sustineo.acc.servertools.views.renderers.ranking.RankingTemplates.*;
-
-public class SessionRankingRenderer {
+public class SessionRankingRenderer extends GridRenderer {
     public static Renderer<SessionRanking> createRaceNumberRenderer() {
         return LitRenderer.<SessionRanking>of(RACE_NUMBER_TEMPLATE)
                 .withProperty(RACE_NUMBER_TEMPLATE_NUMBER, SessionRanking::getRaceNumber)
@@ -29,7 +27,7 @@ public class SessionRankingRenderer {
         return LitRenderer.<SessionRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> RankingRenderer.getTimeColor(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
+                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> getTimeColor(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
                 .withProperty(TIMING_TEMPLATE_FASTEST_LAP, sessionRanking -> sessionRanking.getBestLapTimeMillis() == bestLapTimeMillis);
     }
 

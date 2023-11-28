@@ -1,6 +1,6 @@
 package de.sustineo.acc.servertools.views.renderers.ranking;
 
-public class RankingTemplates {
+public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE = """
                 #${item.raceNumber}
                 ${item.ballastKg ? html`<span theme="badge pill" title="Ballast in kg">+${item.ballastKg}kg</span>` : ""}
@@ -38,4 +38,14 @@ public class RankingTemplates {
     static final String TIMING_TEMPLATE_LAP_COUNT = "lapCount";
     static final String TIMING_TEMPLATE_COLOR = "color";
     static final String TIMING_TEMPLATE_FASTEST_LAP = "fastestLap";
+
+    public static String getTimeColor(Long gapMillis) {
+        if (gapMillis < 0) {
+            return "--lumo-success-text-color";
+        } else if (gapMillis == 0) {
+            return "--lumo-secondary-text-color";
+        } else {
+            return "--lumo-error-text-color";
+        }
+    }
 }
