@@ -4,6 +4,7 @@ import org.apache.ibatis.mapping.VendorDatabaseIdProvider;
 import org.apache.ibatis.session.SqlSessionFactory;
 import org.mybatis.spring.SqlSessionFactoryBean;
 import org.springframework.beans.factory.annotation.Qualifier;
+import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.context.annotation.Profile;
@@ -16,6 +17,9 @@ import java.util.Properties;
 @Profile(ProfileManager.PROFILE_H2)
 @Configuration
 public class EmbeddedPersistenceConfiguration {
+    @Value("${spring.application.name}")
+    private String applicationName;
+
     @Bean("embeddedDatabaseIdProvider")
     public VendorDatabaseIdProvider databaseIdProvider() {
         VendorDatabaseIdProvider databaseIdProvider = new VendorDatabaseIdProvider();
@@ -29,7 +33,7 @@ public class EmbeddedPersistenceConfiguration {
     public DataSource dataSource() {
         return new EmbeddedDatabaseBuilder()
                 .setType(EmbeddedDatabaseType.H2)
-                .generateUniqueName(true)
+                .setName(applicationName)
                 .addScript("db/local-h2/V0_0_1__config.sql")
                 .build();
     }
