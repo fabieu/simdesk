@@ -19,11 +19,9 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class RankingService {
-    private final SessionService sessionService;
     private final RankingMapper rankingMapper;
 
-    public RankingService(SessionService sessionService, RankingMapper rankingMapper) {
-        this.sessionService = sessionService;
+    public RankingService(RankingMapper rankingMapper) {
         this.rankingMapper = rankingMapper;
     }
 
@@ -40,8 +38,7 @@ public class RankingService {
         return driverRankings;
     }
 
-    public List<SessionRanking> getSessionRanking(String fileChecksum) {
-        Session session = sessionService.getSession(fileChecksum);
+    public List<SessionRanking> getSessionRankings(Session session) {
         if (session == null) {
             return null;
         }

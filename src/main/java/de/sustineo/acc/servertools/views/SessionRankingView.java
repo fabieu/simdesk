@@ -64,9 +64,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     }
 
 
-    private Component createSessionInformation(String fileChecksum) {
-        Session session = sessionService.getSession(fileChecksum);
-
+    private Component createSessionInformation(Session session) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setPadding(true);
         layout.setWidthFull();
@@ -82,7 +80,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
 
         StreamResource csvResource = new StreamResource(
-                String.format("session_export_%s.csv", fileChecksum),
+                String.format("session_export_%s.csv", session.getFileChecksum()),
                 () -> {
                     String csv = this.exportCSV();
                     return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
@@ -98,8 +96,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         return layout;
     }
 
-    private Component createLeaderboardGrid(String fileChecksum) {
-        List<SessionRanking> sessionRankings = rankingService.getSessionRanking(fileChecksum);
+    private Component createLeaderboardGrid(Session session) {
+        List<SessionRanking> sessionRankings = rankingService.getSessionRankings(session);
         List<SessionRanking> validSessionRankings = sessionRankings.stream()
                 .filter(SessionRanking::isValid)
                 .toList();
@@ -190,12 +188,13 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
         try {
-            if (!sessionService.sessionExistsByFileChecksum(fileChecksum)) {
+            Session session = sessionService.getSession(fileChecksum);
+            if (session == null) {
                 throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }
 
-            add(createSessionInformation(fileChecksum));
-            addAndExpand(createLeaderboardGrid(fileChecksum));
+            add(createSessionInformation(session));
+            addAndExpand(createLeaderboardGrid(session));
         } catch (IllegalArgumentException e) {
             event.rerouteToError(NotFoundException.class);
         }

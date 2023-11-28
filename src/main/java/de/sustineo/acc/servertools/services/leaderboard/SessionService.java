@@ -50,16 +50,16 @@ public class SessionService {
                 .toList();
     }
 
-    public boolean sessionExistsByFileChecksum(String fileChecksum) {
-        return sessionMapper.findByFileChecksum(fileChecksum) != null;
-    }
-
     public List<Session> getAllSessions() {
         return sessionMapper.findAll();
     }
 
     public Session getSession(String fileChecksum) {
         return sessionMapper.findByFileChecksum(fileChecksum);
+    }
+
+    public boolean sessionExists(String fileChecksum) {
+        return getSession(fileChecksum) != null;
     }
 
     public long getSessionCount() {
@@ -90,7 +90,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
-        if (sessionExistsByFileChecksum(session.getFileChecksum())) {
+        if (sessionExists(session.getFileChecksum())) {
             log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }
