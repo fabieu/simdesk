@@ -101,6 +101,22 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         List<SessionRanking> validSessionRankings = sessionRankings.stream()
                 .filter(SessionRanking::isValid)
                 .toList();
+
+        if (validSessionRankings.isEmpty()) {
+            VerticalLayout layout = new VerticalLayout();
+
+            layout.setPadding(true);
+            layout.setWidthFull();
+            layout.setAlignItems(Alignment.CENTER);
+
+            H3 message = new H3("No valid laps in this session!");
+            message.getStyle()
+                    .setColor("var(--lumo-error-text-color)");
+
+            layout.add(message);
+            return layout;
+        }
+
         SessionRanking bestTotalTimeSessionRanking = validSessionRankings.stream().findFirst().orElse(new SessionRanking());
         SessionRanking bestLapTimeSessionRanking = validSessionRankings.stream()
                 .min(new SessionRankingLapTimeComparator())
