@@ -181,6 +181,10 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     }
 
     private String exportCSV() {
+        if (dataView == null) {
+            return null;
+        }
+
         Stream<SessionRanking> sessionRows = dataView.getItems();
 
         try (StringWriter writer = new StringWriter()) {
