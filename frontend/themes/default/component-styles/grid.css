@@ -45,3 +45,7 @@ vaadin-grid::part(ranking-podium-third) {
 vaadin-grid::part(ranking-dnf) {
     background-color: var(--lumo-error-color-10pct);
 }
+
+vaadin-grid::part(invalid-lap) {
+    background-color: var(--lumo-error-color-10pct);
+}

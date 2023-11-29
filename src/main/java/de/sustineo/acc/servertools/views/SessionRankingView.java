@@ -17,6 +17,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -176,6 +177,21 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+
+        SingleSelect<Grid<SessionRanking>, SessionRanking> singleSelect = grid.asSingleSelect();
+        singleSelect.addValueChangeListener(e -> {
+            SessionRanking selectedSessionRanking = e.getValue();
+
+            if (selectedSessionRanking != null) {
+                getUI().ifPresent(ui -> ui.navigate(SessionLapsView.class,
+                        new RouteParameters(
+                                new RouteParam(SessionLapsView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
+                                new RouteParam(SessionLapsView.ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
+                        )
+                ));
+            }
+        });
 
         return grid;
     }

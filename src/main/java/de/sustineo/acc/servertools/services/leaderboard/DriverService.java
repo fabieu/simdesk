@@ -30,14 +30,16 @@ public class DriverService {
         List<Driver> drivers = driverMapper.findAll();
 
         return drivers.stream()
-                .map(driver -> {
-                    List<LapCount> lapCounts = lapService.findLapCountsByPlayerId(driver.getPlayerId());
-                    driver.setValidLapsCount(lapCounts.stream().filter(LapCount::getValid).map(LapCount::getLapCount).findFirst().orElse(0));
-                    driver.setInvalidLapsCount(lapCounts.stream().filter(lapCount -> !lapCount.getValid()).map(LapCount::getLapCount).findFirst().orElse(0));
-                    return driver;
-                })
+                .map(this::addLapCounts)
                 .sorted(new DriverComparator())
                 .toList();
+    }
+
+    private Driver addLapCounts(Driver driver) {
+        List<LapCount> lapCounts = lapService.getLapCountsByPlayerId(driver.getPlayerId());
+        driver.setValidLapsCount(lapCounts.stream().filter(LapCount::getValid).map(LapCount::getLapCount).findFirst().orElse(0));
+        driver.setInvalidLapsCount(lapCounts.stream().filter(lapCount -> !lapCount.getValid()).map(LapCount::getLapCount).findFirst().orElse(0));
+        return driver;
     }
 
     public long getDriverCount() {

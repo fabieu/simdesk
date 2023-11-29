@@ -27,6 +27,7 @@ public class SessionRanking {
     @CsvBindByName(column = "Position")
     private Integer ranking;
     @CsvBindByName(column = "Car Group")
+    private Integer carId;
     private CarGroup carGroup;
     @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
     private Integer carModelId;
