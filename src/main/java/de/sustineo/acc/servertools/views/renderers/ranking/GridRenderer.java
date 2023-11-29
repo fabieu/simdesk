@@ -12,7 +12,7 @@ public class GridRenderer {
                 ${item.drivers.map(driver => html`
                 <vaadin-horizontal-layout">
                     <div>
-                        <vaadin-button theme="tertiary">${driver.fullName}</vaadin-button>
+                        <span>${driver.fullName}</span>
                         ${driver.prettyDriveTime ? html`<span theme="badge contrast pill" title="Driving time">${driver.prettyDriveTime}</span>` : ""}
                     </div>
                 </vaadin-horizontal-layout>
