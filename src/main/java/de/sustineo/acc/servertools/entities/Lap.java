@@ -19,4 +19,8 @@ public class Lap extends Entity {
     private Long split2Millis;
     private Long split3Millis;
     private boolean valid;
+
+    public String getCarModelName() {
+        return Car.getCarNameById(carModelId);
+    }
 }

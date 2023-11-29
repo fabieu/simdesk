@@ -25,6 +25,20 @@ public interface LapMapper {
     @Select("SELECT * FROM acc_leaderboard.laps")
     List<Lap> findAll();
 
+    String FIND_BY_SESSION_AND_DRIVERS = """
+            <script>
+            SELECT * FROM acc_leaderboard.laps WHERE session_id = #{sessionId} AND driver_id IN 
+                <foreach item="item" index="index" collection="playerIds"
+                    open="(" separator="," close=")">
+                      #{item}
+                </foreach>
+            </script>
+            """;
+
+    @ResultMap("lapResultMap")
+    @Select(FIND_BY_SESSION_AND_DRIVERS)
+    List<Lap> findBySessionAndDrivers(int sessionId, List<String> playerIds);
+
     @Select("SELECT COUNT(id) FROM acc_leaderboard.laps")
     @ResultType(long.class)
     long count();

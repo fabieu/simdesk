@@ -85,4 +85,8 @@ public class RankingService {
                 .sorted(new DriverRankingComparator())
                 .toList();
     }
+
+    public List<String> getPlayerIdsBySessionAndCarId(Integer sessionId, Integer carId) {
+        return rankingMapper.findDriversBySessionAndCarId(sessionId, carId);
+    }
 }

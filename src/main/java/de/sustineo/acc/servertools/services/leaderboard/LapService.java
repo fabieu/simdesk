@@ -41,8 +41,12 @@ public class LapService {
         lapMapper.insert(lap);
     }
 
-    public List<LapCount> findLapCountsByPlayerId(String playerId) {
+    public List<LapCount> getLapCountsByPlayerId(String playerId) {
         return lapMapper.findLapCounts(playerId);
+    }
+
+    public List<Lap> getLapsBySessionAndDrivers(int sessionId, List<String> playerIds) {
+        return lapMapper.findBySessionAndDrivers(sessionId, playerIds);
     }
 
     public long getLapCount() {

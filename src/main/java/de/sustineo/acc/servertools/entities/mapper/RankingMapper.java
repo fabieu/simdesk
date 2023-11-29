@@ -44,6 +44,7 @@ public interface RankingMapper {
     @Results(id = "leaderboardResultMap", value = {
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.acc.servertools.entities.mapper.SessionMapper.findById")),
             @Result(property = "ranking", column = "ranking"),
+            @Result(property = "carId", column = "car_id"),
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "ballastKg", column = "ballast_kg"),
@@ -58,4 +59,8 @@ public interface RankingMapper {
     })
     @Select("SELECT * FROM acc_leaderboard.leaderboard_lines WHERE session_id = #{sessionId} ORDER BY ranking")
     List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
+
+    @ResultType(List.class)
+    @Select("SELECT player_id FROM acc_leaderboard.leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId}")
+    List<String> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 }
