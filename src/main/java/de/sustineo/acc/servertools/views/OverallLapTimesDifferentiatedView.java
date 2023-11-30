@@ -85,7 +85,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getFullName())
                 .setHeader("Driver")
                 .setAutoWidth(true)
-                .setFlexGrow(0)
+                .setFlexGrow(1)
                 .setSortable(true);
         Grid.Column<DriverRanking> lapTimeColumn = grid.addColumn(DriverRankingRenderer.createLapTimeRenderer(topDriverRanking))
                 .setHeader("Lap Time")
@@ -124,13 +124,8 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
                 .setSortable(true);
         Grid.Column<DriverRanking> serverNameColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getServerName())
                 .setHeader("Server Name")
-                .setSortable(true);
-        Grid.Column<DriverRanking> lapCountColumn = grid.addColumn(DriverRanking::getLapCount)
-                .setHeader("Laps")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
                 .setSortable(true)
-                .setTextAlign(ColumnTextAlign.END);
+                .setFlexGrow(2);
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
         grid.setSizeFull();

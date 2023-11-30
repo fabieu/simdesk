@@ -20,7 +20,6 @@ public class DriverRanking extends Entity {
     private Driver driver;
     private Integer carModelId;
     private Session session;
-    private Integer lapCount;
 
     public String getCarModelName() {
         return Car.getCarNameById(carModelId);
