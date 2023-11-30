@@ -39,13 +39,15 @@ public class SessionService {
         this.leaderboardService = leaderboardService;
     }
 
-    @Value("#{${leaderboard.results.ignore_patterns}}")
-    private void setIgnorePatterns(List<String> ignorePatterns) {
-        if (ignorePatterns == null) {
+    @Value("${leaderboard.results.ignore_patterns}")
+    private void setIgnorePatterns(String ignorePatterns) {
+        if (ignorePatterns == null || ignorePatterns.isBlank()) {
             return;
         }
 
-        this.ignorePatterns = ignorePatterns.stream()
+        List<String> splitIgnorePatterns = List.of(ignorePatterns.split("\\|"));
+
+        this.ignorePatterns = splitIgnorePatterns.stream()
                 .map(Pattern::compile)
                 .toList();
     }
