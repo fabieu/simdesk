@@ -78,6 +78,8 @@ public class MainLayout extends AppLayout {
         if (ProfileManager.isEntrylistProfileEnabled()) {
             menuMap.put("entrylist", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
         }
+
+        menuMap.put("external links", createMenuTabs(MainLayout.createExternalMenuTabs()));
     }
 
     private Component createNavbarContent() {
@@ -169,15 +171,6 @@ public class MainLayout extends AppLayout {
         return UI.getCurrent().getElement().getThemeList().stream()
                 .findFirst()
                 .orElse(DEFAULT_THEME);
-    }
-
-    private Component createHelpButton() {
-        Icon helpIcon = VaadinIcon.QUESTION_CIRCLE_O.create();
-
-        Button helpButton = new Button(helpIcon);
-        helpButton.addClickListener(e -> UI.getCurrent().getPage().setLocation(Reference.PROJECT_WIKI));
-
-        return helpButton;
     }
 
     private Component createDrawerContent() {
@@ -298,6 +291,12 @@ public class MainLayout extends AppLayout {
         };
     }
 
+    private static Tab[] createExternalMenuTabs() {
+        return new Tab[] {
+                createExternalTab("Feedback", VaadinIcon.COMMENT.create(), Reference.FEEDBACK),
+        };
+    }
+
     private static Tab createTab(String text, Icon icon, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
         tab.add(icon, new RouterLink(text, navigationTarget));
@@ -311,12 +310,8 @@ public class MainLayout extends AppLayout {
         Anchor link = new Anchor(navigationTarget, text);
         link.setTarget("_blank");
 
-        Span badge = new Span();
-        badge.setText("external");
-        badge.getElement().getThemeList().add("badge pill error small");
-
         final Tab tab = new Tab();
-        tab.add(icon, link, badge);
+        tab.add(icon, link);
         tab.setId("tab-" + text.toLowerCase());
         tab.setSelected(false);
 
