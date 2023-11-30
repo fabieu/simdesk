@@ -126,7 +126,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         Grid<SessionRanking> grid = new Grid<>(SessionRanking.class, false);
         grid.addColumn(SessionRanking::getRanking)
                 .setHeader("#")
-                .setAutoWidth(true)
+                .setWidth(ComponentUtils.GRID_RANKING_WIDTH)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)

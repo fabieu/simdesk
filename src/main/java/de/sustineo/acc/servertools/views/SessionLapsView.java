@@ -1,6 +1,7 @@
 package de.sustineo.acc.servertools.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
@@ -75,9 +76,10 @@ public class SessionLapsView extends VerticalLayout implements BeforeEnterObserv
         Grid<Lap> grid = new Grid<>(Lap.class, false);
         grid.addColumn(LitRenderer.of("${index + 1}"))
                 .setHeader("#")
-                .setAutoWidth(true)
+                .setWidth(ComponentUtils.GRID_RANKING_WIDTH)
                 .setFlexGrow(0)
                 .setSortable(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
                 .setFrozen(true);
         grid.addColumn(Lap::getCarGroup)
                 .setHeader("Car Group")

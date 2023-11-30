@@ -8,6 +8,8 @@ import org.springframework.stereotype.Service;
 
 @Service
 public class ComponentUtils {
+    public static final String GRID_RANKING_WIDTH = "70px";
+
     public static Hr createSpacer(String color) {
         Hr hr = new Hr();
         hr.getStyle()
