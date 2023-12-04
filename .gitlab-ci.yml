@@ -6,19 +6,29 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "push"'
       changes:
         - gradle.properties
+        - docker-compose.yml
 
 .build_conditions:
   rules:
-    - if: '$CI_PIPELINE_SOURCE == "web"'
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
       changes:
         - gradle.properties
+
+.deploy_conditions:
+  rules:
+    - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: manual
+    - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      changes:
+        - docker-compose.yml
+      when: manual
 
 stages:
   - prepare
   - test
   - build
   - release
+  - deploy
 
 default:
   image: gradle:7.6-jdk17-alpine
@@ -107,3 +117,26 @@ create release:
     description: "$CI_COMMIT_MESSAGE"
     ref: "$CI_COMMIT_SHA"
   allow_failure: true
+
+deploy:
+  stage: deploy
+  tags:
+    - s2r
+    - shell
+    - wsl
+  needs:
+    - job: build-docker
+      optional: true
+  rules:
+    - !reference [ .deploy_conditions, rules ]
+  before_script:
+    - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
+  variables:
+    TARGET_DIR: /mnt/d/Docker/acc-leaderboard
+  script:
+    - echo "Deploying application"
+    - cd $TARGET_DIR
+    - cp -f $CI_PROJECT_DIR/docker-compose.yml docker-compose.yml
+    - docker compose up -d
+    - echo "Application deployed successfully."
+

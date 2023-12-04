@@ -1,0 +1,15 @@
+version: "3.9"
+services:
+  app:
+    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1.7.1
+    ports:
+      - "8085:8080"
+    volumes:
+      - ./results:/opt/acc-server-tools/results
+    environment:
+      SPRING_PROFILES_ACTIVE: production, h2, acc-leaderboard, acc-entrylist, acc-raceapp
+      LEADERBOARD_IMPRESSUM_URL: https://markracing.de/impressum
+      LEADERBOARD_PRIVACY_URL: https://markracing.de/privacy
+      LEADERBOARD_COMMUNITY_NAME: Sim2Real
+      LEADERBOARD_RESULTS_IGNORE_PATTERNS: "[§]+"
+    restart: unless-stopped
