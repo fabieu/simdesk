@@ -26,7 +26,7 @@ public class RaceAppResult {
     @JsonProperty("CarName")
     private String carName;
     @JsonProperty("SeriesDrivers")
-    private List<RaceAppSeriesDriver> drivers;
+    private List<RaceAppDriver> drivers;
     @JsonProperty("Tag")
     private String tag;
 
@@ -36,7 +36,7 @@ public class RaceAppResult {
         }
 
         return drivers.stream()
-                .map(RaceAppSeriesDriver::getName)
+                .map(RaceAppDriver::getName)
                 .reduce((s, s2) -> s + ", " + s2)
                 .orElse("");
     }
