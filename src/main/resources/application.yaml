@@ -34,6 +34,14 @@ leaderboard:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
     scan_interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
     ignore_patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+springdoc:
+  swagger-ui:
+    path: /api/swagger
+  api-docs:
+    path: /api/docs
+  paths-to-match: /api/**
+vaadin:
+  exclude-urls: /api/**
 
 ---
 spring:
