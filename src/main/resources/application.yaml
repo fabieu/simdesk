@@ -42,7 +42,8 @@ springdoc:
   paths-to-match: /api/**
 vaadin:
   exclude-urls: /api/**
-
+server:
+  forward-headers-strategy: framework
 ---
 spring:
   config:
