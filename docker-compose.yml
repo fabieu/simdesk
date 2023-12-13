@@ -1,7 +1,7 @@
 version: "3.9"
 services:
   app:
-    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1.8.1
+    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1.8.2
     ports:
       - "8085:8080"
     volumes:
