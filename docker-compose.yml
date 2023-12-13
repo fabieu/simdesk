@@ -11,5 +11,5 @@ services:
       LEADERBOARD_IMPRESSUM_URL: https://markracing.de/impressum
       LEADERBOARD_PRIVACY_URL: https://markracing.de/privacy
       LEADERBOARD_COMMUNITY_NAME: Sim2Real
-      LEADERBOARD_RESULTS_IGNORE_PATTERNS: "[§]+"
+      LEADERBOARD_RESULTS_IGNORE_PATTERNS: "(No leaderboard)+"
     restart: unless-stopped
