@@ -32,6 +32,7 @@ public interface LapMapper {
                     open="(" separator="," close=")">
                       #{item}
                 </foreach>
+                ORDER BY id ASC;
             </script>
             """;
 

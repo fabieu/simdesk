@@ -184,10 +184,10 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
             SessionRanking selectedSessionRanking = e.getValue();
 
             if (selectedSessionRanking != null) {
-                getUI().ifPresent(ui -> ui.navigate(SessionLapsView.class,
+                getUI().ifPresent(ui -> ui.navigate(SessionDetailsView.class,
                         new RouteParameters(
-                                new RouteParam(SessionLapsView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
-                                new RouteParam(SessionLapsView.ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
+                                new RouteParam(SessionDetailsView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
+                                new RouteParam(SessionDetailsView.ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
                         )
                 ));
             }

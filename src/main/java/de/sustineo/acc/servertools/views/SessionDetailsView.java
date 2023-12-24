@@ -30,17 +30,17 @@ import java.util.List;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/sessions/:fileChecksum/laps/:carId", layout = MainLayout.class)
+@Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
-public class SessionLapsView extends VerticalLayout implements BeforeEnterObserver {
+public class SessionDetailsView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     public static final String ROUTE_PARAMETER_CAR_ID = "carId";
     private final SessionService sessionService;
     private final LapService lapService;
     private final RankingService rankingService;
 
-    public SessionLapsView(SessionService sessionService, LapService lapService, RankingService rankingService) {
+    public SessionDetailsView(SessionService sessionService, LapService lapService, RankingService rankingService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.rankingService = rankingService;
