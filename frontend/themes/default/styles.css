@@ -1,6 +1,7 @@
 /* Import your application global css files here or add the styles directly to this file */
 @import "component-styles/grid.css";
 @import "views/main.css";
+@import "views/error.css";
 
 html {
     --acc-color-gt3: rgb(255, 255, 255);
