@@ -1,4 +1,4 @@
-FROM openjdk:17-jdk-alpine
+FROM openjdk:17-jdk-alpine3.14
 
 WORKDIR /opt/acc-server-tools
 RUN mkdir results # default results folder
