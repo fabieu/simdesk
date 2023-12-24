@@ -99,11 +99,7 @@ public class MainLayout extends AppLayout {
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
-        Span betaBadge = new Span("BETA");
-        betaBadge.getElement().getThemeList().add("badge pill");
-        betaBadge.getStyle().set("margin-left", "var(--lumo-space-s)");
-
-        layout.add(viewTitle, betaBadge);
+        layout.add(viewTitle);
 
         return layout;
     }
