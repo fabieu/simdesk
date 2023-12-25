@@ -9,6 +9,9 @@ import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -26,6 +29,7 @@ import de.sustineo.acc.servertools.views.renderers.ranking.LapRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Log
@@ -39,6 +43,8 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
     private final SessionService sessionService;
     private final LapService lapService;
     private final RankingService rankingService;
+    private List<Lap> laps = new ArrayList<>();
+    private List<String> penalties = new ArrayList<>();
 
     public SessionDetailsView(SessionService sessionService, LapService lapService, RankingService rankingService) {
         this.sessionService = sessionService;
@@ -69,10 +75,7 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         return layout;
     }
 
-    private Component createLapsGrid(Session session, int carId) {
-        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
-        List<Lap> laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
-
+    private Component createLapsGrid() {
         Grid<Lap> grid = new Grid<>(Lap.class, false);
         grid.addColumn(LitRenderer.of("${index + 1}"))
                 .setHeader("#")
@@ -140,16 +143,36 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
         int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());
 
-        try {
-            Session session = sessionService.getSession(fileChecksum);
-            if (session == null) {
-                throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
-            }
-
-            add(createSessionInformation(session));
-            addAndExpand(createLapsGrid(session, carId));
-        } catch (IllegalArgumentException e) {
-            event.rerouteToError(NotFoundException.class);
+        Session session = sessionService.getSession(fileChecksum);
+        if (session == null) {
+            throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
         }
+
+        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
+        laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
+        penalties = new ArrayList<>();
+
+        add(createSessionInformation(session));
+
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
+        tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
+        tabSheet.add(createTab("Penalties", penalties.size()), new Span("Coming soon..."));
+        addAndExpand(tabSheet);
+    }
+
+    private Tab createTab(String label, int number) {
+        HorizontalLayout horizontalLayout = new HorizontalLayout();
+        horizontalLayout.setAlignItems(Alignment.CENTER);
+        horizontalLayout.getStyle()
+                .set("gap", "var(--lumo-space-s)");
+
+        Span labelSpan = new Span(label);
+        Span numberSpan = new Span(String.valueOf(number));
+        numberSpan.getElement().getThemeList().add("badge contrast");
+
+        horizontalLayout.add(labelSpan, numberSpan);
+        return new Tab(horizontalLayout);
     }
 }
