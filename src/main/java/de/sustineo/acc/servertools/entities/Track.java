@@ -10,7 +10,7 @@ public class Track extends Entity {
         tracks.put("zolder", "Zolder");
         tracks.put("brands_hatch", "Brands Hatch");
         tracks.put("silverstone", "Silverstone");
-        tracks.put("paul_richard", "Paul Richard");
+        tracks.put("paul_ricard", "Paul Richard");
         tracks.put("misano", "Misano");
         tracks.put("spa", "Spa Franchorchamp");
         tracks.put("nurburgring", "Nürburgring");
