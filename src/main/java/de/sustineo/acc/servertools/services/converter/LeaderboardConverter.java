@@ -1,14 +1,17 @@
 package de.sustineo.acc.servertools.services.converter;
 
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.LeaderboardLine;
 import de.sustineo.acc.servertools.entities.json.AccLeaderboardLine;
 import de.sustineo.acc.servertools.entities.json.AccSession;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.ArrayList;
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class LeaderboardConverter extends BaseConverter {
     private final DriverConverter driverConverter;

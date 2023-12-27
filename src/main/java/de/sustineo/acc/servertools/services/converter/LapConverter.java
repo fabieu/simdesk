@@ -1,5 +1,6 @@
 package de.sustineo.acc.servertools.services.converter;
 
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.Lap;
 import de.sustineo.acc.servertools.entities.json.AccCar;
@@ -7,6 +8,7 @@ import de.sustineo.acc.servertools.entities.json.AccDriver;
 import de.sustineo.acc.servertools.entities.json.AccLap;
 import de.sustineo.acc.servertools.entities.json.AccSession;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -14,6 +16,7 @@ import java.util.Objects;
 import java.util.Optional;
 import java.util.stream.Collectors;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
 public class LapConverter extends BaseConverter {

@@ -1,11 +1,14 @@
 package de.sustineo.acc.servertools.services.converter;
 
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.Driver;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.json.AccDriver;
 import de.sustineo.acc.servertools.entities.json.AccLeaderboardLine;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class DriverConverter extends BaseConverter {
     public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {

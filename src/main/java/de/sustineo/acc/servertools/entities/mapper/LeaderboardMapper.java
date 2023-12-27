@@ -1,11 +1,14 @@
 package de.sustineo.acc.servertools.entities.mapper;
 
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.LeaderboardLine;
 import org.apache.ibatis.annotations.Insert;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Options;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Component
 @Mapper
 public interface LeaderboardMapper {

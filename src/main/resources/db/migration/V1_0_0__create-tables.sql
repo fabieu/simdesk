@@ -50,6 +50,23 @@ CREATE TABLE IF NOT EXISTS acc_leaderboard.laps
     FOREIGN KEY (driver_id) REFERENCES acc_leaderboard.drivers (player_id)
 );
 
+CREATE TABLE IF NOT EXISTS acc_leaderboard.penalties
+(
+    id              INT AUTO_INCREMENT,
+    session_id      INT         NOT NULL,
+    car_id          INT         NOT NULL,
+    reason          VARCHAR(64) NOT NULL,
+    penalty         VARCHAR(64) NOT NULL,
+    penalty_value   INT         NOT NULL,
+    violation_lap   INT         NOT NULL,
+    cleared_lap     INT         NOT NULL,
+    post_race       BOOLEAN     NOT NULL,
+    insert_datetime DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    update_datetime DATETIME    NOT NULL DEFAULT CURRENT_TIMESTAMP ON UPDATE CURRENT_TIMESTAMP,
+    PRIMARY KEY (id),
+    FOREIGN KEY (session_id) REFERENCES acc_leaderboard.sessions (id)
+);
+
 CREATE TABLE IF NOT EXISTS acc_leaderboard.leaderboard_lines
 (
     id                   INT AUTO_INCREMENT,

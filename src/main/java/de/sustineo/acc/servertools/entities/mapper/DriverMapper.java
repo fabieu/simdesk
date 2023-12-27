@@ -1,11 +1,14 @@
 package de.sustineo.acc.servertools.entities.mapper;
 
+import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.Driver;
 import org.apache.ibatis.annotations.*;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Component
 @Mapper
 @SuppressWarnings("unused")

@@ -22,21 +22,24 @@ import java.util.regex.Pattern;
 @Log
 @Service
 public class SessionService {
-    private final LapService lapService;
-    private final LeaderboardService leaderboardService;
     private final SessionConverter sessionConverter;
     private final SessionMapper sessionMapper;
+    private final LapService lapService;
+    private final LeaderboardService leaderboardService;
+    private final PenaltyService penaltyService;
     private List<Pattern> ignorePatterns;
 
     @Autowired
     public SessionService(SessionConverter sessionConverter,
                           SessionMapper sessionMapper,
                           LapService lapService,
-                          LeaderboardService leaderboardService) {
+                          LeaderboardService leaderboardService,
+                          PenaltyService penaltyService) {
         this.sessionConverter = sessionConverter;
         this.sessionMapper = sessionMapper;
         this.lapService = lapService;
         this.leaderboardService = leaderboardService;
+        this.penaltyService = penaltyService;
     }
 
     @Value("${leaderboard.results.ignore_patterns}")
@@ -103,6 +106,7 @@ public class SessionService {
         // Actual processing of the session results
         leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
+        penaltyService.handlePenalties(session.getId(), accSession);
 
         log.info(String.format("Successfully processed session file %s", fileMetadata.getFile()));
     }
