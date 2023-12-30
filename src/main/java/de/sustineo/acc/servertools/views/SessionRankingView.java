@@ -33,7 +33,7 @@ import de.sustineo.acc.servertools.services.leaderboard.SessionService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 import de.sustineo.acc.servertools.views.generators.SessionRankingDNFNameGenerator;
 import de.sustineo.acc.servertools.views.generators.SessionRankingPodiumPartNameGenerator;
-import de.sustineo.acc.servertools.views.renderers.ranking.SessionRankingRenderer;
+import de.sustineo.acc.servertools.views.renderers.SessionRankingRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 

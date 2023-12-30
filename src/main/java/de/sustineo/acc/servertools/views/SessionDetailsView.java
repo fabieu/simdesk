@@ -18,19 +18,23 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.Lap;
+import de.sustineo.acc.servertools.entities.Penalty;
 import de.sustineo.acc.servertools.entities.Session;
 import de.sustineo.acc.servertools.layouts.MainLayout;
 import de.sustineo.acc.servertools.services.leaderboard.LapService;
+import de.sustineo.acc.servertools.services.leaderboard.PenaltyService;
 import de.sustineo.acc.servertools.services.leaderboard.RankingService;
 import de.sustineo.acc.servertools.services.leaderboard.SessionService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
 import de.sustineo.acc.servertools.views.generators.InvalidLapPartNameGenerator;
-import de.sustineo.acc.servertools.views.renderers.ranking.LapRenderer;
+import de.sustineo.acc.servertools.views.renderers.LapRenderer;
+import de.sustineo.acc.servertools.views.renderers.SessionDetailsRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -42,13 +46,18 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
     public static final String ROUTE_PARAMETER_CAR_ID = "carId";
     private final SessionService sessionService;
     private final LapService lapService;
+    private final PenaltyService penaltyService;
     private final RankingService rankingService;
     private List<Lap> laps = new ArrayList<>();
-    private List<String> penalties = new ArrayList<>();
+    private List<Penalty> penalties = new ArrayList<>();
 
-    public SessionDetailsView(SessionService sessionService, LapService lapService, RankingService rankingService) {
+    public SessionDetailsView(SessionService sessionService,
+                              LapService lapService,
+                              PenaltyService penaltyService,
+                              RankingService rankingService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
+        this.penaltyService = penaltyService;
         this.rankingService = rankingService;
 
         setSizeFull();
@@ -135,6 +144,50 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         return grid;
     }
 
+    private Component createPenaltyGrid() {
+        Grid<Penalty> grid = new Grid<>(Penalty.class, false);
+        grid.addColumn(LitRenderer.of("${index + 1}"))
+                .setHeader("#")
+                .setWidth(ComponentUtils.GRID_RANKING_WIDTH)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setTextAlign(ColumnTextAlign.CENTER)
+                .setFrozen(true);
+        grid.addColumn(Penalty::getPenaltyAbbreviation)
+                .setHeader("Penalty")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(Penalty::getReasonDescription)
+                .setHeader("Reason")
+                .setSortable(true);
+        grid.addColumn(Penalty::getViolationLapCorrected)
+                .setHeader("Violation in lap")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(Penalty::getClearedLapCorrected)
+                .setHeader("Cleared in lap")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(SessionDetailsRenderer.createPenaltyServedRenderer())
+                .setHeader("Cleared")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END)
+                .setSortable(true);
+
+        grid.setItems(penalties);
+        grid.setHeightFull();
+        grid.setMultiSort(true, true);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+
+        return grid;
+    }
+
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
@@ -149,8 +202,14 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         }
 
         List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
+        if (playerIds == null || playerIds.isEmpty()) {
+            throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
+        }
+
         laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
-        penalties = new ArrayList<>();
+        penalties = penaltyService.findBySessionAndCarId(session.getId(), carId).stream()
+                .filter(Penalty::isValid)
+                .collect(Collectors.toList());
 
         add(createSessionInformation(session));
 
@@ -158,7 +217,7 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         tabSheet.setSizeFull();
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
-        tabSheet.add(createTab("Penalties", penalties.size()), new Span("Coming soon..."));
+        tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
         addAndExpand(tabSheet);
     }
 

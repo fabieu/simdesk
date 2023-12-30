@@ -1,4 +1,4 @@
-package de.sustineo.acc.servertools.views.renderers.ranking;
+package de.sustineo.acc.servertools.views.renderers;
 
 public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE = """
@@ -38,6 +38,11 @@ public class GridRenderer {
     static final String TIMING_TEMPLATE_LAP_COUNT = "lapCount";
     static final String TIMING_TEMPLATE_COLOR = "color";
     static final String TIMING_TEMPLATE_FASTEST_LAP = "fastestLap";
+
+    static final String PENALTY_SERVED_TEMPLATE = """
+                ${!item.postRace ? html`<vaadin-icon icon="lumo:checkmark" style="color: green;"></vaadin-icon>` : html`<vaadin-icon icon="lumo:cross" style="color: red;"></vaadin-icon>`}
+            """;
+    static final String PENALTY_SERVED_TEMPLATE_BOOLEAN = "postRace";
 
     public static String getTimeColor(Long gapMillis) {
         if (gapMillis < 0) {

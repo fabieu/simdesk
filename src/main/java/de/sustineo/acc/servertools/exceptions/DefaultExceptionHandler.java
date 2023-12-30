@@ -20,10 +20,7 @@ public class DefaultExceptionHandler extends InternalServerError {
     public int setErrorParameter(BeforeEnterEvent beforeEnterEvent, ErrorParameter<Exception> errorParameter) {
         HashMap<String, List<String>> parameters = new HashMap<>();
         parameters.put(ErrorView.QUERY_PARAMETER_HTTP_STATUS, List.of(HttpStatus.INTERNAL_SERVER_ERROR.toString()));
-
-        if (errorParameter.getException().getMessage() != null) {
-            parameters.put(ErrorView.QUERY_PARAMETER_ERROR_MESSAGE, List.of(errorParameter.getException().getMessage()));
-        }
+        parameters.put(ErrorView.QUERY_PARAMETER_ERROR_MESSAGE, List.of("An unexpected error occurred. Please contact support."));
 
         beforeEnterEvent.rerouteTo(ErrorView.class, new QueryParameters(parameters));
         return HttpServletResponse.SC_INTERNAL_SERVER_ERROR;

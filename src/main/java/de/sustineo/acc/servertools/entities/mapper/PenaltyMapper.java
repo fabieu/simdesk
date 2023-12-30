@@ -24,7 +24,7 @@ public interface PenaltyMapper {
             @Result(property = "clearedLap", column = "cleared_lap"),
             @Result(property = "postRace", column = "post_race")
     })
-    @Select("SELECT * FROM acc_leaderboard.penalties")
+    @Select("SELECT * FROM acc_leaderboard.penalties WHERE session_id = #{sessionId} AND car_id = #{carId} ORDER BY id")
     List<Penalty> findBySessionAndCarId(int sessionId, int carId);
 
     @Insert("INSERT INTO acc_leaderboard.penalties (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race) " +

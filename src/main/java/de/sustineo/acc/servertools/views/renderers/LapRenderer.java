@@ -1,4 +1,4 @@
-package de.sustineo.acc.servertools.views.renderers.ranking;
+package de.sustineo.acc.servertools.views.renderers;
 
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;

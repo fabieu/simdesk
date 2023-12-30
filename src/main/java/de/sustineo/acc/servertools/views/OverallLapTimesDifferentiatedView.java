@@ -21,7 +21,7 @@ import de.sustineo.acc.servertools.services.leaderboard.RankingService;
 import de.sustineo.acc.servertools.views.filter.FilterUtils;
 import de.sustineo.acc.servertools.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.acc.servertools.views.generators.DriverRankingPodiumPartNameGenerator;
-import de.sustineo.acc.servertools.views.renderers.ranking.DriverRankingRenderer;
+import de.sustineo.acc.servertools.views.renderers.DriverRankingRenderer;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
