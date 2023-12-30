@@ -10,7 +10,9 @@
       <env name="LEADERBOARD_RESULTS_FOLDER" value="src/main/resources/examples" />
       <env name="LEADERBOARD_RESULTS_IGNORE_PATTERNS" value="[§]+" />
     </envs>
+    <option name="HIDE_BANNER" value="true" />
     <module name="acc-server-tools.main" />
+    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.acc.servertools.LeaderboardApplication" />
     <method v="2">
       <option name="Make" enabled="true" />
