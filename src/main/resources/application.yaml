@@ -37,13 +37,14 @@ vaadin:
   closeIdleSessions: true
   exclude-urls: /api/**
 leaderboard:
+  community-name: ${LEADERBOARD_COMMUNITY_NAME:}
   links:
     impressum: ${LEADERBOARD_IMPRESSUM_URL:}
     privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
-    scan_interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
-    ignore_patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+    scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
+    ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
 springdoc:
   swagger-ui:
     path: /api/swagger

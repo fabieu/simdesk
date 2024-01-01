@@ -40,12 +40,13 @@ public class FileContentService {
     private final SessionService sessionService;
     private final FileService fileService;
     private final JsonUtils jsonUtils;
-
     private final FileAlterationMonitor monitor;
 
-
     @Autowired
-    public FileContentService(SessionService sessionService, FileService fileService, JsonUtils jsonUtils, @Value("${leaderboard.results.scan_interval}") String scanInterval) {
+    public FileContentService(SessionService sessionService,
+                              FileService fileService,
+                              JsonUtils jsonUtils,
+                              @Value("${leaderboard.results.scan-interval}") String scanInterval) {
         this.sessionService = sessionService;
         this.fileService = fileService;
         this.jsonUtils = jsonUtils;

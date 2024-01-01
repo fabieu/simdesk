@@ -13,13 +13,13 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.acc.servertools.configuration.EnvironmentConfiguration;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.Session;
 import de.sustineo.acc.servertools.layouts.MainLayout;
 import de.sustineo.acc.servertools.services.leaderboard.SessionService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
+import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
 import java.util.Arrays;
@@ -33,9 +33,12 @@ import java.util.Optional;
 public class MainView extends VerticalLayout {
     private final SessionService sessionService;
     private static final Integer RECENT_SESSION_DAYS = 7;
+    private final String communityName;
 
-    public MainView(SessionService sessionService) {
+    public MainView(SessionService sessionService,
+                    @Value("${leaderboard.community-name:ACC}") String communityName) {
         this.sessionService = sessionService;
+        this.communityName = communityName;
 
         setSizeFull();
         setPadding(false);
@@ -49,7 +52,7 @@ public class MainView extends VerticalLayout {
     private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
-        header.add(new H1(EnvironmentConfiguration.getCommunityName() + " Server Tools"));
+        header.add(new H1(communityName + " Server Tools"));
         return header;
     }
 

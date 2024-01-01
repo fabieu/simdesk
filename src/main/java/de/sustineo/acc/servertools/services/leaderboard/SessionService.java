@@ -42,7 +42,7 @@ public class SessionService {
         this.penaltyService = penaltyService;
     }
 
-    @Value("${leaderboard.results.ignore_patterns}")
+    @Value("${leaderboard.results.ignore-patterns}")
     private void setIgnorePatterns(String ignorePatterns) {
         if (ignorePatterns == null || ignorePatterns.isBlank()) {
             return;
