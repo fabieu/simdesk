@@ -7,7 +7,7 @@ services:
     volumes:
       - ./results:/opt/acc-server-tools/results
     environment:
-      SPRING_PROFILES_ACTIVE: production, h2, acc-leaderboard, acc-entrylist, acc-raceapp
+      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp
       LEADERBOARD_IMPRESSUM_URL: https://markracing.de/impressum
       LEADERBOARD_PRIVACY_URL: https://markracing.de/privacy
       LEADERBOARD_COMMUNITY_NAME: Sim2Real

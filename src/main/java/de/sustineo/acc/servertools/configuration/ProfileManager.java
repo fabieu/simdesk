@@ -8,9 +8,6 @@ import java.util.List;
 
 @Configuration
 public class ProfileManager {
-    public static final String PROFILE_H2 = "h2";
-    public static final String PROFILE_DEVELOPMENT = "development";
-    public static final String PROFILE_PRODUCTION = "production";
     public static final String PROFILE_LEADERBOARD = "acc-leaderboard";
     public static final String PROFILE_ENTRYLIST = "acc-entrylist";
     public static final String PROFILE_WEATHER = "acc-weather";
