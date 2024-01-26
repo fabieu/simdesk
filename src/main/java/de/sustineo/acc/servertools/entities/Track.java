@@ -29,6 +29,7 @@ public class Track extends Entity {
         tracks.put("indianapolis", "Indianapolis");
         tracks.put("watkins_glen", "Watkins Glen");
         tracks.put("valencia", "Valencia");
+        tracks.put("red_bull_ring", "RedBull Ring");
     }
 
     public static boolean isValid(String trackId) {

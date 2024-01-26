@@ -4,10 +4,6 @@
 @import "views/error.css";
 
 html {
-    --acc-color-gt3: rgb(255, 255, 255);
-    --acc-color-gt4: rgb(38, 38, 96);
-    --acc-color-gtc: rgb(245, 126, 0);
-    --acc-color-tcx: rgb(0, 124, 168);
     --weather-sunny-color: #ffb600;
     --weather-rainy-color: #00aeff;
 }

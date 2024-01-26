@@ -23,11 +23,15 @@ vaadin-grid::part(ranking-car-group-cup) {
 }
 
 vaadin-grid::part(ranking-car-group-chl) {
-    background-color: rgba(224, 0, 0, 0.2);
+    background-color: rgba(128, 0, 0, 0.2);
 }
 
 vaadin-grid::part(ranking-car-group-st) {
     background-color: rgba(152, 138, 0, 0.3);
+}
+
+vaadin-grid::part(ranking-car-group-gt2) {
+    background-color: rgba(241, 0, 0, 0.2);
 }
 
 vaadin-grid::part(ranking-podium-first) {

@@ -58,6 +58,12 @@ public class Car extends Entity {
         carModels.put(59, "McLaren 570S GT4");
         carModels.put(60, "Mercedes-AMG GT4");
         carModels.put(61, "Porsche 718 Cayman GT4");
+        carModels.put(80, "Audi R8 LMS GT2");
+        carModels.put(82, "KTM XBOW GT2");
+        carModels.put(83, "Maserati MC20 GT2");
+        carModels.put(84, "Mercedes AMG GT2");
+        carModels.put(85, "Porsche 911 GT2 RS CS Evo");
+        carModels.put(86, "Porsche 935");
     }
 
     public static boolean isValid(Integer carModelId) {

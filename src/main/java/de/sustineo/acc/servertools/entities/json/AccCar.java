@@ -39,6 +39,10 @@ public class AccCar {
             return CarGroup.GT4;
         }
 
+        if (carModel >= 80 && carModel <= 86) {
+            return CarGroup.GT2;
+        }
+
         if (carModel == 27) {
             return CarGroup.TCX;
         }
