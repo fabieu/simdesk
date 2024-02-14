@@ -19,6 +19,7 @@ import de.sustineo.acc.servertools.entities.Session;
 import de.sustineo.acc.servertools.layouts.MainLayout;
 import de.sustineo.acc.servertools.services.leaderboard.SessionService;
 import de.sustineo.acc.servertools.utils.FormatUtils;
+import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.ArrayList;
@@ -31,13 +32,14 @@ import java.util.Optional;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME)
 @AnonymousAllowed
 public class MainView extends VerticalLayout {
-    private final SessionService sessionService;
+    private final Optional<SessionService> sessionService;
     private static final Integer RECENT_SESSION_DAYS = 7;
     private final String communityName;
 
-    public MainView(SessionService sessionService,
+
+    public MainView(@Autowired(required = false) SessionService sessionService,
                     @Value("${leaderboard.community-name:ACC}") String communityName) {
-        this.sessionService = sessionService;
+        this.sessionService = Optional.ofNullable(sessionService);
         this.communityName = communityName;
 
         setSizeFull();
@@ -58,8 +60,13 @@ public class MainView extends VerticalLayout {
 
     private Component createNavigationTabs() {
         List<Tab> tabs = new ArrayList<>();
-        tabs.addAll(Arrays.stream(MainLayout.createLeaderboardMenuTabs()).toList());
-        tabs.addAll(Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
+        if (ProfileManager.isLeaderboardProfileEnabled()) {
+            tabs.addAll(Arrays.stream(MainLayout.createLeaderboardMenuTabs()).toList());
+        }
+
+        if (ProfileManager.isEntrylistProfileEnabled()) {
+            tabs.addAll(Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
+        }
 
         // Add custom styling to navigation tabs
         List<Div> tabDivs = new ArrayList<>();
@@ -103,7 +110,11 @@ public class MainView extends VerticalLayout {
     }
 
     private Optional<Component> createSessionGrid(int recentDays) {
-        List<Session> sessions = sessionService.getRecentSessions(recentDays);
+        if (sessionService.isEmpty()) {
+            return Optional.empty();
+        }
+
+        List<Session> sessions = sessionService.get().getRecentSessions(recentDays);
         if (sessions.isEmpty()) {
             return Optional.empty();
         }
