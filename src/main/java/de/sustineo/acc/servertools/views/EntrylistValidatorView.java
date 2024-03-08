@@ -1,6 +1,8 @@
 package de.sustineo.acc.servertools.views;
 
+import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.accordion.Accordion;
 import com.vaadin.flow.component.accordion.AccordionPanel;
@@ -10,21 +12,16 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.details.DetailsVariant;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H4;
-import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.entrylist.Entrylist;
@@ -39,12 +36,13 @@ import de.sustineo.acc.servertools.utils.json.JsonUtils;
 import de.sustineo.acc.servertools.views.i18n.UploadI18NDefaults;
 import jakarta.validation.ConstraintViolationException;
 import lombok.extern.java.Log;
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.validation.Validator;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.ArrayList;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
@@ -54,14 +52,16 @@ import java.util.List;
 @AnonymousAllowed
 public class EntrylistValidatorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";
-    private static final Duration NOTIFICATION_DURATION = Duration.ofSeconds(10);
 
     private final EntrylistService entrylistService;
     private final JsonUtils jsonUtils;
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
-    public EntrylistValidatorView(EntrylistService entrylistService, JsonUtils jsonUtils, Validator validator, ValidationService validationService, NotificationService notificationService) {
+    public EntrylistValidatorView(EntrylistService entrylistService,
+                                  JsonUtils jsonUtils,
+                                  ValidationService validationService,
+                                  NotificationService notificationService) {
         this.entrylistService = entrylistService;
         this.jsonUtils = jsonUtils;
         this.validationService = validationService;
@@ -69,22 +69,26 @@ public class EntrylistValidatorView extends VerticalLayout {
 
         setSizeFull();
         setPadding(false);
+        getStyle().setPadding("var(--lumo-space-l)");
 
         addAndExpand(createEntrylistValidationForm());
     }
 
     private Component createEntrylistValidationForm() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
         layout.setSizeFull();
 
         /* Validation rules start */
         VerticalLayout validationRulesLayout = new VerticalLayout();
+        validationRulesLayout.setPadding(false);
         validationRulesLayout.setSpacing(false);
 
         H4 validationRulesTitle = new H4("1. Choose validation rules");
-        CheckboxGroup<String> validationRulesCheckboxGroup = new CheckboxGroup<>();
-        validationRulesCheckboxGroup.setItems(ValidationRule.getFriendlyNames());
-        validationRulesCheckboxGroup.select(ValidationRule.getFriendlyNames());
+        CheckboxGroup<ValidationRule> validationRulesCheckboxGroup = new CheckboxGroup<>();
+        validationRulesCheckboxGroup.setItems(ValidationRule.values());
+        validationRulesCheckboxGroup.setItemLabelGenerator(ValidationRule::getFriendlyName);
+        validationRulesCheckboxGroup.select(ValidationRule.values());
         validationRulesCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
         add(validationRulesCheckboxGroup);
 
@@ -93,6 +97,7 @@ public class EntrylistValidatorView extends VerticalLayout {
 
         /* File upload start */
         VerticalLayout fileUploadLayout = new VerticalLayout();
+        fileUploadLayout.setPadding(false);
         fileUploadLayout.setSpacing(false);
 
         H4 fileUploadTitle = new H4("2. Upload one or more entrylist files");
@@ -105,7 +110,7 @@ public class EntrylistValidatorView extends VerticalLayout {
         fileUpload.setWidthFull();
         fileUpload.setDropAllowed(true);
         fileUpload.setAcceptedFileTypes("application/json", ".json");
-        fileUpload.setMaxFileSize(1024 * 1024 * 1); // 1 MB
+        fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
         fileUpload.setI18n(configureUploadI18N());
         fileUpload.addSucceededListener(event -> {
             String fileName = event.getFileName();
@@ -114,7 +119,7 @@ public class EntrylistValidatorView extends VerticalLayout {
             try {
                 Entrylist entrylist = jsonUtils.fromJson(fileData, Entrylist.class);
                 validationService.validate(entrylist);
-                ValidationData validationData = entrylistService.validateRules(entrylist, ValidationRule.fromFriendlyNames(validationRulesCheckboxGroup.getSelectedItems()));
+                ValidationData validationData = entrylistService.validateRules(entrylist, new ArrayList<>(validationRulesCheckboxGroup.getSelectedItems()));
 
                 if (validationData.getErrors().isEmpty()) {
                     createValidationSuccessNotification(fileName);
@@ -124,17 +129,13 @@ public class EntrylistValidatorView extends VerticalLayout {
                     }
                 }
             } catch (ConstraintViolationException e) {
-                throw new RuntimeException("Invalid entrylist file" + NOTIFICATION_DELIMITER + e.getMessage(), e);
+                throw new RuntimeException("Invalid entrylist file", e);
             } catch (IOException e) {
                 throw new RuntimeException("Invalid JSON file", e);
             }
         });
-        fileUpload.addFileRejectedListener(event -> {
-            notificationService.showErrorNotification(event.getErrorMessage(), NOTIFICATION_DURATION);
-        });
-        fileUpload.addFailedListener(event -> {
-            notificationService.showErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage(), NOTIFICATION_DURATION);
-        });
+        fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
+        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage()));
 
         fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload, fileUploadExplanation);
         /* File upload end */
@@ -145,6 +146,7 @@ public class EntrylistValidatorView extends VerticalLayout {
 
     private Component createValidationRuleDetailsLayout() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
 
         H4 title = new H4("Validation rule details");
 
@@ -176,69 +178,58 @@ public class EntrylistValidatorView extends VerticalLayout {
     }
 
     private void createValidationSuccessNotification(String fileName) {
-        Notification notification = new Notification();
-        notification.setPosition(Notification.Position.BOTTOM_STRETCH);
-        notification.setDuration((int) NOTIFICATION_DURATION.toMillis());
-        notification.addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-
-        Icon icon = VaadinIcon.CHECK_CIRCLE_O.create();
         Div messageContainer = new Div(new Text(fileName + NOTIFICATION_DELIMITER + "Validation passed"));
 
-        HorizontalLayout layout = new HorizontalLayout(icon, messageContainer, createCloseButton(notification));
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        layout.setAlignItems(Alignment.CENTER);
-
-        notification.add(layout);
-        notification.open();
+        notificationService.showSuccessNotification(messageContainer);
     }
 
     private void createValidationErrorNotification(String fileName, ValidationError validationError) {
         List<Object> errorReferences = validationError.getReferences();
         ValidationRule validationRule = validationError.getRule();
 
-        Notification notification = new Notification();
-        notification.setPosition(Notification.Position.BOTTOM_STRETCH);
-        notification.addThemeVariants(NotificationVariant.LUMO_ERROR);
-        notification.setDuration(0);
-
-        Icon icon = VaadinIcon.WARNING.create();
         Div messageContainer = new Div(new Text(fileName + NOTIFICATION_DELIMITER + validationRule.getFriendlyName() + NOTIFICATION_DELIMITER + validationError.getMessage()));
 
         // Add dynamic dialog with error references if available
         if (errorReferences != null && !errorReferences.isEmpty()) {
             Dialog dialog = new Dialog();
-            dialog.setHeaderTitle(validationRule.getFriendlyName() + NOTIFICATION_DELIMITER + validationError.getMessage());
+            dialog.setHeaderTitle(validationRule.getFriendlyName());
+            dialog.setModal(false);
+            dialog.setDraggable(true);
+            dialog.setResizable(true);
 
             VerticalLayout dialogLayout = new VerticalLayout();
+            dialogLayout.setPadding(false);
+
+            Text errorMessage = new Text(validationError.getMessage());
+            dialogLayout.add(errorMessage);
 
             for (Object reference : errorReferences) {
-                Div referenceContainer = new Div(new Text(reference.toString()));
-                dialogLayout.add(referenceContainer);
+                String referenceRepresentation;
+                try {
+                    referenceRepresentation = jsonUtils.toJsonPretty(reference);
+                } catch (JsonProcessingException e) {
+                    referenceRepresentation = reference.toString();
+                }
+                Span referenceSpan = new Span(referenceRepresentation);
+                referenceSpan.setWhiteSpace(HasText.WhiteSpace.PRE_LINE);
+
+                dialogLayout.add(new Div(referenceSpan));
             }
 
             dialog.add(dialogLayout);
 
-            Button dialogButton = new Button("View details", clickEvent -> dialog.open());
-            dialogButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
-            dialogButton.getStyle()
-                    .set("margin-left", "10px");
-            messageContainer.add(dialogButton);
+            Button closeButton = new Button(LumoIcon.CROSS.create(), event -> dialog.close());
+            closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            dialog.getHeader().add(closeButton);
+
+            Anchor dialogLink = new Anchor("javascript:void(0)", "Show details");
+            dialogLink.getStyle()
+                    .setFontWeight(Style.FontWeight.BOLD);
+            dialogLink.getElement().addEventListener("click", event -> dialog.open());
+
+            messageContainer.add(new Text(NOTIFICATION_DELIMITER), dialogLink);
         }
 
-        HorizontalLayout layout = new HorizontalLayout(icon, messageContainer, createCloseButton(notification));
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-        layout.setAlignItems(Alignment.CENTER);
-
-        notification.add(layout);
-        notification.open();
-    }
-
-    private static Button createCloseButton(Notification notification) {
-        Button closeButton = new Button(VaadinIcon.CLOSE_SMALL.create(), clickEvent -> notification.close());
-        closeButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY_INLINE);
-
-        return closeButton;
+        notificationService.showErrorNotification(Duration.ZERO, messageContainer);
     }
 }

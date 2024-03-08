@@ -20,6 +20,10 @@ public class JsonUtils {
         return objectMapper.writeValueAsString(entity);
     }
 
+    public String toJsonPretty(Object entity) throws JsonProcessingException {
+        return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
+    }
+
     public <T> T fromJson(String json, Class<T> clazz) throws JsonProcessingException {
         return objectMapper.readValue(json, clazz);
     }

@@ -1,42 +1,68 @@
 package de.sustineo.acc.servertools.entities;
 
-import java.util.HashMap;
+import lombok.AllArgsConstructor;
+import lombok.Data;
+import lombok.EqualsAndHashCode;
 
+import java.util.Comparator;
+import java.util.HashMap;
+import java.util.List;
+import java.util.Optional;
+import java.util.stream.Collectors;
+
+@Data
+@AllArgsConstructor
+@EqualsAndHashCode(callSuper = false)
 public class Track extends Entity {
-    private static final HashMap<String, String> tracks = new HashMap<>();
+    private static final HashMap<String, Track> tracks = new HashMap<>();
+    private final String trackId;
+    private final String trackName;
+
 
     static {
-        tracks.put("monza", "Monza");
-        tracks.put("zolder", "Zolder");
-        tracks.put("brands_hatch", "Brands Hatch");
-        tracks.put("silverstone", "Silverstone");
-        tracks.put("paul_ricard", "Paul Richard");
-        tracks.put("misano", "Misano");
-        tracks.put("spa", "Spa Franchorchamp");
-        tracks.put("nurburgring", "Nürburgring");
-        tracks.put("barcelona", "Barcelona");
-        tracks.put("hungaroring", "Hungaroring");
-        tracks.put("zandvoort", "Zandvoort");
-        tracks.put("kyalami", "Kyalami");
-        tracks.put("mount_panorama", "Mount Panorama");
-        tracks.put("suzuka", "Suzuka");
-        tracks.put("laguna_seca", "Laguna Seca");
-        tracks.put("imola", "Imola");
-        tracks.put("oulton_park", "Oulton Park");
-        tracks.put("donington", "Donington");
-        tracks.put("snetterton", "Snetterton");
-        tracks.put("cota", "Circuit of the Americas");
-        tracks.put("indianapolis", "Indianapolis");
-        tracks.put("watkins_glen", "Watkins Glen");
-        tracks.put("valencia", "Valencia");
-        tracks.put("red_bull_ring", "RedBull Ring");
+        addTrack("monza", "Monza");
+        addTrack("zolder", "Zolder");
+        addTrack("brands_hatch", "Brands Hatch");
+        addTrack("silverstone", "Silverstone");
+        addTrack("paul_ricard", "Paul Ricard");
+        addTrack("misano", "Misano");
+        addTrack("spa", "Spa Franchorchamp");
+        addTrack("nurburgring", "Nürburgring");
+        addTrack("barcelona", "Barcelona");
+        addTrack("hungaroring", "Hungaroring");
+        addTrack("zandvoort", "Zandvoort");
+        addTrack("kyalami", "Kyalami");
+        addTrack("mount_panorama", "Mount Panorama");
+        addTrack("suzuka", "Suzuka");
+        addTrack("laguna_seca", "Laguna Seca");
+        addTrack("imola", "Imola");
+        addTrack("oulton_park", "Oulton Park");
+        addTrack("donington", "Donington");
+        addTrack("snetterton", "Snetterton");
+        addTrack("cota", "Circuit of the Americas");
+        addTrack("indianapolis", "Indianapolis");
+        addTrack("watkins_glen", "Watkins Glen");
+        addTrack("valencia", "Valencia");
+        addTrack("red_bull_ring", "RedBull Ring");
+    }
+
+    private static void addTrack(String trackId, String trackName) {
+        tracks.put(trackId, new Track(trackId, trackName));
     }
 
     public static boolean isValid(String trackId) {
-        return tracks.containsKey(trackId.toLowerCase());
+        return tracks.containsKey(trackId);
     }
 
     public static String getTrackNameById(String trackId) {
-        return tracks.getOrDefault(trackId, UNKNOWN);
+        return Optional.ofNullable(tracks.get(trackId))
+                .map(Track::getTrackName)
+                .orElse(UNKNOWN);
+    }
+
+    public static List<Track> getAllSortedByName() {
+        return tracks.values().stream()
+                .sorted(Comparator.comparing(Track::getTrackName))
+                .collect(Collectors.toList());
     }
 }

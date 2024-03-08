@@ -3,6 +3,7 @@ package de.sustineo.acc.servertools.exceptions;
 import com.vaadin.flow.router.*;
 import de.sustineo.acc.servertools.views.ErrorView;
 import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -10,6 +11,7 @@ import java.util.HashMap;
 import java.util.List;
 
 @Component
+@Profile("!debug")
 public class NotFoundExceptionHandler extends RouteNotFoundError {
     @Override
     public int setErrorParameter(BeforeEnterEvent beforeEnterEvent, ErrorParameter<NotFoundException> errorParameter) {

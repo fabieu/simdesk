@@ -10,8 +10,8 @@ import java.util.List;
 public class ProfileManager {
     public static final String PROFILE_LEADERBOARD = "acc-leaderboard";
     public static final String PROFILE_ENTRYLIST = "acc-entrylist";
-    public static final String PROFILE_WEATHER = "acc-weather";
     public static final String PROFILE_RACEAPP = "acc-raceapp";
+    public static final String PROFILE_BOP = "acc-bop";
     private static List<String> activeProfiles = new ArrayList<>();
 
     public ProfileManager(Environment environment) {
@@ -30,7 +30,7 @@ public class ProfileManager {
         return isActive(PROFILE_ENTRYLIST);
     }
 
-    public static boolean isWeatherProfileEnabled() {
-        return isActive(PROFILE_WEATHER);
+    public static boolean isBopProfileEnabled() {
+        return isActive(PROFILE_BOP);
     }
 }

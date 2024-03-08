@@ -2,10 +2,6 @@ package de.sustineo.acc.servertools.entities.validation;
 
 import lombok.Getter;
 
-import java.util.Arrays;
-import java.util.List;
-import java.util.Set;
-
 @Getter
 public enum ValidationRule {
     RACE_NUMBERS_INVALID("validateRaceNumbers", "Invalid race numbers", "Check if race numbers are valid, also check for duplicate race numbers."),
@@ -25,17 +21,5 @@ public enum ValidationRule {
         this.methodName = methodName;
         this.friendlyName = friendlyName;
         this.description = description;
-    }
-
-    public static String[] getFriendlyNames() {
-    	return Arrays.stream(ValidationRule.values())
-                .map(ValidationRule::getFriendlyName)
-                .toArray(String[]::new);
-    }
-
-    public static List<ValidationRule> fromFriendlyNames(Set<String> friendlyName) {
-        return Arrays.stream(ValidationRule.values())
-                .filter(validationRule -> friendlyName.contains(validationRule.getFriendlyName()))
-                .toList();
     }
 }

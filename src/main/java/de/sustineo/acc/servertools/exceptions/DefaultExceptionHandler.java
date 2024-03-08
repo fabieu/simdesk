@@ -7,6 +7,7 @@ import com.vaadin.flow.router.QueryParameters;
 import de.sustineo.acc.servertools.views.ErrorView;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.stereotype.Component;
 
@@ -15,6 +16,7 @@ import java.util.List;
 
 @Log
 @Component
+@Profile("!debug")
 public class DefaultExceptionHandler extends InternalServerError {
     @Override
     public int setErrorParameter(BeforeEnterEvent beforeEnterEvent, ErrorParameter<Exception> errorParameter) {
