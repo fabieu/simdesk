@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.3.2"
+        vaadinVersion = "24.3.6"
         springBootVersion = "3.2.1"
     }
 }

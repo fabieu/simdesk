@@ -14,13 +14,13 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.server.VaadinSession;
 import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
@@ -34,7 +34,7 @@ import org.springframework.boot.info.BuildProperties;
 import java.time.Year;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Objects;
+import java.util.Optional;
 import java.util.SortedMap;
 
 
@@ -56,16 +56,18 @@ public class MainLayout extends AppLayout {
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
-        // Read and apply theme from session attribute if available
-        String themeFromAttributes = (String) VaadinSession.getCurrent().getAttribute(SESSION_ATTRIBUTE_THEME);
-        setTheme(Objects.requireNonNullElse(themeFromAttributes, DEFAULT_THEME));
 
         setPrimarySection(Section.NAVBAR);
         addToNavbar(false, createNavbarContent(), createNavbarButtons());
 
         createMenuTabs();
         addToDrawer(createDrawerContent());
-        setDrawerOpened(false);
+        setDrawerOpened(false); // Set drawerOpened to ensure smooth animation, will be overridden
+
+        // Read and apply session attributes
+        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_THEME, value -> {
+            setTheme(Optional.ofNullable(value).orElse(DEFAULT_THEME));
+        });
     }
 
     private void createMenuTabs() {
@@ -77,6 +79,10 @@ public class MainLayout extends AppLayout {
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
             menuMap.put("entrylist", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
+        }
+
+        if (ProfileManager.isBopProfileEnabled()) {
+            menuMap.put("bop", createMenuTabs(MainLayout.createBopMenuTabs()));
         }
 
         menuMap.put("external links", createMenuTabs(MainLayout.createExternalMenuTabs()));
@@ -156,11 +162,11 @@ public class MainLayout extends AppLayout {
     }
 
     private void setTheme(String theme) {
-        VaadinSession vaadinSession = UI.getCurrent().getSession();
         ThemeList themeList = UI.getCurrent().getElement().getThemeList();
         themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));
         themeList.add(theme);
-        vaadinSession.setAttribute(SESSION_ATTRIBUTE_THEME, theme);
+
+        WebStorage.setItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_THEME, theme);
     }
 
     private String getTheme() {
@@ -287,8 +293,14 @@ public class MainLayout extends AppLayout {
         };
     }
 
+    public static Tab[] createBopMenuTabs() {
+        return new Tab[]{
+                createTab("BoP Editor", VaadinIcon.SCALE.create(), BopEditorView.class),
+        };
+    }
+
     private static Tab[] createExternalMenuTabs() {
-        return new Tab[] {
+        return new Tab[]{
                 createExternalTab("Feedback", VaadinIcon.COMMENT.create(), Reference.FEEDBACK),
         };
     }

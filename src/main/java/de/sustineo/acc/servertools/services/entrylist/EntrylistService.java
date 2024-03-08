@@ -28,7 +28,6 @@ public class EntrylistService {
         return validate(entrylist, rules);
     }
 
-    @SuppressWarnings("unchecked")
     private ValidationData validate(Entrylist entrylist, List<ValidationRule> rules) {
         List<ValidationError> errors = new ArrayList<>();
 

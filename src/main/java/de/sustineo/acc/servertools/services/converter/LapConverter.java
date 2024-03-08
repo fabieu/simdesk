@@ -1,6 +1,7 @@
 package de.sustineo.acc.servertools.services.converter;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
+import de.sustineo.acc.servertools.entities.Car;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.Lap;
 import de.sustineo.acc.servertools.entities.json.AccCar;
@@ -48,7 +49,7 @@ public class LapConverter extends BaseConverter {
 
         return Lap.builder()
                 .sessionId(sessionId)
-                .carGroup(accCar.get().getCarGroup())
+                .carGroup(Car.getCarGroupById(accCar.get().getCarModel()))
                 .carModelId(accCar.get().getCarModel())
                 .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))

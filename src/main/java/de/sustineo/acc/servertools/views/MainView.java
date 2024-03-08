@@ -68,6 +68,10 @@ public class MainView extends VerticalLayout {
             tabs.addAll(Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
         }
 
+        if (ProfileManager.isBopProfileEnabled()) {
+            tabs.addAll(Arrays.stream(MainLayout.createBopMenuTabs()).toList());
+        }
+
         // Add custom styling to navigation tabs
         List<Div> tabDivs = new ArrayList<>();
         for (Tab tab : tabs) {
@@ -83,7 +87,7 @@ public class MainView extends VerticalLayout {
 
         final Div row = new Div();
         row.setId("home-tabs");
-        row.addClassNames("row", "justify-content-center", "g-3");
+        row.addClassNames("row", "g-3");
         row.setWidthFull();
         row.add(tabDivs.toArray(new Div[0]));
         container.add(row);

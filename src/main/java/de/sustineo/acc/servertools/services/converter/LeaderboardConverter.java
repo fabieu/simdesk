@@ -1,6 +1,7 @@
 package de.sustineo.acc.servertools.services.converter;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
+import de.sustineo.acc.servertools.entities.Car;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.LeaderboardLine;
 import de.sustineo.acc.servertools.entities.json.AccLeaderboardLine;
@@ -38,7 +39,7 @@ public class LeaderboardConverter extends BaseConverter {
                 .ranking(index + 1)
                 .cupCategory(accLeaderboardLine.getCar().getCupCategory())
                 .carId(accLeaderboardLine.getCar().getCarId())
-                .carGroup(accLeaderboardLine.getCar().getCarGroup())
+                .carGroup(Car.getCarGroupById(accLeaderboardLine.getCar().getCarModel()))
                 .carModelId(accLeaderboardLine.getCar().getCarModel())
                 .ballastKg(accLeaderboardLine.getCar().getBallastKg())
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())
