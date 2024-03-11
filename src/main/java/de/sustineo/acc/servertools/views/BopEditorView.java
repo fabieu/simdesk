@@ -18,7 +18,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -97,16 +97,16 @@ public class BopEditorView extends VerticalLayout {
         Paragraph fileUploadHint = new Paragraph("File size must be less than or equal to 1 MB. Only valid JSON files are accepted.");
         fileUploadHint.getStyle().setColor("var(--lumo-secondary-text-color)");
 
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
-        Upload fileUpload = new Upload(memoryBuffer);
+        MultiFileMemoryBuffer multiFileMemoryBuffer = new MultiFileMemoryBuffer();
+        Upload fileUpload = new Upload(multiFileMemoryBuffer);
         fileUpload.setWidthFull();
         fileUpload.setDropAllowed(true);
         fileUpload.setAcceptedFileTypes("application/json", ".json");
         fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
         fileUpload.setI18n(configureUploadI18N());
         fileUpload.addSucceededListener(event -> {
-            InputStream fileData = memoryBuffer.getInputStream();
             String fileName = event.getFileName();
+            InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
 
             try {
                 currentBop = jsonUtils.fromJson(fileData, AccBop.class);
