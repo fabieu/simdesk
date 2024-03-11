@@ -178,7 +178,16 @@ public class EntrylistValidatorView extends VerticalLayout {
     }
 
     private void createValidationSuccessNotification(String fileName) {
-        Div messageContainer = new Div(new Text(fileName + NOTIFICATION_DELIMITER + "Validation passed"));
+        Div header = new Div(new Text(fileName));
+        header.getStyle()
+                .setFontSize("var(--lumo-font-size-m)")
+                .setFontWeight(Style.FontWeight.BOLD);
+
+        Div description = new Div(new Text("Validation passed"));
+        description.getStyle()
+                .setFontSize("var(--lumo-font-size-s)");
+
+        Div messageContainer = new Div(header, description);
 
         notificationService.showSuccessNotification(messageContainer);
     }
@@ -187,7 +196,16 @@ public class EntrylistValidatorView extends VerticalLayout {
         List<Object> errorReferences = validationError.getReferences();
         ValidationRule validationRule = validationError.getRule();
 
-        Div messageContainer = new Div(new Text(fileName + NOTIFICATION_DELIMITER + validationRule.getFriendlyName() + NOTIFICATION_DELIMITER + validationError.getMessage()));
+        Div header = new Div(new Text(fileName));
+        header.getStyle()
+                .setFontSize("var(--lumo-font-size-m)")
+                .setFontWeight(Style.FontWeight.BOLD);
+
+        Div description = new Div(new Text(validationRule.getFriendlyName() + NOTIFICATION_DELIMITER + validationError.getMessage()));
+        description.getStyle()
+                .setFontSize("var(--lumo-font-size-s)");
+
+        Div messageContainer = new Div(header, description);
 
         // Add dynamic dialog with error references if available
         if (errorReferences != null && !errorReferences.isEmpty()) {
@@ -223,11 +241,11 @@ public class EntrylistValidatorView extends VerticalLayout {
             dialog.getHeader().add(closeButton);
 
             Anchor dialogLink = new Anchor("javascript:void(0)", "Show details");
-            dialogLink.getStyle()
-                    .setFontWeight(Style.FontWeight.BOLD);
             dialogLink.getElement().addEventListener("click", event -> dialog.open());
+            dialogLink.getStyle()
+                    .setFontSize("var(--lumo-font-size-s)");
 
-            messageContainer.add(new Text(NOTIFICATION_DELIMITER), dialogLink);
+            messageContainer.add(new Div(dialogLink));
         }
 
         notificationService.showErrorNotification(Duration.ZERO, messageContainer);
