@@ -49,10 +49,6 @@ leaderboard:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
     scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
     ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
-  auth:
-    admin:
-      username: ${AUTH_ADMIN_USERNAME:admin}
-      password: ${AUTH_ADMIN_PASSWORD:#{null}}
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
@@ -63,6 +59,10 @@ springdoc:
     - /api/**
 server:
   forward-headers-strategy: framework
+auth:
+  admin:
+    username: ${AUTH_ADMIN_USERNAME:admin}
+    password: ${AUTH_ADMIN_PASSWORD:#{null}}
 
 ---
 spring:
@@ -104,6 +104,6 @@ spring:
             user-name-attribute: username
 auth:
   discord:
-    token: ${DISCORD_TOKEN}
+    token: ${DISCORD_BOT_TOKEN}
     guild-id: ${DISCORD_GUILD_ID}
 

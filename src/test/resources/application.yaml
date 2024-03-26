@@ -1,4 +1,36 @@
 spring:
+  application:
+    name: acc-server-tools
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
   datasource:
     url: jdbc:sqlite:memory:db
     driver-class-name: org.sqlite.JDBC
+  flyway:
+    enabled: true
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
+  main:
+    banner-mode: off
+logging:
+  level:
+    ROOT: WARN
+leaderboard:
+  community-name: ${LEADERBOARD_COMMUNITY_NAME:test-community}
+  links:
+    impressum: ${LEADERBOARD_IMPRESSUM_URL:}
+    privacy: ${LEADERBOARD_PRIVACY_URL:}
+  results:
+    folder: ${LEADERBOARD_RESULTS_FOLDER:./results}
+    scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
+    ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+server:
+  forward-headers-strategy: framework
+auth:
+  admin:
+    username: ${AUTH_ADMIN_USERNAME:admin}
+    password: ${AUTH_ADMIN_PASSWORD:admin}

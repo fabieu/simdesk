@@ -1,16 +1,22 @@
 version: "3.9"
 services:
   app:
-    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1.11.1
+    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1.12.0
     ports:
       - "8085:8080"
     volumes:
       - ./data:/opt/acc-server-tools/data
       - ./results:/opt/acc-server-tools/results
     environment:
-      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop
+      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, discord
       LEADERBOARD_IMPRESSUM_URL: https://markracing.de/impressum
       LEADERBOARD_PRIVACY_URL: https://markracing.de/privacy
       LEADERBOARD_COMMUNITY_NAME: Sim2Real
       LEADERBOARD_RESULTS_IGNORE_PATTERNS: "(No leaderboard)+"
+      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
+      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
+      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
+      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
+    env_file:
+      - .env
     restart: unless-stopped

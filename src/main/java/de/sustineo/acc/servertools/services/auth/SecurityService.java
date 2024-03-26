@@ -23,10 +23,10 @@ import java.util.UUID;
 public class SecurityService {
     private static final String LOGOUT_SUCCESS_URL = "/";
 
-    @Value("${leaderboard.auth.admin.username}")
+    @Value("${auth.admin.username}")
     private String adminUsername;
 
-    @Value("${leaderboard.auth.admin.password}")
+    @Value("${auth.admin.password}")
     private String adminPassword;
 
     private final PasswordEncoder passwordEncoder;
