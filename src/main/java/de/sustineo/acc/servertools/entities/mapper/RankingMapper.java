@@ -1,6 +1,7 @@
 package de.sustineo.acc.servertools.entities.mapper;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
+import de.sustineo.acc.servertools.entities.enums.CarGroup;
 import de.sustineo.acc.servertools.entities.ranking.DriverRanking;
 import de.sustineo.acc.servertools.entities.ranking.GroupRanking;
 import de.sustineo.acc.servertools.entities.ranking.SessionRanking;
@@ -21,7 +22,7 @@ public interface RankingMapper {
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
     })
-    @Select("SELECT laps.car_group, laps.car_model_id, laps.driver_id, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis FROM acc_leaderboard.laps LEFT JOIN acc_leaderboard.sessions ON laps.session_id = sessions.id WHERE valid IS TRUE GROUP BY laps.car_group, laps.car_model_id, sessions.track_id, laps.driver_id ORDER BY MIN(laps.lap_time_millis)")
+    @Select("SELECT laps.car_group, laps.car_model_id, laps.driver_id, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis FROM laps LEFT JOIN sessions ON laps.session_id = sessions.id WHERE valid IS TRUE GROUP BY laps.car_group, laps.car_model_id, sessions.track_id, laps.driver_id ORDER BY MIN(laps.lap_time_millis)")
     List<GroupRanking> findAllTimeFastestLaps();
 
     @Results(id = "driverRankingResultMap", value = {
@@ -35,13 +36,24 @@ public interface RankingMapper {
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.acc.servertools.entities.mapper.SessionMapper.findById")),
     })
-    @Select("SELECT laps.* FROM acc_leaderboard.laps INNER JOIN (" +
-            "SELECT laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis, FROM acc_leaderboard.laps LEFT JOIN acc_leaderboard.sessions ON laps.session_id = sessions.id " +
-            "WHERE valid IS TRUE AND laps.car_group = #{carGroup} AND sessions.track_id = #{trackId}" +
-            "GROUP BY laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id) fastest_laps " +
-            "ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND laps.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND laps.lap_time_millis = fastest_laps.lap_time_millis"
-    )
-    List<DriverRanking> findAllTimeFastestLapsByTrack(String carGroup, String trackId);
+    @Select("""
+            SELECT laps.*  FROM laps INNER JOIN (SELECT laps.driver_id,
+                                    laps.car_model_id,
+                                    laps.car_group,
+                                    sessions.track_id,
+                                    MIN(laps.lap_time_millis) AS lap_time_millis
+                             FROM laps
+                                      LEFT JOIN sessions ON laps.session_id = sessions.id
+                             WHERE valid IS TRUE
+                               AND laps.car_group = #{carGroup}
+                               AND sessions.track_id = #{trackId}
+                             GROUP BY laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id) fastest_laps
+                            ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND
+                               laps.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND
+                               laps.lap_time_millis = fastest_laps.lap_time_millis
+
+            """)
+    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId);
 
     @Results(id = "leaderboardResultMap", value = {
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.acc.servertools.entities.mapper.SessionMapper.findById")),
@@ -59,10 +71,10 @@ public interface RankingMapper {
             @Result(property = "totalTimeMillis", column = "total_time_millis"),
             @Result(property = "lapCount", column = "lap_count")
     })
-    @Select("SELECT * FROM acc_leaderboard.leaderboard_lines WHERE session_id = #{sessionId} ORDER BY ranking")
+    @Select("SELECT * FROM leaderboard_lines WHERE session_id = #{sessionId} ORDER BY ranking")
     List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
 
     @ResultType(List.class)
-    @Select("SELECT player_id FROM acc_leaderboard.leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId}")
+    @Select("SELECT player_id FROM leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId}")
     List<String> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 }

@@ -22,25 +22,23 @@ public interface LapMapper {
             @Result(property = "split3Millis", column = "split3_millis"),
             @Result(property = "valid", column = "valid"),
     })
-    @Select("SELECT * FROM acc_leaderboard.laps")
+    @Select("SELECT * FROM laps")
     List<Lap> findAll();
 
-    String FIND_BY_SESSION_AND_DRIVERS = """
+    @ResultMap("lapResultMap")
+    @Select("""
             <script>
-            SELECT * FROM acc_leaderboard.laps WHERE session_id = #{sessionId} AND driver_id IN 
+            SELECT * FROM laps WHERE session_id = #{sessionId} AND driver_id IN 
                 <foreach item="item" index="index" collection="playerIds"
                     open="(" separator="," close=")">
                       #{item}
                 </foreach>
                 ORDER BY id ASC;
             </script>
-            """;
-
-    @ResultMap("lapResultMap")
-    @Select(FIND_BY_SESSION_AND_DRIVERS)
+            """)
     List<Lap> findBySessionAndDrivers(int sessionId, List<String> playerIds);
 
-    @Select("SELECT COUNT(id) FROM acc_leaderboard.laps")
+    @Select("SELECT COUNT(id) FROM laps")
     @ResultType(long.class)
     long count();
 
@@ -48,10 +46,10 @@ public interface LapMapper {
             @Result(property = "valid", column = "valid"),
             @Result(property = "lapCount", column = "lap_count"),
     })
-    @Select("SELECT valid, COUNT(valid) AS lap_count FROM acc_leaderboard.laps WHERE driver_id = #{driverId} GROUP BY valid;")
+    @Select("SELECT valid, COUNT(valid) AS lap_count FROM laps WHERE driver_id = #{driverId} GROUP BY valid;")
     List<LapCount> findLapCounts(String driverId);
 
-    @Insert("INSERT INTO acc_leaderboard.laps (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
+    @Insert("INSERT INTO laps (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
             "VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Lap lap);

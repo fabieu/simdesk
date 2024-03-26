@@ -5,10 +5,11 @@ spring:
     default-property-inclusion: NON_NULL
     deserialization:
       fail-on-unknown-properties: false
+  datasource:
+    url: jdbc:sqlite:./data/acc_leaderboard.db
+    driver-class-name: org.sqlite.JDBC
   flyway:
-    create-schemas: true
-    schemas: acc_leaderboard
-    default-schema: acc_leaderboard
+    enabled: true
   servlet:
     multipart:
       max-file-size: 10MB

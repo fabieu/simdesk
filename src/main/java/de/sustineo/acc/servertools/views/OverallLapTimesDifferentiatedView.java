@@ -22,6 +22,7 @@ import de.sustineo.acc.servertools.views.filter.FilterUtils;
 import de.sustineo.acc.servertools.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.acc.servertools.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.acc.servertools.views.renderers.DriverRankingRenderer;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
@@ -52,7 +53,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
 
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
             add(createRankingHeader(carGroup, trackId));
-            addAndExpand(createRankingGrid(carGroup, trackId));
+            addAndExpand(createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId));
         } else {
             event.rerouteToError(NotFoundException.class);
         }
@@ -70,7 +71,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         return layout;
     }
 
-    private Component createRankingGrid(String carGroup, String trackId) {
+    private Component createRankingGrid(CarGroup carGroup, String trackId) {
         List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
         DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
 

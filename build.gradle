@@ -39,16 +39,17 @@ dependencies {
 
     implementation "com.vaadin:vaadin-spring-boot-starter"
 
-    implementation "org.flywaydb:flyway-core:9.22.3"
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
+    implementation "org.xerial:sqlite-jdbc:3.45.2.0"
+    implementation "org.flywaydb:flyway-core:9.22.3"
+
     implementation "org.apache.commons:commons-lang3:3.14.0"
     implementation 'commons-codec:commons-codec:1.16.0'
     implementation 'commons-io:commons-io:2.15.1'
+
     implementation 'com.opencsv:opencsv:5.9'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     implementation 'org.webjars:webjars-locator:0.50'
-
-    runtimeOnly "com.h2database:h2:2.2.224"
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
 

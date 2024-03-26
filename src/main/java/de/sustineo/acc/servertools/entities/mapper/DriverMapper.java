@@ -22,25 +22,27 @@ public interface DriverMapper {
             @Result(property = "driveTimeMillis", column = "drive_time_millis"),
             @Result(property = "lastActivity", column = "last_activity")
     })
-    @Select("SELECT * FROM acc_leaderboard.drivers")
+    @Select("SELECT * FROM drivers")
     List<Driver> findAll();
 
-    @Select("SELECT COUNT(player_id) FROM acc_leaderboard.drivers")
+    @Select("SELECT COUNT(player_id) FROM drivers")
     @ResultType(long.class)
     long count();
 
     @ResultMap("driverResultMap")
-    @Select("SELECT * FROM acc_leaderboard.drivers WHERE player_id = #{playerId}")
+    @Select("SELECT * FROM drivers WHERE player_id = #{playerId}")
     Driver findByPlayerId(String playerId);
 
     @SuppressWarnings("unused")
     @ResultMap("driverResultMap")
-    @Select("SELECT drivers.*, leaderboard_drivers.drive_time_millis FROM acc_leaderboard.drivers INNER JOIN acc_leaderboard.leaderboard_drivers on drivers.player_id = leaderboard_drivers.player_id WHERE leaderboard_drivers.car_id = #{carId} and leaderboard_drivers.session_id = #{sessionId}")
+    @Select("SELECT drivers.*, leaderboard_drivers.drive_time_millis FROM drivers INNER JOIN leaderboard_drivers on drivers.player_id = leaderboard_drivers.player_id WHERE leaderboard_drivers.car_id = #{carId} and leaderboard_drivers.session_id = #{sessionId}")
     List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 
-    @Insert("INSERT INTO acc_leaderboard.drivers (player_id, first_name, last_name, short_name, last_activity) " +
-            "VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity}) " +
-            "ON DUPLICATE KEY UPDATE first_name = VALUES(first_name), last_name = VALUES(last_name), short_name = VALUES(short_name), last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < VALUES(last_activity) THEN VALUES(last_activity) ELSE last_activity END)"
+    @Insert("""
+            INSERT INTO drivers (player_id, first_name, last_name, short_name, last_activity) 
+            VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity}) 
+            ON CONFLICT(player_id) DO UPDATE SET first_name = excluded.first_name, last_name = excluded.last_name, short_name = excluded.short_name, last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < excluded.last_activity THEN excluded.last_activity ELSE last_activity END)
+            """
     )
     void upsert(Driver driver);
 }

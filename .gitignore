@@ -1,5 +1,6 @@
-HELP.md
-/data/
+### Custom ###
+*.db
+memory
 /src/main/resources/examples/
 
 ### Gradle ###

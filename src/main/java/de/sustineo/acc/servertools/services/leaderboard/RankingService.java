@@ -30,7 +30,7 @@ public class RankingService {
         return getRankingsByCarGroupAndTrackId(groupRankings);
     }
 
-    public List<DriverRanking> getAllTimeDriverRanking(String carGroup, String trackId) {
+    public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId) {
         List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId);
         driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);
         addRanking(driverRankings);
