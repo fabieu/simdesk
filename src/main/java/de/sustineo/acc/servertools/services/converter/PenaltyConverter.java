@@ -2,8 +2,8 @@ package de.sustineo.acc.servertools.services.converter;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.Penalty;
-import de.sustineo.acc.servertools.entities.json.AccPenalty;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccPenalty;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

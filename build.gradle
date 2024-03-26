@@ -36,6 +36,8 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-validation"
     implementation "org.springframework.boot:spring-boot-starter-jdbc"
+    implementation "org.springframework.boot:spring-boot-starter-security"
+    implementation "org.springframework.security:spring-security-oauth2-client"
 
     implementation "com.vaadin:vaadin-spring-boot-starter"
 
@@ -47,6 +49,7 @@ dependencies {
     implementation 'commons-codec:commons-codec:1.16.0'
     implementation 'commons-io:commons-io:2.15.1'
 
+    implementation "com.discord4j:discord4j-core:3.2.6"
     implementation 'com.opencsv:opencsv:5.9'
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
     implementation 'org.webjars:webjars-locator:0.50'

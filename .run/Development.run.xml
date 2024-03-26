@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Development" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, debug" />
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, debug, discord" />
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-17" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
@@ -14,6 +14,17 @@
     <module name="acc-server-tools.main" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.acc.servertools.LeaderboardApplication" />
+    <extension name="net.ashald.envfile">
+      <option name="IS_ENABLED" value="true" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="true" PATH=".env" />
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+      </ENTRIES>
+    </extension>
     <method v="2">
       <option name="Make" enabled="true" />
     </method>

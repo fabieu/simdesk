@@ -3,6 +3,10 @@
 @import "component-styles/dialog.css";
 @import "views/main.css";
 @import "views/error.css";
+@import "assets/fontawesome/fontawesome.min.css";
+@import "assets/fontawesome/brands.min.css";
+@import "assets/fontawesome/solid.min.css";
+@import "assets/fontawesome/regular.min.css";
 
 html {
     --weather-sunny-color: #ffb600;

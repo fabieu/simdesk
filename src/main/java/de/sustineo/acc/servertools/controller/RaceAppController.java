@@ -6,17 +6,18 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.core.io.FileSystemResource;
 import org.springframework.http.MediaType;
 import org.springframework.http.ResponseEntity;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.web.bind.annotation.GetMapping;
 import org.springframework.web.bind.annotation.PathVariable;
 import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.RestController;
 
 import java.io.File;
-import java.io.IOException;
 
 @Profile(ProfileManager.PROFILE_RACEAPP)
 @RestController
 @RequestMapping("/api/raceapp")
+@PreAuthorize("permitAll()")
 public class RaceAppController {
     private final RaceAppService raceAppService;
 
@@ -25,7 +26,7 @@ public class RaceAppController {
     }
 
     @GetMapping(value = "/events/{id}/bookings", produces = "text/csv")
-    public ResponseEntity<FileSystemResource> getRaceAppEvent(@PathVariable Integer id) throws IOException {
+    public ResponseEntity<FileSystemResource> getRaceAppEvent(@PathVariable Integer id) {
         File file = raceAppService.getEventBookingsFile(id);
 
         return ResponseEntity.ok()

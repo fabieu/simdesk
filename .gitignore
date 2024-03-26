@@ -1,4 +1,5 @@
 ### Custom ###
+*.env
 *.db
 memory
 /src/main/resources/examples/

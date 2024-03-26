@@ -4,7 +4,7 @@ import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.Driver;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.LeaderboardLine;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import de.sustineo.acc.servertools.entities.mapper.LeaderboardMapper;
 import de.sustineo.acc.servertools.services.converter.LeaderboardConverter;
 import org.springframework.context.annotation.Profile;

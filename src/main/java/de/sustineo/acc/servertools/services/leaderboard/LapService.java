@@ -4,7 +4,7 @@ import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.Lap;
 import de.sustineo.acc.servertools.entities.LapCount;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import de.sustineo.acc.servertools.entities.mapper.LapMapper;
 import de.sustineo.acc.servertools.services.converter.LapConverter;
 import lombok.extern.java.Log;

@@ -90,3 +90,10 @@ CREATE TABLE IF NOT EXISTS leaderboard_drivers
     FOREIGN KEY (session_id) REFERENCES sessions (id),
     FOREIGN KEY (player_id) REFERENCES drivers (player_id)
 );
+
+CREATE TABLE IF NOT EXISTS users
+(
+    username        VARCHAR(32) NOT NULL PRIMARY KEY,
+    password        VARCHAR(60) NOT NULL,
+    insert_datetime TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP
+);

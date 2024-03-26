@@ -12,6 +12,7 @@ public class ProfileManager {
     public static final String PROFILE_ENTRYLIST = "acc-entrylist";
     public static final String PROFILE_RACEAPP = "acc-raceapp";
     public static final String PROFILE_BOP = "acc-bop";
+    public static final String PROFILE_DISCORD = "discord";
     private static List<String> activeProfiles = new ArrayList<>();
 
     public ProfileManager(Environment environment) {
@@ -32,5 +33,13 @@ public class ProfileManager {
 
     public static boolean isBopProfileEnabled() {
         return isActive(PROFILE_BOP);
+    }
+
+    public static boolean isDiscordProfileEnabled() {
+        return isActive(PROFILE_DISCORD);
+    }
+
+    public static boolean isOAuth2ProfileEnabled() {
+        return isDiscordProfileEnabled();
     }
 }

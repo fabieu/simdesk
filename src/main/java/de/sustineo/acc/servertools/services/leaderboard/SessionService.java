@@ -3,7 +3,7 @@ package de.sustineo.acc.servertools.services.leaderboard;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.FileMetadata;
 import de.sustineo.acc.servertools.entities.Session;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import de.sustineo.acc.servertools.entities.mapper.SessionMapper;
 import de.sustineo.acc.servertools.services.converter.SessionConverter;
 import lombok.extern.java.Log;

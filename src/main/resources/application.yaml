@@ -36,7 +36,10 @@ vaadin:
   productionMode: true
   heartbeatInterval: 60
   closeIdleSessions: true
-  exclude-urls: /api/**
+  exclude-urls:
+    - /api/**
+    - /swagger-ui/**
+    - /openapi/**
 leaderboard:
   community-name: ${LEADERBOARD_COMMUNITY_NAME:}
   links:
@@ -46,12 +49,18 @@ leaderboard:
     folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
     scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
     ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+  auth:
+    admin:
+      username: ${AUTH_ADMIN_USERNAME:admin}
+      password: ${AUTH_ADMIN_PASSWORD:#{null}}
 springdoc:
   swagger-ui:
-    path: /api/swagger
+    disable-swagger-default-url: true
+    path: /swagger-ui
   api-docs:
-    path: /api/docs
-  paths-to-match: /api/**
+    path: /openapi
+  paths-to-match:
+    - /api/**
 server:
   forward-headers-strategy: framework
 
@@ -68,4 +77,33 @@ vaadin:
   productionMode: false
   heartbeatInterval: 60
   closeIdleSessions: false
+
+---
+spring:
+  config:
+    activate:
+      on-profile: "discord"
+  security:
+    oauth2:
+      client:
+        registration:
+          discord:
+            client-id: ${DISCORD_CLIENT_ID}
+            client-secret: ${DISCORD_CLIENT_SECRET}
+            clientAuthenticationMethod: client_secret_post
+            authorizationGrantType: authorization_code
+            scope:
+              - identify
+              - guilds
+            redirectUri: "{baseUrl}/login/oauth2/code/discord"
+        provider:
+          discord:
+            authorizationUri: https://discordapp.com/api/oauth2/authorize
+            tokenUri: https://discordapp.com/api/oauth2/token
+            userInfoUri: https://discordapp.com/api/users/@me
+            user-name-attribute: username
+auth:
+  discord:
+    token: ${DISCORD_TOKEN}
+    guild-id: ${DISCORD_GUILD_ID}
 

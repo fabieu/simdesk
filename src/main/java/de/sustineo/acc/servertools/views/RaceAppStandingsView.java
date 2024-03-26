@@ -9,6 +9,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
 import de.sustineo.acc.servertools.entities.raceapp.RaceAppResult;
@@ -28,6 +29,7 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_RACEAPP)
 @Route(value = "/raceapp/series/:seriesId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "RaceApp - Series Standings")
+@AnonymousAllowed
 public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_SERIES_ID = "seriesId";
     private final RaceAppService raceAppService;

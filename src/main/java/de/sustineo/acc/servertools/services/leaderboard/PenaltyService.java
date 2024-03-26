@@ -2,7 +2,7 @@ package de.sustineo.acc.servertools.services.leaderboard;
 
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.Penalty;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import de.sustineo.acc.servertools.entities.mapper.PenaltyMapper;
 import de.sustineo.acc.servertools.services.converter.PenaltyConverter;
 import lombok.extern.java.Log;

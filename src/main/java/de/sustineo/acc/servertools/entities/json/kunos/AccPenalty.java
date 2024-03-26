@@ -1,4 +1,4 @@
-package de.sustineo.acc.servertools.entities.json;
+package de.sustineo.acc.servertools.entities.json.kunos;
 
 import lombok.Data;
 

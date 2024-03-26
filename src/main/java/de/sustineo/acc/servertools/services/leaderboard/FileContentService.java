@@ -3,7 +3,7 @@ package de.sustineo.acc.servertools.services.leaderboard;
 import de.sustineo.acc.servertools.configuration.FileContentConfiguration;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.entities.FileMetadata;
-import de.sustineo.acc.servertools.entities.json.AccSession;
+import de.sustineo.acc.servertools.entities.json.kunos.AccSession;
 import de.sustineo.acc.servertools.utils.json.JsonUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;

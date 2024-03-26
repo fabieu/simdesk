@@ -26,6 +26,8 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.acc.servertools.configuration.ProfileManager;
 import de.sustineo.acc.servertools.configuration.Reference;
 import de.sustineo.acc.servertools.configuration.VaadinConfiguration;
+import de.sustineo.acc.servertools.entities.auth.UserPrincipal;
+import de.sustineo.acc.servertools.services.auth.SecurityService;
 import de.sustineo.acc.servertools.utils.ApplicationContextProvider;
 import de.sustineo.acc.servertools.views.*;
 import org.springframework.beans.factory.annotation.Value;
@@ -43,15 +45,19 @@ import java.util.SortedMap;
 public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
     private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
+
+    private final SecurityService securityService;
     private final BuildProperties buildProperties;
     private final String privacyUrl;
     private final String impressumUrl;
     private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
     private H1 viewTitle;
 
-    public MainLayout(ApplicationContextProvider applicationContextProvider,
+    public MainLayout(SecurityService securityService,
+                      ApplicationContextProvider applicationContextProvider,
                       @Value("${leaderboard.links.privacy}") String privacyUrl,
                       @Value("${leaderboard.links.impressum}") String impressumUrl) {
+        this.securityService = securityService;
         this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
@@ -114,7 +120,31 @@ public class MainLayout extends AppLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.getStyle().set("margin", "0 var(--lumo-space-m)");
 
-        layout.add(createHomeButton(), createThemeToggleButton());
+        layout.add(createUserDetails(), createHomeButton(), createThemeToggleButton());
+
+        return layout;
+    }
+
+    private Component createUserDetails() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+        if (user.isPresent()) {
+            Icon userIcon = VaadinIcon.USER.create();
+
+            Span userName = new Span(user.get().getUsername());
+            userName.getStyle()
+                    .setFontWeight(Style.FontWeight.BOLD);
+
+            Button authenticationButton = new Button("Logout");
+            authenticationButton.addClickListener(event -> securityService.logout());
+            layout.add(userIcon, userName, authenticationButton);
+        } else {
+            Button authenticationButton = new Button("Login");
+            authenticationButton.addClickListener(event -> authenticationButton.getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
+            layout.add(authenticationButton);
+        }
 
         return layout;
     }
