@@ -19,18 +19,18 @@ spring:
 logging:
   level:
     ROOT: WARN
-leaderboard:
-  community-name: ${LEADERBOARD_COMMUNITY_NAME:test-community}
+simdesk:
+  community-name: ${SIMDESK_COMMUNITY_NAME:test-community}
   links:
-    impressum: ${LEADERBOARD_IMPRESSUM_URL:}
-    privacy: ${LEADERBOARD_PRIVACY_URL:}
+    impressum: ${SIMDESK_IMPRESSUM_URL:}
+    privacy: ${SIMDESK_PRIVACY_URL:}
   results:
-    folder: ${LEADERBOARD_RESULTS_FOLDER:./results}
-    scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
-    ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+    folder: ${SIMDESK_ACC_RESULTS_FOLDER:./results}
+    scan-interval: ${SIMDESK_ACC_RESULTS_SCAN_INTERVAL:PT1M}
+    ignore-patterns: ${SIMDESK_ACC_RESULTS_IGNORE_PATTERNS:}
+  auth:
+    admin:
+      username: ${SIMDESK_ADMIN_USERNAME:admin}
+      password: ${SIMDESK_ADMIN_PASSWORD:admin}
 server:
   forward-headers-strategy: framework
-auth:
-  admin:
-    username: ${AUTH_ADMIN_USERNAME:admin}
-    password: ${AUTH_ADMIN_PASSWORD:admin}

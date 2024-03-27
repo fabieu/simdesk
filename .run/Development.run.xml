@@ -4,11 +4,11 @@
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-17" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
-      <env name="LEADERBOARD_COMMUNITY_NAME" value="Sustineo" />
-      <env name="LEADERBOARD_IMPRESSUM_URL" value="https://example.com" />
-      <env name="LEADERBOARD_PRIVACY_URL" value="https://example.com" />
-      <env name="LEADERBOARD_RESULTS_FOLDER" value="src/main/resources/examples" />
-      <env name="LEADERBOARD_RESULTS_IGNORE_PATTERNS" value="[§]+" />
+      <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
+      <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
+      <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
+      <env name="SIMDESK_ACC_RESULTS_FOLDER" value="src/main/resources/examples" />
+      <env name="SIMDESK_ACC_RESULTS_IGNORE_PATTERNS" value="[§]+" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.main" />

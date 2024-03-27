@@ -40,15 +40,19 @@ vaadin:
     - /api/**
     - /swagger-ui/**
     - /openapi/**
-leaderboard:
-  community-name: ${LEADERBOARD_COMMUNITY_NAME:}
+simdesk:
+  community-name: ${SIMDESK_COMMUNITY_NAME:}
   links:
-    impressum: ${LEADERBOARD_IMPRESSUM_URL:}
-    privacy: ${LEADERBOARD_PRIVACY_URL:}
+    impressum: ${SIMDESK_IMPRESSUM_URL:}
+    privacy: ${SIMDESK_PRIVACY_URL:}
   results:
-    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/simdesk/results}
-    scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
-    ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
+    folder: ${SIMDESK_ACC_RESULTS_FOLDER:/opt/simdesk/results}
+    scan-interval: ${SIMDESK_ACC_RESULTS_SCAN_INTERVAL:PT1M}
+    ignore-patterns: ${SIMDESK_ACC_RESULTS_IGNORE_PATTERNS:}
+  auth:
+    admin:
+      username: ${SIMDESK_ADMIN_USERNAME:admin}
+      password: ${SIMDESK_ADMIN_PASSWORD:#{null}}
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
@@ -59,10 +63,6 @@ springdoc:
     - /api/**
 server:
   forward-headers-strategy: framework
-auth:
-  admin:
-    username: ${AUTH_ADMIN_USERNAME:admin}
-    password: ${AUTH_ADMIN_PASSWORD:#{null}}
 
 ---
 spring:
@@ -88,8 +88,8 @@ spring:
       client:
         registration:
           discord:
-            client-id: ${DISCORD_CLIENT_ID}
-            client-secret: ${DISCORD_CLIENT_SECRET}
+            client-id: ${SIMDESK_DISCORD_CLIENT_ID}
+            client-secret: ${SIMDESK_DISCORD_CLIENT_SECRET}
             clientAuthenticationMethod: client_secret_post
             authorizationGrantType: authorization_code
             scope:
@@ -102,8 +102,9 @@ spring:
             tokenUri: https://discordapp.com/api/oauth2/token
             userInfoUri: https://discordapp.com/api/users/@me
             user-name-attribute: username
-auth:
-  discord:
-    token: ${DISCORD_BOT_TOKEN}
-    guild-id: ${DISCORD_GUILD_ID}
+simdesk:
+  auth:
+    discord:
+      token: ${SIMDESK_DISCORD_BOT_TOKEN}
+      guild-id: ${SIMDESK_DISCORD_GUILD_ID}
 

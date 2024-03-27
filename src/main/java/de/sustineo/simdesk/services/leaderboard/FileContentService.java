@@ -46,7 +46,7 @@ public class FileContentService {
     public FileContentService(SessionService sessionService,
                               FileService fileService,
                               JsonUtils jsonUtils,
-                              @Value("${leaderboard.results.scan-interval}") String scanInterval) {
+                              @Value("${simdesk.results.scan-interval}") String scanInterval) {
         this.sessionService = sessionService;
         this.fileService = fileService;
         this.jsonUtils = jsonUtils;

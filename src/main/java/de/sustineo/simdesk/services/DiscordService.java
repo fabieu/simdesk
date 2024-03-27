@@ -37,8 +37,8 @@ public class DiscordService {
     private final GatewayDiscordClient gatewayClient;
     private final RestClient oauthClient;
 
-    public DiscordService(@Value("${auth.discord.token}") String discordApplicationToken,
-                          @Value("${auth.discord.guild-id}") String guildId,
+    public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
+                          @Value("${simdesk.auth.discord.guild-id}") String guildId,
                           BuildProperties buildProperties) {
         this.botClient = DiscordClientBuilder.create(discordApplicationToken).build();
         this.gatewayClient = botClient.login().block();

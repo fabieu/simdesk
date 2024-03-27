@@ -55,8 +55,8 @@ public class MainLayout extends AppLayout {
 
     public MainLayout(SecurityService securityService,
                       ApplicationContextProvider applicationContextProvider,
-                      @Value("${leaderboard.links.privacy}") String privacyUrl,
-                      @Value("${leaderboard.links.impressum}") String impressumUrl) {
+                      @Value("${simdesk.links.privacy}") String privacyUrl,
+                      @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
         this.privacyUrl = privacyUrl;

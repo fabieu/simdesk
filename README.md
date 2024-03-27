@@ -95,27 +95,27 @@ Set active Spring profiles to activate/deactivate certain features. The followin
 - `acc-entrylist`: Enables the entrylist features
 - `acc-raceapp`: Enables the RaceApp integration and API endpoints
 
-### `LEADERBOARD_RESULTS_FOLDER` (optional)
+### `SIMDESK_ACC_RESULTS_FOLDER` (optional)
 
 Overrides the default results folder. If not set, the default folder is set to `/opt/simdesk/results`.
 
-### `LEADERBOARD_RESULTS_SCAN_INTERVAL` (optional)
+### `SIMDESK_ACC_RESULTS_SCAN_INTERVAL` (optional)
 
 Overrides the default scan interval for the results folder. If not set, the default interval is set to 1 minute.
 
-### `LEADERBOARD_RESULTS_IGNORE_PATTERNS` (optional)
+### `SIMDESK_ACC_RESULTS_IGNORE_PATTERNS` (optional)
 
 Set regex pattern to ignore certain server names. If not set no server names will be ignored.
 
-### `LEADERBOARD_COMMUNITY_NAME` (optional)
+### `SIMDESK_COMMUNITY_NAME` (optional)
 
 Set the community name for the main page. If not set, a generic name will be used.
 
-### `LEADERBOARD_IMPRESSUM_URL` (optional)
+### `SIMDESK_IMPRESSUM_URL` (optional)
 
 The URL to the impressum page. If not set, the impressum link will be hidden.
 
-### `LEADERBOARD_PRIVACY_URL` (optional)
+### `SIMDESK_PRIVACY_URL` (optional)
 
 The URL to the privacy page. If not set, the privacy link will be hidden.
 

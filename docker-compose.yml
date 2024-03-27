@@ -9,14 +9,14 @@ services:
       - ./results:/opt/simdesk/results
     environment:
       SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, discord
-      LEADERBOARD_IMPRESSUM_URL: https://markracing.de/impressum
-      LEADERBOARD_PRIVACY_URL: https://markracing.de/privacy
-      LEADERBOARD_COMMUNITY_NAME: Sim2Real
-      LEADERBOARD_RESULTS_IGNORE_PATTERNS: "(No leaderboard)+"
-      DISCORD_CLIENT_ID: ${DISCORD_CLIENT_ID}
-      DISCORD_CLIENT_SECRET: ${DISCORD_CLIENT_SECRET}
-      DISCORD_BOT_TOKEN: ${DISCORD_BOT_TOKEN}
-      DISCORD_GUILD_ID: ${DISCORD_GUILD_ID}
+      SIMDESK_IMPRESSUM_URL: https://markracing.de/impressum
+      SIMDESK_PRIVACY_URL: https://markracing.de/privacy
+      SIMDESK_COMMUNITY_NAME: Sim2Real
+      SIMDESK_ACC_RESULTS_IGNORE_PATTERNS: "(No leaderboard)+"
+      SIMDESK_DISCORD_CLIENT_ID: ${SIMDESK_DISCORD_CLIENT_ID}
+      SIMDESK_DISCORD_CLIENT_SECRET: ${SIMDESK_DISCORD_CLIENT_SECRET}
+      SIMDESK_DISCORD_BOT_TOKEN: ${SIMDESK_DISCORD_BOT_TOKEN}
+      SIMDESK_DISCORD_GUILD_ID: ${SIMDESK_DISCORD_GUILD_ID}
     env_file:
       - .env
     restart: unless-stopped

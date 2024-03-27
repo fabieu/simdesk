@@ -25,7 +25,7 @@ public class FileContentConfiguration {
         this.applicationContextProvider = applicationContextProvider;
     }
 
-    @Value("${leaderboard.results.folder}")
+    @Value("${simdesk.results.folder}")
     public void setWatchDirectories(List<String> folderPaths) {
         validateResultsFolderPaths(folderPaths);
 
@@ -36,7 +36,7 @@ public class FileContentConfiguration {
 
     private void validateResultsFolderPaths(List<String> folders) {
         if (folders == null || folders.isEmpty()) {
-            log.severe("No results folder configured. Please set a folder via 'LEADERBOARD_RESULTS_FOLDER' environment variable.");
+            log.severe("No results folder configured. Please set a folder via 'SIMDESK_ACC_RESULTS_FOLDER' environment variable.");
             applicationContextProvider.exitApplication(1);
         } else {
             for (String folder : folders) {

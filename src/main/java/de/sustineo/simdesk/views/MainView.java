@@ -38,7 +38,7 @@ public class MainView extends VerticalLayout {
 
 
     public MainView(@Autowired(required = false) SessionService sessionService,
-                    @Value("${leaderboard.community-name:ACC}") String communityName) {
+                    @Value("${simdesk.community-name:ACC}") String communityName) {
         this.sessionService = Optional.ofNullable(sessionService);
         this.communityName = communityName;
 

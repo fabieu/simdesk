@@ -23,10 +23,10 @@ import java.util.UUID;
 public class SecurityService {
     private static final String LOGOUT_SUCCESS_URL = "/";
 
-    @Value("${auth.admin.username}")
+    @Value("${simdesk.auth.admin.username}")
     private String adminUsername;
 
-    @Value("${auth.admin.password}")
+    @Value("${simdesk.auth.admin.password}")
     private String adminPassword;
 
     private final PasswordEncoder passwordEncoder;
@@ -43,7 +43,7 @@ public class SecurityService {
         // Generate random password if not set
         if (adminPassword == null || adminPassword.isEmpty()) {
             adminPassword = UUID.randomUUID().toString();
-            log.info(String.format("Please change the password via environment variable AUTH_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
+            log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
         userMapper.insert(adminUsername, passwordEncoder.encode(adminPassword));
