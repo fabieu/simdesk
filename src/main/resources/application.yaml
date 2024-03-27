@@ -1,12 +1,12 @@
 spring:
   application:
-    name: acc-server-tools
+    name: simdesk
   jackson:
     default-property-inclusion: NON_NULL
     deserialization:
       fail-on-unknown-properties: false
   datasource:
-    url: jdbc:sqlite:./data/acc_leaderboard.db
+    url: jdbc:sqlite:./data/simdesk-db.db
     driver-class-name: org.sqlite.JDBC
   flyway:
     enabled: true
@@ -46,7 +46,7 @@ leaderboard:
     impressum: ${LEADERBOARD_IMPRESSUM_URL:}
     privacy: ${LEADERBOARD_PRIVACY_URL:}
   results:
-    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/acc-server-tools/results}
+    folder: ${LEADERBOARD_RESULTS_FOLDER:/opt/simdesk/results}
     scan-interval: ${LEADERBOARD_RESULTS_SCAN_INTERVAL:PT1M}
     ignore-patterns: ${LEADERBOARD_RESULTS_IGNORE_PATTERNS:}
 springdoc:
@@ -71,8 +71,8 @@ spring:
       on-profile: "development"
 logging:
   level:
-    de.sustineo.acc.servertools: DEBUG
-    de.sustineo.acc.servertools.entities.mapper: INFO
+    de.sustineo.acc.simdesk: DEBUG
+    de.sustineo.acc.simdesk.entities.mapper: INFO
 vaadin:
   productionMode: false
   heartbeatInterval: 60

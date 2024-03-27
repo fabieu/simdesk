@@ -12,7 +12,7 @@ plugins {
     id 'com.vaadin' version "${vaadinVersion}"
 }
 
-group = "de.sustineo.acc"
+group = "de.sustineo.simdesk"
 
 java {
     toolchain {

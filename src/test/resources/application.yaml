@@ -1,6 +1,6 @@
 spring:
   application:
-    name: acc-server-tools
+    name: simdesk
   jackson:
     default-property-inclusion: NON_NULL
     deserialization:

@@ -10,9 +10,9 @@
       <env name="LEADERBOARD_RESULTS_FOLDER" value="src/main/resources/examples/empty" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
-    <module name="acc-server-tools.main" />
+    <module name="simdesk.main" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
-    <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.acc.servertools.LeaderboardApplication" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.simdesk.SimDeskApplication" />
     <extension name="net.ashald.envfile">
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="false" />

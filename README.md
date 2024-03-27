@@ -56,7 +56,7 @@
 🐳 Docker
 
 ```bash
-docker run -d --restart=always -p 8085:8080 --name acc-server-tools -e SPRING_PROFILES_ACTIVE="acc-leaderboard,acc-entrylist,acc-raceapp" -v ./results:/opt/acc-server-tools/results registry.gitlab.com/sim2real-eu/acc-server-tools:1
+docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_ACTIVE="acc-leaderboard,acc-entrylist,acc-raceapp" -v ./results:/opt/simdesk/results registry.gitlab.com/sim2real-eu/acc-server-tools:1
 ```
 
 🐳 Docker Compose
@@ -69,7 +69,7 @@ services:
     ports:
       - "8085:8080"
     volumes:
-      - ./results:/opt/acc-server-tools/results
+      - ./results:/opt/simdesk/results
     environment:
       SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp
     restart: always
@@ -97,7 +97,7 @@ Set active Spring profiles to activate/deactivate certain features. The followin
 
 ### `LEADERBOARD_RESULTS_FOLDER` (optional)
 
-Overrides the default results folder. If not set, the default folder is set to `/opt/acc-server-tools/results`.
+Overrides the default results folder. If not set, the default folder is set to `/opt/simdesk/results`.
 
 ### `LEADERBOARD_RESULTS_SCAN_INTERVAL` (optional)
 
