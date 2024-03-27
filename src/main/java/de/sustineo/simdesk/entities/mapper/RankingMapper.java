@@ -51,7 +51,6 @@ public interface RankingMapper {
                             ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND
                                laps.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND
                                laps.lap_time_millis = fastest_laps.lap_time_millis
-
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId);
 
