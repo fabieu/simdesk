@@ -14,10 +14,9 @@ import com.vaadin.flow.theme.Theme;
 @Meta(name = "Author", content = "Fabian Eulitz")
 @Meta(name = "robots", content = "noindex, nofollow")
 @Meta(name= "theme-color", content= "#1a1a1a")
-@PWA(name = "ACC Server Tools", shortName = "ACC Tools")
+@PWA(name = "SimDesk", shortName = "SimDesk", description = "SimDesk - Sim Racing Utilities")
 @Theme(value = "default")
 public class VaadinConfiguration implements AppShellConfigurator {
-    public static final String APPLICATION_NAME = "ACC Server Tools";
-    public static final String APPLICATION_NAME_SHORT = "ACC";
-    public static final String APPLICATION_NAME_SHORT_PREFIX = APPLICATION_NAME_SHORT + " ";
+    public static final String APPLICATION_NAME = "SimDesk";
+    public static final String APPLICATION_NAME_SHORT_PREFIX = APPLICATION_NAME + " - ";
 }

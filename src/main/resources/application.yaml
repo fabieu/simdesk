@@ -41,7 +41,8 @@ vaadin:
     - /swagger-ui/**
     - /openapi/**
 simdesk:
-  community-name: ${SIMDESK_COMMUNITY_NAME:}
+  community:
+    name: ${SIMDESK_COMMUNITY_NAME:#{null}}
   links:
     impressum: ${SIMDESK_IMPRESSUM_URL:}
     privacy: ${SIMDESK_PRIVACY_URL:}

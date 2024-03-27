@@ -20,7 +20,8 @@ logging:
   level:
     ROOT: WARN
 simdesk:
-  community-name: ${SIMDESK_COMMUNITY_NAME:test-community}
+  community:
+    name: ${SIMDESK_COMMUNITY_NAME:#{null}}
   links:
     impressum: ${SIMDESK_IMPRESSUM_URL:}
     privacy: ${SIMDESK_PRIVACY_URL:}

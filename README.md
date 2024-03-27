@@ -13,7 +13,7 @@
 <br />
 <div style="text-align: center">
     <img src="docs/icon.png" alt="Logo" width="128" height="128">
-    <h3 style="text-align: center">ACC Server Tools</h3>
+    <h3 style="text-align: center">SimDesk</h3>
 
   <p style="text-align: center">
     Simple and customizable server dashboard for Assetto Corsa Competizione

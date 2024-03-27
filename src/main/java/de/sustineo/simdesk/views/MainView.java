@@ -38,7 +38,7 @@ public class MainView extends VerticalLayout {
 
 
     public MainView(@Autowired(required = false) SessionService sessionService,
-                    @Value("${simdesk.community-name:ACC}") String communityName) {
+                    @Value("${simdesk.community.name}") String communityName) {
         this.sessionService = Optional.ofNullable(sessionService);
         this.communityName = communityName;
 
@@ -54,7 +54,10 @@ public class MainView extends VerticalLayout {
     private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
-        header.add(new H1(communityName + " Server Tools"));
+        String communityName = Optional.ofNullable(this.communityName)
+                .map(name -> "SimDesk by " + name)
+                .orElse("SimDesk");
+        header.add(new H1(communityName));
         return header;
     }
 
