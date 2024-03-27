@@ -4,11 +4,11 @@
     <option name="ALTERNATIVE_JRE_PATH" value="temurin-17" />
     <option name="ALTERNATIVE_JRE_PATH_ENABLED" value="true" />
     <envs>
+      <env name="SIMDESK_ACC_RESULTS_FOLDER" value="data/results" />
+      <env name="SIMDESK_ACC_RESULTS_IGNORE_PATTERNS" value="[§]+" />
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
-      <env name="SIMDESK_ACC_RESULTS_FOLDER" value="src/main/resources/examples" />
-      <env name="SIMDESK_ACC_RESULTS_IGNORE_PATTERNS" value="[§]+" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.main" />
@@ -18,11 +18,11 @@
       <option name="IS_ENABLED" value="true" />
       <option name="IS_SUBST" value="false" />
       <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
-      <option name="IS_IGNORE_MISSING_FILES" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="true" />
       <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
       <ENTRIES>
-        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
         <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
       </ENTRIES>
     </extension>
     <method v="2">
