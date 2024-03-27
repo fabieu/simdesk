@@ -20,9 +20,9 @@
     <br />
     <a href="https://acc.sim2real.eu">View Demo</a>
     ·
-    <a href="https://gitlab.com/sim2real-eu/acc-server-tools/issues">Report Bug</a>
+    <a href="https://gitlab.com/sustineo/simdesk/issues">Report Bug</a>
     ·
-    <a href="https://gitlab.com/sim2real-eu/acc-server-tools/issues">Request Feature</a>
+    <a href="https://gitlab.com/sustineo/simdesk/issues">Request Feature</a>
   </p>
 </div>
 
@@ -56,7 +56,7 @@
 🐳 Docker
 
 ```bash
-docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_ACTIVE="acc-leaderboard,acc-entrylist,acc-raceapp" -v ./results:/opt/simdesk/results registry.gitlab.com/sim2real-eu/acc-server-tools:1
+docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_ACTIVE="acc-leaderboard,acc-entrylist,acc-raceapp" -v ./results:/opt/simdesk/results registry.gitlab.com/sustineo/simdesk:1
 ```
 
 🐳 Docker Compose
@@ -65,13 +65,13 @@ docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_AC
 version: "3.9"
 services:
   app:
-    image: registry.gitlab.com/sim2real-eu/acc-server-tools:1
+    image: registry.gitlab.com/sustineo/simdesk:2
     ports:
       - "8085:8080"
     volumes:
       - ./results:/opt/simdesk/results
     environment:
-      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp
+      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-bop
     restart: always
 ```
 
@@ -199,23 +199,23 @@ Distributed under the Apache License 2.0. See [LICENSE][license-url] for more in
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[project-url]: https://gitlab.com/sim2real-eu/acc-server-tools
+[project-url]: https://gitlab.com/sustineo/simdesk
 
-[stars-shield]: https://img.shields.io/gitlab/stars/sim2real-eu%2Facc-server-tools?style=for-the-badge
+[stars-shield]: https://img.shields.io/gitlab/stars/sustineo%2Fsimdesk?style=for-the-badge
 
-[issues-shield]: https://img.shields.io/gitlab/issues/open/sim2real-eu%2Facc-server-tools?style=for-the-badge
+[issues-shield]: https://img.shields.io/gitlab/issues/open/sustineo%2Fsimdesk?style=for-the-badge
 
-[issues-url]: https://gitlab.com/sim2real-eu/acc-server-tools/-/issues
+[issues-url]: https://gitlab.com/sustineo/simdesk/-/issues
 
-[contributors-shield]: https://img.shields.io/gitlab/contributors/sim2real-eu%2Facc-server-tools?style=for-the-badge
+[contributors-shield]: https://img.shields.io/gitlab/contributors/sustineo%2Fsimdesk?style=for-the-badge
 
-[forks-shield]: https://img.shields.io/gitlab/forks/sim2real-eu%2Facc-server-tools?style=for-the-badge
+[forks-shield]: https://img.shields.io/gitlab/forks/sustineo%2Fsimdesk?style=for-the-badge
 
-[forks-url]: https://gitlab.com/sim2real-eu/acc-server-tools/-/forks
+[forks-url]: https://gitlab.com/sustineo/simdesk/-/forks
 
-[license-shield]: https://img.shields.io/gitlab/license/sim2real-eu%2Facc-server-tools?style=for-the-badge
+[license-shield]: https://img.shields.io/gitlab/license/sustineo%2Fsimdesk?style=for-the-badge
 
-[license-url]: https://gitlab.com/sim2real-eu/acc-server-tools/-/blob/main/LICENSE
+[license-url]: https://gitlab.com/sustineo/simdesk/-/blob/main/LICENSE
 
 [spring-boot]: https://img.shields.io/badge/spring%20boot-6DB33F?logo=springboot&logoColor=white&style=for-the-badge
 
