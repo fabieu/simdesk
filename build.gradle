@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        vaadinVersion = "24.3.6"
-        springBootVersion = "3.2.1"
+        vaadinVersion = "24.3.8"
+        springBootVersion = "3.2.4"
     }
 }
 
@@ -32,6 +32,7 @@ repositories {
 }
 
 dependencies {
+    // Spring Boot
     implementation "org.springframework.boot:spring-boot-starter-web"
     implementation "org.springframework.boot:spring-boot-starter-actuator"
     implementation "org.springframework.boot:spring-boot-starter-validation"
@@ -39,27 +40,32 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-security"
     implementation "org.springframework.security:spring-security-oauth2-client"
 
+    // Vaadin
     implementation "com.vaadin:vaadin-spring-boot-starter"
 
+    // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
     implementation "org.xerial:sqlite-jdbc:3.45.2.0"
-    implementation "org.flywaydb:flyway-core:9.22.3"
+    implementation "org.flywaydb:flyway-core:10.10.0"
 
+    // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.14.0"
-    implementation 'commons-codec:commons-codec:1.16.0'
-    implementation 'commons-io:commons-io:2.15.1'
+    implementation 'commons-codec:commons-codec:1.16.1'
+    implementation 'commons-io:commons-io:2.16.0'
 
+    // Misc
     implementation "com.discord4j:discord4j-core:3.2.6"
     implementation 'com.opencsv:opencsv:5.9'
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.3.0'
-    implementation 'org.webjars:webjars-locator:0.50'
+
+    // OpenAPI documentation
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.4.0'
+    implementation 'org.webjars:webjars-locator:0.52'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
-
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
-    compileOnly "org.projectlombok:lombok:1.18.30"
-    annotationProcessor "org.projectlombok:lombok:1.18.30"
+    compileOnly "org.projectlombok:lombok:1.18.32"
+    annotationProcessor "org.projectlombok:lombok:1.18.32"
 }
 
 springBoot {
