@@ -44,6 +44,7 @@ public class Track extends Entity {
         addTrack("watkins_glen", "Watkins Glen");
         addTrack("valencia", "Valencia");
         addTrack("red_bull_ring", "RedBull Ring");
+        addTrack("nurburgring_24h", "Nürburgring 24h");
     }
 
     private static void addTrack(String trackId, String trackName) {
