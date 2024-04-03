@@ -5,8 +5,8 @@ services:
     ports:
       - "8085:8080"
     volumes:
-      - ./data:/opt/simdesk/data
-      - ./results:/opt/simdesk/results
+      - ./data:/app/data
+      - ./results:/app/results
     environment:
       SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, discord
       SIMDESK_IMPRESSUM_URL: https://markracing.de/impressum

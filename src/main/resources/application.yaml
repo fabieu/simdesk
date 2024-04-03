@@ -1,4 +1,6 @@
 spring:
+  profiles:
+    active: acc-entrylist, acc-bop
   application:
     name: simdesk
   jackson:
@@ -47,7 +49,7 @@ simdesk:
     impressum: ${SIMDESK_IMPRESSUM_URL:}
     privacy: ${SIMDESK_PRIVACY_URL:}
   results:
-    folder: ${SIMDESK_ACC_RESULTS_FOLDER:/opt/simdesk/results}
+    folders: ${SIMDESK_ACC_RESULTS_FOLDERS:}
     scan-interval: ${SIMDESK_ACC_RESULTS_SCAN_INTERVAL:PT1M}
     ignore-patterns: ${SIMDESK_ACC_RESULTS_IGNORE_PATTERNS:}
   auth:
@@ -64,6 +66,7 @@ springdoc:
     - /api/**
 server:
   forward-headers-strategy: framework
+  shutdown: graceful
 
 ---
 spring:

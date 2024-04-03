@@ -1,10 +1,12 @@
 FROM openjdk:17-jdk-alpine3.14
 
-WORKDIR /opt/simdesk
+WORKDIR /app
 RUN mkdir data results
 
-COPY build/libs/simdesk-*.jar app.jar
+COPY build/libs/simdesk-*.jar simdesk.jar
+
+ENV SIMDESK_ACC_RESULTS_FOLDERS=results
 
 EXPOSE 8080
 
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /opt/simdesk/app.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/simdesk.jar"]

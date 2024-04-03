@@ -25,8 +25,12 @@ public class FileContentConfiguration {
         this.applicationContextProvider = applicationContextProvider;
     }
 
-    @Value("${simdesk.results.folder}")
+    @Value("${simdesk.results.folders}")
     public void setWatchDirectories(List<String> folderPaths) {
+        if (folderPaths == null || folderPaths.isEmpty()) {
+            return;
+        }
+
         validateResultsFolderPaths(folderPaths);
 
         FileContentConfiguration.WATCH_DIRECTORIES = folderPaths.stream()
@@ -35,21 +39,21 @@ public class FileContentConfiguration {
     }
 
     private void validateResultsFolderPaths(List<String> folders) {
-        if (folders == null || folders.isEmpty()) {
-            log.severe("No results folder configured. Please set a folder via 'SIMDESK_ACC_RESULTS_FOLDER' environment variable.");
-            applicationContextProvider.exitApplication(1);
-        } else {
-            for (String folder : folders) {
-                try {
-                    Path folderPath = Path.of(folder);
-                    if (!Files.isDirectory(folderPath)) {
-                        log.severe(String.format("Configured results folder '%s' is not a directory.", folder));
-                        applicationContextProvider.exitApplication(1);
-                    }
-                } catch (InvalidPathException e) {
-                    log.severe(String.format("Configured results folder '%s' is not a valid path.", folder));
+        for (String folder : folders) {
+            try {
+                Path folderPath = Path.of(folder);
+                if (!Files.exists(folderPath)) {
+                    log.severe(String.format("Configured results folder '%s' does not exist.", folder));
                     applicationContextProvider.exitApplication(1);
                 }
+
+                if (!Files.isDirectory(folderPath)) {
+                    log.severe(String.format("Configured results folder '%s' is not a directory.", folder));
+                    applicationContextProvider.exitApplication(1);
+                }
+            } catch (InvalidPathException e) {
+                log.severe(String.format("Configured results folder '%s' is not a valid path.", folder));
+                applicationContextProvider.exitApplication(1);
             }
         }
     }
