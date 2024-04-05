@@ -20,9 +20,9 @@ workflow:
     - if: '$CI_PIPELINE_SOURCE == "web"'
       when: manual
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: manual
       changes:
         - docker-compose.yml
-      when: manual
 
 stages:
   - prepare
@@ -32,7 +32,7 @@ stages:
   - deploy
 
 default:
-  image: gradle:7.6-jdk17-alpine
+  image: gradle:8.7-jdk21-alpine
   tags:
     - gitlab-org-docker
 
@@ -90,9 +90,9 @@ build-docker:
     - job: build-jar
   rules:
     - !reference [ .build_conditions, rules ]
-  image: docker:24.0.5
+  image: docker:26.0.0
   services:
-    - docker:24.0.5-dind
+    - docker:26.0.0-dind
   variables:
     DOCKER_DRIVER: overlay2
     DOCKER_TLS_CERTDIR: ""
