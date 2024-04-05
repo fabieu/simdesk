@@ -1,17 +1,18 @@
 workflow:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_TAG'
       when: never
     - if: '$CI_PIPELINE_SOURCE == "push"'
-      changes:
-        - gradle.properties
-        - docker-compose.yml
+      when: always
 
 .build_conditions:
   rules:
     - if: '$CI_PIPELINE_SOURCE == "web"'
+      when: always
     - if: '$CI_PIPELINE_SOURCE == "push" && $CI_COMMIT_BRANCH == $CI_DEFAULT_BRANCH'
+      when: always
       changes:
         - gradle.properties
 
