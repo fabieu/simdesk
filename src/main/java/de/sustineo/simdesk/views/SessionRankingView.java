@@ -47,7 +47,7 @@ import java.util.stream.Stream;
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:fileChecksum", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Session")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";

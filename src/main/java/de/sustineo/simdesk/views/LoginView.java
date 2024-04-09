@@ -18,7 +18,7 @@ import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.layouts.MainLayout;
 
 @Route(value = "login", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Login")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Login")
 @AnonymousAllowed
 public class LoginView extends VerticalLayout implements BeforeEnterObserver {
     private final LoginForm login = new LoginForm();

@@ -37,7 +37,10 @@ import java.util.stream.Collectors;
 public class SecurityConfiguration extends VaadinWebSecurity {
     private final String[] PUBLIC_PATHS = {
             "/public/**",
+            "/assets/**",
     };
+    private final String LOGIN_URL = "/login";
+    private final String LOGIN_SUCCESS_URL = "/";
     private final String OAUTH2_PROVIDER_DISCORD = "discord";
     private final String DISCORD_ROLE_PREFIX = "AST-";
 
@@ -62,15 +65,21 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatchers(PUBLIC_PATHS)).permitAll()
+                )
+                .formLogin(formLogin -> formLogin
+                        .loginPage(LOGIN_URL).permitAll()
+                        .loginProcessingUrl(LOGIN_URL)
+                        .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
                 );
 
         if (ProfileManager.isOAuth2ProfileEnabled()) {
             http
                     .oauth2Login(oauth2 -> oauth2
-                            .loginPage("/login/oauth")
+                            .loginPage("/login/oauth").permitAll()
                             .authorizationEndpoint(authorization -> authorization
                                     .baseUri("/login/oauth2/authorization")
                             )
+                            .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
                     );
         }
         super.configure(http);

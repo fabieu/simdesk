@@ -18,7 +18,7 @@ import de.sustineo.simdesk.utils.FormatUtils;
 import java.util.List;
 
 @Route(value = "/converter", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Converter")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Converter")
 @AnonymousAllowed
 public class ConverterView extends VerticalLayout {
     public ConverterView() {

@@ -54,7 +54,7 @@ import java.util.Set;
 @Profile(ProfileManager.PROFILE_BOP)
 @Log
 @Route(value = "/bop/editor", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "BoP - Editor")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "BoP - Editor")
 @AnonymousAllowed
 public class BopEditorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";

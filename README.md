@@ -11,10 +11,8 @@
 
 <!-- OVERVIEW -->
 <br />
-<div style="text-align: center">
-    <img src="docs/icon.png" alt="Logo" width="128" height="128">
-    <h3 style="text-align: center">SimDesk</h3>
-
+  <div style="text-align: center">
+  <img src="/src/main/resources/META-INF/resources/img/logo_full_black.png" alt="Logo" height="196">
   <p style="text-align: center">
     Simple and customizable server dashboard and utilities for Assetto Corsa Competizione
     <br />

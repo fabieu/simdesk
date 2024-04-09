@@ -18,5 +18,5 @@ import com.vaadin.flow.theme.Theme;
 @Theme(value = "default")
 public class VaadinConfiguration implements AppShellConfigurator {
     public static final String APPLICATION_NAME = "SimDesk";
-    public static final String APPLICATION_NAME_SHORT_PREFIX = APPLICATION_NAME + " - ";
+    public static final String APPLICATION_NAME_PREFIX = APPLICATION_NAME + " - ";
 }

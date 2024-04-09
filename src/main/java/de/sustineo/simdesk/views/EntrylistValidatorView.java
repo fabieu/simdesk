@@ -48,7 +48,7 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Route(value = "/entrylist/validator", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Entrylist - Validator")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Entrylist - Validator")
 @AnonymousAllowed
 public class EntrylistValidatorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";
