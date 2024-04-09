@@ -28,7 +28,7 @@ import java.util.List;
 @Log
 @Profile(ProfileManager.PROFILE_RACEAPP)
 @Route(value = "/raceapp/series/:seriesId", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "RaceApp - Series Standings")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "RaceApp - Series Standings")
 @AnonymousAllowed
 public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_SERIES_ID = "seriesId";

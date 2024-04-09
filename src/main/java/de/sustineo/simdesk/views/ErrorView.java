@@ -19,7 +19,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Route(layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME + " - Error")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Error")
 @AnonymousAllowed
 public class ErrorView extends VerticalLayout implements BeforeEnterObserver {
     public static final String QUERY_PARAMETER_HTTP_STATUS = "httpStatus";

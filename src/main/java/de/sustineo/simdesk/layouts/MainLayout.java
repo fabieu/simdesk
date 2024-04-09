@@ -30,6 +30,7 @@ import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.utils.ApplicationContextProvider;
 import de.sustineo.simdesk.views.*;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
@@ -40,7 +41,6 @@ import java.util.Optional;
 import java.util.SortedMap;
 
 
-@PageTitle(VaadinConfiguration.APPLICATION_NAME)
 @StyleSheet(value = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap-grid.min.css")
 public class MainLayout extends AppLayout {
     private static final String DEFAULT_THEME = Lumo.DARK;
@@ -104,7 +104,13 @@ public class MainLayout extends AppLayout {
         // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        Image viewImage = new Image("img/logo_short_black.png", "SimDesk");
+        Image logo = new Image("assets/img/logo_full_black.png", "SimDesk Logo");
+        logo.setHeight("var(--lumo-size-l)");
+        logo.getStyle()
+                .setPaddingRight("var(--lumo-space-s)");
+
+        RouterLink logoRouter = new RouterLink(MainView.class);
+        logoRouter.add(logo);
 
         // Placeholder for the title of the current view.
         // The title will be set after navigation.
@@ -113,7 +119,7 @@ public class MainLayout extends AppLayout {
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
-        layout.add(viewImage, viewTitle);
+        layout.add(logoRouter, viewTitle);
 
         return layout;
     }
@@ -122,7 +128,7 @@ public class MainLayout extends AppLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.getStyle().set("margin", "0 var(--lumo-space-m)");
 
-        layout.add(createUserDetails(), createHomeButton(), createThemeToggleButton());
+        layout.add(createThemeToggleButton(), createUserDetails());
 
         return layout;
     }
@@ -149,18 +155,6 @@ public class MainLayout extends AppLayout {
         }
 
         return layout;
-    }
-
-    private Component createHomeButton() {
-        Icon homeIcon = VaadinIcon.HOME_O.create();
-        String label = "Back to Home";
-
-        Button homeButton = new Button(homeIcon);
-        homeButton.setTooltipText(label);
-        homeButton.setAriaLabel(label);
-        homeButton.addClickListener(e -> UI.getCurrent().navigate(MainView.class));
-
-        return homeButton;
     }
 
     private Button createThemeToggleButton() {
@@ -370,7 +364,8 @@ public class MainLayout extends AppLayout {
                         .map(Tab.class::cast)
                         .ifPresentOrElse(menu::setSelectedTab, () -> menu.setSelectedTab(null));
             }
-            viewTitle.setText(getCurrentPageTitle());
+
+            viewTitle.setText(StringUtils.removeStart(getCurrentPageTitle(), VaadinConfiguration.APPLICATION_NAME_PREFIX));
         } else {
             for (Tabs menu : menuMap.values()) {
                 menu.setSelectedTab(null);

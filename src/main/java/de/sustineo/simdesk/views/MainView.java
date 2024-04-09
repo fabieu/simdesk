@@ -29,7 +29,7 @@ import java.util.Optional;
 
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "/home", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME)
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Dashboard")
 @AnonymousAllowed
 public class MainView extends VerticalLayout {
     private final Optional<SessionService> sessionService;

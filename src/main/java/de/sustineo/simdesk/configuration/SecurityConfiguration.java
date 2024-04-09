@@ -37,6 +37,7 @@ import java.util.stream.Collectors;
 public class SecurityConfiguration extends VaadinWebSecurity {
     private final String[] PUBLIC_PATHS = {
             "/public/**",
+            "/assets/**",
     };
     private final String OAUTH2_PROVIDER_DISCORD = "discord";
     private final String DISCORD_ROLE_PREFIX = "AST-";

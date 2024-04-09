@@ -26,7 +26,7 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times/overall", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Lap times")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
 @AnonymousAllowed
 public class OverallLapTimesView extends VerticalLayout {
     private final RankingService rankingService;

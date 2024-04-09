@@ -23,7 +23,7 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/drivers", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_SHORT_PREFIX + "Leaderboard - Drivers")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Drivers")
 @AnonymousAllowed
 public class DriverView extends VerticalLayout {
     private final DriverService driverService;
