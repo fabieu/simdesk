@@ -104,14 +104,16 @@ public class MainLayout extends AppLayout {
         // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
+        Image viewImage = new Image("img/logo_short_black.png", "SimDesk");
+
         // Placeholder for the title of the current view.
         // The title will be set after navigation.
-        viewTitle = new H1(VaadinConfiguration.APPLICATION_NAME);
+        viewTitle = new H1();
         viewTitle.getStyle()
                 .set("font-size", "var(--lumo-font-size-l)")
                 .set("margin", "0");
 
-        layout.add(viewTitle);
+        layout.add(viewImage, viewTitle);
 
         return layout;
     }
@@ -373,7 +375,6 @@ public class MainLayout extends AppLayout {
             for (Tabs menu : menuMap.values()) {
                 menu.setSelectedTab(null);
             }
-            viewTitle.setText(VaadinConfiguration.APPLICATION_NAME);
         }
 
         // Close drawer when navigating to different view
