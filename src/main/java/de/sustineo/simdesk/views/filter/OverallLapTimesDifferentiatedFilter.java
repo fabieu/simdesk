@@ -2,10 +2,8 @@ package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
-import lombok.Data;
 
-@Data
-public class OverallLapTimesDifferentiatedFilter {
+public class OverallLapTimesDifferentiatedFilter extends GridFilter {
     private final GridListDataView<DriverRanking> dataView;
 
     private String driverName;
@@ -45,9 +43,5 @@ public class OverallLapTimesDifferentiatedFilter {
         boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);
 
         return matchesDriverFullName && matchesCarModelName && matchesServerName && matchesSessionTypeDescription;
-    }
-
-    private boolean matches(String value, String searchTerm) {
-        return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
     }
 }

@@ -9,8 +9,8 @@ import com.vaadin.flow.data.value.ValueChangeMode;
 
 import java.util.function.Consumer;
 
-public class FilterUtils {
-    public static Component createFilterHeader(Consumer<String> filterChangeConsumer) {
+public class GridFilter {
+    public static Component createHeader(Consumer<String> filterChangeConsumer) {
         VerticalLayout layout = new VerticalLayout();
 
         TextField textField = new TextField();
@@ -27,5 +27,9 @@ public class FilterUtils {
         layout.getThemeList().add("spacing-xs");
 
         return layout;
+    }
+
+    protected boolean matches(String value, String searchTerm) {
+        return searchTerm == null || searchTerm.isEmpty() || (value != null && value.toLowerCase().contains(searchTerm.toLowerCase()));
     }
 }

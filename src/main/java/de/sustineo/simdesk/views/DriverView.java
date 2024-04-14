@@ -16,7 +16,7 @@ import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.filter.DriverFilter;
-import de.sustineo.simdesk.views.filter.FilterUtils;
+import de.sustineo.simdesk.views.filter.GridFilter;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
@@ -88,9 +88,9 @@ public class DriverView extends VerticalLayout {
 
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(firstNameColumn).setComponent(FilterUtils.createFilterHeader(driverFilter::setFirstName));
-        headerRow.getCell(lastNameColumn).setComponent(FilterUtils.createFilterHeader(driverFilter::setLastName));
-        headerRow.getCell(shortNameColumn).setComponent(FilterUtils.createFilterHeader(driverFilter::setShortName));
+        headerRow.getCell(firstNameColumn).setComponent(GridFilter.createHeader(driverFilter::setFirstName));
+        headerRow.getCell(lastNameColumn).setComponent(GridFilter.createHeader(driverFilter::setLastName));
+        headerRow.getCell(shortNameColumn).setComponent(GridFilter.createHeader(driverFilter::setShortName));
 
         return grid;
     }

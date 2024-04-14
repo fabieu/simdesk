@@ -7,6 +7,7 @@ public class GridRenderer {
             """;
     static final String RACE_NUMBER_TEMPLATE_NUMBER = "raceNumber";
     static final String RACE_NUMBER_TEMPLATE_BALLAST = "ballastKg";
+
     static final String DRIVERS_TEMPLATE = """
             <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
                 ${item.drivers.map(driver => html`
@@ -40,9 +41,31 @@ public class GridRenderer {
     static final String TIMING_TEMPLATE_FASTEST_LAP = "fastestLap";
 
     static final String PENALTY_SERVED_TEMPLATE = """
-                ${!item.postRace ? html`<vaadin-icon icon="lumo:checkmark" style="color: green;"></vaadin-icon>` : html`<vaadin-icon icon="lumo:cross" style="color: red;"></vaadin-icon>`}
+            ${!item.postRace ? html`<vaadin-icon icon="lumo:checkmark" style="color: green;"></vaadin-icon>` : html`<vaadin-icon icon="lumo:cross" style="color: red;"></vaadin-icon>`}
             """;
     static final String PENALTY_SERVED_TEMPLATE_BOOLEAN = "postRace";
+
+    static final String BOP_BALLAST_TEMPLATE = """
+            ${item.ballastKg ? item.ballastKg + " kg" : ""}
+            """;
+    static final String BOP_BALLAST_TEMPLATE_BALLAST_KG = "ballastKg";
+
+    static final String BOP_RESTRICTOR_TEMPLATE = """
+            ${item.restrictor ? item.restrictor + " %" : ""}
+            """;
+    static final String BOP_RESTRICTOR_TEMPLATE_RESTRICTOR = "restrictor";
+
+    public static String enrichNumber(Integer number) {
+        if (number == null) {
+            return "";
+        } else if (number > 0) {
+            return "+" + number;
+        } else if (number < 0) {
+            return "" + number;
+        } else {
+            return " " + number;
+        }
+    }
 
     public static String getTimeColor(Long gapMillis) {
         if (gapMillis < 0) {

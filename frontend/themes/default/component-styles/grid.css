@@ -6,32 +6,32 @@ vaadin-grid::part(font-weight-bold) {
     font-weight: bold;
 }
 
-vaadin-grid::part(ranking-car-group-gt3) {
+vaadin-grid::part(car-group-gt3) {
     background-color: var(--lumo-contrast-5pct);
 }
 
-vaadin-grid::part(ranking-car-group-gt4) {
+vaadin-grid::part(car-group-gt4) {
     background-color: rgba(38, 38, 96, 0.2)
 }
 
-vaadin-grid::part(ranking-car-group-tcx) {
+vaadin-grid::part(car-group-gt2) {
+    background-color: rgba(241, 0, 0, 0.2);
+}
+
+vaadin-grid::part(car-group-tcx) {
     background-color: rgb(0, 124, 168, 0.2);
 }
 
-vaadin-grid::part(ranking-car-group-cup) {
+vaadin-grid::part(car-group-cup) {
     background-color: rgba(40, 76, 40, 0.3);
 }
 
-vaadin-grid::part(ranking-car-group-chl) {
+vaadin-grid::part(car-group-chl) {
     background-color: rgba(128, 0, 0, 0.2);
 }
 
-vaadin-grid::part(ranking-car-group-st) {
+vaadin-grid::part(car-group-st) {
     background-color: rgba(152, 138, 0, 0.3);
-}
-
-vaadin-grid::part(ranking-car-group-gt2) {
-    background-color: rgba(241, 0, 0, 0.2);
 }
 
 vaadin-grid::part(ranking-podium-first) {
@@ -52,4 +52,8 @@ vaadin-grid::part(ranking-dnf) {
 
 vaadin-grid::part(invalid-lap) {
     background-color: var(--lumo-error-color-10pct);
+}
+
+vaadin-grid::part(inactive-bop) {
+    color: var(--lumo-contrast-50pct);
 }

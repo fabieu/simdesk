@@ -19,7 +19,7 @@ import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
-import de.sustineo.simdesk.views.filter.FilterUtils;
+import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.SessionFilter;
 import org.springframework.context.annotation.Profile;
 
@@ -82,9 +82,9 @@ public class SessionView extends VerticalLayout {
 
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(FilterUtils.createFilterHeader(sessionFilter::setSessionDescription));
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setTrackName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createHeader(sessionFilter::setSessionDescription));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();

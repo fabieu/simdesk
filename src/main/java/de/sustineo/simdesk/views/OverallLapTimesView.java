@@ -17,9 +17,9 @@ import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
-import de.sustineo.simdesk.views.filter.FilterUtils;
+import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
-import de.sustineo.simdesk.views.generators.CarGroupPartNameGenerator;
+import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
@@ -72,14 +72,14 @@ public class OverallLapTimesView extends VerticalLayout {
         grid.setColumnReorderingAllowed(true);
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setPartNameGenerator(new CarGroupPartNameGenerator());
+        grid.setPartNameGenerator(new GroupRankingCarGroupPartNameGenerator());
 
         OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(carGroupColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setCarGroup));
-        headerRow.getCell(trackNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setTrackName));
-        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setDriverName));
-        headerRow.getCell(carModelNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesFilter::setCarModelName));
+        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setCarGroup));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setTrackName));
+        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setDriverName));
+        headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setCarModelName));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<GroupRanking>, GroupRanking> singleSelect = grid.asSingleSelect();
