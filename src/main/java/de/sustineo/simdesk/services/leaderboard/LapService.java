@@ -3,7 +3,6 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
-import de.sustineo.simdesk.entities.LapCount;
 import de.sustineo.simdesk.entities.json.kunos.AccSession;
 import de.sustineo.simdesk.entities.mapper.LapMapper;
 import de.sustineo.simdesk.services.converter.LapConverter;
@@ -39,10 +38,6 @@ public class LapService {
     public void insertLapAsync(Lap lap) {
         driverService.upsertDriver(lap.getDriver());
         lapMapper.insert(lap);
-    }
-
-    public List<LapCount> getLapCountsByPlayerId(String playerId) {
-        return lapMapper.findLapCounts(playerId);
     }
 
     public List<Lap> getLapsBySessionAndDrivers(int sessionId, List<String> playerIds) {

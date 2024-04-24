@@ -244,7 +244,6 @@ public class MainLayout extends AppLayout {
     private static Tab[] createDefaultMenuTabs() {
         return new Tab[]{
                 createTab("Home", VaadinIcon.HOME.create(), MainView.class),
-                createTab("Converter", VaadinIcon.REFRESH.create(), ConverterView.class),
         };
     }
 
@@ -252,7 +251,6 @@ public class MainLayout extends AppLayout {
         return new Tab[]{
                 createTab("Lap Times", VaadinIcon.CLOCK.create(), OverallLapTimesView.class),
                 createTab("Sessions", LumoIcon.ORDERED_LIST.create(), SessionView.class),
-                createTab("Drivers", VaadinIcon.USERS.create(), DriverView.class),
         };
     }
 
