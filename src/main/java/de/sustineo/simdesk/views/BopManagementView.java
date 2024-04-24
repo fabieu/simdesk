@@ -99,13 +99,15 @@ public class BopManagementView extends VerticalLayout {
                 .setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.END)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(Bop::getRestrictor);
         Grid.Column<Bop> ballastKgColumn = grid.addColumn(BopRenderer.createBallastKgRenderer())
                 .setHeader("Ballast (kg)")
                 .setAutoWidth(true)
                 .setTextAlign(ColumnTextAlign.END)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(Bop::getBallastKg);
         Grid.Column<Bop> activeColumn = grid.addColumn(Bop::isActive)
                 .setHeader("Active")
                 .setAutoWidth(true)
@@ -120,7 +122,8 @@ public class BopManagementView extends VerticalLayout {
                 .setHeader("Last change")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true);
+                .setSortable(true)
+                .setComparator(Bop::getUpdateDatetime);
         Grid.Column<Bop> editColumn = grid.addComponentColumn(bop -> {
                     Button editButton = new Button("Edit");
                     editButton.addClickListener(e -> {

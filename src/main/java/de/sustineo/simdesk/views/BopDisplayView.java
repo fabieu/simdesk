@@ -126,19 +126,21 @@ public class BopDisplayView extends VerticalLayout {
                     .setAutoWidth(true)
                     .setTextAlign(ColumnTextAlign.END)
                     .setFlexGrow(0)
-                    .setSortable(true);
+                    .setSortable(true)
+                    .setComparator(Bop::getRestrictor);
             grid.addColumn(BopRenderer.createBallastKgRenderer())
                     .setHeader("Ballast")
                     .setAutoWidth(true)
                     .setTextAlign(ColumnTextAlign.END)
                     .setFlexGrow(0)
-                    .setSortable(true);
+                    .setSortable(true)
+                    .setComparator(Bop::getBallastKg);
             grid.addColumn(bop -> FormatUtils.formatDate(bop.getUpdateDatetime()))
                     .setHeader("Last change")
                     .setAutoWidth(true)
                     .setFlexGrow(0)
-                    .setSortable(true);
-
+                    .setSortable(true)
+                    .setComparator(Bop::getUpdateDatetime);
 
             trackLayout.add(header, grid);
             layout.add(trackLayout);
