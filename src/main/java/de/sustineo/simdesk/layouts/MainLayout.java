@@ -315,13 +315,14 @@ public class MainLayout extends AppLayout {
 
     public static Tab[] createEntrylistMenuTabs() {
         return new Tab[]{
-                createTab("Entrylist Validation", VaadinIcon.COG.create(), EntrylistValidatorView.class),
+                createTab("Validator", VaadinIcon.COG.create(), EntrylistValidatorView.class),
         };
     }
 
     public static Tab[] createBopMenuTabs() {
         return new Tab[]{
-                createTab("BoP Editor", VaadinIcon.SCALE.create(), BopEditorView.class),
+                createTab("Overview", VaadinIcon.EYE.create(), BopDisplayView.class),
+                createTab("Editor", VaadinIcon.SCALE.create(), BopEditorView.class),
         };
     }
 

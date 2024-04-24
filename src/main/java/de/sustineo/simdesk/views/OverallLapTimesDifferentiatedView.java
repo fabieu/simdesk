@@ -18,7 +18,7 @@ import de.sustineo.simdesk.entities.enums.CarGroup;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
-import de.sustineo.simdesk.views.filter.FilterUtils;
+import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.simdesk.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.DriverRankingRenderer;
@@ -136,10 +136,10 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
 
         OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setDriverName));
-        headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
-        headerRow.getCell(serverNameColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setServerName));
-        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(FilterUtils.createFilterHeader(overallLapTimesDifferentiatedFilter::setSessionTypeDescription));
+        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setDriverName));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setServerName));
+        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setSessionTypeDescription));
 
         return grid;
     }

@@ -17,7 +17,7 @@ import de.sustineo.simdesk.entities.raceapp.RaceAppSeries;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.raceapp.RaceAppService;
-import de.sustineo.simdesk.views.filter.FilterUtils;
+import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.RaceAppStandingsFilter;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
@@ -103,10 +103,10 @@ public class RaceAppStandingsView extends VerticalLayout implements BeforeEnterO
 
         RaceAppStandingsFilter raceAppStandingsFilter = new RaceAppStandingsFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(teamNameColumn).setComponent(FilterUtils.createFilterHeader(raceAppStandingsFilter::setTeamName));
-        headerRow.getCell(driverNamesColumn).setComponent(FilterUtils.createFilterHeader(raceAppStandingsFilter::setDriverNames));
-        headerRow.getCell(carGroupColumn).setComponent(FilterUtils.createFilterHeader(raceAppStandingsFilter::setCarGroup));
-        headerRow.getCell(carModelColumn).setComponent(FilterUtils.createFilterHeader(raceAppStandingsFilter::setCarModel));
+        headerRow.getCell(teamNameColumn).setComponent(GridFilter.createHeader(raceAppStandingsFilter::setTeamName));
+        headerRow.getCell(driverNamesColumn).setComponent(GridFilter.createHeader(raceAppStandingsFilter::setDriverNames));
+        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createHeader(raceAppStandingsFilter::setCarGroup));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(raceAppStandingsFilter::setCarModel));
 
         return grid;
     }

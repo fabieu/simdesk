@@ -3,7 +3,7 @@ package de.sustineo.simdesk.views.filter;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 
-public class OverallLapTimesFilter {
+public class OverallLapTimesFilter extends GridFilter {
     private final GridListDataView<GroupRanking> dataView;
 
     private String carGroup;
@@ -43,9 +43,5 @@ public class OverallLapTimesFilter {
         boolean matchesCarModelName = matches(groupRanking.getCarModelName(), carModelName);
 
         return matchesCarGroup && matchesTrackName && matchesDriverName && matchesCarModelName;
-    }
-
-    private boolean matches(String value, String searchTerm) {
-        return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
     }
 }

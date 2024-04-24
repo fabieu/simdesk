@@ -7,6 +7,7 @@ import de.sustineo.simdesk.services.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
 import discord4j.discordjson.json.RoleData;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -42,7 +43,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     private final String LOGIN_URL = "/login";
     private final String LOGIN_SUCCESS_URL = "/";
     private final String OAUTH2_PROVIDER_DISCORD = "discord";
-    private final String DISCORD_ROLE_PREFIX = "AST-";
+    private final String DISCORD_ROLE_PREFIX = "SIMDESK-";
+    private final String SPRING_ROLE_PREFIX = "ROLE_";
 
     private final Optional<DiscordService> discordService;
 
@@ -135,8 +137,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
                     // Map the guild roles to Spring Security authorities
                     Set<GrantedAuthority> authorities = userRoles.stream()
-                            .filter(role -> role.name().startsWith(DISCORD_ROLE_PREFIX))
-                            .map(role -> new SimpleGrantedAuthority(role.name().toUpperCase()))
+                            .filter(role -> StringUtils.startsWith(role.name(), DISCORD_ROLE_PREFIX))
+                            .map(role -> new SimpleGrantedAuthority(convertDiscordRoleToSpringRole(role.name())))
                             .collect(Collectors.toSet());
 
                     return new DefaultOAuth2User(authorities, user.getAttributes(), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
@@ -148,5 +150,9 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
             return user;
         });
+    }
+
+    private String convertDiscordRoleToSpringRole(String discordRole) {
+        return SPRING_ROLE_PREFIX + StringUtils.removeStart(discordRole, DISCORD_ROLE_PREFIX);
     }
 }

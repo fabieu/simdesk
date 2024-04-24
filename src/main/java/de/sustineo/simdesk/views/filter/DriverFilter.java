@@ -2,10 +2,8 @@ package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Driver;
-import lombok.Data;
 
-@Data
-public class DriverFilter {
+public class DriverFilter extends GridFilter {
     private final GridListDataView<Driver> dataView;
 
     private String firstName;
@@ -38,9 +36,5 @@ public class DriverFilter {
         boolean matchesShortName = matches(driver.getShortName(), shortName);
 
         return matchesFirstName && matchesLastName && matchesShortName;
-    }
-
-    private boolean matches(String value, String searchTerm) {
-        return searchTerm == null || searchTerm.isEmpty() || value.toLowerCase().contains(searchTerm.toLowerCase());
     }
 }
