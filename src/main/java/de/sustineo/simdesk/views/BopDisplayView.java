@@ -8,11 +8,13 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
@@ -62,6 +64,14 @@ public class BopDisplayView extends VerticalLayout {
 
     private Component createBopGrid() {
         VerticalLayout layout = new VerticalLayout();
+
+        // Disclaimer
+        H3 disclaimer = new H3("Disclaimer: We might use data provided by Low Fuel Motorsport (LFM). The data may be subject to change.");
+        disclaimer.setWidthFull();
+        disclaimer.getStyle()
+                .setColor("var(--lumo-secondary-text-color)")
+                .setTextAlign(Style.TextAlign.CENTER);
+        layout.add(disclaimer);
 
         Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
                 .sorted(bopService.getComparator())
