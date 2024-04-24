@@ -23,7 +23,7 @@ public class Car extends Entity {
         addCarModel(6, "Nissan GT-R Nismo GT3 2018", CarGroup.GT3);
         addCarModel(7, "BMW M6 GT3", CarGroup.GT3);
         addCarModel(8, "Bentley Continental GT3 2018", CarGroup.GT3);
-        addCarModel(9, "Porsche 991II GT3 Cup", CarGroup.CUP);
+        addCarModel(9, "Porsche 991II GT3 Cup", CarGroup.GTC);
         addCarModel(10, "Nissan GT-R Nismo GT3 2017", CarGroup.GT3);
         addCarModel(11, "Bentley Continental GT3 2016", CarGroup.GT3);
         addCarModel(12, "Aston Martin V12 Vantage GT3", CarGroup.GT3);
@@ -32,7 +32,7 @@ public class Car extends Entity {
         addCarModel(15, "Lexus RC F GT3", CarGroup.GT3);
         addCarModel(16, "Lamborghini Huracan Evo (2019)", CarGroup.GT3);
         addCarModel(17, "Honda NSX GT3", CarGroup.GT3);
-        addCarModel(18, "Lamborghini Huracan SuperTrofeo", CarGroup.ST);
+        addCarModel(18, "Lamborghini Huracan SuperTrofeo", CarGroup.GT2);
         addCarModel(19, "Audi R8 LMS Evo (2019)", CarGroup.GT3);
         addCarModel(20, "AMR V8 Vantage (2019)", CarGroup.GT3);
         addCarModel(21, "Honda NSX Evo (2019)", CarGroup.GT3);
@@ -40,10 +40,10 @@ public class Car extends Entity {
         addCarModel(23, "Porsche 911II GT3 R (2019)", CarGroup.GT3);
         addCarModel(24, "Ferrari 488 GT3 Evo 2020", CarGroup.GT3);
         addCarModel(25, "Mercedes-AMG GT3 2020", CarGroup.GT3);
-        addCarModel(26, "Ferrari 488 Challenge Evo", CarGroup.CHL);
+        addCarModel(26, "Ferrari 488 Challenge Evo", CarGroup.GT2);
         addCarModel(27, "BMW M2 CS Racing", CarGroup.TCX);
-        addCarModel(28, "Porsche 911 GT3 Cup (Type 992)", CarGroup.CUP);
-        addCarModel(29, "Lamborghini Huracán Super Trofeo EVO2", CarGroup.ST);
+        addCarModel(28, "Porsche 911 GT3 Cup (Type 992)", CarGroup.GTC);
+        addCarModel(29, "Lamborghini Huracán Super Trofeo EVO2", CarGroup.GT2);
         addCarModel(30, "BMW M4 GT3", CarGroup.GT3);
         addCarModel(31, "Audi R8 LMS GT3 evo II", CarGroup.GT3);
         addCarModel(32, "Ferrari 296 GT3", CarGroup.GT3);
