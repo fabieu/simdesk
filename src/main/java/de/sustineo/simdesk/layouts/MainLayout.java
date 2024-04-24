@@ -3,7 +3,6 @@ package de.sustineo.simdesk.layouts;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
@@ -14,14 +13,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.lumo.Lumo;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.configuration.Reference;
@@ -36,16 +32,12 @@ import org.springframework.boot.info.BuildProperties;
 
 import java.time.Year;
 import java.util.LinkedHashMap;
-import java.util.List;
 import java.util.Optional;
 import java.util.SortedMap;
 
 
 @StyleSheet(value = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap-grid.min.css")
 public class MainLayout extends AppLayout {
-    private static final String DEFAULT_THEME = Lumo.DARK;
-    private static final String SESSION_ATTRIBUTE_THEME = "vaadin.custom.theme";
-
     private final SecurityService securityService;
     private final BuildProperties buildProperties;
     private final String privacyUrl;
@@ -69,11 +61,6 @@ public class MainLayout extends AppLayout {
         createMenuTabs();
         addToDrawer(createDrawerContent());
         setDrawerOpened(false); // Set drawerOpened to ensure smooth animation, will be overridden
-
-        // Read and apply session attributes
-        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_THEME, value -> {
-            setTheme(Optional.ofNullable(value).orElse(DEFAULT_THEME));
-        });
     }
 
     private void createMenuTabs() {
@@ -128,7 +115,7 @@ public class MainLayout extends AppLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.getStyle().set("margin", "0 var(--lumo-space-m)");
 
-        layout.add(createThemeToggleButton(), createUserDetails());
+        layout.add(createUserDetails());
 
         return layout;
     }
@@ -155,50 +142,6 @@ public class MainLayout extends AppLayout {
         }
 
         return layout;
-    }
-
-    private Button createThemeToggleButton() {
-        String currentTheme = getTheme();
-
-        Icon darkThemeIcon = VaadinIcon.MOON_O.create();
-        Icon lightThemeIcon = VaadinIcon.SUN_O.create();
-        String darkThemeLabel = "Enable dark theme";
-        String lightThemeLabel = "Enable light theme";
-        Icon themeButtonIcon = Lumo.DARK.equals(currentTheme) ? lightThemeIcon : darkThemeIcon;
-        String label = Lumo.DARK.equals(currentTheme) ? lightThemeLabel : darkThemeLabel;
-
-        Button themeButton = new Button(themeButtonIcon);
-        themeButton.setTooltipText(label);
-        themeButton.setAriaLabel(label);
-        themeButton.addClickListener(e -> {
-            if (Lumo.DARK.equals(getTheme())) {
-                setTheme(Lumo.LIGHT);
-                themeButton.setIcon(darkThemeIcon);
-                themeButton.setTooltipText(darkThemeLabel);
-                themeButton.setAriaLabel(darkThemeLabel);
-            } else {
-                setTheme(Lumo.DARK);
-                themeButton.setIcon(lightThemeIcon);
-                themeButton.setTooltipText(lightThemeLabel);
-                themeButton.setAriaLabel(lightThemeLabel);
-            }
-        });
-
-        return themeButton;
-    }
-
-    private void setTheme(String theme) {
-        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-        themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));
-        themeList.add(theme);
-
-        WebStorage.setItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_THEME, theme);
-    }
-
-    private String getTheme() {
-        return UI.getCurrent().getElement().getThemeList().stream()
-                .findFirst()
-                .orElse(DEFAULT_THEME);
     }
 
     private Component createDrawerContent() {
