@@ -91,7 +91,7 @@ public class MainLayout extends AppLayout {
         // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        Image logo = new Image("assets/img/logo_full_black.png", "SimDesk Logo");
+        Image logo = new Image("assets/img/logo_full_white.png", "SimDesk Logo");
         logo.setHeight("var(--lumo-size-l)");
         logo.getStyle()
                 .setPaddingRight("var(--lumo-space-s)");
