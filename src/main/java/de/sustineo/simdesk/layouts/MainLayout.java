@@ -64,21 +64,21 @@ public class MainLayout extends AppLayout {
     }
 
     private void createMenuTabs() {
-        menuMap.put("main", createMenuTabs(createDefaultMenuTabs()));
+        menuMap.put("MAIN", createMenuTabs(createDefaultMenuTabs()));
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            menuMap.put("leaderboard", createMenuTabs(MainLayout.createLeaderboardMenuTabs()));
-        }
-
-        if (ProfileManager.isEntrylistProfileEnabled()) {
-            menuMap.put("entrylist", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
+            menuMap.put("LEADERBOARD", createMenuTabs(MainLayout.createLeaderboardMenuTabs()));
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
-            menuMap.put("bop", createMenuTabs(MainLayout.createBopMenuTabs()));
+            menuMap.put("BOP", createMenuTabs(MainLayout.createBopMenuTabs()));
         }
 
-        menuMap.put("external links", createMenuTabs(MainLayout.createExternalMenuTabs()));
+        if (ProfileManager.isEntrylistProfileEnabled()) {
+            menuMap.put("ENTRYLIST", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
+        }
+
+        menuMap.put("EXTERNAL LINKS", createMenuTabs(MainLayout.createExternalMenuTabs()));
     }
 
     private Component createNavbarContent() {
@@ -225,7 +225,7 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createMenuHeader(String title) {
-        Span span = new Span(title.toUpperCase());
+        Span span = new Span(title);
         span.setWidthFull();
         span.getStyle()
                 .setTextAlign(Style.TextAlign.CENTER)
