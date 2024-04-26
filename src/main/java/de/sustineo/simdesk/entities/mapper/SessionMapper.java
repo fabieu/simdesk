@@ -6,7 +6,6 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
-import java.time.Instant;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -40,10 +39,6 @@ public interface SessionMapper {
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM sessions WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);
-
-    @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM sessions WHERE session_datetime > #{untilDatetime} ORDER BY session_datetime DESC")
-    List<Session> findRecentSessions(Instant untilDatetime);
 
     @Insert("""
             INSERT INTO sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory)
