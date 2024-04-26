@@ -85,7 +85,7 @@ public class BopManagementView extends VerticalLayout {
             Bop bop = event.getItem();
             bop.setUsername(authenticatedUsername);
             bop.setUpdateDatetime(Instant.now());
-            bopService.upsert(bop);
+            bopService.update(bop);
         });
 
         Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameById(bop.getTrackId()))

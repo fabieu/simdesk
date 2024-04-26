@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.AccBopEntry;
 import de.sustineo.simdesk.entities.mapper.BopMapper;
+import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.cache.annotation.CacheEvict;
@@ -19,6 +20,7 @@ import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
+@Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Service
 public class BopService {
@@ -65,8 +67,13 @@ public class BopService {
     }
 
     @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
-    public void upsert(Bop bop) {
-        bopMapper.upsert(bop);
+    public void update(Bop bop) {
+        if (bop.getTrackId() == null || bop.getCarId() == null) {
+            log.severe(String.format("Cannot update %s because trackId or carId is null", bop));
+            return;
+        }
+
+        bopMapper.update(bop);
     }
 
     public Comparator<Bop> getComparator() {

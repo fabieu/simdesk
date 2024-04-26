@@ -96,10 +96,6 @@ public class Car extends Entity {
         carModels.put(carId, new Car(carId, carName, carGroup));
     }
 
-    public static Car getCarById(Integer carId) {
-        return carModels.get(carId);
-    }
-
     public static String getCarNameById(Integer carId) {
         return Optional.ofNullable(carModels.get(carId))
                 .map(Car::getCarName)

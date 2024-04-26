@@ -55,14 +55,6 @@ public class FormatUtils {
         return DurationFormatUtils.formatDuration(millis, DRIVE_TIME_FORMAT, true);
     }
 
-    public static String formatPercentage(Double value) {
-        if (value == null) {
-            return Entity.EMPTY;
-        }
-
-        return String.format("%.2f", value * 100) + "%";
-    }
-
     public static String formatDatetime(Instant instant) {
         if (instant == null) {
             return Entity.EMPTY;

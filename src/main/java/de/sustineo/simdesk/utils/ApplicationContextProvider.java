@@ -1,23 +1,17 @@
 package de.sustineo.simdesk.utils;
 
+import lombok.Getter;
+import lombok.Setter;
 import org.springframework.boot.SpringApplication;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Component;
 
 @Component
+@Getter
+@Setter
 public class ApplicationContextProvider implements ApplicationContextAware {
     private ApplicationContext applicationContext;
-
-    @Override
-    public void setApplicationContext(@NonNull ApplicationContext applicationContext) {
-        this.applicationContext = applicationContext;
-    }
-
-    public ApplicationContext getApplicationContext() {
-        return this.applicationContext;
-    }
 
     public <T> T getBean(Class<T> clazz) {
         return this.applicationContext.getBean(clazz);

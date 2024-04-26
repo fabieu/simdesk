@@ -21,10 +21,6 @@ public interface LapMapper {
             @Result(property = "split3Millis", column = "split3_millis"),
             @Result(property = "valid", column = "valid"),
     })
-    @Select("SELECT * FROM laps")
-    List<Lap> findAll();
-
-    @ResultMap("lapResultMap")
     @Select("""
             <script>
             SELECT * FROM laps WHERE session_id = #{sessionId} AND driver_id IN 

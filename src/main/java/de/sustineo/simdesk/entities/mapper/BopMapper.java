@@ -36,10 +36,9 @@ public interface BopMapper {
     void insert(Bop bop);
 
 
-    @Insert("""
-            INSERT INTO bop (track_id, car_id, restrictor, ballast_kg, username, active, update_datetime)
-            VALUES (#{trackId}, #{carId}, #{restrictor}, #{ballastKg}, #{username}, #{active}, #{updateDatetime})
-            ON CONFLICT (track_id, car_id) DO UPDATE SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
+    @Update("""
+            UPDATE bop SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
+            WHERE track_id = #{trackId} AND car_id = #{carId}
             """)
-    void upsert(Bop bop);
+    void update(Bop bop);
 }

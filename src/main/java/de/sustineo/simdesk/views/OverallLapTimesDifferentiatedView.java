@@ -133,6 +133,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
 
         OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();

@@ -26,14 +26,11 @@ import java.util.Optional;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Dashboard")
 @AnonymousAllowed
 public class MainView extends VerticalLayout {
-    private final Optional<SessionService> sessionService;
-    private static final Integer RECENT_SESSION_DAYS = 7;
     private final String communityName;
 
 
     public MainView(@Autowired(required = false) SessionService sessionService,
                     @Value("${simdesk.community.name}") String communityName) {
-        this.sessionService = Optional.ofNullable(sessionService);
         this.communityName = communityName;
 
         setSizeFull();

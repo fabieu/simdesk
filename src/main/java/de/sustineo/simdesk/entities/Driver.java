@@ -22,22 +22,6 @@ public class Driver extends Entity {
     private Long driveTimeMillis;
     private Instant lastActivity;
 
-    public Double getValidLapsPercentage() {
-        if (validLapsCount == null || getTotalLapsCount() == null || getTotalLapsCount() <= 0) {
-            return 0.0;
-        }
-
-        return (double) validLapsCount / (double) getTotalLapsCount();
-    }
-
-    public Integer getTotalLapsCount() {
-        if (validLapsCount == null || invalidLapsCount == null) {
-            return 0;
-        }
-
-        return validLapsCount + invalidLapsCount;
-    }
-
     public String getFullName() {
         if (firstName == null || lastName == null) {
             return UNKNOWN;
