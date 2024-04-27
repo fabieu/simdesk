@@ -20,6 +20,38 @@ import java.time.Duration;
 public class NotificationService {
     private static final Duration DEFAULT_NOTIFICATION_DURATION = Duration.ofSeconds(5);
 
+    public void showSuccessNotification(String successMessage) {
+        showSuccessNotification(DEFAULT_NOTIFICATION_DURATION, successMessage);
+    }
+
+    public void showSuccessNotification(Duration duration, String successMessage) {
+        showSuccessNotification(duration, new Text(successMessage));
+    }
+
+    public void showSuccessNotification(Component... components) {
+        showSuccessNotification(DEFAULT_NOTIFICATION_DURATION, components);
+    }
+
+    public void showSuccessNotification(Duration duration, Component... components) {
+        showNotification(NotificationType.SUCCESS, duration, components);
+    }
+
+    public void showWarningNotification(String warningMessage) {
+        showWarningNotification(DEFAULT_NOTIFICATION_DURATION, warningMessage);
+    }
+
+    public void showWarningNotification(Duration duration, String warningMessage) {
+        showWarningNotification(duration, new Text(warningMessage));
+    }
+
+    public void showWarningNotification(Component... components) {
+        showWarningNotification(DEFAULT_NOTIFICATION_DURATION, components);
+    }
+
+    public void showWarningNotification(Duration duration, Component... components) {
+        showNotification(NotificationType.SUCCESS, duration, components);
+    }
+
     public void showErrorNotification(String errorMessage) {
         showErrorNotification(DEFAULT_NOTIFICATION_DURATION, errorMessage);
     }
@@ -36,20 +68,20 @@ public class NotificationService {
         showNotification(NotificationType.ERROR, duration, components);
     }
 
-    public void showSuccessNotification(String successMessage) {
-        showSuccessNotification(DEFAULT_NOTIFICATION_DURATION, successMessage);
+    public void showInfoNotification(String infoMessage) {
+        showInfoNotification(DEFAULT_NOTIFICATION_DURATION, infoMessage);
     }
 
-    public void showSuccessNotification(Duration duration, String successMessage) {
-        showSuccessNotification(duration, new Text(successMessage));
+    public void showInfoNotification(Duration duration, String infoMessage) {
+        showInfoNotification(duration, new Text(infoMessage));
     }
 
-    public void showSuccessNotification(Component... components) {
-        showSuccessNotification(DEFAULT_NOTIFICATION_DURATION, components);
+    public void showInfoNotification(Component... components) {
+        showInfoNotification(DEFAULT_NOTIFICATION_DURATION, components);
     }
 
-    public void showSuccessNotification(Duration duration, Component... components) {
-        showNotification(NotificationType.SUCCESS, duration, components);
+    public void showInfoNotification(Duration duration, Component... components) {
+        showNotification(NotificationType.INFO, duration, components);
     }
 
     private void showNotification(NotificationType notificationType, Duration duration, Component... components) {
