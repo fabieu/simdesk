@@ -45,7 +45,7 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/overview", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "BoP - Overview")
+@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends VerticalLayout {
     private final BopService bopService;

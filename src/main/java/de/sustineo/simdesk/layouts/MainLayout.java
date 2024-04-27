@@ -6,7 +6,6 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.dependency.StyleSheet;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -36,7 +35,6 @@ import java.util.Optional;
 import java.util.SortedMap;
 
 
-@StyleSheet(value = "https://cdn.jsdelivr.net/npm/bootstrap@5.3.1/dist/css/bootstrap-grid.min.css")
 public class MainLayout extends AppLayout {
     private final SecurityService securityService;
     private final BuildProperties buildProperties;
@@ -71,7 +69,7 @@ public class MainLayout extends AppLayout {
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
-            menuMap.put("BOP", createMenuTabs(MainLayout.createBopMenuTabs()));
+            menuMap.put("BALANCE OF PERFORMANCE", createMenuTabs(MainLayout.createBopMenuTabs()));
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
@@ -103,8 +101,9 @@ public class MainLayout extends AppLayout {
         // The title will be set after navigation.
         viewTitle = new H1();
         viewTitle.getStyle()
-                .set("font-size", "var(--lumo-font-size-l)")
-                .set("margin", "0");
+                .setColor("var(--lumo-header-text-color)")
+                .setFontSize("var(--lumo-font-size-l)")
+                .setMargin("0");
 
         layout.add(logoRouter, viewTitle);
 

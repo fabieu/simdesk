@@ -3,8 +3,10 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.TabVariant;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -16,10 +18,7 @@ import de.sustineo.simdesk.services.leaderboard.SessionService;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
 
-import java.util.ArrayList;
-import java.util.Arrays;
-import java.util.List;
-import java.util.Optional;
+import java.util.*;
 
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "/home", layout = MainLayout.class)
@@ -37,9 +36,7 @@ public class MainView extends VerticalLayout {
         setPadding(false);
 
         add(createHeader());
-        add(createNavigationTabs());
-
-        addAndExpand(createMainContent());
+        addAndExpand(createMainMenu());
     }
 
     private Component createHeader() {
@@ -52,48 +49,39 @@ public class MainView extends VerticalLayout {
         return header;
     }
 
-    private Component createNavigationTabs() {
-        List<Tab> tabs = new ArrayList<>();
-        if (ProfileManager.isLeaderboardProfileEnabled()) {
-            tabs.addAll(Arrays.stream(MainLayout.createLeaderboardMenuTabs()).toList());
-        }
+    private Component createMainMenu() {
+        Map<String, List<Tab>> categories = new LinkedHashMap<>();
 
-        if (ProfileManager.isEntrylistProfileEnabled()) {
-            tabs.addAll(Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
+        if (ProfileManager.isLeaderboardProfileEnabled()) {
+            categories.put("Leaderboard", Arrays.stream(MainLayout.createLeaderboardMenuTabs()).toList());
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
-            tabs.addAll(Arrays.stream(MainLayout.createBopMenuTabs()).toList());
+            categories.put("Balance of Performance", Arrays.stream(MainLayout.createBopMenuTabs()).toList());
         }
 
-        // Add custom styling to navigation tabs
-        List<Div> tabDivs = new ArrayList<>();
-        for (Tab tab : tabs) {
-            Div tabDiv = new Div();
-            tabDiv.addClassNames("col-12", "col-md-6", "col-lg-3");
-            tabDiv.add(tab);
-
-            tabDivs.add(tabDiv);
+        if (ProfileManager.isEntrylistProfileEnabled()) {
+            categories.put("Entrylist", Arrays.stream(MainLayout.createEntrylistMenuTabs()).toList());
         }
 
-        Div container = new Div();
-        container.addClassNames("container-fluid");
+        Div menuContainer = new Div();
+        menuContainer.addClassNames("home-menu-container", "pure-g");
 
-        final Div row = new Div();
-        row.setId("home-tabs");
-        row.addClassNames("row", "g-3");
-        row.setWidthFull();
-        row.add(tabDivs.toArray(new Div[0]));
-        container.add(row);
+        for (Map.Entry<String, List<Tab>> entry : categories.entrySet()) {
+            Div menuCategory = new Div();
+            menuCategory.addClassNames("home-menu-category", "pure-u-1", String.format("pure-u-md-1-%s", (int) Math.ceil((double) categories.size() / 2)), String.format("pure-u-lg-1-%s", categories.size()));
 
-        return container;
-    }
+            menuCategory.add(new H3(entry.getKey()));
 
-    private Component createMainContent() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.getStyle().set("padding-bottom", "3rem");
+            for (Tab tab : entry.getValue()) {
+                tab.addClassName("home-menu-tab");
+                tab.addThemeVariants(TabVariant.LUMO_ICON_ON_TOP);
+                menuCategory.add(tab);
+            }
 
-        return layout;
+            menuContainer.add(menuCategory);
+        }
+
+        return menuContainer;
     }
 }

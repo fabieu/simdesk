@@ -3,8 +3,8 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 30vh;
-    background-color: var(--lumo-primary-contrast-color);
+    min-height: 20vh;
+    background-color: black;
 }
 
 #home-header h1 {
@@ -13,36 +13,35 @@
     text-align: center;
 }
 
-#home-tabs vaadin-tab {
+.home-menu-container {
+    display: flex;
+    flex-direction: column;
+    justify-content: start;
+    width: 100%;
+}
+
+.home-menu-category {
+    text-align: center;
+}
+
+.home-menu-tab {
     color: var(--lumo-primary-contrast-color);
     background-color: var(--lumo-primary-color);
-    border: 1px solid var(--lumo-primary-color);
-}
-
-#home-tabs vaadin-tab:hover {
-    color: var(--lumo-body-text-color);
-    background-color: var(--lumo-base-color);
-}
-
-#home-stats .stats-box {
-    border: 2px solid var(--lumo-primary-color);
+    border: 3px solid var(--lumo-primary-color);
     margin: var(--lumo-space-m);
-    padding: 0;
+    padding: var(--lumo-space-xl);
 }
 
-#home-stats .stats-title {
-    width: 100%;
+.home-menu-tab:hover {
     color: var(--lumo-primary-color);
     background-color: var(--lumo-primary-contrast-color);
-    border-bottom: 2px solid var(--lumo-primary-color);
-    font-weight: bold;
-    text-align: center;
-    margin: 0;
-    padding: var(--lumo-space-s) 0;
 }
 
-#home-stats .stats-value {
-    text-align: center;
-    margin: 0;
+.home-menu-tab vaadin-icon {
+    font-size: 1.5em;
+}
+
+.home-menu-tab a {
     padding: var(--lumo-space-m) 0;
+    font-size: 1.3em;
 }

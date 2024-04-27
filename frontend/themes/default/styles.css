@@ -7,18 +7,12 @@
 @import "assets/fontawesome/brands.min.css";
 @import "assets/fontawesome/solid.min.css";
 @import "assets/fontawesome/regular.min.css";
+@import "assets/purecss/pure-min.css";
+@import "assets/purecss/grids-responsive-min.css";
 
 html {
     --weather-sunny-color: #ffb600;
     --weather-rainy-color: #00aeff;
-}
-
-[theme~="light"] {
-    --lumo-primary-color-10pct: hsla(46, 95%, 45%, 0.2);
-    --lumo-primary-color-50pct: hsla(46, 95%, 60%, 0.59);
-    --lumo-primary-color: hsl(46, 95%, 58%);
-    --lumo-primary-text-color: hsl(46, 95%, 45%);
-    --lumo-primary-contrast-color: hsl(0, 0%, 5%);
 }
 
 [theme~="dark"] {
@@ -27,7 +21,7 @@ html {
     --lumo-primary-color-50pct: hsla(46, 95%, 60%, 0.59);
     --lumo-primary-color: hsl(46, 95%, 58%);
     --lumo-primary-text-color: hsl(46, 95%, 58%);
-    --lumo-primary-contrast-color: hsl(0, 0%, 5%);
+    --lumo-primary-contrast-color: hsl(0, 0%, 10%);
 }
 
 .noselect {
