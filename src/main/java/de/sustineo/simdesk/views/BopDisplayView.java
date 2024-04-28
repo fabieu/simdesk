@@ -74,7 +74,7 @@ public class BopDisplayView extends VerticalLayout {
                 .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
         // Disclaimer
-        H3 disclaimer = new H3("Disclaimer: We might use data provided by Low Fuel Motorsport (LFM). The data may be subject to change.");
+        H3 disclaimer = new H3("Disclaimer: We use data provided by Low Fuel Motorsport (LFM) and pitskill.io (PitBoP). The data is subject to change.");
         disclaimer.setWidthFull();
         disclaimer.getStyle()
                 .setColor("var(--lumo-secondary-text-color)")
