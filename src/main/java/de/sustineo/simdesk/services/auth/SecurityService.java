@@ -2,12 +2,15 @@ package de.sustineo.simdesk.services.auth;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
+import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.mapper.UserMapper;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
@@ -51,7 +54,10 @@ public class SecurityService {
 
     public Optional<UserPrincipal> getAuthenticatedUser() {
         SecurityContext context = SecurityContextHolder.getContext();
-        Object principal = context.getAuthentication().getPrincipal();
+        Object principal = Optional.ofNullable(context)
+                .map(SecurityContext::getAuthentication)
+                .map(Authentication::getPrincipal)
+                .orElse(null);
 
         if (principal instanceof UserPrincipal) {
             return Optional.of((UserPrincipal) principal);
@@ -62,6 +68,24 @@ public class SecurityService {
         }
 
         return Optional.empty(); // Anonymous or no authentication
+    }
+
+    public boolean hasAnyRole(String... roles) {
+        Optional<UserPrincipal> user = getAuthenticatedUser();
+
+        if (user.isEmpty()) {
+            return false;
+        }
+
+        for (GrantedAuthority authority : user.get().getAuthorities()) {
+            for (String role : roles) {
+                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role)) {
+                    return true;
+                }
+            }
+        }
+
+        return false;
     }
 
     public void logout() {

@@ -17,37 +17,41 @@ import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
-import com.vaadin.flow.theme.lumo.LumoIcon;
-import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.menu.MenuItem;
+import de.sustineo.simdesk.entities.menu.MenuItemCategory;
+import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.utils.ApplicationContextProvider;
-import de.sustineo.simdesk.views.*;
+import de.sustineo.simdesk.views.ComponentUtils;
+import de.sustineo.simdesk.views.LoginView;
+import de.sustineo.simdesk.views.MainView;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
 import java.time.Year;
-import java.util.LinkedHashMap;
-import java.util.Optional;
-import java.util.SortedMap;
+import java.util.*;
 
 
 public class MainLayout extends AppLayout {
     private final SecurityService securityService;
+    private final MenuService menuService;
     private final BuildProperties buildProperties;
     private final String privacyUrl;
     private final String impressumUrl;
-    private static final LinkedHashMap<String, Tabs> menuMap = new LinkedHashMap<>();
+    private static final LinkedHashMap<MenuItemCategory, Tabs> menuMap = new LinkedHashMap<>();
     private H1 viewTitle;
 
     public MainLayout(SecurityService securityService,
+                      MenuService menuService,
                       ApplicationContextProvider applicationContextProvider,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
+        this.menuService = menuService;
         this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
@@ -62,21 +66,27 @@ public class MainLayout extends AppLayout {
     }
 
     private void createMenuTabs() {
-        menuMap.put("MAIN", createMenuTabs(createDefaultMenuTabs()));
+        Map<MenuItemCategory, List<MenuItem>> menuItemMap = menuService.getItemsByCategory();
 
-        if (ProfileManager.isLeaderboardProfileEnabled()) {
-            menuMap.put("LEADERBOARD", createMenuTabs(MainLayout.createLeaderboardMenuTabs()));
+        for (Map.Entry<MenuItemCategory, List<MenuItem>> entry : menuItemMap.entrySet()) {
+            final Tabs tabs = new Tabs();
+            tabs.setOrientation(Tabs.Orientation.VERTICAL);
+
+            for (MenuItem item : entry.getValue()) {
+                switch (item.getType()) {
+                    case INTERNAL -> {
+                        Tab tab = createTab(item.getName(), item.getIcon(), item.getNavigationTarget());
+                        tabs.add(tab);
+                    }
+                    case EXTERNAL -> {
+                        Tab tab = createExternalTab(item.getName(), item.getIcon(), item.getHref());
+                        tabs.add(tab);
+                    }
+                }
+            }
+
+            menuMap.put(entry.getKey(), tabs);
         }
-
-        if (ProfileManager.isBopProfileEnabled()) {
-            menuMap.put("BALANCE OF PERFORMANCE", createMenuTabs(MainLayout.createBopMenuTabs()));
-        }
-
-        if (ProfileManager.isEntrylistProfileEnabled()) {
-            menuMap.put("ENTRYLIST", createMenuTabs(MainLayout.createEntrylistMenuTabs()));
-        }
-
-        menuMap.put("EXTERNAL LINKS", createMenuTabs(MainLayout.createExternalMenuTabs()));
     }
 
     private Component createNavbarContent() {
@@ -156,8 +166,8 @@ public class MainLayout extends AppLayout {
         menuLayout.setSpacing(false);
 
         int menuMapCounter = 0;
-        for (SortedMap.Entry<String, Tabs> entry : menuMap.entrySet()) {
-            menuLayout.add(createMenuHeader(entry.getKey()));
+        for (SortedMap.Entry<MenuItemCategory, Tabs> entry : menuMap.entrySet()) {
+            menuLayout.add(createMenuHeader(entry.getKey().getName()));
             menuLayout.add(entry.getValue());
 
             if (menuMapCounter < menuMap.size() - 1) {
@@ -233,45 +243,6 @@ public class MainLayout extends AppLayout {
         return span;
     }
 
-    private Tabs createMenuTabs(Tab[] tabEntries) {
-        final Tabs tabs = new Tabs();
-        tabs.setOrientation(Tabs.Orientation.VERTICAL);
-        tabs.add(tabEntries);
-        return tabs;
-    }
-
-    private static Tab[] createDefaultMenuTabs() {
-        return new Tab[]{
-                createTab("Home", VaadinIcon.HOME.create(), MainView.class),
-        };
-    }
-
-    public static Tab[] createLeaderboardMenuTabs() {
-        return new Tab[]{
-                createTab("Lap Times", VaadinIcon.CLOCK.create(), OverallLapTimesView.class),
-                createTab("Sessions", LumoIcon.ORDERED_LIST.create(), SessionView.class),
-        };
-    }
-
-    public static Tab[] createEntrylistMenuTabs() {
-        return new Tab[]{
-                createTab("Validator", VaadinIcon.COG.create(), EntrylistValidatorView.class),
-        };
-    }
-
-    public static Tab[] createBopMenuTabs() {
-        return new Tab[]{
-                createTab("Overview", VaadinIcon.EYE.create(), BopDisplayView.class),
-                createTab("Editor", VaadinIcon.SCALE.create(), BopEditorView.class),
-        };
-    }
-
-    private static Tab[] createExternalMenuTabs() {
-        return new Tab[]{
-                createExternalTab("Feedback", VaadinIcon.COMMENT.create(), Reference.FEEDBACK),
-        };
-    }
-
     private static Tab createTab(String text, Icon icon, Class<? extends Component> navigationTarget) {
         final Tab tab = new Tab();
         tab.add(icon, new RouterLink(text, navigationTarget));
@@ -298,18 +269,18 @@ public class MainLayout extends AppLayout {
         super.afterNavigation();
 
         if (getContent() != null) {
-            for (Tabs menu : menuMap.values()) {
-                menu.getChildren()
+            for (Tabs tabs : menuMap.values()) {
+                tabs.getChildren()
                         .filter(tab -> getContent().getClass().equals(ComponentUtil.getData(tab, Class.class)))
                         .findFirst()
                         .map(Tab.class::cast)
-                        .ifPresentOrElse(menu::setSelectedTab, () -> menu.setSelectedTab(null));
+                        .ifPresentOrElse(tabs::setSelectedTab, () -> tabs.setSelectedTab(null));
             }
 
             viewTitle.setText(StringUtils.removeStart(getCurrentPageTitle(), VaadinConfiguration.APPLICATION_NAME_PREFIX));
         } else {
-            for (Tabs menu : menuMap.values()) {
-                menu.setSelectedTab(null);
+            for (Tabs tabs : menuMap.values()) {
+                tabs.setSelectedTab(null);
             }
         }
 
@@ -320,5 +291,4 @@ public class MainLayout extends AppLayout {
     private String getCurrentPageTitle() {
         return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
-
 }

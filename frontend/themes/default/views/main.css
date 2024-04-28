@@ -3,13 +3,13 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 20vh;
+    min-height: 30vh;
     background-color: black;
 }
 
 #home-header h1 {
     color: var(--lumo-primary-color);
-    font-size: 4em;
+    font-size: 4rem;
     text-align: center;
 }
 
@@ -24,24 +24,22 @@
     text-align: center;
 }
 
-.home-menu-tab {
+.home-menu-button {
+    font-size: 1.2rem;
     color: var(--lumo-primary-contrast-color);
     background-color: var(--lumo-primary-color);
     border: 3px solid var(--lumo-primary-color);
+    display: block;
     margin: var(--lumo-space-m);
-    padding: var(--lumo-space-xl);
+    padding: 4rem;
 }
 
-.home-menu-tab:hover {
+.home-menu-button:hover {
     color: var(--lumo-primary-color);
     background-color: var(--lumo-primary-contrast-color);
+    cursor: pointer;
 }
 
-.home-menu-tab vaadin-icon {
-    font-size: 1.5em;
-}
-
-.home-menu-tab a {
-    padding: var(--lumo-space-m) 0;
-    font-size: 1.3em;
+.home-menu-button vaadin-icon {
+    font-size: 1.5rem;
 }

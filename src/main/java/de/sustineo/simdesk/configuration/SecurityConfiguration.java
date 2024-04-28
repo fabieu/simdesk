@@ -40,11 +40,11 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             "/public/**",
             "/assets/**",
     };
-    private final String LOGIN_URL = "/login";
-    private final String LOGIN_SUCCESS_URL = "/";
-    private final String OAUTH2_PROVIDER_DISCORD = "discord";
-    private final String DISCORD_ROLE_PREFIX = "SIMDESK-";
-    private final String SPRING_ROLE_PREFIX = "ROLE_";
+    private static final String LOGIN_URL = "/login";
+    private static final String LOGIN_SUCCESS_URL = "/";
+    private static final String OAUTH2_PROVIDER_DISCORD = "discord";
+    public static final String DISCORD_ROLE_PREFIX = "SIMDESK-";
+    public static final String SPRING_ROLE_PREFIX = "ROLE_";
 
     private final Optional<DiscordService> discordService;
 
