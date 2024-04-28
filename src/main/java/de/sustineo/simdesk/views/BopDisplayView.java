@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views;
 
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -14,6 +15,7 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -50,6 +52,8 @@ import java.util.stream.Collectors;
 public class BopDisplayView extends VerticalLayout {
     private final BopService bopService;
     private final JsonUtils jsonUtils;
+    private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
+    private final List<H2> trackTitles = new ArrayList<>();
 
     public BopDisplayView(BopService bopService, JsonUtils jsonUtils) {
         this.bopService = bopService;
@@ -65,6 +69,10 @@ public class BopDisplayView extends VerticalLayout {
     private Component createBopGrid() {
         VerticalLayout layout = new VerticalLayout();
 
+        Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
+                .sorted(bopService.getComparator())
+                .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
+
         // Disclaimer
         H3 disclaimer = new H3("Disclaimer: We might use data provided by Low Fuel Motorsport (LFM). The data may be subject to change.");
         disclaimer.setWidthFull();
@@ -73,12 +81,29 @@ public class BopDisplayView extends VerticalLayout {
                 .setTextAlign(Style.TextAlign.CENTER);
         layout.add(disclaimer);
 
-        Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
-                .sorted(bopService.getComparator())
-                .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
+        // Track selection
+        HorizontalLayout trackSelectionLayout = new HorizontalLayout();
+        trackSelectionLayout.setWidthFull();
+        trackSelectionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        Select<String> trackSelect = new Select<>();
+        trackSelect.setWidthFull();
+        trackSelect.setPlaceholder("Jump to track");
+        trackSelect.addValueChangeListener(event -> {
+            if (event.getValue() != null) {
+                trackTitles.stream()
+                        .filter(h2 -> event.getValue().equals(h2.getText()))
+                        .findFirst()
+                        .ifPresent(h2 -> h2.scrollIntoView(scrollOptions));
+            }
+        });
+        trackSelectionLayout.add(trackSelect);
+
+        layout.add(trackSelectionLayout, ComponentUtils.createSpacer());
 
         for (Map.Entry<String, Set<Bop>> entry : bopsByTrack.entrySet()) {
             VerticalLayout trackLayout = new VerticalLayout();
+            trackLayout.setPadding(false);
 
             StreamResource bopResource = new StreamResource(
                     String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())),
@@ -98,6 +123,7 @@ public class BopDisplayView extends VerticalLayout {
 
             // Header
             H2 trackTitle = new H2(Track.getTrackNameById(entry.getKey()));
+            trackTitles.add(trackTitle);
 
             Anchor downloadAnchor = new Anchor(bopResource, "");
             downloadAnchor.getElement().setAttribute("download", true);
@@ -142,9 +168,13 @@ public class BopDisplayView extends VerticalLayout {
                     .setSortable(true)
                     .setComparator(Bop::getUpdateDatetime);
 
-            trackLayout.add(header, grid);
+            trackLayout.add(header, grid, ComponentUtils.createSpacer());
             layout.add(trackLayout);
         }
+
+        trackSelect.setItems(trackTitles.stream()
+                .map(H2::getText)
+                .collect(Collectors.toList()));
 
         return layout;
     }
