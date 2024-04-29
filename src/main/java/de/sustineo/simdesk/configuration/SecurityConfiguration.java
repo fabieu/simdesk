@@ -2,7 +2,6 @@ package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import de.sustineo.simdesk.entities.json.discord.Guild;
 import de.sustineo.simdesk.services.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
 import discord4j.discordjson.json.RoleData;
@@ -77,11 +76,13 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         if (ProfileManager.isOAuth2ProfileEnabled()) {
             http
                     .oauth2Login(oauth2 -> oauth2
-                            .loginPage("/login/oauth").permitAll()
+                            .loginPage("/login/oauth")
+                            .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
+                            .failureUrl("/login?oauth-error")
+                            .permitAll()
                             .authorizationEndpoint(authorization -> authorization
                                     .baseUri("/login/oauth2/authorization")
                             )
-                            .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
                     );
         }
         super.configure(http);
@@ -116,24 +117,15 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             OAuth2User user = delegate.loadUser(request);
 
             if (OAUTH2_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
-                Optional<Long> userId = Optional.ofNullable(user.getAttribute("id")).map(o -> Long.parseLong((String) o));
-                if (userId.isEmpty()) {
+                Optional<Long> memberId = Optional.ofNullable(user.getAttribute("id")).map(o -> Long.parseLong((String) o));
+                if (memberId.isEmpty()) {
                     log.severe("Failed to find id attribute for user: " + user.getName());
                     return user;
                 }
 
                 try {
-                    String guildId = discordService.get().getGuildId();
-
-                    // Check if the user is a member of the provided guild
-                    List<Guild> userGuilds = discordService.get().getGuildsOfCurrentUser(request.getAccessToken().getTokenValue());
-                    if (userGuilds.stream().noneMatch(guild -> guildId.equals(guild.getId()))) {
-                        log.warning(String.format("OAuth2 failed - User %s is not a member of the provided guild", user.getName()));
-                        throw new OAuth2AuthenticationException(new OAuth2Error("invalid_user", "User is not a member of the required guild", ""));
-                    }
-
                     // Get the roles of the user from the Discord bot installed in the guild
-                    List<RoleData> userRoles = discordService.get().getRolesOfMember(userId.get());
+                    List<RoleData> userRoles = discordService.get().getRolesOfMember(memberId.get());
 
                     // Map the guild roles to Spring Security authorities
                     Set<GrantedAuthority> authorities = userRoles.stream()

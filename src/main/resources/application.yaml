@@ -98,7 +98,6 @@ spring:
             authorizationGrantType: authorization_code
             scope:
               - identify
-              - guilds
             redirectUri: "{baseUrl}/login/oauth2/code/discord"
         provider:
           discord:
