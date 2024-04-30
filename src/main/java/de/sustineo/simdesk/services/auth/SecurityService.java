@@ -4,7 +4,7 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.entities.mapper.UserMapper;
+import de.sustineo.simdesk.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -18,6 +18,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
 
@@ -25,20 +26,20 @@ import java.util.UUID;
 @Service
 public class SecurityService {
     private static final String LOGOUT_SUCCESS_URL = "/";
+    public static final String DISCORD_CDN_AVATARS_URL = "https://cdn.discordapp.com/avatars";
+
+    private final UserService userService;
+    private final PasswordEncoder passwordEncoder;
 
     @Value("${simdesk.auth.admin.username}")
     private String adminUsername;
-
     @Value("${simdesk.auth.admin.password}")
     private String adminPassword;
 
-    private final PasswordEncoder passwordEncoder;
-    private final UserMapper userMapper;
-
-    public SecurityService(PasswordEncoder passwordEncoder,
-                           UserMapper userMapper) {
+    public SecurityService(UserService userService,
+                           PasswordEncoder passwordEncoder) {
+        this.userService = userService;
         this.passwordEncoder = passwordEncoder;
-        this.userMapper = userMapper;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -49,7 +50,7 @@ public class SecurityService {
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userMapper.insert(adminUsername, passwordEncoder.encode(adminPassword));
+        userService.insertUser(adminUsername, passwordEncoder.encode(adminPassword));
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {
@@ -92,5 +93,26 @@ public class SecurityService {
         UI.getCurrent().getPage().setLocation(LOGOUT_SUCCESS_URL);
         SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
         logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
+    }
+
+
+    public Optional<String> getAvatarUrl() {
+        Optional<UserPrincipal> user = getAuthenticatedUser();
+
+        if (user.isEmpty()) {
+            return Optional.empty();
+        }
+
+        Map<String, Object> userAttributes = user.get().getAttributes();
+
+        // Discord avatar
+        String avatarId = (String) userAttributes.get("avatar");
+        String userId = (String) userAttributes.get("id");
+
+        if (avatarId == null || userId == null) {
+            return Optional.empty();
+        }
+
+        return Optional.of(DISCORD_CDN_AVATARS_URL + "/" + userId + "/" + avatarId);
     }
 }

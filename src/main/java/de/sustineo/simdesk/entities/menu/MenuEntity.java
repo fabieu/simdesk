@@ -10,9 +10,9 @@ import org.apache.commons.lang3.ObjectUtils;
 
 @Getter
 @Builder(access = AccessLevel.PRIVATE)
-public class MenuItem {
-    private MenuItemType type;
-    private MenuItemCategory category;
+public class MenuEntity {
+    private MenuEntityType type;
+    private MenuEntityCategory category;
     private String name;
     @Getter(AccessLevel.NONE)
     private IconFactory iconFactory;
@@ -23,24 +23,24 @@ public class MenuItem {
         return iconFactory.create();
     }
 
-    public MenuItemType getType() {
+    public MenuEntityType getType() {
         if (ObjectUtils.allNotNull(navigationTarget, href)) {
-            throw new IllegalStateException("MenuItem cannot have both navigation target and href");
+            throw new IllegalStateException("MenuEntity cannot have both navigation target and href");
         }
 
         if (navigationTarget != null) {
-            return MenuItemType.INTERNAL;
+            return MenuEntityType.INTERNAL;
         }
 
         if (href != null) {
-            return MenuItemType.EXTERNAL;
+            return MenuEntityType.EXTERNAL;
         }
 
-        return MenuItemType.UNDEFINED;
+        return MenuEntityType.UNDEFINED;
     }
 
-    public static MenuItem of(MenuItemCategory category, String name, IconFactory iconFactory, Class<? extends Component> navigationTarget) {
-        return MenuItem.builder()
+    public static MenuEntity of(MenuEntityCategory category, String name, IconFactory iconFactory, Class<? extends Component> navigationTarget) {
+        return MenuEntity.builder()
                 .category(category)
                 .name(name)
                 .iconFactory(iconFactory)
@@ -48,8 +48,8 @@ public class MenuItem {
                 .build();
     }
 
-    public static MenuItem of(MenuItemCategory category, String name, IconFactory iconFactory, String href) {
-        return MenuItem.builder()
+    public static MenuEntity of(MenuEntityCategory category, String name, IconFactory iconFactory, String href) {
+        return MenuEntity.builder()
                 .category(category)
                 .name(name)
                 .iconFactory(iconFactory)

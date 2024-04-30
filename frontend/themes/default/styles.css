@@ -1,9 +1,11 @@
 /* Import your application global css files here or add the styles directly to this file */
 @import "component-styles/grid.css";
 @import "component-styles/dialog.css";
+@import "component-styles/menu-bar.css";
 @import "views/main.css";
 @import "views/error.css";
 @import "views/login.css";
+@import "views/permit.css";
 @import "assets/fontawesome/fontawesome.min.css";
 @import "assets/fontawesome/brands.min.css";
 @import "assets/fontawesome/solid.min.css";
@@ -31,4 +33,43 @@ html {
     -moz-user-select: none; /* Old versions of Firefox */
     -ms-user-select: none; /* Internet Explorer/Edge */
     user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+hr.spacer {
+    margin: var(--lumo-space-s) calc(var(--lumo-border-radius-m) / 2);
+    border-top: 1px solid var(--lumo-contrast-10pct);
+}
+
+.container {
+    padding-right: 15px;
+    padding-left: 15px;
+    margin-right: auto;
+    margin-left: auto;
+    padding: var(--lumo-space-m);
+}
+
+@media (min-width: 768px) {
+    .container {
+        width: 750px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        width: 970px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1170px;
+    }
+}
+
+.container > h2 {
+    padding: var(--lumo-space-m);
+}
+
+.bg-light {
+    background-color: var(--lumo-contrast-5pct);
 }
