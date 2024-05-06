@@ -61,8 +61,6 @@ public class BopEditorView extends VerticalLayout {
 
     private final ValidationService validationService;
     private final NotificationService notificationService;
-    private final JsonUtils jsonUtils;
-
 
     private final FormLayout settingsLayout = new FormLayout();
     private final FormLayout carsLayout = new FormLayout();
@@ -73,11 +71,9 @@ public class BopEditorView extends VerticalLayout {
     private AccBop currentBop = new AccBop();
 
     public BopEditorView(ValidationService validationService,
-                         NotificationService notificationService,
-                         JsonUtils jsonUtils) {
+                         NotificationService notificationService) {
         this.validationService = validationService;
         this.notificationService = notificationService;
-        this.jsonUtils = jsonUtils;
 
         setId("bop-editor-view");
         setSizeFull();
@@ -109,7 +105,7 @@ public class BopEditorView extends VerticalLayout {
             InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
 
             try {
-                currentBop = jsonUtils.fromJson(fileData, AccBop.class);
+                currentBop = JsonUtils.fromJson(fileData, AccBop.class);
                 validationService.validate(currentBop);
 
                 if (currentBop.isMultiTrack()) {
@@ -276,7 +272,7 @@ public class BopEditorView extends VerticalLayout {
                 "bop.json",
                 () -> {
                     try {
-                        return new ByteArrayInputStream(jsonUtils.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
+                        return new ByteArrayInputStream(JsonUtils.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
                     } catch (JsonProcessingException e) {
                         String errorMessage = "Failed to create download resource for BoP file";
                         notificationService.showErrorNotification(errorMessage);
@@ -297,7 +293,7 @@ public class BopEditorView extends VerticalLayout {
 
     private void reloadComponents() {
         try {
-            previewTextArea.setValue(jsonUtils.toJsonPretty(currentBop));
+            previewTextArea.setValue(JsonUtils.toJsonPretty(currentBop));
             carsLayout.removeAll();
             carsLayout.add(currentCarComponents.values());
         } catch (JsonProcessingException e) {

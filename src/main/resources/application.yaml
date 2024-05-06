@@ -18,6 +18,10 @@ spring:
       max-request-size: 10MB
   main:
     banner-mode: off
+  task:
+    scheduling:
+      pool:
+        size: 4
 management:
   endpoints:
     enabled-by-default: false

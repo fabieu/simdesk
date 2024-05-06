@@ -2,7 +2,7 @@ package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
-import de.sustineo.simdesk.services.DiscordService;
+import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
 import discord4j.discordjson.json.RoleData;
 import lombok.extern.java.Log;
@@ -70,14 +70,14 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                 .formLogin(formLogin -> formLogin
                         .loginPage(LOGIN_URL).permitAll()
                         .loginProcessingUrl(LOGIN_URL)
-                        .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
+                        .defaultSuccessUrl(LOGIN_SUCCESS_URL)
                 );
 
         if (ProfileManager.isOAuth2ProfileEnabled()) {
             http
                     .oauth2Login(oauth2 -> oauth2
                             .loginPage("/login/oauth")
-                            .defaultSuccessUrl(LOGIN_SUCCESS_URL, true)
+                            .defaultSuccessUrl(LOGIN_SUCCESS_URL)
                             .failureUrl("/login?oauth-error")
                             .permitAll()
                             .authorizationEndpoint(authorization -> authorization

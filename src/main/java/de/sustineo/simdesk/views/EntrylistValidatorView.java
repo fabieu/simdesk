@@ -54,16 +54,13 @@ public class EntrylistValidatorView extends VerticalLayout {
     private static final String NOTIFICATION_DELIMITER = " - ";
 
     private final EntrylistService entrylistService;
-    private final JsonUtils jsonUtils;
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
     public EntrylistValidatorView(EntrylistService entrylistService,
-                                  JsonUtils jsonUtils,
                                   ValidationService validationService,
                                   NotificationService notificationService) {
         this.entrylistService = entrylistService;
-        this.jsonUtils = jsonUtils;
         this.validationService = validationService;
         this.notificationService = notificationService;
 
@@ -117,7 +114,7 @@ public class EntrylistValidatorView extends VerticalLayout {
             InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
 
             try {
-                Entrylist entrylist = jsonUtils.fromJson(fileData, Entrylist.class);
+                Entrylist entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
                 validationService.validate(entrylist);
                 ValidationData validationData = entrylistService.validateRules(entrylist, new ArrayList<>(validationRulesCheckboxGroup.getSelectedItems()));
 
@@ -224,7 +221,7 @@ public class EntrylistValidatorView extends VerticalLayout {
             for (Object reference : errorReferences) {
                 String referenceRepresentation;
                 try {
-                    referenceRepresentation = jsonUtils.toJsonPretty(reference);
+                    referenceRepresentation = JsonUtils.toJsonPretty(reference);
                 } catch (JsonProcessingException e) {
                     referenceRepresentation = reference.toString();
                 }

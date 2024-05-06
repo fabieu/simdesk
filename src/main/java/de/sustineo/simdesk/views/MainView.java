@@ -11,8 +11,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
-import de.sustineo.simdesk.entities.menu.MenuItem;
-import de.sustineo.simdesk.entities.menu.MenuItemCategory;
+import de.sustineo.simdesk.entities.menu.MenuEntity;
+import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.MenuService;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,26 +53,26 @@ public class MainView extends VerticalLayout {
     }
 
     private Component createMainMenu() {
-        Map<MenuItemCategory, List<MenuItem>> menuMap = menuService.getItemsByCategory();
-        menuMap.remove(MenuItemCategory.MAIN);
-        menuMap.remove(MenuItemCategory.EXTERNAL_LINKS);
+        Map<MenuEntityCategory, List<MenuEntity>> menuMap = menuService.getItemsByCategory();
+        menuMap.remove(MenuEntityCategory.MAIN);
+        menuMap.remove(MenuEntityCategory.EXTERNAL_LINKS);
 
         Div menuContainer = new Div();
         menuContainer.addClassNames("home-menu-container", "pure-g");
 
-        for (Map.Entry<MenuItemCategory, List<MenuItem>> entry : menuMap.entrySet()) {
+        for (Map.Entry<MenuEntityCategory, List<MenuEntity>> entry : menuMap.entrySet()) {
             Div menuCategory = new Div();
             menuCategory.addClassNames("home-menu-category", "pure-u-1", String.format("pure-u-md-1-%s", (int) Math.ceil((double) menuMap.size() / 2)), String.format("pure-u-lg-1-%s", menuMap.size()));
 
             menuCategory.add(new H3(entry.getKey().getName()));
 
-            for (MenuItem menuItem : entry.getValue()) {
-                Button button = new Button(menuItem.getName(), menuItem.getIcon());
+            for (MenuEntity menuEntity : entry.getValue()) {
+                Button button = new Button(menuEntity.getName(), menuEntity.getIcon());
                 button.addClassName("home-menu-button");
                 button.addClickListener(event -> {
-                    switch (menuItem.getType()) {
+                    switch (menuEntity.getType()) {
                         case INTERNAL:
-                            getUI().ifPresent(ui -> ui.navigate(menuItem.getNavigationTarget()));
+                            getUI().ifPresent(ui -> ui.navigate(menuEntity.getNavigationTarget()));
                             break;
                         case EXTERNAL:
                             //TODO: Implement external link handling

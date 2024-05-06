@@ -1,19 +1,18 @@
-package de.sustineo.simdesk.entities.auth;
+package de.sustineo.simdesk.entities.permit;
 
 import lombok.AllArgsConstructor;
+import lombok.Builder;
 import lombok.Data;
 import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
 
 import java.time.Instant;
 
 @Data
-@SuperBuilder
+@Builder
 @NoArgsConstructor
 @AllArgsConstructor
-public class User {
+public class Permit {
     private Long userId;
-    private String username;
-    private String password;
+    private String permit;
     private Instant updateDatetime;
 }

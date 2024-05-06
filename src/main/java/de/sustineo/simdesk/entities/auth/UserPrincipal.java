@@ -5,10 +5,7 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.HashSet;
-import java.util.Map;
+import java.util.*;
 
 @Data
 public class UserPrincipal implements UserDetails {
@@ -64,5 +61,15 @@ public class UserPrincipal implements UserDetails {
     @Override
     public boolean isEnabled() {
         return true;
+    }
+
+    public Optional<Long> getUserId() {
+        String key = "id";
+
+        if (attributes == null || !attributes.containsKey(key)) {
+            return Optional.empty();
+        }
+
+        return Optional.of(Long.parseLong((String) attributes.get(key)));
     }
 }

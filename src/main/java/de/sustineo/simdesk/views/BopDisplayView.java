@@ -51,13 +51,11 @@ import java.util.stream.Collectors;
 @AnonymousAllowed
 public class BopDisplayView extends VerticalLayout {
     private final BopService bopService;
-    private final JsonUtils jsonUtils;
     private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
     private final List<H2> trackTitles = new ArrayList<>();
 
-    public BopDisplayView(BopService bopService, JsonUtils jsonUtils) {
+    public BopDisplayView(BopService bopService) {
         this.bopService = bopService;
-        this.jsonUtils = jsonUtils;
 
         setId("bop-display-view");
         setSizeFull();
@@ -113,7 +111,7 @@ public class BopDisplayView extends VerticalLayout {
                             List<AccBopEntry> accBopEntries = entry.getValue().stream()
                                     .map(bopService::convertToAccBopEntry)
                                     .toList();
-                            json = jsonUtils.toJson(new AccBop(accBopEntries));
+                            json = JsonUtils.toJson(new AccBop(accBopEntries));
                         } catch (JsonProcessingException e) {
                             throw new RuntimeException(e);
                         }

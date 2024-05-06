@@ -10,17 +10,15 @@ import org.springframework.stereotype.Service;
 public class ComponentUtils {
     public static final String GRID_RANKING_WIDTH = "70px";
 
-    public static Hr createSpacer(String color) {
+    public static Hr createSpacer() {
+        String color = "var(--lumo-contrast-10pct)";
+
         Hr hr = new Hr();
         hr.getStyle()
-                .setMargin("var(--lumo-space-m) calc(var(--lumo-border-radius-m) / 2)")
+                .setMargin("var(--lumo-space-s) calc(var(--lumo-border-radius-m) / 2)")
                 .set("border-top", "1px solid " + color);
 
         return hr;
-    }
-
-    public static Hr createSpacer(){
-        return createSpacer("var(--lumo-contrast-10pct)");
     }
 
     public static Icon createWeatherIcon(Session session) {

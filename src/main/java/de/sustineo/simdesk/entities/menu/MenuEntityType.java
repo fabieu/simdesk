@@ -1,5 +1,5 @@
 package de.sustineo.simdesk.entities.menu;
 
-public enum MenuItemType {
+public enum MenuEntityType {
     INTERNAL, EXTERNAL, UNDEFINED
 }

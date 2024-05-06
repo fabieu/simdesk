@@ -5,10 +5,13 @@ import com.vaadin.flow.component.ComponentUtil;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
-import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.contextmenu.MenuItem;
+import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.menubar.MenuBar;
+import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -20,14 +23,16 @@ import com.vaadin.flow.router.RouterLink;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.entities.menu.MenuItem;
-import de.sustineo.simdesk.entities.menu.MenuItemCategory;
+import de.sustineo.simdesk.entities.menu.MenuEntity;
+import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.auth.SecurityService;
+import de.sustineo.simdesk.services.discord.PermitService;
 import de.sustineo.simdesk.utils.ApplicationContextProvider;
 import de.sustineo.simdesk.views.ComponentUtils;
 import de.sustineo.simdesk.views.LoginView;
 import de.sustineo.simdesk.views.MainView;
+import de.sustineo.simdesk.views.PermitUserView;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
@@ -39,26 +44,29 @@ import java.util.*;
 public class MainLayout extends AppLayout {
     private final SecurityService securityService;
     private final MenuService menuService;
+    private final Optional<PermitService> permitService;
     private final BuildProperties buildProperties;
     private final String privacyUrl;
     private final String impressumUrl;
-    private static final LinkedHashMap<MenuItemCategory, Tabs> menuMap = new LinkedHashMap<>();
+    private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
     private H1 viewTitle;
 
     public MainLayout(SecurityService securityService,
                       MenuService menuService,
+                      Optional<PermitService> permitService,
                       ApplicationContextProvider applicationContextProvider,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
+        this.permitService = permitService;
         this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
 
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(false, createNavbarContent(), createNavbarButtons());
+        addToNavbar(false, createNavbarContent(), createNavbarMenu());
 
         createMenuTabs();
         addToDrawer(createDrawerContent());
@@ -66,13 +74,13 @@ public class MainLayout extends AppLayout {
     }
 
     private void createMenuTabs() {
-        Map<MenuItemCategory, List<MenuItem>> menuItemMap = menuService.getItemsByCategory();
+        Map<MenuEntityCategory, List<MenuEntity>> menuItemMap = menuService.getItemsByCategory();
 
-        for (Map.Entry<MenuItemCategory, List<MenuItem>> entry : menuItemMap.entrySet()) {
+        for (Map.Entry<MenuEntityCategory, List<MenuEntity>> entry : menuItemMap.entrySet()) {
             final Tabs tabs = new Tabs();
             tabs.setOrientation(Tabs.Orientation.VERTICAL);
 
-            for (MenuItem item : entry.getValue()) {
+            for (MenuEntity item : entry.getValue()) {
                 switch (item.getType()) {
                     case INTERNAL -> {
                         Tab tab = createTab(item.getName(), item.getIcon(), item.getNavigationTarget());
@@ -120,37 +128,50 @@ public class MainLayout extends AppLayout {
         return layout;
     }
 
-    private Component createNavbarButtons() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.getStyle().set("margin", "0 var(--lumo-space-m)");
+    private MenuBar createNavbarMenu() {
+        MenuBar menuBar = new MenuBar();
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_TERTIARY);
 
-        layout.add(createUserDetails());
+        addUserMenu(menuBar);
 
-        return layout;
+        return menuBar;
     }
 
-    private Component createUserDetails() {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-
+    private void addUserMenu(MenuBar menuBar) {
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
-        if (user.isPresent()) {
-            Icon userIcon = VaadinIcon.USER.create();
 
-            Span userName = new Span(user.get().getUsername());
-            userName.getStyle()
-                    .setFontWeight(Style.FontWeight.BOLD);
-
-            Button authenticationButton = new Button("Logout");
-            authenticationButton.addClickListener(event -> securityService.logout());
-            layout.add(userIcon, userName, authenticationButton);
-        } else {
-            Button authenticationButton = new Button("Login");
-            authenticationButton.addClickListener(event -> authenticationButton.getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
-            layout.add(authenticationButton);
+        if (user.isEmpty()) {
+            MenuItem loginMenuItem = menuBar.addItem("Login");
+            loginMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
         }
 
-        return layout;
+        if (permitService.isPresent() && user.isPresent()) {
+            Component permitBadge = permitService.get().getBasePermitBadge();
+
+            MenuItem permitMenuItem = menuBar.addItem(permitBadge);
+            permitMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(PermitUserView.class)));
+        }
+
+        Avatar avatar = new Avatar();
+        avatar.setTooltipEnabled(true);
+
+        MenuItem avatarMenuItem = menuBar.addItem(avatar);
+        SubMenu userSubMenu = avatarMenuItem.getSubMenu();
+
+        if (user.isPresent()) {
+            avatar.setName(user.get().getUsername());
+
+            Optional<String> avatarUrl = securityService.getAvatarUrl();
+            avatarUrl.ifPresent(avatar::setImage);
+
+            MenuItem profileMenuItem = userSubMenu.addItem("Profile");
+            profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(PermitUserView.class)));
+
+            userSubMenu.add(ComponentUtils.createSpacer());
+
+            MenuItem logoutMenuItem = userSubMenu.addItem("Logout");
+            logoutMenuItem.addClickListener(event -> securityService.logout());
+        }
     }
 
     private Component createDrawerContent() {
@@ -166,7 +187,7 @@ public class MainLayout extends AppLayout {
         menuLayout.setSpacing(false);
 
         int menuMapCounter = 0;
-        for (SortedMap.Entry<MenuItemCategory, Tabs> entry : menuMap.entrySet()) {
+        for (SortedMap.Entry<MenuEntityCategory, Tabs> entry : menuMap.entrySet()) {
             menuLayout.add(createMenuHeader(entry.getKey().getName()));
             menuLayout.add(entry.getValue());
 
