@@ -50,6 +50,7 @@ public class Car extends Entity {
         addCarModel(33, "Lamborghini Huracan Evo2", CarGroup.GT3);
         addCarModel(34, "Porsche 992 GT3 R", CarGroup.GT3);
         addCarModel(35, "McLaren 720S GT3 Evo 2023", CarGroup.GT3);
+        addCarModel(36, "Ford Mustang GT3", CarGroup.GT3);
         addCarModel(50, "Alpine A110 GT4", CarGroup.GT4);
         addCarModel(51, "AMR V8 Vantage GT4", CarGroup.GT4);
         addCarModel(52, "Audi R8 LMS GT4", CarGroup.GT4);
