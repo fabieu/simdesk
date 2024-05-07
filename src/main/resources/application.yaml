@@ -10,6 +10,9 @@ spring:
   datasource:
     url: jdbc:sqlite:./data/simdesk-db.db
     driver-class-name: org.sqlite.JDBC
+    hikari:
+      connection-init-sql: PRAGMA journal_mode = wal; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA busy_timeout = 300000
+      connection-test-query: SELECT 1
   flyway:
     enabled: true
   servlet:
@@ -37,7 +40,7 @@ management:
       enabled: true
 logging:
   level:
-    ROOT: INFO
+    root: INFO
 vaadin:
   productionMode: true
   heartbeatInterval: 60
