@@ -14,11 +14,13 @@ import discord4j.discordjson.Id;
 import discord4j.discordjson.json.MemberData;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
+import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
+import java.util.concurrent.TimeUnit;
 import java.util.stream.Collectors;
 
 @Log
@@ -195,7 +197,7 @@ public class PermitService {
         permitMapper.deleteByUserId(userId);
     }
 
-    //@Scheduled(fixedDelay = 15, initialDelay = 1, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 15, initialDelay = 1, timeUnit = TimeUnit.MINUTES)
     public void fetchPermits() {
         Instant start = Instant.now();
 
