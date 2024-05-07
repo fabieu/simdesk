@@ -1,6 +1,8 @@
 ### Custom ###
 *.env
 *.db
+*.db-shm
+*.db-wal
 memory
 /src/main/resources/examples/
 
