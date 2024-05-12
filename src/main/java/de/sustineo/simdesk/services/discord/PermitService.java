@@ -197,7 +197,7 @@ public class PermitService {
         permitMapper.deleteByUserId(userId);
     }
 
-    @Scheduled(fixedDelay = 15, initialDelay = 1, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 15, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void fetchPermits() {
         Instant start = Instant.now();
 
