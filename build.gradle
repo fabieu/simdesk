@@ -50,6 +50,9 @@ dependencies {
     implementation "org.xerial:sqlite-jdbc:3.45.3.0"
     implementation "org.flywaydb:flyway-core:10.12.0"
 
+    // Logging
+    implementation "io.logz.logback:logzio-logback-appender:2.0.0"
+
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.14.0"
     implementation 'commons-codec:commons-codec:1.17.0'

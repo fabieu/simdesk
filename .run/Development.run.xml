@@ -2,6 +2,7 @@
   <configuration default="false" name="Development" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
     <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-raceapp, acc-bop, debug, discord" />
     <envs>
+      <env name="debug" value="false"/>
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
