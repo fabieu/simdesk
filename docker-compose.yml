@@ -1,8 +1,6 @@
 services:
   app:
     image: registry.gitlab.com/sustineo/simdesk:2.5.4
-    ports:
-      - "8085:8080"
     volumes:
       - ./data:/app/data
       - ./results:/app/results
@@ -19,4 +17,15 @@ services:
       SIMDESK_LOGZIO_TOKEN: ${SIMDESK_LOGZIO_TOKEN}
     env_file:
       - .env
+    labels:
+      - "traefik.enable=true"
+      - "traefik.http.routers.simdesk.rule=Host(`sim2real.simdesk.eu`)"
+      - "traefik.http.routers.simdesk.entrypoints=websecure"
+      - "traefik.http.routers.simdesk.tls.certresolver=myresolver"
+    networks:
+      - traefik_proxy
     restart: unless-stopped
+
+networks:
+  traefik_proxy:
+    external: true

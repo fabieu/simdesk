@@ -126,9 +126,8 @@ create release:
 deploy:
   stage: deploy
   tags:
-    - s2r
+    - sustineo-01
     - shell
-    - wsl
   needs:
     - job: build-docker
       optional: true
@@ -137,7 +136,7 @@ deploy:
   before_script:
     - echo $CI_REGISTRY_PASSWORD | docker login -u $CI_REGISTRY_USER $CI_REGISTRY --password-stdin
   variables:
-    TARGET_DIR: /mnt/d/Docker/acc-leaderboard
+    TARGET_DIR: /opt/simdesk
   script:
     - echo "Deploying application"
     - cd $TARGET_DIR
