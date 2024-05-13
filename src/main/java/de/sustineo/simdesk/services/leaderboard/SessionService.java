@@ -73,7 +73,7 @@ public class SessionService {
     public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
         // Ignore session without any laps
         if (accSession.getLaps().isEmpty()) {
-            log.info(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
+            log.fine(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
             return;
         }
 
@@ -81,7 +81,7 @@ public class SessionService {
         if (accSession.getServerName() != null && ignorePatterns != null) {
             for (Pattern ignorePattern : ignorePatterns) {
                 if (ignorePattern.matcher(accSession.getServerName()).find()) {
-                    log.info(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
+                    log.fine(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
                     return;
                 }
             }
@@ -89,7 +89,7 @@ public class SessionService {
 
         Session session = sessionConverter.convertToSession(accSession, fileMetadata);
         if (sessionExists(session.getFileChecksum())) {
-            log.info(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
+            log.fine(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;
         }
 
