@@ -8,7 +8,7 @@ services:
       - ./data:/app/data
       - ./results:/app/results
     environment:
-      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-bop, discord
+      SPRING_PROFILES_ACTIVE: acc-leaderboard, acc-entrylist, acc-bop, discord, logzio
       SIMDESK_IMPRESSUM_URL: https://markracing.de/impressum
       SIMDESK_PRIVACY_URL: https://markracing.de/privacy
       SIMDESK_COMMUNITY_NAME: Sim2Real
@@ -17,6 +17,7 @@ services:
       SIMDESK_DISCORD_CLIENT_SECRET: ${SIMDESK_DISCORD_CLIENT_SECRET}
       SIMDESK_DISCORD_BOT_TOKEN: ${SIMDESK_DISCORD_BOT_TOKEN}
       SIMDESK_DISCORD_GUILD_ID: ${SIMDESK_DISCORD_GUILD_ID}
+      SIMDESK_LOGZIO_TOKEN: ${SIMDESK_LOGZIO_TOKEN}
     env_file:
       - .env
     restart: unless-stopped

@@ -8,12 +8,15 @@
     <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
 
     <springProfile name="logzio">
-        <!-- Use shutdownHook so that we can close gracefully and finish the log drain -->
+        <!-- Closes gracefully and finishes the log drain -->
         <shutdownHook class="ch.qos.logback.core.hook.DelayingShutdownHook"/>
+
         <appender name="LOGZIO" class="io.logz.logback.LogzioLogbackAppender">
             <logzioUrl>https://listener-eu.logz.io:8071</logzioUrl>
             <token>${SIMDESK_LOGZIO_TOKEN}</token>
             <logzioType>java</logzioType>
+            <additionalFields>application=simdesk;</additionalFields>
+            <addHostname>true</addHostname>
 
             <filter class="ch.qos.logback.classic.filter.ThresholdFilter">
                 <level>INFO</level>
