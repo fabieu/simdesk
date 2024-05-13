@@ -20,7 +20,11 @@ public class PermitsTypeHandler extends BaseTypeHandler<Set<String>> {
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, Set<String> parameter, JdbcType jdbcType) throws SQLException {
         try {
-            ps.setString(i, JsonUtils.toJson(parameter));
+            if (parameter == null) {
+                ps.setString(i, null);
+            } else {
+                ps.setString(i, JsonUtils.toJson(parameter));
+            }
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -29,7 +33,13 @@ public class PermitsTypeHandler extends BaseTypeHandler<Set<String>> {
     @Override
     public Set<String> getNullableResult(ResultSet rs, String columnName) throws SQLException {
         try {
-            return JsonUtils.fromJson(rs.getString(columnName), setStringType);
+            String content = rs.getString(columnName);
+
+            if (content == null) {
+                return null;
+            }
+
+            return JsonUtils.fromJson(content, setStringType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -38,7 +48,13 @@ public class PermitsTypeHandler extends BaseTypeHandler<Set<String>> {
     @Override
     public Set<String> getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
         try {
-            return JsonUtils.fromJson(rs.getString(columnIndex), setStringType);
+            String content = rs.getString(columnIndex);
+
+            if (content == null) {
+                return null;
+            }
+
+            return JsonUtils.fromJson(content, setStringType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
@@ -47,7 +63,13 @@ public class PermitsTypeHandler extends BaseTypeHandler<Set<String>> {
     @Override
     public Set<String> getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
         try {
-            return JsonUtils.fromJson(cs.getString(columnIndex), setStringType);
+            String content = cs.getString(columnIndex);
+
+            if (content == null) {
+                return null;
+            }
+
+            return JsonUtils.fromJson(content, setStringType);
         } catch (JsonProcessingException e) {
             throw new RuntimeException(e);
         }
