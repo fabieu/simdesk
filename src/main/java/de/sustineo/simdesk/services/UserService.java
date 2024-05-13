@@ -33,6 +33,10 @@ public class UserService {
         userMapper.insert(user);
     }
 
+    public DiscordUser findDiscordUserByUserId(Long userId) {
+        return discordUserMapper.findByUserId(userId);
+    }
+
     public void insertDiscordUser(DiscordUser user) {
         discordUserMapper.insert(user);
     }

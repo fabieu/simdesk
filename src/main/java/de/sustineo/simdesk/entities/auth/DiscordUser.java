@@ -6,6 +6,8 @@ import lombok.EqualsAndHashCode;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
 
+import java.util.Set;
+
 @Data
 @EqualsAndHashCode(callSuper = true)
 @SuperBuilder
@@ -13,4 +15,5 @@ import lombok.experimental.SuperBuilder;
 @AllArgsConstructor
 public class DiscordUser extends User {
     private String globalName;
+    private Set<String> permits;
 }

@@ -6,8 +6,6 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.auth.DiscordUser;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.enums.CarGroup;
-import de.sustineo.simdesk.entities.mapper.PermitMapper;
-import de.sustineo.simdesk.entities.permit.Permit;
 import de.sustineo.simdesk.services.UserService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import discord4j.discordjson.Id;
@@ -34,16 +32,13 @@ public class PermitService {
     private final Map<String, List<CarGroup>> nosPermitMap = new HashMap<>();
     private final Set<String> reviewRoles = new HashSet<>();
     private final Set<String> permitRoles = new HashSet<>();
-    private final PermitMapper permitMapper;
 
     public PermitService(SecurityService securityService,
                          DiscordService discordService,
-                         UserService userService,
-                         PermitMapper permitMapper) {
+                         UserService userService) {
         this.securityService = securityService;
         this.discordService = discordService;
         this.userService = userService;
-        this.permitMapper = permitMapper;
 
         // Ensure that the permit maps are sorted by permit level from highest to lowest
         basePermitMap.put("Permit-A", List.of(CarGroup.GT3, CarGroup.GT2, CarGroup.GTC, CarGroup.GT4, CarGroup.TCX));
@@ -92,9 +87,9 @@ public class PermitService {
             return Optional.empty();
         }
 
-        List<Permit> permits = getPermitsByUserId(userId.get());
+        Set<String> permits = getPermitsByUserId(userId.get());
         for (String permitRole : basePermitMap.keySet()) {
-            if (permits.stream().anyMatch(permit -> permit.getPermit().equals(permitRole))) {
+            if (permits.stream().anyMatch(permit -> permit.equals(permitRole))) {
                 return Optional.of(permitRole);
             }
         }
@@ -123,7 +118,7 @@ public class PermitService {
     }
 
     public List<Component> getNosPermitBadges() {
-        Optional<List<String>> permitGroups = getNosPermitGroups();
+        Optional<Set<String>> permitGroups = getNosPermitGroups();
 
         List<Component> permitBadges = new ArrayList<>();
         if (!inReview() && permitGroups.isPresent()) {
@@ -139,7 +134,7 @@ public class PermitService {
         return permitBadges;
     }
 
-    public Optional<List<String>> getNosPermitGroups() {
+    public Optional<Set<String>> getNosPermitGroups() {
         Optional<Long> userId = securityService.getAuthenticatedUser()
                 .flatMap(UserPrincipal::getUserId);
 
@@ -147,10 +142,10 @@ public class PermitService {
             return Optional.empty();
         }
 
-        List<Permit> permits = getPermitsByUserId(userId.get());
-        List<String> nosPermitGroups = new ArrayList<>();
+        Set<String> permits = getPermitsByUserId(userId.get());
+        Set<String> nosPermitGroups = new LinkedHashSet<>();
         for (String permitRole : nosPermitMap.keySet()) {
-            if (permits.stream().anyMatch(permit -> permit.getPermit().equals(permitRole))) {
+            if (permits.stream().anyMatch(permit -> permit.equals(permitRole))) {
                 nosPermitGroups.add(permitRole);
             }
         }
@@ -159,7 +154,7 @@ public class PermitService {
     }
 
     public Optional<List<CarGroup>> getNosPermittedCarGroups() {
-        Optional<List<String>> nosPermitGroups = getNosPermitGroups();
+        Optional<Set<String>> nosPermitGroups = getNosPermitGroups();
 
         if (inReview() || nosPermitGroups.isEmpty()) {
             return Optional.empty();
@@ -181,20 +176,18 @@ public class PermitService {
             return false;
         }
 
-        List<Permit> permits = getPermitsByUserId(userId.get());
-        return permits.stream().anyMatch(permit -> reviewRoles.contains(permit.getPermit()));
+        Set<String> permits = getPermitsByUserId(userId.get());
+        return permits.stream().anyMatch(reviewRoles::contains);
     }
 
-    public List<Permit> getPermitsByUserId(Long userId) {
-        return permitMapper.findByUserId(userId);
-    }
+    public Set<String> getPermitsByUserId(Long userId) {
+        DiscordUser discordUser = userService.findDiscordUserByUserId(userId);
 
-    public void insertPermit(Permit permit) {
-        permitMapper.insert(permit);
-    }
+        if (discordUser == null || discordUser.getPermits() == null) {
+            return Collections.emptySet();
+        }
 
-    public void deletePermitsByUserId(Long userId) {
-        permitMapper.deleteByUserId(userId);
+        return discordUser.getPermits();
     }
 
     @Scheduled(fixedDelay = 15, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
@@ -217,19 +210,10 @@ public class PermitService {
                     .userId(member.user().id().asLong())
                     .username(member.user().username())
                     .globalName(member.user().globalName().orElse(null))
+                    .permits(permits)
                     .updateDatetime(Instant.now())
                     .build();
             userService.insertDiscordUser(user);
-
-            deletePermitsByUserId(user.getUserId());
-            for (String permit : permits) {
-                Permit permitEntity = Permit.builder()
-                        .userId(user.getUserId())
-                        .permit(permit)
-                        .updateDatetime(Instant.now())
-                        .build();
-                insertPermit(permitEntity);
-            }
         }
 
         log.info(String.format("Finished permit synchronisation in %sms", Duration.between(start, Instant.now()).toMillis()));
