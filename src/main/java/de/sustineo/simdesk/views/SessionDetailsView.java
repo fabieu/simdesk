@@ -1,12 +1,18 @@
 package de.sustineo.simdesk.views;
 
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -14,9 +20,11 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.*;
+import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
+import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
@@ -34,6 +42,10 @@ import de.sustineo.simdesk.views.renderers.SessionDetailsRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
+import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.List;
 import java.util.stream.Collectors;
@@ -98,12 +110,12 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFrozen(true);
-        grid.addColumn(Lap::getCarGroup)
+        grid.addColumn(lap -> Car.getCarGroupById(lap.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(Lap::getCarModelName)
+        grid.addColumn(lap -> Car.getCarNameById(lap.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -193,6 +205,41 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         return grid;
     }
 
+    private Component createStatisticsLayout(String fileChecksum, int carId) {
+        VerticalLayout layout = new VerticalLayout();
+
+        StreamResource csvResource = new StreamResource(
+                String.format("session_laps_%s_%s.csv", fileChecksum, carId),
+                () -> {
+                    String csv = this.exportLapsCSV();
+                    return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                }
+        );
+
+        Anchor downloadLapsAnchor = ComponentUtils.createDownloadAnchor(csvResource, "Download laps", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+
+        layout.add(downloadLapsAnchor);
+        return layout;
+    }
+
+    private String exportLapsCSV() {
+        if (laps == null) {
+            return null;
+        }
+
+        try (StringWriter writer = new StringWriter()) {
+            StatefulBeanToCsv<Lap> sbc = new StatefulBeanToCsvBuilder<Lap>(writer)
+                    .withSeparator(';')
+                    .build();
+            sbc.write(laps);
+
+            return writer.toString();
+        } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
+            log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
+            return null;
+        }
+    }
+
 
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
@@ -224,14 +271,9 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
         tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
         if (securityService.hasAnyRole(Role.ADMIN)) {
-            tabSheet.add(createTab("Statistics"), createStatisticsLayout());
+            tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
         }
         addAndExpand(tabSheet);
-    }
-
-    private Component createStatisticsLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        return layout;
     }
 
     private Tab createTab(String label) {

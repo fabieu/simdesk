@@ -5,7 +5,6 @@ import com.opencsv.bean.StatefulBeanToCsvBuilder;
 import com.opencsv.exceptions.CsvDataTypeMismatchException;
 import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -87,13 +86,9 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                     return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
                 }
         );
+        Anchor downloadSessionAnchor = ComponentUtils.createDownloadAnchor(csvResource, "CSV", VaadinIcon.CLOUD_DOWNLOAD_O.create());
 
-        Anchor csvAnchor = new Anchor(csvResource, "");
-        csvAnchor.getElement().setAttribute("download", true);
-        csvAnchor.removeAll();
-        csvAnchor.add(new Button("CSV", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O)));
-
-        layout.add(weatherIcon, heading, sessionDatetimeBadge, csvAnchor);
+        layout.add(weatherIcon, heading, sessionDatetimeBadge, downloadSessionAnchor);
         return layout;
     }
 

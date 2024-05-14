@@ -1,8 +1,11 @@
 package de.sustineo.simdesk.views;
 
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Hr;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.server.StreamResource;
 import de.sustineo.simdesk.entities.Session;
 import org.springframework.stereotype.Service;
 
@@ -33,5 +36,13 @@ public class ComponentUtils {
         }
 
         return icon;
+    }
+
+    public static Anchor createDownloadAnchor(StreamResource csvResource, String label, Icon icon) {
+        Anchor csvAnchor = new Anchor(csvResource, "");
+        csvAnchor.getElement().setAttribute("download", true);
+        csvAnchor.removeAll();
+        csvAnchor.add(new Button(label, icon));
+        return csvAnchor;
     }
 }

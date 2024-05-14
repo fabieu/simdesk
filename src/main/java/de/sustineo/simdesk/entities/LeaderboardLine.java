@@ -17,6 +17,7 @@ public class LeaderboardLine {
     private Integer ranking;
     private CupCategory cupCategory;
     private Integer carId;
+    @Deprecated
     private CarGroup carGroup;
     private Integer carModelId;
     private Integer ballastKg;
