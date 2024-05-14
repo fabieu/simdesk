@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.entities.json.kunos;
 
 import com.fasterxml.jackson.annotation.JsonProperty;
-import de.sustineo.simdesk.entities.enums.SessionType;
+import de.sustineo.simdesk.entities.SessionType;
 import lombok.Data;
 import lombok.ToString;
 

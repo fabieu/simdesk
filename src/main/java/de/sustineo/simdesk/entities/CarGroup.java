@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.enums;
+package de.sustineo.simdesk.entities;
 
 import org.apache.commons.lang3.EnumUtils;
 

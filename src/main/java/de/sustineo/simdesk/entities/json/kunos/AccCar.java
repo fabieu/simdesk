@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.entities.json.kunos;
 
-import de.sustineo.simdesk.entities.enums.CupCategory;
+import de.sustineo.simdesk.entities.CupCategory;
 import lombok.Data;
 
 import java.util.List;

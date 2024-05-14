@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.entities.ranking;
 
 import de.sustineo.simdesk.entities.*;
-import de.sustineo.simdesk.entities.enums.CarGroup;
 import lombok.*;
 
 @Data

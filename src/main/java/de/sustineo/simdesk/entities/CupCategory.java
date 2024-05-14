@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.enums;
+package de.sustineo.simdesk.entities;
 
 import lombok.Getter;
 

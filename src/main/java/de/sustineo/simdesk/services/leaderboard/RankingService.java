@@ -1,10 +1,10 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
 import de.sustineo.simdesk.entities.comparator.GroupRankingComparator;
-import de.sustineo.simdesk.entities.enums.CarGroup;
 import de.sustineo.simdesk.entities.mapper.RankingMapper;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;

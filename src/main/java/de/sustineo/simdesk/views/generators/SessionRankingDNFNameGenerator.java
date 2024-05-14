@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
-import de.sustineo.simdesk.entities.enums.SessionType;
+import de.sustineo.simdesk.entities.SessionType;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
 
 public class SessionRankingDNFNameGenerator implements SerializableFunction<SessionRanking, String> {

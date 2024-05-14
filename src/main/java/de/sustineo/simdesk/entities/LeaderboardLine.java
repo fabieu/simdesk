@@ -1,7 +1,5 @@
 package de.sustineo.simdesk.entities;
 
-import de.sustineo.simdesk.entities.enums.CarGroup;
-import de.sustineo.simdesk.entities.enums.CupCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

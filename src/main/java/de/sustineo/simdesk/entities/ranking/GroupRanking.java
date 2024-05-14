@@ -1,10 +1,6 @@
 package de.sustineo.simdesk.entities.ranking;
 
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.Entity;
-import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.enums.CarGroup;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.utils.FormatUtils;
 import lombok.*;
 

@@ -20,7 +20,9 @@ import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.PenaltyService;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
@@ -48,17 +50,20 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
     private final LapService lapService;
     private final PenaltyService penaltyService;
     private final RankingService rankingService;
+    private final SecurityService securityService;
     private List<Lap> laps = new ArrayList<>();
     private List<Penalty> penalties = new ArrayList<>();
 
     public SessionDetailsView(SessionService sessionService,
                               LapService lapService,
                               PenaltyService penaltyService,
-                              RankingService rankingService) {
+                              RankingService rankingService,
+                              SecurityService securityService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.penaltyService = penaltyService;
         this.rankingService = rankingService;
+        this.securityService = securityService;
 
         setSizeFull();
         setPadding(false);
@@ -218,20 +223,36 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
         tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
+        if (securityService.hasAnyRole(Role.ADMIN)) {
+            tabSheet.add(createTab("Statistics"), createStatisticsLayout());
+        }
         addAndExpand(tabSheet);
     }
 
-    private Tab createTab(String label, int number) {
+    private Component createStatisticsLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        return layout;
+    }
+
+    private Tab createTab(String label) {
+        return createTab(label, null);
+    }
+
+    private Tab createTab(String label, Integer number) {
         HorizontalLayout horizontalLayout = new HorizontalLayout();
         horizontalLayout.setAlignItems(Alignment.CENTER);
         horizontalLayout.getStyle()
                 .set("gap", "var(--lumo-space-s)");
 
         Span labelSpan = new Span(label);
-        Span numberSpan = new Span(String.valueOf(number));
-        numberSpan.getElement().getThemeList().add("badge contrast");
+        horizontalLayout.add(labelSpan);
 
-        horizontalLayout.add(labelSpan, numberSpan);
+        if (number != null) {
+            Span numberSpan = new Span(String.valueOf(number));
+            numberSpan.getElement().getThemeList().add("badge contrast");
+            horizontalLayout.add(numberSpan);
+        }
+
         return new Tab(horizontalLayout);
     }
 }

@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities;
 
-import de.sustineo.simdesk.entities.enums.SessionType;
 import lombok.*;
 
 import java.time.Instant;
