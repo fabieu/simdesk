@@ -28,8 +28,8 @@ public class PermitService {
     private final SecurityService securityService;
     private final DiscordService discordService;
     private final UserService userService;
-    private final Map<String, List<CarGroup>> basePermitMap = new LinkedHashMap<>();
-    private final Map<String, List<CarGroup>> nosPermitMap = new HashMap<>();
+    private final Map<String, Set<CarGroup>> basePermitMap = new LinkedHashMap<>();
+    private final Map<String, Set<CarGroup>> nosPermitMap = new LinkedHashMap<>();
     private final Set<String> reviewRoles = new HashSet<>();
     private final Set<String> permitRoles = new HashSet<>();
 
@@ -41,15 +41,15 @@ public class PermitService {
         this.userService = userService;
 
         // Ensure that the permit maps are sorted by permit level from highest to lowest
-        basePermitMap.put("Permit-A", List.of(CarGroup.GT3, CarGroup.GT2, CarGroup.GTC, CarGroup.GT4, CarGroup.TCX));
-        basePermitMap.put("Permit-B", List.of(CarGroup.GT4, CarGroup.TCX));
-        basePermitMap.put("Permit-C", List.of(CarGroup.TCX));
+        basePermitMap.put("Permit-A", Set.of(CarGroup.GT3, CarGroup.GT2, CarGroup.GTC, CarGroup.GT4, CarGroup.TCX));
+        basePermitMap.put("Permit-B", Set.of(CarGroup.GT4, CarGroup.TCX));
+        basePermitMap.put("Permit-C", Set.of(CarGroup.TCX));
 
-        nosPermitMap.put("Permit-NOS-SP9", List.of(CarGroup.GT3));
-        nosPermitMap.put("Permit-NOS-SPX", List.of(CarGroup.GT2));
-        nosPermitMap.put("Permit-NOS-CUP2", List.of(CarGroup.GTC));
-        nosPermitMap.put("Permit-NOS-SP10", List.of(CarGroup.GT4));
-        nosPermitMap.put("Permit-NOS-CUP5", List.of(CarGroup.TCX));
+        nosPermitMap.put("Permit-NOS-SP9", Set.of(CarGroup.GT3));
+        nosPermitMap.put("Permit-NOS-SPX", Set.of(CarGroup.GT2));
+        nosPermitMap.put("Permit-NOS-CUP2", Set.of(CarGroup.GTC));
+        nosPermitMap.put("Permit-NOS-SP10", Set.of(CarGroup.GT4));
+        nosPermitMap.put("Permit-NOS-CUP5", Set.of(CarGroup.TCX));
 
         reviewRoles.add("Sichtung");
 
@@ -97,6 +97,14 @@ public class PermitService {
         return Optional.empty();
     }
 
+    public Optional<Set<CarGroup>> getBasePermittedCarGroups() {
+        if (inReview()) {
+            return Optional.empty();
+        }
+
+        return getBasePermitGroup().map(basePermitMap::get);
+    }
+
     public Set<String> getAllBasePermitGroups() {
         return new LinkedHashSet<>(basePermitMap.keySet());
     }
@@ -107,14 +115,6 @@ public class PermitService {
         }
 
         return getBasePermitGroup().isPresent();
-    }
-
-    public Optional<List<CarGroup>> getBasePermittedCarGroups() {
-        if (inReview()) {
-            return Optional.empty();
-        }
-
-        return getBasePermitGroup().map(basePermitMap::get);
     }
 
     public List<Component> getNosPermitBadges() {
@@ -153,16 +153,26 @@ public class PermitService {
         return Optional.of(nosPermitGroups);
     }
 
-    public Optional<List<CarGroup>> getNosPermittedCarGroups() {
+    public Optional<Set<CarGroup>> getNosPermittedCarGroups() {
+        Optional<Set<CarGroup>> basePermittedCarGroups = getBasePermittedCarGroups();
         Optional<Set<String>> nosPermitGroups = getNosPermitGroups();
 
-        if (inReview() || nosPermitGroups.isEmpty()) {
+        if (inReview() || basePermittedCarGroups.isEmpty() || nosPermitGroups.isEmpty()) {
             return Optional.empty();
         }
 
-        List<CarGroup> permittedCarGroups = new ArrayList<>();
+        Set<CarGroup> permittedCarGroups = new HashSet<>();
         for (String permitGroup : nosPermitGroups.get()) {
-            permittedCarGroups.addAll(nosPermitMap.get(permitGroup));
+            Set<CarGroup> nosPermittedCarGroups = nosPermitMap.get(permitGroup);
+            if (nosPermittedCarGroups == null) {
+                continue;
+            }
+
+            for (CarGroup nosCarGroup : nosPermittedCarGroups) {
+                if (basePermittedCarGroups.get().contains(nosCarGroup)) {
+                    permittedCarGroups.add(nosCarGroup);
+                }
+            }
         }
 
         return Optional.of(permittedCarGroups);
@@ -190,7 +200,7 @@ public class PermitService {
         return discordUser.getPermits();
     }
 
-    @Scheduled(fixedDelay = 15, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 15, initialDelay = 0, timeUnit = TimeUnit.MINUTES)
     public void fetchPermits() {
         Instant start = Instant.now();
 

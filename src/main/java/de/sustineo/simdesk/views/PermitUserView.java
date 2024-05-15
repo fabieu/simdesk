@@ -22,7 +22,6 @@ import de.sustineo.simdesk.services.discord.PermitService;
 import jakarta.annotation.security.PermitAll;
 import org.springframework.context.annotation.Profile;
 
-import java.util.List;
 import java.util.Optional;
 import java.util.Set;
 
@@ -135,7 +134,7 @@ public class PermitUserView extends VerticalLayout {
         VerticalLayout basePermittedCarGroupsLayout = new VerticalLayout();
         basePermittedCarGroupsLayout.setSpacing(false);
         basePermittedCarGroupsLayout.setPadding(false);
-        Optional<List<CarGroup>> basePermittedCarGroups = permitService.flatMap(PermitService::getBasePermittedCarGroups);
+        Optional<Set<CarGroup>> basePermittedCarGroups = permitService.flatMap(PermitService::getBasePermittedCarGroups);
         for (CarGroup carGroup : CarGroup.getValid()) {
             HorizontalLayout carGroupLayout = new HorizontalLayout();
             carGroupLayout.setPadding(false);
@@ -169,7 +168,7 @@ public class PermitUserView extends VerticalLayout {
         VerticalLayout nosPermittedCarGroupsLayout = new VerticalLayout();
         nosPermittedCarGroupsLayout.setSpacing(false);
         nosPermittedCarGroupsLayout.setPadding(false);
-        Optional<List<CarGroup>> permittedCarGroups = permitService.flatMap(PermitService::getNosPermittedCarGroups);
+        Optional<Set<CarGroup>> permittedCarGroups = permitService.flatMap(PermitService::getNosPermittedCarGroups);
         for (CarGroup carGroup : CarGroup.getValid()) {
             HorizontalLayout carGroupLayout = new HorizontalLayout();
             carGroupLayout.setPadding(false);
