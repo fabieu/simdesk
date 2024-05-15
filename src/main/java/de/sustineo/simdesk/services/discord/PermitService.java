@@ -200,7 +200,7 @@ public class PermitService {
         return discordUser.getPermits();
     }
 
-    @Scheduled(fixedDelay = 15, initialDelay = 0, timeUnit = TimeUnit.MINUTES)
+    @Scheduled(fixedDelay = 15, initialDelay = 5, timeUnit = TimeUnit.MINUTES)
     public void fetchPermits() {
         Instant start = Instant.now();
 
