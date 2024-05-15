@@ -1,6 +1,6 @@
 services:
   app:
-    image: registry.gitlab.com/sustineo/simdesk:2.5.8
+    image: registry.gitlab.com/sustineo/simdesk:2.5.9
     volumes:
       - ./data:/app/data
       - ./results:/app/results
