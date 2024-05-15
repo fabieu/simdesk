@@ -70,7 +70,7 @@ public class SessionService {
     }
 
     @Transactional
-    public void handleSession(AccSession accSession, FileMetadata fileMetadata) {
+    public void handleSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
         // Ignore session without any laps
         if (accSession.getLaps().isEmpty()) {
             log.fine(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
@@ -87,7 +87,7 @@ public class SessionService {
             }
         }
 
-        Session session = sessionConverter.convertToSession(accSession, fileMetadata);
+        Session session = sessionConverter.convertToSession(accSession, fileContent, fileMetadata);
         if (sessionExists(session.getFileChecksum())) {
             log.fine(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
             return;

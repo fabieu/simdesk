@@ -10,7 +10,7 @@ import org.springframework.stereotype.Service;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class SessionConverter extends BaseConverter {
-    public Session convertToSession(AccSession accSession, FileMetadata fileMetadata) {
+    public Session convertToSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
         return Session.builder()
                 .sessionType(accSession.getSessionType())
                 .raceWeekendIndex(accSession.getRaceWeekendIndex())
@@ -22,6 +22,7 @@ public class SessionConverter extends BaseConverter {
                 .fileChecksum(fileMetadata.getChecksum())
                 .fileName(fileMetadata.getName())
                 .fileDirectory(fileMetadata.getDirectory().toString())
+                .fileContent(fileContent)
                 .build();
     }
 }

@@ -114,11 +114,11 @@ public class FileContentService {
                 return;
             }
 
+            FileMetadata fileMetadata = new FileMetadata(file);
             String fileContent = readFile(file);
             AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
-            FileMetadata fileMetadata = new FileMetadata(file);
 
-            sessionService.handleSession(accSession, fileMetadata);
+            sessionService.handleSession(accSession, fileContent, fileMetadata);
         } catch (Exception e) {
             log.log(Level.SEVERE, String.format("Could not process session file %s", file), e);
         }

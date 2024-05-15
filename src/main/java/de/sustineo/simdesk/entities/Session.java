@@ -21,6 +21,7 @@ public class Session extends Entity {
     private String fileChecksum;
     private String fileName;
     private String fileDirectory;
+    private String fileContent;
 
     public String getTrackName() {
         return Track.getTrackNameById(trackId);

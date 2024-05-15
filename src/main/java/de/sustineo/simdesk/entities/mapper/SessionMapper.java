@@ -24,6 +24,7 @@ public interface SessionMapper {
             @Result(property = "fileChecksum", column = "file_checksum"),
             @Result(property = "fileName", column = "file_name"),
             @Result(property = "fileDirectory", column = "file_directory"),
+            @Result(property = "fileContent", column = "file_content"),
     })
     @Select("SELECT * FROM sessions ORDER BY session_datetime DESC")
     List<Session> findAll();
@@ -41,8 +42,8 @@ public interface SessionMapper {
     Session findByFileChecksum(String fileChecksum);
 
     @Insert("""
-            INSERT INTO sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory)
-            VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory})
+            INSERT INTO sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory, file_content)
+            VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory}, #{fileContent})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Session session);
