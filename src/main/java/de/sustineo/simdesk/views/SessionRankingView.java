@@ -24,9 +24,11 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -52,15 +54,17 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     private final RankingService rankingService;
     private final SessionService sessionService;
+    private final SecurityService securityService;
     private GridListDataView<SessionRanking> dataView;
 
-    public SessionRankingView(RankingService rankingService, SessionService sessionService) {
+    public SessionRankingView(RankingService rankingService, SessionService sessionService, SecurityService securityService) {
         this.rankingService = rankingService;
         this.sessionService = sessionService;
 
         setSizeFull();
         setPadding(false);
         setSpacing(false);
+        this.securityService = securityService;
     }
 
 
@@ -79,16 +83,30 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
         sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
 
-        StreamResource csvResource = new StreamResource(
-                String.format("session_export_%s.csv", session.getFileChecksum()),
-                () -> {
-                    String csv = this.exportCSV();
-                    return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                }
-        );
-        Anchor downloadSessionAnchor = ComponentUtils.createDownloadAnchor(csvResource, "CSV", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+        layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
-        layout.add(weatherIcon, heading, sessionDatetimeBadge, downloadSessionAnchor);
+        if (securityService.hasAnyRole(Role.ADMIN)) {
+            StreamResource csvResource = new StreamResource(
+                    String.format("session_table_%s.csv", session.getFileChecksum()),
+                    () -> {
+                        String csv = this.exportCSV();
+                        return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                    }
+            );
+            Anchor downloadSessionAnchor = ComponentUtils.createDownloadAnchor(csvResource, "CSV", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+
+            StreamResource fileContentResource = new StreamResource(
+                    String.format("session_file_%s.json", session.getFileChecksum()),
+                    () -> {
+                        String fileContent = session.getFileContent();
+                        return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                    }
+            );
+            Anchor downloadSessionFileAnchor = ComponentUtils.createDownloadAnchor(fileContentResource, "Download", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+
+            layout.add(downloadSessionAnchor, downloadSessionFileAnchor);
+        }
+
         return layout;
     }
 
