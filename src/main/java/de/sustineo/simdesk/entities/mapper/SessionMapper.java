@@ -33,17 +33,19 @@ public interface SessionMapper {
     @ResultType(long.class)
     long count();
 
+    @SuppressWarnings("unused")
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM sessions WHERE id = #{id} LIMIT 1")
     Session findById(Integer id);
+
 
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM sessions WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);
 
     @Insert("""
-            INSERT INTO sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_directory, file_content)
-            VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileDirectory}, #{fileContent})
+            INSERT INTO sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_content)
+            VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileContent})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Session session);

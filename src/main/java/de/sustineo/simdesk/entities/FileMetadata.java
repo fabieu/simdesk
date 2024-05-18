@@ -25,7 +25,6 @@ public class FileMetadata {
     public FileMetadata(Path file) {
         this.file = file;
         this.absolutePath = file.toAbsolutePath();
-        this.directory = file.getParent();
         this.name = file.getFileName().toString();
         this.checksum = calculateChecksum();
         this.modifiedDatetime = calculateModifiedDatetime();

@@ -21,7 +21,6 @@ public class SessionConverter extends BaseConverter {
                 .sessionDatetime(fileMetadata.getModifiedDatetime())
                 .fileChecksum(fileMetadata.getChecksum())
                 .fileName(fileMetadata.getName())
-                .fileDirectory(fileMetadata.getDirectory().toString())
                 .fileContent(fileContent)
                 .build();
     }
