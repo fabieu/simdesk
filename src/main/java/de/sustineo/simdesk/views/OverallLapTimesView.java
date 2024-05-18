@@ -25,7 +25,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-times/overall", layout = MainLayout.class)
+@Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
 @AnonymousAllowed
 public class OverallLapTimesView extends VerticalLayout {

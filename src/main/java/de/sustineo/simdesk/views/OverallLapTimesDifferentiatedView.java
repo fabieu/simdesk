@@ -28,7 +28,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-times/overall/:carGroup/:trackId", layout = MainLayout.class)
+@Route(value = "/leaderboard/lap-times/:carGroup/:trackId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times by track")
 @AnonymousAllowed
 public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver {
