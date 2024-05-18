@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -18,6 +19,7 @@ import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.simdesk.views.generators.DriverRankingPodiumPartNameGenerator;
@@ -26,6 +28,7 @@ import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
+import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times/:carGroup/:trackId", layout = MainLayout.class)
@@ -34,7 +37,12 @@ import java.util.List;
 public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
+    public static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
+
     private final RankingService rankingService;
+
+    private Grid<DriverRanking> rankingGrid;
+    private TimeRange timeRange = TimeRange.ALL_TIME;
 
     public OverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
@@ -47,32 +55,51 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     @Override
     public void beforeEnter(BeforeEnterEvent event) {
         final RouteParameters routeParameters = event.getRouteParameters();
+        final QueryParameters queryParameters = event.getLocation().getQueryParameters();
 
         String carGroup = routeParameters.get(ROUTE_PARAMETER_CAR_GROUP).orElseThrow();
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
+        Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
 
         if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
-            add(createRankingHeader(carGroup, trackId));
-            addAndExpand(createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId));
+            if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
+                this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
+            }
+
+            this.rankingGrid = createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, this.timeRange);
+
+            add(createRankingHeader(carGroup, trackId, this.timeRange));
+            addAndExpand(this.rankingGrid);
         } else {
             event.rerouteToError(NotFoundException.class);
         }
     }
 
-    private Component createRankingHeader(String carGroup, String trackId) {
+    private Component createRankingHeader(String carGroup, String trackId, TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setPadding(true);
+        layout.setAlignItems(Alignment.CENTER);
+        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         // Header displaying the car group and track name
         H3 heading = new H3(carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId));
 
-        layout.add(heading);
+        Select<TimeRange> timeRangeSelect = new Select<>();
+        timeRangeSelect.setItems(TimeRange.values());
+        timeRangeSelect.setValue(timeRange);
+        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
+        timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
+        timeRangeSelect.addValueChangeListener(event -> {
+            replaceRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, event.getValue());
+        });
+
+        layout.add(heading, timeRangeSelect);
         return layout;
     }
 
-    private Component createRankingGrid(CarGroup carGroup, String trackId) {
-        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId);
+    private Grid<DriverRanking> createRankingGrid(CarGroup carGroup, String trackId, TimeRange timeRange) {
+        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId, timeRange);
         DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
 
         Grid<DriverRanking> grid = new Grid<>(DriverRanking.class, false);
@@ -143,5 +170,11 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         headerRow.getCell(sessionTypeDescriptionColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setSessionTypeDescription));
 
         return grid;
+    }
+
+    private void replaceRankingGrid(CarGroup carGroup, String trackId, TimeRange timeRange) {
+        Grid<DriverRanking> grid = createRankingGrid(carGroup, trackId, timeRange);
+        replace(this.rankingGrid, grid);
+        this.rankingGrid = grid;
     }
 }

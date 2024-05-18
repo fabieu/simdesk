@@ -9,6 +9,7 @@ import de.sustineo.simdesk.entities.mapper.RankingMapper;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
+import de.sustineo.simdesk.views.enums.TimeRange;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -25,13 +26,13 @@ public class RankingService {
         this.rankingMapper = rankingMapper;
     }
 
-    public List<GroupRanking> getAllTimeGroupRanking() {
-        List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps();
+    public List<GroupRanking> getAllTimeGroupRanking(TimeRange timeRange) {
+        List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps(timeRange.start(), timeRange.end());
         return getRankingsByCarGroupAndTrackId(groupRankings);
     }
 
-    public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId) {
-        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId);
+    public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId, TimeRange timeRange) {
+        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.start(), timeRange.end());
         driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);
         addRanking(driverRankings);
 
@@ -47,7 +48,7 @@ public class RankingService {
     }
 
     private void addRanking(List<DriverRanking> driverRankings) {
-        for (DriverRanking driverRanking : driverRankings){
+        for (DriverRanking driverRanking : driverRankings) {
             driverRanking.setRanking(driverRankings.indexOf(driverRanking) + 1);
         }
     }

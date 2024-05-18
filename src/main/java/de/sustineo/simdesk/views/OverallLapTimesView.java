@@ -5,43 +5,87 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.selection.SingleSelect;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteParam;
-import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
+import java.util.Map;
+import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
 @AnonymousAllowed
-public class OverallLapTimesView extends VerticalLayout {
+public class OverallLapTimesView extends VerticalLayout implements BeforeEnterObserver {
+    private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     private final RankingService rankingService;
+
+    private Grid<GroupRanking> rankingGrid;
+    private TimeRange timeRange = TimeRange.ALL_TIME;
 
     public OverallLapTimesView(RankingService rankingService) {
         this.rankingService = rankingService;
 
         setSizeFull();
         setPadding(false);
-
-        addAndExpand(createRankingGrid());
+        setSpacing(false);
     }
 
-    private Component createRankingGrid() {
-        List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking();
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        final QueryParameters queryParameters = event.getLocation().getQueryParameters();
+
+        Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
+        if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
+            this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
+        }
+
+        this.rankingGrid = createRankingGrid(this.timeRange);
+        add(createRankingHeader(this.timeRange));
+        addAndExpand(rankingGrid);
+    }
+
+    private Component createRankingHeader(TimeRange timeRange) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setPadding(true);
+        layout.setAlignItems(Alignment.CENTER);
+        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+
+        // Header displaying the car group and track name
+        H3 heading = new H3("Overall Lap Times");
+
+        Select<TimeRange> timeRangeSelect = new Select<>();
+        timeRangeSelect.setItems(TimeRange.values());
+        timeRangeSelect.setValue(timeRange);
+        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
+        timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
+        timeRangeSelect.addValueChangeListener(event -> {
+            replaceRankingGrid(event.getValue());
+        });
+
+        layout.add(heading, timeRangeSelect);
+        return layout;
+    }
+
+    private Grid<GroupRanking> createRankingGrid(TimeRange timeRange) {
+        List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking(timeRange);
 
         Grid<GroupRanking> grid = new Grid<>(GroupRanking.class, false);
         Grid.Column<GroupRanking> carGroupColumn = grid.addColumn(GroupRanking::getCarGroup)
@@ -91,11 +135,18 @@ public class OverallLapTimesView extends VerticalLayout {
                         new RouteParameters(
                                 new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
                                 new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
-                        )
+                        ),
+                        new QueryParameters(Map.of(OverallLapTimesDifferentiatedView.QUERY_PARAMETER_TIME_RANGE, List.of(timeRange.name().toLowerCase())))
                 ));
             }
         });
 
         return grid;
+    }
+
+    private void replaceRankingGrid(TimeRange timeRange) {
+        Grid<GroupRanking> grid = createRankingGrid(timeRange);
+        replace(this.rankingGrid, grid);
+        this.rankingGrid = grid;
     }
 }

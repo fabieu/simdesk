@@ -9,6 +9,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -22,8 +23,17 @@ public interface RankingMapper {
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
     })
-    @Select("SELECT laps.car_group, laps.car_model_id, laps.driver_id, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis FROM laps LEFT JOIN sessions ON laps.session_id = sessions.id WHERE valid IS TRUE GROUP BY laps.car_group, laps.car_model_id, sessions.track_id, laps.driver_id ORDER BY MIN(laps.lap_time_millis)")
-    List<GroupRanking> findAllTimeFastestLaps();
+    @Select("""
+            SELECT laps.car_group, laps.car_model_id, laps.driver_id, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis
+            FROM laps
+                LEFT JOIN sessions ON laps.session_id = sessions.id
+            WHERE valid IS TRUE
+                AND sessions.session_datetime >= #{startTime}
+                AND sessions.session_datetime <= #{endTime}
+            GROUP BY laps.car_group, laps.car_model_id, sessions.track_id, laps.driver_id
+            ORDER BY MIN(laps.lap_time_millis)
+            """)
+    List<GroupRanking> findAllTimeFastestLaps(Instant startTime, Instant endTime);
 
     @Results(id = "driverRankingResultMap", value = {
             @Result(property = "carGroup", column = "car_group"),
@@ -47,12 +57,14 @@ public interface RankingMapper {
                              WHERE valid IS TRUE
                                AND laps.car_group = #{carGroup}
                                AND sessions.track_id = #{trackId}
+                               AND sessions.session_datetime >= #{startTime}
+                               AND sessions.session_datetime <= #{endTime}
                              GROUP BY laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id) fastest_laps
                             ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND
                                laps.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND
                                laps.lap_time_millis = fastest_laps.lap_time_millis
             """)
-    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId);
+    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant startTime, Instant endTime);
 
     @Results(id = "leaderboardResultMap", value = {
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.simdesk.entities.mapper.SessionMapper.findById")),
