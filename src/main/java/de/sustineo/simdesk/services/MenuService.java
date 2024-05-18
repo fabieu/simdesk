@@ -33,25 +33,28 @@ public class MenuService {
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Times", VaadinIcon.CLOCK, OverallLapTimesView.class));
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.ORDERED_LIST, SessionView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, SessionView.class));
+        }
+
+        if (ProfileManager.isBopProfileEnabled()) {
+            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
+
+            if (securityService.hasAnyRole(Role.ADMIN, Role.BOP_MANAGER)) {
+                items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
+            }
         }
 
         if (ProfileManager.isDiscordProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.PERMIT, "My Permit", VaadinIcon.USER_CHECK, PermitUserView.class));
         }
 
-        if (ProfileManager.isBopProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.EYE, BopDisplayView.class));
-
-            if (securityService.hasAnyRole(Role.ADMIN, Role.BOP_MANAGER)) {
-                items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
-            }
-
-            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
-        }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Validator", VaadinIcon.COG, EntrylistValidatorView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "Entrylist Validator", VaadinIcon.CLIPBOARD_CHECK, EntrylistValidatorView.class));
+        }
+
+        if (ProfileManager.isBopProfileEnabled()) {
+            items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "BoP Editor", VaadinIcon.SCALE, BopEditorView.class));
         }
 
         items.add(MenuEntity.of(MenuEntityCategory.EXTERNAL_LINKS, "Feedback", VaadinIcon.CHAT, Reference.FEEDBACK));
