@@ -220,7 +220,7 @@ public class PermitService {
                     .userId(member.user().id().asLong())
                     .username(member.user().username())
                     .globalName(member.user().globalName().orElse(null))
-                    .permits(permits)
+                    .permits(permits.isEmpty() ? null : permits)
                     .updateDatetime(Instant.now())
                     .build();
             userService.insertDiscordUser(user);
