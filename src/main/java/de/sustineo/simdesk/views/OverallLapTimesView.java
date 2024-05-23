@@ -76,9 +76,7 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
         timeRangeSelect.setValue(timeRange);
         timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
-        timeRangeSelect.addValueChangeListener(event -> {
-            replaceRankingGrid(event.getValue());
-        });
+        timeRangeSelect.addValueChangeListener(event -> replaceRankingGrid(event.getValue()));
 
         layout.add(heading, timeRangeSelect);
         return layout;

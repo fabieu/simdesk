@@ -6,6 +6,7 @@ import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
+import java.time.Instant;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -26,8 +27,14 @@ public interface SessionMapper {
             @Result(property = "fileDirectory", column = "file_directory"),
             @Result(property = "fileContent", column = "file_content"),
     })
-    @Select("SELECT * FROM sessions ORDER BY session_datetime DESC")
-    List<Session> findAll();
+    @Select("""
+            SELECT *
+            FROM sessions
+            WHERE session_datetime >= #{startTime}
+              AND session_datetime <= #{endTime}
+            ORDER BY session_datetime DESC
+            """)
+    List<Session> findAllByTimeRange(Instant startTime, Instant endTime);
 
     @Select("SELECT COUNT(id) FROM sessions")
     @ResultType(long.class)

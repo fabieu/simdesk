@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.AccSession;
 import de.sustineo.simdesk.entities.mapper.SessionMapper;
 import de.sustineo.simdesk.services.converter.SessionConverter;
+import de.sustineo.simdesk.views.enums.TimeRange;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.beans.factory.annotation.Value;
@@ -53,8 +54,8 @@ public class SessionService {
                 .toList();
     }
 
-    public List<Session> getAllSessions() {
-        return sessionMapper.findAll();
+    public List<Session> getAllSessions(TimeRange timeRange) {
+        return sessionMapper.findAllByTimeRange(timeRange.start(), timeRange.end());
     }
 
     public Session getSession(String fileChecksum) {
