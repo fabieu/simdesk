@@ -12,7 +12,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -216,7 +215,7 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
                 }
         );
 
-        Anchor downloadLapsAnchor = ComponentUtils.createDownloadAnchor(csvResource, "Download laps", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+        Anchor downloadLapsAnchor = ComponentUtils.createDownloadAnchor(csvResource, "Download laps");
 
         layout.add(downloadLapsAnchor);
         return layout;

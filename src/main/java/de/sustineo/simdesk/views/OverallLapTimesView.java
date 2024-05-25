@@ -48,8 +48,8 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        final QueryParameters queryParameters = event.getLocation().getQueryParameters();
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
         if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {

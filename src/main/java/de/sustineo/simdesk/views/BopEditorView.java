@@ -11,8 +11,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -242,7 +240,7 @@ public class BopEditorView extends VerticalLayout {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setAlignItems(Alignment.CENTER);
 
-        Button downloadButton = new Button("Download", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O));
+        Button downloadButton = new Button("Download", ComponentUtils.getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Anchor downloadAnchor = new Anchor(downloadBop(), "");

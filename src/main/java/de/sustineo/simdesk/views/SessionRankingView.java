@@ -13,7 +13,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
@@ -93,7 +92,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                         return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
                     }
             );
-            Anchor downloadSessionAnchor = ComponentUtils.createDownloadAnchor(csvResource, "CSV", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+            Anchor downloadSessionAnchor = ComponentUtils.createDownloadAnchor(csvResource, "Table (CSV)");
 
             StreamResource fileContentResource = new StreamResource(
                     String.format("session_file_%s.json", session.getFileChecksum()),
@@ -102,7 +101,7 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
                         return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
                     }
             );
-            Anchor downloadSessionFileAnchor = ComponentUtils.createDownloadAnchor(fileContentResource, "Download", VaadinIcon.CLOUD_DOWNLOAD_O.create());
+            Anchor downloadSessionFileAnchor = ComponentUtils.createDownloadAnchor(fileContentResource, "File (JSON)");
 
             layout.add(downloadSessionAnchor, downloadSessionFileAnchor);
         }

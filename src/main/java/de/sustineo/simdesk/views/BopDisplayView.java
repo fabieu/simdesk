@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ScrollOptions;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -10,15 +11,13 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -29,6 +28,7 @@ import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.AccBopEntry;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.json.JsonUtils;
@@ -37,6 +37,7 @@ import de.sustineo.simdesk.views.generators.InactiveBopPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.BopRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
@@ -49,19 +50,34 @@ import java.util.stream.Collectors;
 @Route(value = "/bop/overview", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
 @AnonymousAllowed
-public class BopDisplayView extends VerticalLayout {
+public class BopDisplayView extends VerticalLayout implements BeforeEnterObserver {
     private final BopService bopService;
-    private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
-    private final List<H2> trackTitles = new ArrayList<>();
+    private final NotificationService notificationService;
 
-    public BopDisplayView(BopService bopService) {
+    private static final String QUERY_PARAMETER_TRACK_ID = "track";
+    private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
+    private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
+
+
+    public BopDisplayView(BopService bopService, NotificationService notificationService) {
         this.bopService = bopService;
+        this.notificationService = notificationService;
 
         setId("bop-display-view");
         setSizeFull();
         setPadding(false);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         addAndExpand(createBopGrid());
+
+        Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
+        if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
+            Optional.ofNullable(scrollTargets.get(Track.getTrackNameById(trackIdParameter.get()))).ifPresent(component -> component.scrollIntoView(scrollOptions));
+        }
     }
 
     private Component createBopGrid() {
@@ -89,10 +105,7 @@ public class BopDisplayView extends VerticalLayout {
         trackSelect.setPlaceholder("Jump to track");
         trackSelect.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                trackTitles.stream()
-                        .filter(h2 -> event.getValue().equals(h2.getText()))
-                        .findFirst()
-                        .ifPresent(h2 -> h2.scrollIntoView(scrollOptions));
+                Optional.ofNullable(scrollTargets.get(event.getValue())).ifPresent(component -> component.scrollIntoView(scrollOptions));
             }
         });
         trackSelectionLayout.add(trackSelect);
@@ -120,17 +133,34 @@ public class BopDisplayView extends VerticalLayout {
             );
 
             // Header
-            H2 trackTitle = new H2(Track.getTrackNameById(entry.getKey()));
-            trackTitles.add(trackTitle);
+            String trackName = Track.getTrackNameById(entry.getKey());
+            H2 trackTitle = new H2(trackName);
+            scrollTargets.put(trackName, trackTitle);
 
             Anchor downloadAnchor = new Anchor(bopResource, "");
             downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.removeAll();
-            downloadAnchor.add(new Button("Download", new Icon(VaadinIcon.CLOUD_DOWNLOAD_O)));
+            Button downloadButton = new Button(ComponentUtils.getDownloadIcon());
+            downloadButton.setTooltipText("Download");
+            downloadAnchor.add(downloadButton);
+
+            Button shareButton = new Button(ComponentUtils.getShareIcon());
+            shareButton.setTooltipText("Share");
+            shareButton.addClickListener(event -> {
+                        Page page = UI.getCurrent().getPage();
+                        page.fetchCurrentURL(url -> {
+                            String shareUrl = UriComponentsBuilder.fromHttpUrl(url.toString())
+                                    .replaceQueryParam(QUERY_PARAMETER_TRACK_ID, entry.getKey())
+                                    .toUriString();
+                            page.executeJs(String.format("navigator.clipboard.writeText('%s')", shareUrl));
+                            notificationService.showSuccessNotification("Copied share link to clipboard");
+                        });
+                    }
+            );
 
             HorizontalLayout header = new HorizontalLayout();
             header.setAlignItems(FlexComponent.Alignment.CENTER);
-            header.add(trackTitle, downloadAnchor);
+            header.add(trackTitle, downloadAnchor, shareButton);
 
             // Grid
             Grid<Bop> grid = new Grid<>(Bop.class, false);
@@ -170,9 +200,7 @@ public class BopDisplayView extends VerticalLayout {
             layout.add(trackLayout);
         }
 
-        trackSelect.setItems(trackTitles.stream()
-                .map(H2::getText)
-                .collect(Collectors.toList()));
+        trackSelect.setItems(new ArrayList<>(scrollTargets.keySet()));
 
         return layout;
     }
