@@ -2,6 +2,7 @@ package de.sustineo.simdesk.entities.mapper;
 
 import de.sustineo.simdesk.entities.Lap;
 import org.apache.ibatis.annotations.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -9,6 +10,7 @@ import java.util.List;
 @Component
 @Mapper
 public interface LapMapper {
+    @Cacheable("laps")
     @Results(id = "lapResultMap", value = {
             @Result(id = true, property = "id", column = "id"),
             @Result(property = "sessionId", column = "session_id"),
@@ -23,7 +25,7 @@ public interface LapMapper {
     })
     @Select("""
             <script>
-            SELECT * FROM laps WHERE session_id = #{sessionId} AND driver_id IN 
+            SELECT * FROM laps WHERE session_id = #{sessionId} AND driver_id IN
                 <foreach item="item" index="index" collection="playerIds"
                     open="(" separator="," close=")">
                       #{item}

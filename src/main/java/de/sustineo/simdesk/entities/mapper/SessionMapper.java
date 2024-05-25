@@ -3,6 +3,7 @@ package de.sustineo.simdesk.entities.mapper;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
 import org.apache.ibatis.annotations.*;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
@@ -40,12 +41,12 @@ public interface SessionMapper {
     @ResultType(long.class)
     long count();
 
-    @SuppressWarnings("unused")
+    @Cacheable("sessions-by-id")
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM sessions WHERE id = #{id} LIMIT 1")
     Session findById(Integer id);
 
-
+    @Cacheable("sessions-by-file-checksum")
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM sessions WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);

@@ -84,6 +84,7 @@ logging:
   level:
     de.sustineo.acc.simdesk: DEBUG
     de.sustineo.acc.simdesk.entities.mapper: INFO
+    #org.springframework.cache: TRACE
 vaadin:
   productionMode: false
   heartbeatInterval: 60
