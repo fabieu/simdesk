@@ -23,6 +23,7 @@ import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
+import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -32,7 +33,7 @@ import java.util.Optional;
 @Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
 @AnonymousAllowed
-public class OverallLapTimesView extends VerticalLayout implements BeforeEnterObserver {
+public class OverallLapTimesView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
     private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     private final RankingService rankingService;
 
@@ -61,6 +62,11 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
         addAndExpand(rankingGrid);
     }
 
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        updateQueryParameters(this.timeRange);
+    }
+
     private Component createRankingHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
@@ -76,7 +82,10 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
         timeRangeSelect.setValue(timeRange);
         timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
-        timeRangeSelect.addValueChangeListener(event -> replaceRankingGrid(event.getValue()));
+        timeRangeSelect.addValueChangeListener(event -> {
+            replaceRankingGrid(event.getValue());
+            updateQueryParameters(event.getValue());
+        });
 
         layout.add(heading, timeRangeSelect);
         return layout;
@@ -146,5 +155,16 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
         Grid<GroupRanking> grid = createRankingGrid(timeRange);
         replace(this.rankingGrid, grid);
         this.rankingGrid = grid;
+    }
+
+    private void updateQueryParameters(TimeRange timeRange) {
+        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
+        // Assign the full deep linking URL directly using
+        // History object: changes the URL in the browser,
+        // but doesn't reload the page.
+        String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
+                .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
+                .toUriString();
+        getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
     }
 }
