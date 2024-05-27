@@ -35,6 +35,7 @@ import java.util.Optional;
 @AnonymousAllowed
 public class SessionView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
     private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
+
     private final SessionService sessionService;
 
     private Grid<Session> sessionGrid;
@@ -48,8 +49,8 @@ public class SessionView extends VerticalLayout implements BeforeEnterObserver, 
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        final QueryParameters queryParameters = event.getLocation().getQueryParameters();
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
         if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {

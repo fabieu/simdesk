@@ -51,21 +51,43 @@ import java.util.stream.Stream;
 @AnonymousAllowed
 public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
+
     private final RankingService rankingService;
     private final SessionService sessionService;
     private final SecurityService securityService;
+
     private GridListDataView<SessionRanking> dataView;
 
-    public SessionRankingView(RankingService rankingService, SessionService sessionService, SecurityService securityService) {
+    public SessionRankingView(RankingService rankingService,
+                              SessionService sessionService,
+                              SecurityService securityService) {
         this.rankingService = rankingService;
         this.sessionService = sessionService;
+        this.securityService = securityService;
 
         setSizeFull();
         setPadding(false);
         setSpacing(false);
-        this.securityService = securityService;
     }
 
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+
+        String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
+
+        try {
+            Session session = sessionService.getSession(fileChecksum);
+            if (session == null) {
+                throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
+            }
+
+            add(createSessionInformation(session));
+            addAndExpand(createLeaderboardGrid(session));
+        } catch (IllegalArgumentException e) {
+            beforeEnterEvent.rerouteToError(NotFoundException.class);
+        }
+    }
 
     private Component createSessionInformation(Session session) {
         HorizontalLayout layout = new HorizontalLayout();
@@ -226,25 +248,6 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
         } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
             log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
             return null;
-        }
-    }
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        final RouteParameters routeParameters = event.getRouteParameters();
-
-        String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
-
-        try {
-            Session session = sessionService.getSession(fileChecksum);
-            if (session == null) {
-                throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
-            }
-
-            add(createSessionInformation(session));
-            addAndExpand(createLeaderboardGrid(session));
-        } catch (IllegalArgumentException e) {
-            event.rerouteToError(NotFoundException.class);
         }
     }
 }

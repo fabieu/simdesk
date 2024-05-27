@@ -57,11 +57,13 @@ import java.util.stream.Collectors;
 public class SessionDetailsView extends VerticalLayout implements BeforeEnterObserver {
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     public static final String ROUTE_PARAMETER_CAR_ID = "carId";
+
     private final SessionService sessionService;
     private final LapService lapService;
     private final PenaltyService penaltyService;
     private final RankingService rankingService;
     private final SecurityService securityService;
+
     private List<Lap> laps = new ArrayList<>();
     private List<Penalty> penalties = new ArrayList<>();
 
@@ -79,6 +81,41 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
         setSizeFull();
         setPadding(false);
         setSpacing(false);
+    }
+
+    @Override
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+
+        String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
+        int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());
+
+        Session session = sessionService.getSession(fileChecksum);
+        if (session == null) {
+            throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
+        }
+
+        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
+        if (playerIds == null || playerIds.isEmpty()) {
+            throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
+        }
+
+        laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
+        penalties = penaltyService.findBySessionAndCarId(session.getId(), carId).stream()
+                .filter(Penalty::isValid)
+                .collect(Collectors.toList());
+
+        add(createSessionInformation(session));
+
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
+        tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
+        tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
+        if (securityService.hasAnyRole(Role.ADMIN)) {
+            tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
+        }
+        addAndExpand(tabSheet);
     }
 
     private Component createSessionInformation(Session session) {
@@ -237,42 +274,6 @@ public class SessionDetailsView extends VerticalLayout implements BeforeEnterObs
             log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
             return null;
         }
-    }
-
-
-    @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        RouteParameters routeParameters = event.getRouteParameters();
-
-        String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
-        int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());
-
-        Session session = sessionService.getSession(fileChecksum);
-        if (session == null) {
-            throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
-        }
-
-        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
-        if (playerIds == null || playerIds.isEmpty()) {
-            throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
-        }
-
-        laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
-        penalties = penaltyService.findBySessionAndCarId(session.getId(), carId).stream()
-                .filter(Penalty::isValid)
-                .collect(Collectors.toList());
-
-        add(createSessionInformation(session));
-
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setSizeFull();
-        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
-        tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
-        tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
-        if (securityService.hasAnyRole(Role.ADMIN)) {
-            tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
-        }
-        addAndExpand(tabSheet);
     }
 
     private Tab createTab(String label) {

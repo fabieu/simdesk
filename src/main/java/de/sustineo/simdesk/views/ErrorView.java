@@ -58,8 +58,8 @@ public class ErrorView extends VerticalLayout implements BeforeEnterObserver {
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        QueryParameters queryParameters = event.getLocation().getQueryParameters();
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
         Map<String, String> parametersMap = queryParameters.getParameters().entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,

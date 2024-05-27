@@ -35,6 +35,7 @@ import java.util.Optional;
 @AnonymousAllowed
 public class OverallLapTimesView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
     private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
+
     private final RankingService rankingService;
 
     private Grid<GroupRanking> rankingGrid;

@@ -54,9 +54,9 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
     }
 
     @Override
-    public void beforeEnter(BeforeEnterEvent event) {
-        final RouteParameters routeParameters = event.getRouteParameters();
-        final QueryParameters queryParameters = event.getLocation().getQueryParameters();
+    public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
+        final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         String carGroup = routeParameters.get(ROUTE_PARAMETER_CAR_GROUP).orElseThrow();
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
@@ -72,7 +72,7 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
             add(createRankingHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
         } else {
-            event.rerouteToError(NotFoundException.class);
+            beforeEnterEvent.rerouteToError(NotFoundException.class);
         }
     }
 

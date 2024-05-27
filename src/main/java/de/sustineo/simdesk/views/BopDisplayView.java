@@ -51,13 +51,13 @@ import java.util.stream.Collectors;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends VerticalLayout implements BeforeEnterObserver {
+    private static final String QUERY_PARAMETER_TRACK_ID = "track";
+
     private final BopService bopService;
     private final NotificationService notificationService;
 
-    private static final String QUERY_PARAMETER_TRACK_ID = "track";
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
     private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
-
 
     public BopDisplayView(BopService bopService, NotificationService notificationService) {
         this.bopService = bopService;
