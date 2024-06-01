@@ -49,9 +49,7 @@ import java.util.stream.Stream;
 @Route(value = "/leaderboard/sessions/:fileChecksum", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
-public class SessionRankingView extends VerticalLayout implements BeforeEnterObserver {
-    public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
-
+public class SessionRankingView extends BaseView implements BeforeEnterObserver {
     private final RankingService rankingService;
     private final SessionService sessionService;
     private final SecurityService securityService;
@@ -220,8 +218,8 @@ public class SessionRankingView extends VerticalLayout implements BeforeEnterObs
             if (selectedSessionRanking != null) {
                 getUI().ifPresent(ui -> ui.navigate(SessionDetailsView.class,
                         new RouteParameters(
-                                new RouteParam(SessionDetailsView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
-                                new RouteParam(SessionDetailsView.ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
+                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
+                                new RouteParam(ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
                         )
                 ));
             }

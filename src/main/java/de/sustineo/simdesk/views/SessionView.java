@@ -8,7 +8,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
@@ -24,7 +23,6 @@ import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.SessionFilter;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -33,9 +31,7 @@ import java.util.Optional;
 @Route(value = "/leaderboard/sessions", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Sessions")
 @AnonymousAllowed
-public class SessionView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
-    private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
-
+public class SessionView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final SessionService sessionService;
 
     private Grid<Session> sessionGrid;
@@ -144,7 +140,7 @@ public class SessionView extends VerticalLayout implements BeforeEnterObserver, 
             if (selectedSession != null) {
                 getUI().ifPresent(ui -> ui.navigate(SessionRankingView.class,
                         new RouteParameters(
-                                new RouteParam(SessionRankingView.ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
+                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )
                 ));
             }
@@ -157,16 +153,5 @@ public class SessionView extends VerticalLayout implements BeforeEnterObserver, 
         Grid<Session> grid = createSessionGrid(timeRange);
         replace(this.sessionGrid, grid);
         this.sessionGrid = grid;
-    }
-
-    private void updateQueryParameters(TimeRange timeRange) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
-        // Assign the full deep linking URL directly using
-        // History object: changes the URL in the browser,
-        // but doesn't reload the page.
-        String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
-                .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
-                .toUriString();
-        getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
     }
 }

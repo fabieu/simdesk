@@ -7,7 +7,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
@@ -23,7 +22,6 @@ import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Map;
@@ -33,9 +31,7 @@ import java.util.Optional;
 @Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
 @AnonymousAllowed
-public class OverallLapTimesView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
-    private static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
-
+public class OverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
 
     private Grid<GroupRanking> rankingGrid;
@@ -141,10 +137,10 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
             if (selectedGroupRanking != null) {
                 getUI().ifPresent(ui -> ui.navigate(OverallLapTimesDifferentiatedView.class,
                         new RouteParameters(
-                                new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
-                                new RouteParam(OverallLapTimesDifferentiatedView.ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
+                                new RouteParam(ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
+                                new RouteParam(ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())
                         ),
-                        new QueryParameters(Map.of(OverallLapTimesDifferentiatedView.QUERY_PARAMETER_TIME_RANGE, List.of(timeRange.name().toLowerCase())))
+                        new QueryParameters(Map.of(QUERY_PARAMETER_TIME_RANGE, List.of(timeRange.name().toLowerCase())))
                 ));
             }
         });
@@ -156,16 +152,5 @@ public class OverallLapTimesView extends VerticalLayout implements BeforeEnterOb
         Grid<GroupRanking> grid = createRankingGrid(timeRange);
         replace(this.rankingGrid, grid);
         this.rankingGrid = grid;
-    }
-
-    private void updateQueryParameters(TimeRange timeRange) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
-        // Assign the full deep linking URL directly using
-        // History object: changes the URL in the browser,
-        // but doesn't reload the page.
-        String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
-                .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
-                .toUriString();
-        getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
     }
 }

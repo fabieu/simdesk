@@ -54,7 +54,7 @@ import java.util.Set;
 @Route(value = "/bop/editor", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "BoP - Editor")
 @AnonymousAllowed
-public class BopEditorView extends VerticalLayout {
+public class BopEditorView extends BaseView {
     private static final String NOTIFICATION_DELIMITER = " - ";
 
     private final ValidationService validationService;

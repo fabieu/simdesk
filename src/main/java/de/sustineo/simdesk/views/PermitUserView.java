@@ -29,7 +29,7 @@ import java.util.Set;
 @Route(value = "/permit/me", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Permit")
 @PermitAll
-public class PermitUserView extends VerticalLayout {
+public class PermitUserView extends BaseView {
     private final SecurityService securityService;
     private final Optional<PermitService> permitService;
 

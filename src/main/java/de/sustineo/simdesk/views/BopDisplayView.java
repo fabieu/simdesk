@@ -50,7 +50,7 @@ import java.util.stream.Collectors;
 @Route(value = "/bop/overview", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
 @AnonymousAllowed
-public class BopDisplayView extends VerticalLayout implements BeforeEnterObserver {
+public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private static final String QUERY_PARAMETER_TRACK_ID = "track";
 
     private final BopService bopService;

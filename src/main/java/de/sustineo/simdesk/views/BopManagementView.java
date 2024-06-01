@@ -43,7 +43,7 @@ import java.util.List;
 @Route(value = "/bop/management", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Management")
 @RolesAllowed({"ADMIN", "BOP-MANAGER"})
-public class BopManagementView extends VerticalLayout {
+public class BopManagementView extends BaseView {
     private final BopService bopService;
     private final SecurityService securityService;
 

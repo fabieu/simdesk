@@ -8,7 +8,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -26,7 +25,6 @@ import de.sustineo.simdesk.views.generators.DriverRankingPodiumPartNameGenerator
 import de.sustineo.simdesk.views.renderers.DriverRankingRenderer;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.web.util.UriComponentsBuilder;
 
 import java.util.List;
 import java.util.Optional;
@@ -35,11 +33,7 @@ import java.util.Optional;
 @Route(value = "/leaderboard/lap-times/:carGroup/:trackId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times by track")
 @AnonymousAllowed
-public class OverallLapTimesDifferentiatedView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver {
-    public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
-    public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
-    public static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
-
+public class OverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
 
     private Grid<DriverRanking> rankingGrid;
@@ -183,16 +177,5 @@ public class OverallLapTimesDifferentiatedView extends VerticalLayout implements
         Grid<DriverRanking> grid = createRankingGrid(carGroup, trackId, timeRange);
         replace(this.rankingGrid, grid);
         this.rankingGrid = grid;
-    }
-
-    private void updateQueryParameters(TimeRange timeRange) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
-        // Assign the full deep linking URL directly using
-        // History object: changes the URL in the browser,
-        // but doesn't reload the page.
-        String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
-                .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
-                .toUriString();
-        getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
     }
 }

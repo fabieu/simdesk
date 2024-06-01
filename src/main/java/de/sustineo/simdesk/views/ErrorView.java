@@ -5,7 +5,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -21,7 +20,7 @@ import java.util.stream.Collectors;
 @Route(layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Error")
 @AnonymousAllowed
-public class ErrorView extends VerticalLayout implements BeforeEnterObserver {
+public class ErrorView extends BaseView implements BeforeEnterObserver {
     public static final String QUERY_PARAMETER_HTTP_STATUS = "httpStatus";
     public static final String QUERY_PARAMETER_ERROR_MESSAGE = "errorMessage";
 
@@ -68,6 +67,8 @@ public class ErrorView extends VerticalLayout implements BeforeEnterObserver {
 
         String httpStatus = parametersMap.getOrDefault(QUERY_PARAMETER_HTTP_STATUS, "500 - Internal Server Error");
         String errorMessage = parametersMap.getOrDefault(QUERY_PARAMETER_ERROR_MESSAGE, "Unknown error");
+
+        log.warning(String.format("ErrorView: %s: %s", httpStatus, errorMessage));
 
         add(createStatusCode(httpStatus));
         add(createErrorMessage(errorMessage));

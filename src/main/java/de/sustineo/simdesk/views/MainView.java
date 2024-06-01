@@ -5,7 +5,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
@@ -25,7 +24,7 @@ import java.util.Optional;
 @RouteAlias(value = "/home", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Dashboard")
 @AnonymousAllowed
-public class MainView extends VerticalLayout {
+public class MainView extends BaseView {
     private final MenuService menuService;
     private final String communityName;
 

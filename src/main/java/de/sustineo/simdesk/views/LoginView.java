@@ -21,7 +21,7 @@ import de.sustineo.simdesk.services.NotificationService;
 @Route(value = "login", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Login")
 @AnonymousAllowed
-public class LoginView extends VerticalLayout implements BeforeEnterObserver {
+public class LoginView extends BaseView implements BeforeEnterObserver {
     private final NotificationService notificationService;
     private final LoginForm login = new LoginForm();
     private Button loginButton = new Button();

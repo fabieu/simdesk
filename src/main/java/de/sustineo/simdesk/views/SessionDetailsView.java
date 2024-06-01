@@ -54,10 +54,7 @@ import java.util.stream.Collectors;
 @Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Session")
 @AnonymousAllowed
-public class SessionDetailsView extends VerticalLayout implements BeforeEnterObserver {
-    public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
-    public static final String ROUTE_PARAMETER_CAR_ID = "carId";
-
+public class SessionDetailsView extends BaseView implements BeforeEnterObserver {
     private final SessionService sessionService;
     private final LapService lapService;
     private final PenaltyService penaltyService;

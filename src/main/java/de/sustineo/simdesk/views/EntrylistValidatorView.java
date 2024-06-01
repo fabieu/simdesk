@@ -50,7 +50,7 @@ import java.util.List;
 @Route(value = "/entrylist/validator", layout = MainLayout.class)
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Entrylist - Validator")
 @AnonymousAllowed
-public class EntrylistValidatorView extends VerticalLayout {
+public class EntrylistValidatorView extends BaseView {
     private static final String NOTIFICATION_DELIMITER = " - ";
 
     private final EntrylistService entrylistService;
