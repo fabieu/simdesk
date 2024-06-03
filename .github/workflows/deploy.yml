@@ -1,0 +1,33 @@
+name: Deploy
+
+on:
+  workflow_dispatch:
+    inputs:
+      environment:
+        type: environment
+        description: 'Environment'
+        required: true
+
+concurrency:
+  group: ${{ github.workflow }}-${{ inputs.environment }}
+  cancel-in-progress: true
+
+jobs:
+  deployment:
+    if: startsWith(github.ref, 'refs/tags/')
+    runs-on: sustineo-01
+    environment:
+      name: ${{ inputs.environment }}
+      url: "https://${{ inputs.environment }}.simdesk.eu"
+    defaults:
+      run:
+        working-directory: ${{ vars.TARGET_DIR }}
+    env:
+      SIMDESK_VERSION: ${{ github.ref }}
+    steps:
+      - name: Login to container registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
+      - name: Copy docker compose file
+        run: cp -f ${{ github.workspace }}/docker-compose.yml docker-compose.yml
+      - name: docker compose up
+        run: docker-compose up -d
