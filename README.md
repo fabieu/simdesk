@@ -1,14 +1,5 @@
 <a id="readme-top"></a>
 
-<!-- SHIELDS -->
-[![Stargazers][stars-shield]][project-url]
-[![Issues][issues-shield]][issues-url]
-[![Contributors][contributors-shield]][project-url]
-[![Forks][forks-shield]][forks-url]
-[![MIT License][license-shield]][license-url]
-
-
-
 <!-- OVERVIEW -->
 <br />
 <div style="text-align: center">
@@ -16,19 +7,13 @@
   <p style="text-align: center">
     Simple and customizable server dashboard and utilities for Assetto Corsa Competizione
     <br />
-    <a href="https://acc.sim2real.eu">View Demo</a>
+    <a href="https://sim2real.simdesk.eu">View Demo</a>
     ·
-    <a href="https://gitlab.com/sustineo/simdesk/issues">Report Bug</a>
+    <a href="https://github.com/fabieu/simdesk/issues">Report Bug</a>
     ·
-    <a href="https://gitlab.com/sustineo/simdesk/issues">Request Feature</a>
+    <a href="https://github.com/fabieu/simdesk/issues">Request Feature</a>
   </p>
 </div>
-
-
-
-<!-- TABLE OF CONTENTS -->
-[[_TOC_]]
-
 
 <!-- FEATURES -->
 
@@ -56,7 +41,7 @@
 🐳 Docker
 
 ```bash
-docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_ACTIVE="acc-entrylist,acc-bop,acc-leaderboard" -v ./results:/app/results -v ./data:/app/data registry.gitlab.com/sustineo/simdesk:latest
+docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_ACTIVE="acc-entrylist,acc-bop,acc-leaderboard" -v ./results:/app/results -v ./data:/app/data ghcr.io/fabieu/simdesk:latest
 ```
 
 🐳 Docker Compose
@@ -65,7 +50,7 @@ docker run -d --restart=always -p 8085:8080 --name simdesk -e SPRING_PROFILES_AC
 version: "3.9"
 services:
   app:
-    image: registry.gitlab.com/sustineo/simdesk:latest
+    image: ghcr.io/fabieu/simdesk:latest
     ports:
       - "8080:8080"
     volumes:
@@ -184,7 +169,7 @@ settings:
 
 # Changelog & Releases
 
-This repository keeps a changelog using GitLab's releases functionality.
+This repository keeps a changelog using GitHub's releases functionality.
 
 Releases are based on Semantic Versioning, and use the format of `MAJOR.MINOR.PATCH`. In short, the version will be
 incremented based on the following:
@@ -216,17 +201,6 @@ Don't forget to give the project a star! Thanks again!
 
 <p style="text-align: end">(<a href="#readme-top">back to top</a>)</p>
 
-
-<!-- ACKNOWLEDGMENTS -->
-
-# Acknowledgments
-
-* [Choose an Open Source License](https://choosealicense.com)
-* [shields.io](https://shields.io)
-
-<p style="text-align: end">(<a href="#readme-top">back to top</a>)</p>
-
-
 <!-- LICENSE -->
 
 # License
@@ -239,27 +213,17 @@ Distributed under the Apache License 2.0. See [LICENSE][license-url] for more in
 
 <!-- MARKDOWN LINKS & IMAGES -->
 
-[project-url]: https://gitlab.com/sustineo/simdesk
+[project-url]: https://github.com/fabieu/simdesk
 
-[stars-shield]: https://img.shields.io/gitlab/stars/sustineo%2Fsimdesk?style=for-the-badge
+[issues-url]: https://github.com/fabieu/simdesk/issues
 
-[issues-shield]: https://img.shields.io/gitlab/issues/open/sustineo%2Fsimdesk?style=for-the-badge
-
-[issues-url]: https://gitlab.com/sustineo/simdesk/-/issues
-
-[contributors-shield]: https://img.shields.io/gitlab/contributors/sustineo%2Fsimdesk?style=for-the-badge
-
-[forks-shield]: https://img.shields.io/gitlab/forks/sustineo%2Fsimdesk?style=for-the-badge
-
-[forks-url]: https://gitlab.com/sustineo/simdesk/-/forks
-
-[license-shield]: https://img.shields.io/gitlab/license/sustineo%2Fsimdesk?style=for-the-badge
+[forks-url]: https://github.com/fabieu/simdesk/forks
 
 [license-url]: https://gitlab.com/sustineo/simdesk/-/blob/main/LICENSE
 
 [spring-boot]: https://img.shields.io/badge/spring%20boot-6DB33F?logo=springboot&logoColor=white&style=for-the-badge
 
-[spring-boot-url]: https://vaadin.com/
+[spring-boot-url]: https://spring.io/projects/spring-boot
 
 [vaadin]: https://img.shields.io/badge/vaadin-00B4F0?logo=vaadin&logoColor=white&style=for-the-badge
 
