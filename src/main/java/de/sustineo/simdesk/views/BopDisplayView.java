@@ -51,8 +51,6 @@ import java.util.stream.Collectors;
 @PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
-    private static final String QUERY_PARAMETER_TRACK_ID = "track";
-
     private final BopService bopService;
     private final NotificationService notificationService;
 
@@ -76,7 +74,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
-            Optional.ofNullable(scrollTargets.get(Track.getTrackNameById(trackIdParameter.get()))).ifPresent(component -> component.scrollIntoView(scrollOptions));
+            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(component -> component.scrollIntoView(scrollOptions));
         }
     }
 
@@ -103,9 +101,14 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         Select<String> trackSelect = new Select<>();
         trackSelect.setWidthFull();
         trackSelect.setPlaceholder("Jump to track");
+        trackSelect.setItemLabelGenerator(Track::getTrackNameById);
         trackSelect.addValueChangeListener(event -> {
-            if (event.getValue() != null) {
-                Optional.ofNullable(scrollTargets.get(event.getValue())).ifPresent(component -> component.scrollIntoView(scrollOptions));
+            String trackId = event.getValue();
+            if (trackId != null) {
+                Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
+                    updateQueryParameters(trackId);
+                    component.scrollIntoView(scrollOptions);
+                });
             }
         });
         trackSelectionLayout.add(trackSelect);
@@ -113,6 +116,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         layout.add(trackSelectionLayout, ComponentUtils.createSpacer());
 
         for (Map.Entry<String, Set<Bop>> entry : bopsByTrack.entrySet()) {
+            String trackId = entry.getKey();
             VerticalLayout trackLayout = new VerticalLayout();
             trackLayout.setPadding(false);
 
@@ -133,9 +137,8 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             );
 
             // Header
-            String trackName = Track.getTrackNameById(entry.getKey());
-            H2 trackTitle = new H2(trackName);
-            scrollTargets.put(trackName, trackTitle);
+            H2 trackTitle = new H2(Track.getTrackNameById(trackId));
+            scrollTargets.put(trackId, trackTitle);
 
             Anchor downloadAnchor = new Anchor(bopResource, "");
             downloadAnchor.getElement().setAttribute("download", true);
