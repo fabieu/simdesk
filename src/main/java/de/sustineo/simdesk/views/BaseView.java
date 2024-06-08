@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.RouteConfiguration;
+import com.vaadin.flow.router.RouteParameters;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import org.springframework.web.util.UriComponentsBuilder;
 
@@ -19,8 +20,8 @@ public class BaseView extends VerticalLayout {
      *
      * @param timeRange the time range to set
      */
-    protected void updateQueryParameters(TimeRange timeRange) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
+    protected void updateQueryParameters(TimeRange timeRange, RouteParameters routeParameters) {
+        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass(), routeParameters);
         String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
                 .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
                 .toUriString();
@@ -33,8 +34,8 @@ public class BaseView extends VerticalLayout {
      *
      * @param trackId the track id to set
      */
-    protected void updateQueryParameters(String trackId) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass());
+    protected void updateQueryParameters(String trackId, RouteParameters routeParameters) {
+        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass(), routeParameters);
         String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
                 .queryParam(QUERY_PARAMETER_TRACK_ID, trackId.toLowerCase())
                 .toUriString();

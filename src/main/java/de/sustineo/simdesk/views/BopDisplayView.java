@@ -54,6 +54,9 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final BopService bopService;
     private final NotificationService notificationService;
 
+    private RouteParameters routeParameters;
+    private QueryParameters queryParameters;
+
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
     private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
@@ -68,7 +71,8 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
+        queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         addAndExpand(createBopGrid());
 
@@ -106,7 +110,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             String trackId = event.getValue();
             if (trackId != null) {
                 Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
-                    updateQueryParameters(trackId);
+                    updateQueryParameters(trackId, routeParameters);
                     component.scrollIntoView(scrollOptions);
                 });
             }

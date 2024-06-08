@@ -36,6 +36,8 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
 
     private Grid<Session> sessionGrid;
     private TimeRange timeRange = TimeRange.LAST_MONTH;
+    private RouteParameters routeParameters;
+    private QueryParameters queryParameters;
 
     public SessionView(SessionService sessionService) {
         this.sessionService = sessionService;
@@ -46,7 +48,8 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
+        queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
         if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
@@ -60,7 +63,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange);
+        updateQueryParameters(this.timeRange, routeParameters);
     }
 
     private Component createSessionHeader(TimeRange timeRange) {
@@ -80,7 +83,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceSessionGrid(event.getValue());
-            updateQueryParameters(event.getValue());
+            updateQueryParameters(event.getValue(), routeParameters);
         });
 
         layout.add(heading, timeRangeSelect);

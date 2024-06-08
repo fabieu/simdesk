@@ -38,6 +38,8 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
     private Grid<DriverRanking> rankingGrid;
     private TimeRange timeRange = TimeRange.ALL_TIME;
+    private RouteParameters routeParameters;
+    private QueryParameters queryParameters;
 
     public OverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
@@ -49,8 +51,8 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
-        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
+        queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         String carGroup = routeParameters.get(ROUTE_PARAMETER_CAR_GROUP).orElseThrow();
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
@@ -72,7 +74,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange);
+        updateQueryParameters(this.timeRange, routeParameters);
     }
 
     private Component createRankingHeader(String carGroup, String trackId, TimeRange timeRange) {
@@ -92,7 +94,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, event.getValue());
-            updateQueryParameters(event.getValue());
+            updateQueryParameters(event.getValue(), routeParameters);
         });
 
         layout.add(heading, timeRangeSelect);

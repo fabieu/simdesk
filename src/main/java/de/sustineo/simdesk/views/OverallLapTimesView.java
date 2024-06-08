@@ -36,6 +36,8 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
 
     private Grid<GroupRanking> rankingGrid;
     private TimeRange timeRange = TimeRange.ALL_TIME;
+    private RouteParameters routeParameters;
+    private QueryParameters queryParameters;
 
     public OverallLapTimesView(RankingService rankingService) {
         this.rankingService = rankingService;
@@ -47,7 +49,8 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
+        queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
         if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
@@ -61,7 +64,7 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange);
+        updateQueryParameters(this.timeRange, routeParameters);
     }
 
     private Component createRankingHeader(TimeRange timeRange) {
@@ -81,7 +84,7 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceRankingGrid(event.getValue());
-            updateQueryParameters(event.getValue());
+            updateQueryParameters(event.getValue(), routeParameters);
         });
 
         layout.add(heading, timeRangeSelect);
