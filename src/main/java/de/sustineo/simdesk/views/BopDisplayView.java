@@ -110,7 +110,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             String trackId = event.getValue();
             if (trackId != null) {
                 Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
-                    updateQueryParameters(trackId, routeParameters);
+                    updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, trackId));
                     component.scrollIntoView(scrollOptions);
                 });
             }

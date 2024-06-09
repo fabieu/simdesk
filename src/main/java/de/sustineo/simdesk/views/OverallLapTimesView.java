@@ -64,7 +64,7 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange, routeParameters);
+        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
     private Component createRankingHeader(TimeRange timeRange) {
@@ -84,7 +84,7 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceRankingGrid(event.getValue());
-            updateQueryParameters(event.getValue(), routeParameters);
+            updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
 
         layout.add(heading, timeRangeSelect);

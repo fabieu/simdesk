@@ -74,7 +74,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange, routeParameters);
+        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
     private Component createRankingHeader(String carGroup, String trackId, TimeRange timeRange) {
@@ -94,7 +94,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, event.getValue());
-            updateQueryParameters(event.getValue(), routeParameters);
+            updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
         });
 
         layout.add(heading, timeRangeSelect);

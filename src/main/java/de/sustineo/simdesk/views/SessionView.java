@@ -63,7 +63,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(this.timeRange, routeParameters);
+        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
     private Component createSessionHeader(TimeRange timeRange) {
@@ -83,7 +83,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceSessionGrid(event.getValue());
-            updateQueryParameters(event.getValue(), routeParameters);
+            updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
 
         layout.add(heading, timeRangeSelect);

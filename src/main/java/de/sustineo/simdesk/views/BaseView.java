@@ -1,9 +1,10 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteParameters;
-import de.sustineo.simdesk.views.enums.TimeRange;
+import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public class BaseView extends VerticalLayout {
@@ -17,27 +18,11 @@ public class BaseView extends VerticalLayout {
     /**
      * Updates the query parameters of the current view with the given time range.
      * Assign the full deep linking URL directly using History object: changes the URL in the browser but doesn't reload the page.
-     *
-     * @param timeRange the time range to set
      */
-    protected void updateQueryParameters(TimeRange timeRange, RouteParameters routeParameters) {
+    protected void updateQueryParameters(RouteParameters routeParameters, QueryParameters queryParameters) {
         String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass(), routeParameters);
         String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
-                .queryParam(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase())
-                .toUriString();
-        getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
-    }
-
-    /**
-     * Updates the query parameters of the current view with the given track id.
-     * Assign the full deep linking URL directly using History object: changes the URL in the browser but doesn't reload the page.
-     *
-     * @param trackId the track id to set
-     */
-    protected void updateQueryParameters(String trackId, RouteParameters routeParameters) {
-        String deepLinkingUrl = RouteConfiguration.forSessionScope().getUrl(getClass(), routeParameters);
-        String deepLinkingUrlWithParam = UriComponentsBuilder.fromPath(deepLinkingUrl)
-                .queryParam(QUERY_PARAMETER_TRACK_ID, trackId.toLowerCase())
+                .queryParams(new LinkedMultiValueMap<>(queryParameters.getParameters()))
                 .toUriString();
         getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
     }
