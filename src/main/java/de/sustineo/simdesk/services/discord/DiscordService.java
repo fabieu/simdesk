@@ -3,8 +3,9 @@ package de.sustineo.simdesk.services.discord;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
-import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
+import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.entity.Message;
 import discord4j.discordjson.json.MemberData;
 import discord4j.discordjson.json.RoleData;
 import discord4j.rest.http.client.ClientException;
@@ -22,15 +23,25 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class DiscordService {
+    private final StageAttendanceService stageAttendanceService;
+
     private final Long guildId;
     private final DiscordClient botClient;
-    private final GatewayDiscordClient gatewayClient;
 
     public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
-                          @Value("${simdesk.auth.discord.guild-id}") String guildId) {
-        this.botClient = DiscordClientBuilder.create(discordApplicationToken).build();
-        this.gatewayClient = botClient.login().block();
+                          @Value("${simdesk.auth.discord.guild-id}") String guildId,
+                          StageAttendanceService stageAttendanceService) {
+        this.stageAttendanceService = stageAttendanceService;
+
         this.guildId = Long.parseLong(guildId);
+        this.botClient = DiscordClient.create(discordApplicationToken);
+        botClient
+                .withGateway(client -> {
+                    handleGatewayEvents(client);
+                    return client.onDisconnect();
+                })
+                .block();
+
 
         // Check if the Discord bot is connected to the guild
         checkIfBotIsConnectedToGuild();
@@ -86,5 +97,19 @@ public class DiscordService {
         return guildRoles.stream()
                 .filter(role -> memberData.roles().contains(role.id()))
                 .collect(Collectors.toList());
+    }
+
+    public void handleGatewayEvents(GatewayDiscordClient client) {
+        client.on(MessageCreateEvent.class).subscribe(event -> {
+            Message message = event.getMessage();
+
+            if (message.getContent().equals("!ping")) {
+                message.getChannel().block().createMessage("Pong!").block();
+            }
+
+            if (Message.Type.STAGE_START.equals(message.getType()) || Message.Type.STAGE_END.equals(message.getType())) {
+                stageAttendanceService.handleStageEvent(event);
+            }
+        });
     }
 }
