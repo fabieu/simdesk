@@ -8,7 +8,7 @@ import java.time.Instant;
 
 @Data
 @Builder
-public class StageEvent {
+public class StageAttendanceEvent {
     private Member member;
     private StageEventType type;
     private Instant timestamp;

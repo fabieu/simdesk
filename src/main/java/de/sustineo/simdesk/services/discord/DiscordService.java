@@ -44,7 +44,7 @@ public class DiscordService {
                     handleGatewayEvents(client);
                     return client.onDisconnect();
                 })
-                .block();
+                .subscribe();
 
 
         // Check if the Discord bot is connected to the guild
@@ -101,6 +101,12 @@ public class DiscordService {
         return guildRoles.stream()
                 .filter(role -> memberData.roles().contains(role.id()))
                 .collect(Collectors.toList());
+    }
+
+    public void sendMessage(Snowflake channelId, String content) {
+        botClient.getChannelById(channelId)
+                .createMessage(content)
+                .subscribe();
     }
 
     public void handleGatewayEvents(GatewayDiscordClient client) {
