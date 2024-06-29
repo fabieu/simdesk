@@ -27,8 +27,18 @@ public class StageAttendanceService {
 
     private final DiscordService discordService;
 
+    private Snowflake reportChannelId;
+
     public StageAttendanceService(@Lazy DiscordService discordService) {
         this.discordService = discordService;
+    }
+
+    public Snowflake getReportChannelId() {
+        return reportChannelId;
+    }
+
+    public void setReportChannelId(Snowflake reportChannelId) {
+        this.reportChannelId = reportChannelId;
     }
 
     public void handleStageStartEvent(MessageCreateEvent event, Instant receivedAt) {
@@ -107,7 +117,11 @@ public class StageAttendanceService {
         }
 
         // Send stage attendance report
-        sendAttendanceReport(Snowflake.of(1174485060209102959L), stageAttendanceRangeByMember, stageStartTimestamp, stageEndTimestamp);
+        if (reportChannelId != null) {
+            sendAttendanceReport(reportChannelId, stageAttendanceRangeByMember, stageStartTimestamp, stageEndTimestamp);
+        } else {
+            log.severe("Could not send stage attendance report, because report channel is not set");
+        }
 
         clearInternalStageState(channelId);
     }

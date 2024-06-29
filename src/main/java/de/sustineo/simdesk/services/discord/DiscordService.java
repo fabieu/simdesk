@@ -1,32 +1,43 @@
 package de.sustineo.simdesk.services.discord;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.discord.Command;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
+import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.channel.Channel;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.MemberData;
 import discord4j.discordjson.json.RoleData;
 import discord4j.rest.http.client.ClientException;
+import discord4j.rest.interaction.GuildCommandRegistrar;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import reactor.core.publisher.Mono;
 
 import java.time.Instant;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
+import java.util.logging.Level;
 import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class DiscordService {
+    private static final List<ApplicationCommandRequest> applicationCommandRequests = new ArrayList<>();
+    private static final Map<String, Command> commands = new HashMap<>();
+    private static final String COMMAND_SET_REPORT_CHANNEL = "set-report-channel";
+    private static final String COMMAND_GET_REPORT_CHANNEL = "get-report-channel";
+
     private final StageAttendanceService stageAttendanceService;
 
     private final Long guildId;
@@ -41,6 +52,7 @@ public class DiscordService {
         this.botClient = DiscordClient.create(discordApplicationToken);
         botClient
                 .withGateway(client -> {
+                    registerCommands(client);
                     handleGatewayEvents(client);
                     return client.onDisconnect();
                 })
@@ -120,10 +132,6 @@ public class DiscordService {
             }
 
             Message message = event.getMessage();
-            if (message.getContent().equalsIgnoreCase("!ping")) {
-                message.getChannel().block().createMessage("Pong!").block();
-            }
-
             if (Message.Type.STAGE_START.equals(message.getType())) {
                 stageAttendanceService.handleStageStartEvent(event, receivedAt);
             } else if (Message.Type.STAGE_END.equals(message.getType())) {
@@ -144,6 +152,15 @@ public class DiscordService {
                 stageAttendanceService.handleStageJoinEvent(event, receivedAt);
             } else if (event.isLeaveEvent() && isStageChannel(event)) {
                 stageAttendanceService.handleStageLeaveEvent(event, receivedAt);
+            }
+        });
+
+        client.on(ChatInputInteractionEvent.class).subscribe(event -> {
+            for (Map.Entry<String, Command> entry : commands.entrySet()) {
+                if (event.getCommandName().equals(entry.getKey())) {
+                    entry.getValue().execute(event);
+                    break;
+                }
             }
         });
     }
@@ -167,5 +184,58 @@ public class DiscordService {
         }
 
         return false;
+    }
+
+    private void registerCommands(GatewayDiscordClient client) {
+        registerGetReportChannelCommand();
+        registerSetReportChannelCommand();
+
+        GuildCommandRegistrar.create(client.getRestClient(), applicationCommandRequests)
+                .registerCommands(Snowflake.of(guildId))
+                .doOnError(e -> log.log(Level.SEVERE, "Unable to create guild command", e))
+                .onErrorResume(e -> Mono.empty())
+                .blockLast();
+    }
+
+    private void registerGetReportChannelCommand() {
+        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
+                .name(COMMAND_GET_REPORT_CHANNEL)
+                .description("Get the channel where reports will be sent")
+                .build();
+        applicationCommandRequests.add(applicationCommand);
+
+        commands.put(COMMAND_GET_REPORT_CHANNEL, event -> {
+            Snowflake reportChannelId = stageAttendanceService.getReportChannelId();
+            String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", getChannelMention(reportChannelId));
+            event.reply(message).subscribe();
+        });
+    }
+
+    private void registerSetReportChannelCommand() {
+        String optionNameChannel = "channel";
+
+        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
+                .name(COMMAND_SET_REPORT_CHANNEL)
+                .description("Set the channel where reports will be sent")
+                .addOption(ApplicationCommandOptionData.builder()
+                        .name(optionNameChannel)
+                        .description("Report channel")
+                        .type(ApplicationCommandOption.Type.CHANNEL.getValue())
+                        .required(true)
+                        .build())
+                .build();
+        applicationCommandRequests.add(applicationCommand);
+
+        commands.put(COMMAND_SET_REPORT_CHANNEL, event -> event.getInteraction().getCommandInteraction()
+                .map(applicationCommandInteraction -> applicationCommandInteraction.getOption(optionNameChannel))
+                .ifPresent(applicationCommandInteractionOption -> {
+                    Snowflake channelId = applicationCommandInteractionOption.flatMap(ApplicationCommandInteractionOption::getValue).get().asSnowflake();
+                    stageAttendanceService.setReportChannelId(channelId);
+                    event.reply(String.format("Successfully changed report channel to %s", getChannelMention(channelId))).subscribe();
+                }));
+    }
+
+    private String getChannelMention(Snowflake channelId) {
+        return "<#" + channelId.asString() + '>';
     }
 }
