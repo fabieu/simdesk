@@ -8,6 +8,7 @@ import discord4j.core.GatewayDiscordClient;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.interaction.ChatInputInteractionEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
+import discord4j.core.object.command.ApplicationCommandInteraction;
 import discord4j.core.object.command.ApplicationCommandInteractionOption;
 import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.Message;
@@ -35,8 +36,7 @@ import java.util.stream.Collectors;
 public class DiscordService {
     private static final List<ApplicationCommandRequest> applicationCommandRequests = new ArrayList<>();
     private static final Map<String, Command> commands = new HashMap<>();
-    private static final String COMMAND_SET_REPORT_CHANNEL = "set-report-channel";
-    private static final String COMMAND_GET_REPORT_CHANNEL = "get-report-channel";
+    private static final String COMMAND_REPORT_CHANNEL = "report-channel";
 
     private final StageAttendanceService stageAttendanceService;
 
@@ -187,8 +187,7 @@ public class DiscordService {
     }
 
     private void registerCommands(GatewayDiscordClient client) {
-        registerGetReportChannelCommand();
-        registerSetReportChannelCommand();
+        registerReportChannelCommand();
 
         GuildCommandRegistrar.create(client.getRestClient(), applicationCommandRequests)
                 .registerCommands(Snowflake.of(guildId))
@@ -197,42 +196,37 @@ public class DiscordService {
                 .blockLast();
     }
 
-    private void registerGetReportChannelCommand() {
+    private void registerReportChannelCommand() {
+        ApplicationCommandOptionData optionChannel = ApplicationCommandOptionData.builder()
+                .name("channel")
+                .description("Define the channel where reports will be sent to")
+                .type(ApplicationCommandOption.Type.CHANNEL.getValue())
+                .required(false)
+                .build();
+
         ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
-                .name(COMMAND_GET_REPORT_CHANNEL)
-                .description("Get the channel where reports will be sent")
+                .name(COMMAND_REPORT_CHANNEL)
+                .description("Modify channel for reports sent by the bot")
+                .addOption(optionChannel)
                 .build();
         applicationCommandRequests.add(applicationCommand);
 
-        commands.put(COMMAND_GET_REPORT_CHANNEL, event -> {
-            Snowflake reportChannelId = stageAttendanceService.getReportChannelId();
-            String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", getChannelMention(reportChannelId));
-            event.reply(message).subscribe();
+        commands.put(COMMAND_REPORT_CHANNEL, event -> {
+            Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
+
+            Optional<ApplicationCommandInteractionOption> commandInteractionChannel = commandInteraction
+                    .flatMap(applicationCommandInteraction -> applicationCommandInteraction.getOption(optionChannel.name()));
+
+            if (commandInteractionChannel.isPresent() && commandInteractionChannel.get().getValue().isPresent()) {
+                Snowflake reportChannelId = commandInteractionChannel.get().getValue().get().asSnowflake();
+                stageAttendanceService.setReportChannelId(reportChannelId);
+                event.reply(String.format("Successfully changed report channel to %s", getChannelMention(reportChannelId))).subscribe();
+            } else {
+                Snowflake reportChannelId = stageAttendanceService.getReportChannelId();
+                String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", getChannelMention(reportChannelId));
+                event.reply(message).subscribe();
+            }
         });
-    }
-
-    private void registerSetReportChannelCommand() {
-        String optionNameChannel = "channel";
-
-        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
-                .name(COMMAND_SET_REPORT_CHANNEL)
-                .description("Set the channel where reports will be sent")
-                .addOption(ApplicationCommandOptionData.builder()
-                        .name(optionNameChannel)
-                        .description("Report channel")
-                        .type(ApplicationCommandOption.Type.CHANNEL.getValue())
-                        .required(true)
-                        .build())
-                .build();
-        applicationCommandRequests.add(applicationCommand);
-
-        commands.put(COMMAND_SET_REPORT_CHANNEL, event -> event.getInteraction().getCommandInteraction()
-                .map(applicationCommandInteraction -> applicationCommandInteraction.getOption(optionNameChannel))
-                .ifPresent(applicationCommandInteractionOption -> {
-                    Snowflake channelId = applicationCommandInteractionOption.flatMap(ApplicationCommandInteractionOption::getValue).get().asSnowflake();
-                    stageAttendanceService.setReportChannelId(channelId);
-                    event.reply(String.format("Successfully changed report channel to %s", getChannelMention(channelId))).subscribe();
-                }));
     }
 
     private String getChannelMention(Snowflake channelId) {
