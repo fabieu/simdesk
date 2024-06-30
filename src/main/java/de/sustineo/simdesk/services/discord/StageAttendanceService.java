@@ -130,7 +130,7 @@ public class StageAttendanceService {
     private void sendAttendanceReport(Snowflake channelId, Map<Member, List<StageAttendanceRange>> stageAttendanceRangeByMember, Instant stageStartTimestamp, Instant stageEndTimestamp) {
         StringBuilder content = new StringBuilder();
         content.append("## Stage attendance report").append("\n");
-        content.append(String.format("Duration: <t:%1$s:d> <t:%1$s:T> - <t:%2$s:d> <t:%2$s:T>", stageStartTimestamp.getEpochSecond(), stageEndTimestamp.getEpochSecond())).append("\n\n");
+        content.append(String.format("Duration: <t:%s:f> - <t:%s:f>", stageStartTimestamp.getEpochSecond(), stageEndTimestamp.getEpochSecond())).append("\n\n");
 
         for (Map.Entry<Member, List<StageAttendanceRange>> entry : stageAttendanceRangeByMember.entrySet()) {
             Member member = entry.getKey();
