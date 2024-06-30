@@ -82,8 +82,9 @@ spring:
       on-profile: "development"
 logging:
   level:
-    de.sustineo.acc.simdesk: DEBUG
-    de.sustineo.acc.simdesk.entities.mapper: INFO
+    #org.springframework.cache: TRACE
+    de.sustineo.simdesk: DEBUG
+    de.sustineo.simdesk.entities.mapper: INFO
 vaadin:
   productionMode: false
   heartbeatInterval: 60
