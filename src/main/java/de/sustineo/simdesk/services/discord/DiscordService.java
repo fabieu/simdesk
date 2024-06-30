@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.discord;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.discord.Command;
+import de.sustineo.simdesk.services.PropertyService;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClient;
 import discord4j.core.GatewayDiscordClient;
@@ -39,14 +40,17 @@ public class DiscordService {
     private static final String COMMAND_REPORT_CHANNEL = "report-channel";
 
     private final StageAttendanceService stageAttendanceService;
+    private final PropertyService propertyService;
 
     private final Long guildId;
     private final DiscordClient botClient;
 
     public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
                           @Value("${simdesk.auth.discord.guild-id}") String guildId,
-                          StageAttendanceService stageAttendanceService) {
+                          StageAttendanceService stageAttendanceService,
+                          PropertyService propertyService) {
         this.stageAttendanceService = stageAttendanceService;
+        this.propertyService = propertyService;
 
         this.guildId = Long.parseLong(guildId);
         this.botClient = DiscordClient.create(discordApplicationToken);
@@ -219,11 +223,11 @@ public class DiscordService {
 
             if (commandInteractionChannel.isPresent() && commandInteractionChannel.get().getValue().isPresent()) {
                 Snowflake reportChannelId = commandInteractionChannel.get().getValue().get().asSnowflake();
-                stageAttendanceService.setReportChannelId(reportChannelId);
+                propertyService.setPropertyValue(StageAttendanceService.PROPERTY_REPORT_CHANNEL_ID, reportChannelId.asString());
                 event.reply(String.format("Successfully changed report channel to %s", getChannelMention(reportChannelId))).subscribe();
             } else {
-                Snowflake reportChannelId = stageAttendanceService.getReportChannelId();
-                String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", getChannelMention(reportChannelId));
+                String reportChannelId = propertyService.getPropertyValue(StageAttendanceService.PROPERTY_REPORT_CHANNEL_ID);
+                String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", getChannelMention(Snowflake.of(reportChannelId)));
                 event.reply(message).subscribe();
             }
         });

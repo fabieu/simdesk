@@ -4,6 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.discord.StageAttendanceEvent;
 import de.sustineo.simdesk.entities.discord.StageAttendanceRange;
 import de.sustineo.simdesk.entities.discord.StageEventType;
+import de.sustineo.simdesk.services.PropertyService;
 import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
@@ -22,23 +23,17 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class StageAttendanceService {
+    public static final String PROPERTY_REPORT_CHANNEL_ID = "discord.reports.channel-id";
     private static final HashMap<Long, Instant> stageStartTimestamps = new HashMap<>();
     private static final HashMap<Long, List<StageAttendanceEvent>> stageAttendanceEvents = new HashMap<>();
 
     private final DiscordService discordService;
+    private final PropertyService propertyService;
 
-    private Snowflake reportChannelId;
-
-    public StageAttendanceService(@Lazy DiscordService discordService) {
+    public StageAttendanceService(@Lazy DiscordService discordService,
+                                  PropertyService propertyService) {
         this.discordService = discordService;
-    }
-
-    public Snowflake getReportChannelId() {
-        return reportChannelId;
-    }
-
-    public void setReportChannelId(Snowflake reportChannelId) {
-        this.reportChannelId = reportChannelId;
+        this.propertyService = propertyService;
     }
 
     public void handleStageStartEvent(MessageCreateEvent event, Instant receivedAt) {
@@ -117,8 +112,9 @@ public class StageAttendanceService {
         }
 
         // Send stage attendance report
+        String reportChannelId = propertyService.getPropertyValue(PROPERTY_REPORT_CHANNEL_ID);
         if (reportChannelId != null) {
-            sendAttendanceReport(reportChannelId, stageAttendanceRangeByMember, stageStartTimestamp, stageEndTimestamp);
+            sendAttendanceReport(Snowflake.of(reportChannelId), stageAttendanceRangeByMember, stageStartTimestamp, stageEndTimestamp);
         } else {
             log.severe("Could not send stage attendance report, because report channel is not set");
         }
