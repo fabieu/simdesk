@@ -7,7 +7,7 @@ updates:
       day: "saturday"
       time: "07:00"
     labels:
-      - "dependency"
+      - "dependencies"
     groups:
       prod-dependencies:
         dependency-type: "production"
