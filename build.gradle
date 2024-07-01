@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        vaadinVersion = "24.3.13"
-        springBootVersion = "3.3.0"
+        vaadinVersion = "24.4.4"
+        springBootVersion = "3.3.1"
     }
 }
 
@@ -48,10 +48,10 @@ dependencies {
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
     implementation "org.xerial:sqlite-jdbc:3.46.0.0"
-    implementation "org.flywaydb:flyway-core:10.14.0"
+    implementation "org.flywaydb:flyway-core:10.15.0"
 
     // Logging
-    implementation "io.logz.logback:logzio-logback-appender:2.0.0"
+    implementation "io.logz.logback:logzio-logback-appender:2.0.1"
 
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.14.0"
@@ -63,14 +63,14 @@ dependencies {
     implementation 'com.opencsv:opencsv:5.9'
 
     // OpenAPI documentation
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.5.0'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
     implementation 'org.webjars:webjars-locator:0.52'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 
-    compileOnly "org.projectlombok:lombok:1.18.32"
-    annotationProcessor "org.projectlombok:lombok:1.18.32"
+    compileOnly "org.projectlombok:lombok:1.18.34"
+    annotationProcessor "org.projectlombok:lombok:1.18.34"
 }
 
 springBoot {
