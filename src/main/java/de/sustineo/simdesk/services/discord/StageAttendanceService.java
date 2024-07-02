@@ -11,10 +11,12 @@ import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.VoiceState;
 import discord4j.core.object.entity.Member;
 import lombok.extern.java.Log;
+import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.time.Duration;
 import java.time.Instant;
 import java.util.*;
 import java.util.stream.Collectors;
@@ -122,10 +124,18 @@ public class StageAttendanceService {
     }
 
     private void sendAttendanceReport(Snowflake channelId, Map<Member, List<StageAttendanceRange>> stageAttendanceRangeByMember, Instant stageStartTimestamp, Instant stageEndTimestamp) {
+        final String durationFormat = "HH:mm:ss";
+
         StringBuilder content = new StringBuilder();
         content.append("## Stage attendance report").append("\n");
-        content.append(String.format("Duration: <t:%s:f> - <t:%s:f>", stageStartTimestamp.getEpochSecond(), stageEndTimestamp.getEpochSecond())).append("\n\n");
+        content.append("**Details:**").append("\n");
+        content.append(String.format("* <t:%s:f> - <t:%s:f> (Duration: %s)",
+                stageStartTimestamp.getEpochSecond(),
+                stageEndTimestamp.getEpochSecond(),
+                DurationFormatUtils.formatDuration(Duration.between(stageStartTimestamp, stageEndTimestamp).toMillis(), durationFormat, true)));
+        content.append("\n\n");
 
+        content.append("**Participants:**").append("\n");
         for (Map.Entry<Member, List<StageAttendanceRange>> entry : stageAttendanceRangeByMember.entrySet()) {
             Member member = entry.getKey();
             List<StageAttendanceRange> stageAttendanceRanges = entry.getValue();
@@ -133,8 +143,11 @@ public class StageAttendanceService {
             String stageAttendanceRangeContent = stageAttendanceRanges.stream()
                     .map(stageAttendanceRange -> String.format("<t:%s:T> - <t:%s:T>", stageAttendanceRange.getJoinTimestamp().getEpochSecond(), stageAttendanceRange.getLeaveTimestamp().getEpochSecond()))
                     .collect(Collectors.joining(", "));
+            long stageAttendanceDuration = stageAttendanceRanges.stream()
+                    .mapToLong(stageAttendanceRange -> Duration.between(stageAttendanceRange.getJoinTimestamp(), stageAttendanceRange.getLeaveTimestamp()).toMillis())
+                    .sum();
 
-            content.append(String.format("%s: %s", member.getMention(), stageAttendanceRangeContent)).append("\n");
+            content.append(String.format("%s: %s (Duration: %s)", member.getMention(), stageAttendanceRangeContent, DurationFormatUtils.formatDuration(stageAttendanceDuration, durationFormat, true))).append("\n");
         }
 
         discordService.sendMessage(channelId, content.toString());
