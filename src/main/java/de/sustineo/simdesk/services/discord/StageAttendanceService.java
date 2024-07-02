@@ -80,12 +80,8 @@ public class StageAttendanceService {
 
             List<StageAttendanceRange> stageAttendanceRanges = new ArrayList<>();
             for (StageAttendanceEvent joinEvent : joinEvents) {
-                Instant joinTimestamp;
-                if (joinEvent.getTimestamp().isBefore(stageStartTimestamp)) {
-                    joinTimestamp = stageStartTimestamp;
-                } else {
-                    joinTimestamp = joinEvent.getTimestamp();
-                }
+                Instant joinTimestamp = joinEvent.getTimestamp();
+                Instant correctedJoinTimestamp = joinTimestamp.isBefore(stageStartTimestamp) ? stageStartTimestamp : joinTimestamp;
 
                 Optional<StageAttendanceEvent> leaveEvent = leaveEvents.stream()
                         .filter(leave -> leave.getTimestamp().isAfter(joinTimestamp))
@@ -95,17 +91,15 @@ public class StageAttendanceService {
                         .orElse(stageEndTimestamp);
 
                 StageAttendanceRange stageAttendanceRange = StageAttendanceRange.builder()
-                        .joinTimestamp(joinTimestamp)
+                        .joinTimestamp(correctedJoinTimestamp)
                         .leaveTimestamp(leaveTimestamp)
                         .build();
 
-                leaveEvent.ifPresent(leaveEvents::remove);
-
-                if (stageAttendanceRange.getLeaveTimestamp().isBefore(stageStartTimestamp)) {
-                    continue;
+                if (stageAttendanceRange.getLeaveTimestamp().isAfter(stageStartTimestamp)) {
+                    stageAttendanceRanges.add(stageAttendanceRange);
                 }
 
-                stageAttendanceRanges.add(stageAttendanceRange);
+                leaveEvent.ifPresent(leaveEvents::remove);
             }
 
             stageAttendanceRangeByMember.put(membersById.get(memberId), stageAttendanceRanges);

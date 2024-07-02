@@ -7,6 +7,8 @@ spring:
     default-property-inclusion: NON_NULL
     deserialization:
       fail-on-unknown-properties: false
+    serialization:
+      fail-on-empty-beans: false
   datasource:
     url: jdbc:sqlite:./data/simdesk-db.db
     driver-class-name: org.sqlite.JDBC
