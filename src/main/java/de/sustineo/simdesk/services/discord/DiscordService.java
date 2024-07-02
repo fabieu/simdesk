@@ -216,6 +216,10 @@ public class DiscordService {
         applicationCommandRequests.add(applicationCommand);
 
         commands.put(COMMAND_REPORT_CHANNEL, event -> {
+            if (!Snowflake.of(guildId).equals(event.getInteraction().getGuildId().orElse(null))) {
+                return;
+            }
+
             Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
 
             Optional<ApplicationCommandInteractionOption> commandInteractionChannel = commandInteraction
