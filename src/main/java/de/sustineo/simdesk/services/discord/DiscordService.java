@@ -44,14 +44,17 @@ public class DiscordService {
 
     private final Long guildId;
     private final DiscordClient botClient;
+    private final boolean stageReportEnabled;
 
     public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
                           @Value("${simdesk.auth.discord.guild-id}") String guildId,
+                          @Value("${simdesk.features.discord.reports.enabled}") boolean stageReportEnabled,
                           StageAttendanceService stageAttendanceService,
                           PropertyService propertyService) {
         this.stageAttendanceService = stageAttendanceService;
         this.propertyService = propertyService;
 
+        this.stageReportEnabled = stageReportEnabled;
         this.guildId = Long.parseLong(guildId);
         this.botClient = DiscordClient.create(discordApplicationToken);
         botClient
@@ -126,6 +129,15 @@ public class DiscordService {
     }
 
     public void handleGatewayEvents(GatewayDiscordClient client) {
+        client.on(ChatInputInteractionEvent.class).subscribe(event -> {
+            for (Map.Entry<String, Command> entry : commands.entrySet()) {
+                if (event.getCommandName().equals(entry.getKey())) {
+                    entry.getValue().execute(event);
+                    break;
+                }
+            }
+        });
+
         client.on(MessageCreateEvent.class).subscribe(event -> {
             Instant receivedAt = Instant.now();
 
@@ -137,9 +149,13 @@ public class DiscordService {
 
             Message message = event.getMessage();
             if (Message.Type.STAGE_START.equals(message.getType())) {
-                stageAttendanceService.handleStageStartEvent(event, receivedAt);
+                if (stageReportEnabled) {
+                    stageAttendanceService.handleStageStartEvent(event, receivedAt);
+                }
             } else if (Message.Type.STAGE_END.equals(message.getType())) {
-                stageAttendanceService.handleStageEndEvent(event, receivedAt);
+                if (stageReportEnabled) {
+                    stageAttendanceService.handleStageEndEvent(event, receivedAt);
+                }
             }
         });
 
@@ -153,17 +169,12 @@ public class DiscordService {
             }
 
             if (event.isJoinEvent() && isStageChannel(event)) {
-                stageAttendanceService.handleStageJoinEvent(event, receivedAt);
+                if (stageReportEnabled) {
+                    stageAttendanceService.handleStageJoinEvent(event, receivedAt);
+                }
             } else if (event.isLeaveEvent() && isStageChannel(event)) {
-                stageAttendanceService.handleStageLeaveEvent(event, receivedAt);
-            }
-        });
-
-        client.on(ChatInputInteractionEvent.class).subscribe(event -> {
-            for (Map.Entry<String, Command> entry : commands.entrySet()) {
-                if (event.getCommandName().equals(entry.getKey())) {
-                    entry.getValue().execute(event);
-                    break;
+                if (stageReportEnabled) {
+                    stageAttendanceService.handleStageLeaveEvent(event, receivedAt);
                 }
             }
         });

@@ -65,6 +65,10 @@ simdesk:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}
       password: ${SIMDESK_ADMIN_PASSWORD:#{null}}
+  features:
+    discord:
+      reports:
+        enabled: false
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
