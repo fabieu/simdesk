@@ -20,8 +20,10 @@ import discord4j.discordjson.json.MemberData;
 import discord4j.discordjson.json.RoleData;
 import discord4j.rest.http.client.ClientException;
 import discord4j.rest.interaction.GuildCommandRegistrar;
+import discord4j.rest.util.Color;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.context.annotation.Lazy;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import reactor.core.publisher.Mono;
@@ -37,7 +39,9 @@ import java.util.stream.Collectors;
 public class DiscordService {
     private static final List<ApplicationCommandRequest> applicationCommandRequests = new ArrayList<>();
     private static final Map<String, Command> commands = new HashMap<>();
+    public static final Color DEFAULT_EMBED_COLOR = Color.of(250, 202, 48);
     private static final String COMMAND_REPORT_CHANNEL = "report-channel";
+    private static final String COMMAND_PERMIT = "permit";
 
     private final StageAttendanceService stageAttendanceService;
     private final PropertyService propertyService;
@@ -45,14 +49,17 @@ public class DiscordService {
     private final Long guildId;
     private final DiscordClient botClient;
     private final boolean stageReportEnabled;
+    private final PermitService permitService;
 
     public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
                           @Value("${simdesk.auth.discord.guild-id}") String guildId,
                           @Value("${simdesk.features.discord.reports.enabled}") boolean stageReportEnabled,
                           StageAttendanceService stageAttendanceService,
-                          PropertyService propertyService) {
+                          PropertyService propertyService,
+                          @Lazy PermitService permitService) {
         this.stageAttendanceService = stageAttendanceService;
         this.propertyService = propertyService;
+        this.permitService = permitService;
 
         this.stageReportEnabled = stageReportEnabled;
         this.guildId = Long.parseLong(guildId);
@@ -203,6 +210,7 @@ public class DiscordService {
 
     private void registerCommands(GatewayDiscordClient client) {
         registerReportChannelCommand();
+        registerPermitCommand();
 
         GuildCommandRegistrar.create(client.getRestClient(), applicationCommandRequests)
                 .registerCommands(Snowflake.of(guildId))
@@ -248,7 +256,30 @@ public class DiscordService {
         });
     }
 
-    private String getChannelMention(Snowflake channelId) {
+    private void registerPermitCommand() {
+        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
+                .name(COMMAND_PERMIT)
+                .description("Display your current permit status")
+                .build();
+        applicationCommandRequests.add(applicationCommand);
+
+        commands.put(COMMAND_PERMIT, event -> {
+            if (!Snowflake.of(guildId).equals(event.getInteraction().getGuildId().orElse(null))) {
+                return;
+            }
+
+            event.reply()
+                    .withEmbeds(permitService.createPermitEmbed(event.getInteraction().getUser().getId().asLong()))
+                    .withEphemeral(true)
+                    .subscribe();
+        });
+    }
+
+    public static String getChannelMention(Snowflake channelId) {
         return "<#" + channelId.asString() + '>';
+    }
+
+    public static String getUserMention(Snowflake userId) {
+        return "<@" + userId.asString() + '>';
     }
 }
