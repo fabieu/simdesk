@@ -139,14 +139,15 @@ public class MainLayout extends AppLayout {
 
     private void addUserMenu(MenuBar menuBar) {
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+        Optional<Long> userId = user.flatMap(UserPrincipal::getUserId);
 
         if (user.isEmpty()) {
             MenuItem loginMenuItem = menuBar.addItem("Login");
             loginMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
         }
 
-        if (permitService.isPresent() && user.isPresent()) {
-            Component permitBadge = permitService.get().getBasePermitBadge();
+        if (permitService.isPresent() && userId.isPresent()) {
+            Component permitBadge = permitService.get().getBasePermitBadge(userId.get());
 
             MenuItem permitMenuItem = menuBar.addItem(permitBadge);
             permitMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(PermitUserView.class)));

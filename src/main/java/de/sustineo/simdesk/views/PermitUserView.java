@@ -116,6 +116,9 @@ public class PermitUserView extends BaseView {
     }
 
     private VerticalLayout createPermitDetails() {
+        Optional<Long> userId = securityService.getAuthenticatedUser()
+                .flatMap(UserPrincipal::getUserId);
+
         /* Permit details */
         VerticalLayout permitDetailsLayout = new VerticalLayout();
         permitDetailsLayout.setWidth(null);
@@ -127,14 +130,21 @@ public class PermitUserView extends BaseView {
         /* Base permit details > Permit Group */
         H4 basePermitStatusHeader = new H4("Base: ");
         Div basePermitStatusBadges = new Div();
-        permitService.map(PermitService::getBasePermitBadge).ifPresent(basePermitStatusBadges::add);
+        userId.flatMap(userIdValue -> permitService
+                        .map(permitService -> permitService.getBasePermitBadge(userIdValue))
+                )
+                .ifPresent(basePermitStatusBadges::add);
         basePermitLayout.add(basePermitStatusHeader, basePermitStatusBadges);
 
         /* Base permit details > Car groups */
         VerticalLayout basePermittedCarGroupsLayout = new VerticalLayout();
         basePermittedCarGroupsLayout.setSpacing(false);
         basePermittedCarGroupsLayout.setPadding(false);
-        Optional<Set<CarGroup>> basePermittedCarGroups = permitService.flatMap(PermitService::getBasePermittedCarGroups);
+        Optional<Set<CarGroup>> basePermittedCarGroups = userId
+                .flatMap(userIdValue -> permitService
+                        .flatMap(permitService -> permitService.getBasePermittedCarGroups(userIdValue))
+                );
+
         for (CarGroup carGroup : CarGroup.getValid()) {
             HorizontalLayout carGroupLayout = new HorizontalLayout();
             carGroupLayout.setPadding(false);
@@ -160,20 +170,26 @@ public class PermitUserView extends BaseView {
         /* NOS permit details > Permit Groups */
         H4 nosPermitStatusHeader = new H4("NOS: ");
         Div nosPermitStatusBadges = new Div();
-        permitService.map(PermitService::getNosPermitBadges).ifPresent(nosPermitStatusBadges::add);
-
+        userId.flatMap(userIdValue -> permitService
+                        .map(permitService -> permitService.getNosPermitBadges(userIdValue))
+                )
+                .ifPresent(nosPermitStatusBadges::add);
         nosPermitLayout.add(nosPermitStatusHeader, nosPermitStatusBadges);
 
         /* NOS permit details > Car groups */
         VerticalLayout nosPermittedCarGroupsLayout = new VerticalLayout();
         nosPermittedCarGroupsLayout.setSpacing(false);
         nosPermittedCarGroupsLayout.setPadding(false);
-        Optional<Set<CarGroup>> permittedCarGroups = permitService.flatMap(PermitService::getNosPermittedCarGroups);
+        Optional<Set<CarGroup>> nosPermittedCarGroups = userId
+                .flatMap(userIdValue -> permitService
+                        .flatMap(permitService -> permitService.getNosPermittedCarGroups(userIdValue))
+                );
+
         for (CarGroup carGroup : CarGroup.getValid()) {
             HorizontalLayout carGroupLayout = new HorizontalLayout();
             carGroupLayout.setPadding(false);
 
-            if (permittedCarGroups.isPresent() && permittedCarGroups.get().contains(carGroup)) {
+            if (nosPermittedCarGroups.isPresent() && nosPermittedCarGroups.get().contains(carGroup)) {
                 FontIcon icon = new FontIcon("fa-solid", "fa-square-check");
                 icon.setColor("var(--lumo-success-color)");
                 carGroupLayout.add(icon);
@@ -194,16 +210,22 @@ public class PermitUserView extends BaseView {
     }
 
     private Component createPermitExplanation() {
+        Optional<Long> userId = securityService.getAuthenticatedUser()
+                .flatMap(UserPrincipal::getUserId);
+
         /* Explanation */
         VerticalLayout explanationLayout = new VerticalLayout();
         explanationLayout.addClassNames("pure-u-1", "pure-u-md-4-5");
         explanationLayout.setWidth(null);
         explanationLayout.setSpacing(false);
 
-        Set<String> permitGroups = permitService.map(PermitService::getAllBasePermitGroups).orElse(Set.of());
-        boolean hasPermit = permitService.map(PermitService::hasBasePermitGroup).orElse(false);
+        Set<String> availablePermitGroups = permitService.map(PermitService::getAvailableBasePermitGroups).orElse(Set.of());
+        boolean hasBasePermit = false;
+        if (permitService.isPresent() && userId.isPresent()) {
+            hasBasePermit = permitService.get().hasBasePermitGroup(userId.get());
+        }
 
-        Paragraph introduction = new Paragraph(String.format("Participating drivers must have a permit %s for certain events. Drivers are assigned one of %s license levels based on their previous experience and performance. A driver may be reclassified by his behavior on- and off-track.", permitGroups, permitGroups.size()));
+        Paragraph introduction = new Paragraph(String.format("Participating drivers must have a permit %s for certain events. Drivers are assigned one of %s license levels based on their previous experience and performance. A driver may be reclassified by his behavior on- and off-track.", availablePermitGroups, availablePermitGroups.size()));
         String newPermitExplanationHtml = """
                 <div class='permit-explanation'>
                     <p><strong>STEP 1:</strong> To fulfill this step, you must complete a stint with the vehicle class corresponding to your desired license level, comprising the following components:</p>
@@ -273,7 +295,7 @@ public class PermitUserView extends BaseView {
                 """;
         Details nosPermitDetails = new Details("Nordschleife Permit", new Html(nosPermitExplanationHtml));
 
-        if (!hasPermit) {
+        if (!hasBasePermit) {
             newPermitDetails.setOpened(true);
         } else {
             upgradePermitDetails.setOpened(true);
