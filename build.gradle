@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.3.14"
+        vaadinVersion = "24.4.4"
         springBootVersion = "3.3.1"
     }
 }
@@ -48,7 +48,7 @@ dependencies {
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
     implementation "org.xerial:sqlite-jdbc:3.46.0.0"
-    implementation "org.flywaydb:flyway-core:10.15.0"
+    implementation "org.flywaydb:flyway-core:10.15.2"
 
     // Logging
     implementation "io.logz.logback:logzio-logback-appender:2.0.1"
