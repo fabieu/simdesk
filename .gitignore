@@ -72,6 +72,8 @@ replay_pid*
 .idea/modules.xml
 .idea/*.iml
 .idea/modules
+*.iml
+*.ipr
 
 # CMake
 cmake-build-*/
@@ -80,8 +82,10 @@ cmake-build-*/
 .idea/**/mongoSettings.xml
 
 # File-based project format
+*.iws
 
 # IntelliJ
+out/
 
 # mpeltonen/sbt-idea plugin
 .idea_modules/
@@ -111,8 +115,6 @@ fabric.properties
 .vaadin-designer
 .designer
 /target/
-!**/src/main/**/target/
-!**/src/test/**/target/
 
 # The following files are generated/updated by vaadin-maven-plugin or vaadin-gradle-plugin
 node_modules/
@@ -136,28 +138,24 @@ index.html
 
 ### Gradle ###
 .gradle
-build/
-!gradle/wrapper/gradle-wrapper.jar
-!**/src/main/**/build/
-!**/src/test/**/build/
+**/build/
+!src/**/build/
 
-### STS ###
-.apt_generated
-.classpath
-.factorypath
+# Ignore Gradle GUI config
+gradle-app.setting
+
+# Avoid ignoring Gradle wrapper jar file (.jar files are usually ignored)
+!gradle-wrapper.jar
+
+# Avoid ignore Gradle wrappper properties
+!gradle-wrapper.properties
+
+# Cache of project
+.gradletasknamecache
+
+# Eclipse Gradle plugin generated files
+# Eclipse Core
 .project
-.settings
-.springBeans
-.sts4-cache
-bin/
-!**/src/main/**/bin/
-!**/src/test/**/bin/
+# JDT-specific (Eclipse Java Development Tools)
+.classpath
 
-### IntelliJ IDEA ###
-.idea
-*.iws
-*.iml
-*.ipr
-out/
-!**/src/main/**/out/
-!**/src/test/**/out/

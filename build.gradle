@@ -1,14 +1,13 @@
 buildscript {
     ext {
         vaadinVersion = "24.4.4"
-        springBootVersion = "3.3.1"
     }
 }
 
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.5"
-    id "org.springframework.boot" version "${springBootVersion}"
+    id "org.springframework.boot" version "3.3.1"
     id 'com.vaadin' version "${vaadinVersion}"
 }
 
@@ -21,15 +20,15 @@ java {
     }
 }
 
-configurations {
-    compileOnly {
-        extendsFrom annotationProcessor
-    }
-}
-
 repositories {
     mavenCentral()
     maven { setUrl("https://maven.vaadin.com/vaadin-addons") }
+}
+
+dependencyManagement {
+    imports {
+        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+    }
 }
 
 dependencies {
@@ -73,23 +72,23 @@ dependencies {
     annotationProcessor "org.projectlombok:lombok:1.18.34"
 }
 
-springBoot {
-    buildInfo()
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+
+    bootJar {
+        archiveFileName.set("${project.name}.jar")
+    }
 }
 
-test {
-    useJUnitPlatform()
+springBoot {
+    buildInfo()
 }
 
 configurations {
     developmentOnly
     runtimeClasspath {
         extendsFrom developmentOnly
-    }
-}
-
-dependencyManagement {
-    imports {
-        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
     }
 }
