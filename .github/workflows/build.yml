@@ -52,7 +52,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Run tests
-        run: ./gradlew test
+        run: chmod +x gradlew && sh gradlew test
 
   build-jar:
     name: Build jar
@@ -71,7 +71,7 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Clean and build
-        run: ./gradlew clean vaadinBuildFrontend bootJar
+        run: chmod +x gradlew && sh gradlew vaadinBuildFrontend bootJar
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
@@ -89,10 +89,10 @@ jobs:
       contents: read
       packages: write
     container:
-      image: docker:26.1
+      image: docker:27.0
     services:
       dind:
-        image: docker:26.1-dind
+        image: docker:27.0-dind
     timeout-minutes: 30
     env:
       IMAGE_ID: "${{ vars.CONTAINER_REGISTRY }}/${{ github.repository }}"
