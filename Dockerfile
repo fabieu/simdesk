@@ -1,12 +1,20 @@
-FROM eclipse-temurin:21-jdk-alpine
+ARG JVM_TARGET=21
+ARG JVM_FROM=eclipse-temurin:${JVM_TARGET}-alpine
 
+FROM ${JVM_FROM} AS builder
+WORKDIR /build
+COPY . ./
+RUN chmod +x gradlew && sh gradlew -DjvmTarget=${JVM_TARGET} --no-build-cache --no-daemon vaadinBuildFrontend bootJar && mv build/libs/* .
+RUN java -Djarmode=layertools -jar simdesk.jar extract
+
+FROM $JVM_FROM
 WORKDIR /app
-RUN mkdir data results
+COPY --from=builder /build/dependencies/ ./
+COPY --from=builder /build/spring-boot-loader/ ./
+COPY --from=builder /build/application/ ./
 
-COPY build/libs/simdesk-*.jar simdesk.jar
-
+WORKDIR /
 ENV SIMDESK_ACC_RESULTS_FOLDERS=results
-
+RUN mkdir data results
 EXPOSE 8080
-
-ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/simdesk.jar"]
+ENTRYPOINT ["java", "${JAVA_OPTS}", "-cp", "/app", "org.springframework.boot.loader.launch.JarLauncher"]

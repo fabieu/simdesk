@@ -52,58 +52,28 @@ jobs:
       - name: Setup Gradle
         uses: gradle/actions/setup-gradle@v3
       - name: Run tests
-        run: ./gradlew test
+        run: chmod +x gradlew && sh gradlew test
 
-  build-jar:
-    name: Build jar
-    runs-on: ubuntu-latest
-    needs:
-      - test
-    timeout-minutes: 30
-    steps:
-      - name: Checkout
-        uses: actions/checkout@v4
-      - name: Setup Java
-        uses: actions/setup-java@v4
-        with:
-          java-version: '21'
-          distribution: 'temurin'
-      - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
-      - name: Clean and build
-        run: ./gradlew clean vaadinBuildFrontend bootJar
-      - name: Upload artifact
-        uses: actions/upload-artifact@v4
-        with:
-          name: jar
-          path: build/libs/*.jar
-          retention-days: 1
-
-  build-image:
-    name: Build container images
+  build:
+    name: Build and publish container images
     runs-on: ubuntu-latest
     needs:
       - variables
-      - build-jar
+      - test
     permissions:
       contents: read
       packages: write
     container:
-      image: docker:26.1
+      image: docker:27.0
     services:
       dind:
-        image: docker:26.1-dind
+        image: docker:27.0-dind
     timeout-minutes: 30
     env:
       IMAGE_ID: "${{ vars.CONTAINER_REGISTRY }}/${{ github.repository }}"
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download artifact
-        uses: actions/download-artifact@v4
-        with:
-          name: jar
-          path: build/libs
       - name: Login to container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
       - name: Build images
