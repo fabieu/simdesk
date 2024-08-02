@@ -9,7 +9,6 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.Reference;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.layouts.MainLayout;
 import lombok.extern.java.Log;
 
@@ -18,7 +17,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Route(layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Error")
+@PageTitle("Error")
 @AnonymousAllowed
 public class ErrorView extends BaseView implements BeforeEnterObserver {
     public static final String QUERY_PARAMETER_HTTP_STATUS = "httpStatus";

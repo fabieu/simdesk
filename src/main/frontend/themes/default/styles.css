@@ -41,11 +41,10 @@ hr.spacer {
 }
 
 .container {
-    padding-right: 15px;
-    padding-left: 15px;
     margin-right: auto;
     margin-left: auto;
-    padding: var(--lumo-space-m);
+    padding: var(--lumo-space-l);
+    margin-bottom: 100px;
 }
 
 @media (min-width: 768px) {
@@ -72,4 +71,11 @@ hr.spacer {
 
 .bg-light {
     background-color: var(--lumo-contrast-5pct);
+}
+
+.selection-header {
+    width: 100%;
+    justify-content: start;
+    align-items: center;
+    padding: 0 var(--lumo-space-m);
 }

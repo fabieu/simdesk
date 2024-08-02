@@ -6,13 +6,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
@@ -31,7 +29,7 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times/:carGroup/:trackId", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times by track")
+@PageTitle("Leaderboard - Lap times by track")
 @AnonymousAllowed
 public class OverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
@@ -65,7 +63,8 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
             this.rankingGrid = createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, this.timeRange);
 
-            add(createRankingHeader(carGroup, trackId, this.timeRange));
+            add(createViewHeader(getAnnotatedPageTitle() + " - " + carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId)));
+            add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
         } else {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
@@ -77,15 +76,9 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
         updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
-    private Component createRankingHeader(String carGroup, String trackId, TimeRange timeRange) {
+    private Component createSelectHeader(String carGroup, String trackId, TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidthFull();
-        layout.setPadding(true);
-        layout.setAlignItems(Alignment.CENTER);
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-
-        // Header displaying the car group and track name
-        H3 heading = new H3(carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId));
+        layout.addClassNames("selection-header");
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
@@ -97,7 +90,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
             updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
         });
 
-        layout.add(heading, timeRangeSelect);
+        layout.add(timeRangeSelect);
         return layout;
     }
 

@@ -13,7 +13,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.layouts.MainLayout;
@@ -27,7 +26,7 @@ import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Route(value = "/permit/me", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Permit")
+@PageTitle("Permit")
 @PermitAll
 public class PermitUserView extends BaseView {
     private final SecurityService securityService;
@@ -40,20 +39,15 @@ public class PermitUserView extends BaseView {
 
         setSizeFull();
         setPadding(false);
-
-        VerticalLayout layout = new VerticalLayout();
-        layout.setAlignItems(Alignment.CENTER);
+        setAlignItems(Alignment.CENTER);
 
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
         if (user.isEmpty()) {
-            layout.add(new Text("No user found"));
-            add(layout);
+            add(new Text("No user found"));
             return;
         }
 
-        layout.add(createUserHeader(), createPermitContainer());
-
-        add(layout);
+        add(createUserHeader(), createPermitContainer());
     }
 
     private Component createUserHeader() {
