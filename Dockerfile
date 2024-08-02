@@ -8,4 +8,4 @@ COPY build/libs/simdesk.jar simdesk.jar
 
 EXPOSE 8080
 
-ENTRYPOINT ["java", "${JAVA_OPTS}", "-jar", "/app/simdesk.jar"]
+ENTRYPOINT ["sh", "-c", "java ${JAVA_OPTS} -jar /app/simdesk.jar"]
