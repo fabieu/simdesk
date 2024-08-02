@@ -1,6 +1,6 @@
 spring:
   profiles:
-    active: acc-entrylist, acc-bop
+    active: production, acc-entrylist, acc-bop
   application:
     name: simdesk
   jackson:
@@ -97,8 +97,6 @@ vaadin:
   productionMode: false
   heartbeatInterval: 60
   closeIdleSessions: false
-  frontend:
-    hotdeploy: true
 ---
 spring:
   config:

@@ -1,6 +1,9 @@
 buildscript {
     ext {
-        vaadinVersion = "24.4.4"
+        vaadinVersion = "24.4.7"
+    }
+    configurations.classpath {
+        exclude group: 'com.vaadin', module: 'hilla-engine-core'
     }
 }
 
@@ -42,7 +45,11 @@ dependencies {
     implementation "org.springframework.security:spring-security-oauth2-client"
 
     // Vaadin
-    implementation "com.vaadin:vaadin-spring-boot-starter"
+    implementation("com.vaadin:vaadin-spring-boot-starter") {
+        exclude group: "com.vaadin", module: "flow-react"
+        exclude group: "com.vaadin", module: "hilla"
+        exclude group: "com.vaadin", module: "hilla-dev"
+    }
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
