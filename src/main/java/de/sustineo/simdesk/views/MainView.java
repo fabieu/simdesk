@@ -9,7 +9,6 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.layouts.MainLayout;
@@ -22,7 +21,7 @@ import java.util.Optional;
 
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "/home", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Dashboard")
+@PageTitle("Dashboard")
 @AnonymousAllowed
 public class MainView extends BaseView {
     private final MenuService menuService;

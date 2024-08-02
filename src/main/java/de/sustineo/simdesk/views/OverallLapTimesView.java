@@ -5,14 +5,12 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
@@ -29,7 +27,7 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Lap times")
+@PageTitle("Leaderboard - Lap times")
 @AnonymousAllowed
 public class OverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
@@ -58,7 +56,9 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
         }
 
         this.rankingGrid = createRankingGrid(this.timeRange);
-        add(createRankingHeader(this.timeRange));
+
+        add(createViewHeader());
+        add(createSelectHeader(this.timeRange));
         addAndExpand(rankingGrid);
     }
 
@@ -67,16 +67,11 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
         updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
-    private Component createRankingHeader(TimeRange timeRange) {
+    private Component createSelectHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidthFull();
-        layout.setPadding(true);
-        layout.setAlignItems(Alignment.CENTER);
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        layout.addClassNames("selection-header");
 
-        // Header displaying the car group and track name
-        H3 heading = new H3("Overall Lap Times");
-
+        // Time range selection
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
         timeRangeSelect.setValue(timeRange);
@@ -86,8 +81,8 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
             replaceRankingGrid(event.getValue());
             updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
+        layout.add(timeRangeSelect);
 
-        layout.add(heading, timeRangeSelect);
         return layout;
     }
 

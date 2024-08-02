@@ -23,7 +23,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
@@ -48,11 +47,9 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Route(value = "/entrylist/validator", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Entrylist - Validator")
+@PageTitle("Entrylist - Validator")
 @AnonymousAllowed
 public class EntrylistValidatorView extends BaseView {
-    private static final String NOTIFICATION_DELIMITER = " - ";
-
     private final EntrylistService entrylistService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
@@ -65,16 +62,15 @@ public class EntrylistValidatorView extends BaseView {
         this.notificationService = notificationService;
 
         setSizeFull();
-        setPadding(false);
-        getStyle().setPadding("var(--lumo-space-l)");
+        setPadding(true);
 
-        addAndExpand(createEntrylistValidationForm());
+        add(createViewHeader());
+        add(createEntrylistValidationForm());
     }
 
     private Component createEntrylistValidationForm() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(false);
-        layout.setSizeFull();
+        Div layout = new Div();
+        layout.addClassNames("container", "bg-light");
 
         /* Validation rules start */
         VerticalLayout validationRulesLayout = new VerticalLayout();
@@ -132,7 +128,7 @@ public class EntrylistValidatorView extends BaseView {
             }
         });
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
-        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage()));
+        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + TEXT_DELIMITER + event.getReason().getMessage()));
 
         fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload, fileUploadExplanation);
         /* File upload end */
@@ -198,7 +194,7 @@ public class EntrylistValidatorView extends BaseView {
                 .setFontSize("var(--lumo-font-size-m)")
                 .setFontWeight(Style.FontWeight.BOLD);
 
-        Div description = new Div(new Text(validationRule.getFriendlyName() + NOTIFICATION_DELIMITER + validationError.getMessage()));
+        Div description = new Div(new Text(validationRule.getFriendlyName() + TEXT_DELIMITER + validationError.getMessage()));
         description.getStyle()
                 .setFontSize("var(--lumo-font-size-s)");
 

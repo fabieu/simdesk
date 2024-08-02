@@ -9,6 +9,7 @@ import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -23,7 +24,6 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
@@ -52,11 +52,9 @@ import java.util.Set;
 @Profile(ProfileManager.PROFILE_BOP)
 @Log
 @Route(value = "/bop/editor", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "BoP - Editor")
+@PageTitle("BoP - Editor")
 @AnonymousAllowed
 public class BopEditorView extends BaseView {
-    private static final String NOTIFICATION_DELIMITER = " - ";
-
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
@@ -75,15 +73,23 @@ public class BopEditorView extends BaseView {
 
         setId("bop-editor-view");
         setSizeFull();
-        setPadding(false);
-        getStyle().setPadding("var(--lumo-space-l)");
 
-        add(createFileUploadLayout());
-        addAndExpand(createFormLayout());
+        add(createViewHeader());
+        add(createFormLayout());
+
         reloadComponents();
     }
 
-    private Component createFileUploadLayout() {
+    private Component createFormLayout() {
+        Div layout = new Div();
+        layout.addClassNames("container", "bg-light");
+
+        layout.add(createFileUploadForm(), createEditingForm());
+
+        return layout;
+    }
+
+    private Component createFileUploadForm() {
         VerticalLayout fileUploadLayout = new VerticalLayout();
         fileUploadLayout.setPadding(false);
 
@@ -128,7 +134,7 @@ public class BopEditorView extends BaseView {
             }
         });
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
-        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + NOTIFICATION_DELIMITER + event.getReason().getMessage()));
+        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + TEXT_DELIMITER + event.getReason().getMessage()));
 
         fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload);
         return fileUploadLayout;
@@ -168,7 +174,7 @@ public class BopEditorView extends BaseView {
         return bopEditField;
     }
 
-    private Component createFormLayout() {
+    private Component createEditingForm() {
         VerticalLayout verticalLayout = new VerticalLayout();
         verticalLayout.setPadding(false);
 
@@ -240,7 +246,7 @@ public class BopEditorView extends BaseView {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setAlignItems(Alignment.CENTER);
 
-        Button downloadButton = new Button("Download", ComponentUtils.getDownloadIcon());
+        Button downloadButton = new Button("Download", getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Anchor downloadAnchor = new Anchor(downloadBop(), "");
@@ -274,7 +280,7 @@ public class BopEditorView extends BaseView {
                     } catch (JsonProcessingException e) {
                         String errorMessage = "Failed to create download resource for BoP file";
                         notificationService.showErrorNotification(errorMessage);
-                        log.severe(errorMessage + NOTIFICATION_DELIMITER + e.getMessage());
+                        log.severe(errorMessage + TEXT_DELIMITER + e.getMessage());
                         return null;
                     }
                 }
@@ -297,7 +303,7 @@ public class BopEditorView extends BaseView {
         } catch (JsonProcessingException e) {
             String errorMessage = "Failed to update preview";
             notificationService.showErrorNotification(errorMessage);
-            log.severe(errorMessage + NOTIFICATION_DELIMITER + e.getMessage());
+            log.severe(errorMessage + TEXT_DELIMITER + e.getMessage());
         }
     }
 }

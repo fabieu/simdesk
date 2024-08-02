@@ -48,7 +48,7 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/overview", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Overview")
+@PageTitle("Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final BopService bopService;
@@ -74,6 +74,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         routeParameters = beforeEnterEvent.getRouteParameters();
         queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
+        add(createViewHeader());
         addAndExpand(createBopGrid());
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
@@ -88,14 +89,6 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
                 .sorted(bopService.getComparator())
                 .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
-
-        // Disclaimer
-        H3 disclaimer = new H3("Disclaimer: We use data provided by Low Fuel Motorsport (LFM) and pitskill.io (PitBoP). The data is subject to change.");
-        disclaimer.setWidthFull();
-        disclaimer.getStyle()
-                .setColor("var(--lumo-secondary-text-color)")
-                .setTextAlign(Style.TextAlign.CENTER);
-        layout.add(disclaimer);
 
         // Track selection
         HorizontalLayout trackSelectionLayout = new HorizontalLayout();
@@ -147,11 +140,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             Anchor downloadAnchor = new Anchor(bopResource, "");
             downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.removeAll();
-            Button downloadButton = new Button(ComponentUtils.getDownloadIcon());
+            Button downloadButton = new Button(getDownloadIcon());
             downloadButton.setTooltipText("Download");
             downloadAnchor.add(downloadButton);
 
-            Button shareButton = new Button(ComponentUtils.getShareIcon());
+            Button shareButton = new Button(getShareIcon());
             shareButton.setTooltipText("Share");
             shareButton.addClickListener(event -> {
                         Page page = UI.getCurrent().getPage();
@@ -208,6 +201,14 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         }
 
         trackSelect.setItems(new ArrayList<>(scrollTargets.keySet()));
+
+        // Disclaimer
+        H3 disclaimer = new H3("Disclaimer: We use data provided by Low Fuel Motorsport (LFM) and pitskill.io (PitBoP). The data is subject to change.");
+        disclaimer.setWidthFull();
+        disclaimer.getStyle()
+                .setColor("var(--lumo-secondary-text-color)")
+                .setTextAlign(Style.TextAlign.CENTER);
+        layout.add(disclaimer);
 
         return layout;
     }

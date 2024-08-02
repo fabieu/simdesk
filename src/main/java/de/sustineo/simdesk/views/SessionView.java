@@ -6,14 +6,12 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
@@ -29,7 +27,7 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Leaderboard - Sessions")
+@PageTitle("Leaderboard - Sessions")
 @AnonymousAllowed
 public class SessionView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final SessionService sessionService;
@@ -57,7 +55,9 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
         }
 
         this.sessionGrid = createSessionGrid(this.timeRange);
-        add(createSessionHeader(this.timeRange));
+
+        add(createViewHeader());
+        add(createSelectHeader(this.timeRange));
         addAndExpand(sessionGrid);
     }
 
@@ -66,15 +66,9 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
         updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
     }
 
-    private Component createSessionHeader(TimeRange timeRange) {
+    private Component createSelectHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidthFull();
-        layout.setPadding(true);
-        layout.setAlignItems(Alignment.CENTER);
-        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
-
-        // Header displaying the car group and track name
-        H3 heading = new H3("Sessions");
+        layout.addClassNames("selection-header");
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
@@ -86,7 +80,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
             updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
 
-        layout.add(heading, timeRangeSelect);
+        layout.add(timeRangeSelect);
         return layout;
     }
 
@@ -94,7 +88,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
         List<Session> sessions = sessionService.getAllSessions(timeRange);
 
         Grid<Session> grid = new Grid<>(Session.class, false);
-        Grid.Column<Session> weatherColumn = grid.addComponentColumn(ComponentUtils::createWeatherIcon)
+        Grid.Column<Session> weatherColumn = grid.addComponentColumn(this::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
@@ -141,7 +135,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
             Session selectedSession = e.getValue();
 
             if (selectedSession != null) {
-                getUI().ifPresent(ui -> ui.navigate(SessionRankingView.class,
+                getUI().ifPresent(ui -> ui.navigate(SessionDetailsView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )

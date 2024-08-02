@@ -97,7 +97,8 @@ vaadin:
   productionMode: false
   heartbeatInterval: 60
   closeIdleSessions: false
-
+  frontend:
+    hotdeploy: true
 ---
 spring:
   config:

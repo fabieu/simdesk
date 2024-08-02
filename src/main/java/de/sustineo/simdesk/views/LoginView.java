@@ -14,12 +14,11 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 
 @Route(value = "login", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Login")
+@PageTitle("Login")
 @AnonymousAllowed
 public class LoginView extends BaseView implements BeforeEnterObserver {
     private final NotificationService notificationService;

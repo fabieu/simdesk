@@ -18,10 +18,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.RouterLink;
 import de.sustineo.simdesk.configuration.Reference;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
@@ -33,7 +31,6 @@ import de.sustineo.simdesk.views.ComponentUtils;
 import de.sustineo.simdesk.views.LoginView;
 import de.sustineo.simdesk.views.MainView;
 import de.sustineo.simdesk.views.PermitUserView;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
@@ -49,7 +46,6 @@ public class MainLayout extends AppLayout {
     private final String privacyUrl;
     private final String impressumUrl;
     private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
-    private H1 viewTitle;
 
     public MainLayout(SecurityService securityService,
                       MenuService menuService,
@@ -115,15 +111,7 @@ public class MainLayout extends AppLayout {
         RouterLink logoRouter = new RouterLink(MainView.class);
         logoRouter.add(logo);
 
-        // Placeholder for the title of the current view.
-        // The title will be set after navigation.
-        viewTitle = new H1();
-        viewTitle.getStyle()
-                .setColor("var(--lumo-header-text-color)")
-                .setFontSize("var(--lumo-font-size-l)")
-                .setMargin("0");
-
-        layout.add(logoRouter, viewTitle);
+        layout.add(logoRouter);
 
         return layout;
     }
@@ -298,8 +286,6 @@ public class MainLayout extends AppLayout {
                         .map(Tab.class::cast)
                         .ifPresentOrElse(tabs::setSelectedTab, () -> tabs.setSelectedTab(null));
             }
-
-            viewTitle.setText(StringUtils.removeStart(getCurrentPageTitle(), VaadinConfiguration.APPLICATION_NAME_PREFIX));
         } else {
             for (Tabs tabs : menuMap.values()) {
                 tabs.setSelectedTab(null);
@@ -308,9 +294,5 @@ public class MainLayout extends AppLayout {
 
         // Close drawer when navigating to different view
         setDrawerOpened(false);
-    }
-
-    private String getCurrentPageTitle() {
-        return getContent().getClass().getAnnotation(PageTitle.class).value();
     }
 }

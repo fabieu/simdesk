@@ -19,7 +19,6 @@ import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
@@ -41,7 +40,7 @@ import java.util.List;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/management", layout = MainLayout.class)
-@PageTitle(VaadinConfiguration.APPLICATION_NAME_PREFIX + "Balance of Performance - Management")
+@PageTitle("Balance of Performance - Management")
 @RolesAllowed({"ADMIN", "BOP-MANAGER"})
 public class BopManagementView extends BaseView {
     private final BopService bopService;
@@ -56,6 +55,7 @@ public class BopManagementView extends BaseView {
         setSizeFull();
         setPadding(false);
 
+        add(createViewHeader());
         addAndExpand(createBopGrid());
     }
 
