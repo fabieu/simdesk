@@ -4,7 +4,7 @@ ENV SIMDESK_ACC_RESULTS_FOLDERS=results
 
 WORKDIR /app
 RUN mkdir data results
-COPY build/libs/simdesk-*.jar simdesk.jar
+COPY build/libs/simdesk.jar simdesk.jar
 
 EXPOSE 8080
 
