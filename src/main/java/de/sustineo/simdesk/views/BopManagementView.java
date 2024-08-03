@@ -52,7 +52,6 @@ public class BopManagementView extends BaseView {
         this.securityService = securityService;
 
         setSizeFull();
-        setPadding(false);
 
         add(createViewHeader());
         addAndExpand(createBopGrid());
@@ -60,6 +59,7 @@ public class BopManagementView extends BaseView {
 
     private Component createBopGrid() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
 
         List<Bop> bops = bopService.getAll().stream()
                 .sorted(bopService.getComparator())
