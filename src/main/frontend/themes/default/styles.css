@@ -75,7 +75,7 @@ hr.spacer {
 
 .selection-header {
     width: 100%;
-    justify-content: start;
+    justify-content: end;
     align-items: center;
     padding: 0 var(--lumo-space-m);
 }

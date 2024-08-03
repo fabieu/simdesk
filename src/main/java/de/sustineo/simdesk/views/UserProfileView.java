@@ -25,15 +25,15 @@ import java.util.Optional;
 import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_DISCORD)
-@Route(value = "/permit/me", layout = MainLayout.class)
-@PageTitle("Permit")
+@Route(value = "/profile", layout = MainLayout.class)
+@PageTitle("Profile")
 @PermitAll
-public class PermitUserView extends BaseView {
+public class UserProfileView extends BaseView {
     private final SecurityService securityService;
     private final Optional<PermitService> permitService;
 
-    public PermitUserView(SecurityService securityService,
-                          Optional<PermitService> permitService) {
+    public UserProfileView(SecurityService securityService,
+                           Optional<PermitService> permitService) {
         this.securityService = securityService;
         this.permitService = permitService;
 

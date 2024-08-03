@@ -32,8 +32,8 @@ public class MenuService {
         items.add(MenuEntity.of(MenuEntityCategory.MAIN, "Home", VaadinIcon.HOME, MainView.class));
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Times", VaadinIcon.CLOCK, OverallLapTimesView.class));
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, SessionView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.CLOCK, LeaderboardOverallLapTimesView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
@@ -43,11 +43,6 @@ public class MenuService {
                 items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
             }
         }
-
-        if (ProfileManager.isDiscordProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.PERMIT, "My Permit", VaadinIcon.USER_CHECK, PermitUserView.class));
-        }
-
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "Entrylist Validator", VaadinIcon.CLIPBOARD_CHECK, EntrylistValidatorView.class));

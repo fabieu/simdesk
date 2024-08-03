@@ -7,7 +7,6 @@ public enum MenuEntityCategory {
     MAIN("Main"),
     LEADERBOARD("Leaderboard"),
     BALANCE_OF_PERFORMANCE("Balance of Performance"),
-    PERMIT("Permit"),
     TOOLS("Tools"),
     EXTERNAL_LINKS("External Links");
 

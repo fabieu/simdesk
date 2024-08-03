@@ -30,7 +30,7 @@ import de.sustineo.simdesk.utils.ApplicationContextProvider;
 import de.sustineo.simdesk.views.ComponentUtils;
 import de.sustineo.simdesk.views.LoginView;
 import de.sustineo.simdesk.views.MainView;
-import de.sustineo.simdesk.views.PermitUserView;
+import de.sustineo.simdesk.views.UserProfileView;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
@@ -138,7 +138,7 @@ public class MainLayout extends AppLayout {
             Component permitBadge = permitService.get().getBasePermitBadge(userId.get());
 
             MenuItem permitMenuItem = menuBar.addItem(permitBadge);
-            permitMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(PermitUserView.class)));
+            permitMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));
         }
 
         Avatar avatar = new Avatar();
@@ -154,7 +154,7 @@ public class MainLayout extends AppLayout {
             avatarUrl.ifPresent(avatar::setImage);
 
             MenuItem profileMenuItem = userSubMenu.addItem("Profile");
-            profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(PermitUserView.class)));
+            profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));
 
             userSubMenu.add(ComponentUtils.createSpacer());
 

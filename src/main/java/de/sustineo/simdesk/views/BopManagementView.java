@@ -51,7 +51,6 @@ public class BopManagementView extends BaseView {
         this.bopService = bopService;
         this.securityService = securityService;
 
-        setId("bop-management-view");
         setSizeFull();
         setPadding(false);
 
