@@ -41,10 +41,11 @@ hr.spacer {
 }
 
 .container {
+    width: 80%;
     margin-right: auto;
     margin-left: auto;
     padding: var(--lumo-space-l);
-    margin-bottom: 100px;
+    margin-bottom: var(--lumo-space-m);
 }
 
 @media (min-width: 768px) {
@@ -65,17 +66,13 @@ hr.spacer {
     }
 }
 
-.container > h2 {
-    padding: var(--lumo-space-m);
-}
-
 .bg-light {
     background-color: var(--lumo-contrast-5pct);
 }
 
 .selection-header {
     width: 100%;
-    justify-content: start;
+    justify-content: end;
     align-items: center;
     padding: 0 var(--lumo-space-m);
 }

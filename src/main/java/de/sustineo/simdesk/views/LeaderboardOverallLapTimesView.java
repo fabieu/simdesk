@@ -26,10 +26,10 @@ import java.util.Map;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-times", layout = MainLayout.class)
-@PageTitle("Leaderboard - Lap times")
+@Route(value = "/leaderboard/lap-records", layout = MainLayout.class)
+@PageTitle("Leaderboard - Lap records")
 @AnonymousAllowed
-public class OverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
 
     private Grid<GroupRanking> rankingGrid;
@@ -37,11 +37,10 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
 
-    public OverallLapTimesView(RankingService rankingService) {
+    public LeaderboardOverallLapTimesView(RankingService rankingService) {
         this.rankingService = rankingService;
 
         setSizeFull();
-        setPadding(false);
         setSpacing(false);
     }
 
@@ -133,7 +132,7 @@ public class OverallLapTimesView extends BaseView implements BeforeEnterObserver
             GroupRanking selectedGroupRanking = e.getValue();
 
             if (selectedGroupRanking != null) {
-                getUI().ifPresent(ui -> ui.navigate(OverallLapTimesDifferentiatedView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardOverallLapTimesDifferentiatedView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_CAR_GROUP, selectedGroupRanking.getCarGroup().name().toLowerCase()),
                                 new RouteParam(ROUTE_PARAMETER_TRACK_ID, selectedGroupRanking.getTrackId())

@@ -29,7 +29,7 @@ import java.util.Optional;
 @Route(value = "/leaderboard/sessions", layout = MainLayout.class)
 @PageTitle("Leaderboard - Sessions")
 @AnonymousAllowed
-public class SessionView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+public class LeaderboardSessionsView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final SessionService sessionService;
 
     private Grid<Session> sessionGrid;
@@ -37,11 +37,11 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
 
-    public SessionView(SessionService sessionService) {
+    public LeaderboardSessionsView(SessionService sessionService) {
         this.sessionService = sessionService;
 
         setSizeFull();
-        setPadding(false);
+        setSpacing(false);
     }
 
     @Override
@@ -135,7 +135,7 @@ public class SessionView extends BaseView implements BeforeEnterObserver, AfterN
             Session selectedSession = e.getValue();
 
             if (selectedSession != null) {
-                getUI().ifPresent(ui -> ui.navigate(SessionDetailsView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )

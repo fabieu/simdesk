@@ -21,7 +21,6 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.VaadinConfiguration;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
@@ -64,9 +63,8 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         this.bopService = bopService;
         this.notificationService = notificationService;
 
-        setId("bop-display-view");
         setSizeFull();
-        setPadding(false);
+        setSpacing(true);
     }
 
     @Override
@@ -85,6 +83,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     private Component createBopGrid() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
 
         Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
                 .sorted(bopService.getComparator())

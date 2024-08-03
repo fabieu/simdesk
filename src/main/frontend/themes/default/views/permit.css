@@ -7,8 +7,8 @@
     flex-direction: column;
     align-items: flex-start;
     box-sizing: border-box;
-    gap: var(--lumo-space-xs);
-    margin-bottom: var(--lumo-space-m);
+    gap: var(--lumo-space-s);
+    padding: var(--lumo-space-m);
 }
 
 .permit-explanation ul {

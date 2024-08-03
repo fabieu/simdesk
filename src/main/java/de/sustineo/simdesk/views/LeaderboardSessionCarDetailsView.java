@@ -53,7 +53,7 @@ import java.util.stream.Collectors;
 @Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId", layout = MainLayout.class)
 @PageTitle("Leaderboard - Session Car Details")
 @AnonymousAllowed
-public class SessionCarDetailsView extends BaseView implements BeforeEnterObserver {
+public class LeaderboardSessionCarDetailsView extends BaseView implements BeforeEnterObserver {
     private final SessionService sessionService;
     private final LapService lapService;
     private final PenaltyService penaltyService;
@@ -63,11 +63,11 @@ public class SessionCarDetailsView extends BaseView implements BeforeEnterObserv
     private List<Lap> laps = new ArrayList<>();
     private List<Penalty> penalties = new ArrayList<>();
 
-    public SessionCarDetailsView(SessionService sessionService,
-                                 LapService lapService,
-                                 PenaltyService penaltyService,
-                                 RankingService rankingService,
-                                 SecurityService securityService) {
+    public LeaderboardSessionCarDetailsView(SessionService sessionService,
+                                            LapService lapService,
+                                            PenaltyService penaltyService,
+                                            RankingService rankingService,
+                                            SecurityService securityService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.penaltyService = penaltyService;
@@ -75,7 +75,6 @@ public class SessionCarDetailsView extends BaseView implements BeforeEnterObserv
         this.securityService = securityService;
 
         setSizeFull();
-        setPadding(false);
         setSpacing(false);
     }
 
@@ -119,6 +118,7 @@ public class SessionCarDetailsView extends BaseView implements BeforeEnterObserv
         HorizontalLayout layout = new HorizontalLayout();
         layout.setPadding(true);
         layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();

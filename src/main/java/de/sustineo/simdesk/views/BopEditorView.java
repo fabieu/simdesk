@@ -71,7 +71,6 @@ public class BopEditorView extends BaseView {
         this.validationService = validationService;
         this.notificationService = notificationService;
 
-        setId("bop-editor-view");
         setSizeFull();
 
         add(createViewHeader());

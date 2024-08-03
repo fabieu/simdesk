@@ -48,22 +48,21 @@ import java.util.stream.Stream;
 @Route(value = "/leaderboard/sessions/:fileChecksum", layout = MainLayout.class)
 @PageTitle("Leaderboard - Session Details")
 @AnonymousAllowed
-public class SessionDetailsView extends BaseView implements BeforeEnterObserver {
+public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnterObserver {
     private final RankingService rankingService;
     private final SessionService sessionService;
     private final SecurityService securityService;
 
     private GridListDataView<SessionRanking> dataView;
 
-    public SessionDetailsView(RankingService rankingService,
-                              SessionService sessionService,
-                              SecurityService securityService) {
+    public LeaderboardSessionDetailsView(RankingService rankingService,
+                                         SessionService sessionService,
+                                         SecurityService securityService) {
         this.rankingService = rankingService;
         this.sessionService = sessionService;
         this.securityService = securityService;
 
         setSizeFull();
-        setPadding(false);
         setSpacing(false);
     }
 
@@ -91,6 +90,7 @@ public class SessionDetailsView extends BaseView implements BeforeEnterObserver 
         HorizontalLayout layout = new HorizontalLayout();
         layout.setPadding(true);
         layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
@@ -216,7 +216,7 @@ public class SessionDetailsView extends BaseView implements BeforeEnterObserver 
             SessionRanking selectedSessionRanking = e.getValue();
 
             if (selectedSessionRanking != null) {
-                getUI().ifPresent(ui -> ui.navigate(SessionCarDetailsView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionCarDetailsView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
                                 new RouteParam(ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())

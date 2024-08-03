@@ -28,10 +28,10 @@ import java.util.List;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-times/:carGroup/:trackId", layout = MainLayout.class)
-@PageTitle("Leaderboard - Lap times by track")
+@Route(value = "/leaderboard/lap-records/:carGroup/:trackId", layout = MainLayout.class)
+@PageTitle("Leaderboard - All lap records")
 @AnonymousAllowed
-public class OverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
 
     private Grid<DriverRanking> rankingGrid;
@@ -39,11 +39,10 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
 
-    public OverallLapTimesDifferentiatedView(RankingService rankingService) {
+    public LeaderboardOverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
 
         setSizeFull();
-        setPadding(false);
         setSpacing(false);
     }
 
@@ -63,7 +62,7 @@ public class OverallLapTimesDifferentiatedView extends BaseView implements Befor
 
             this.rankingGrid = createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, this.timeRange);
 
-            add(createViewHeader(getAnnotatedPageTitle() + " - " + carGroup.toUpperCase() + " - " + Track.getTrackNameById(trackId)));
+            add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameById(trackId), carGroup.toUpperCase())));
             add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
         } else {
