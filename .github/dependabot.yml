@@ -9,17 +9,25 @@ updates:
     labels:
       - "dependencies"
     groups:
-      prod-dependencies:
-        dependency-type: "production"
+      major-updates:
+        update-types:
+          - "major"
+      minor-updates:
         update-types:
           - "minor"
           - "patch"
+      other-updates:
+        patterns:
+          - "*"
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
       interval: "weekly"
       day: "saturday"
       time: "07:00"
+    labels:
+      - "dependencies"
     groups:
-      all-actions:
-        patterns: [ "*" ]
+      gh-actions:
+        patterns:
+          - "*"
