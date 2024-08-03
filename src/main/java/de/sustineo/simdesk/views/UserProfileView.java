@@ -1,12 +1,12 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.Html;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
-import com.vaadin.flow.component.details.Details;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -97,29 +97,22 @@ public class UserProfileView extends BaseView {
 
     private Component createPermitContainer() {
         Div layout = new Div();
-        layout.addClassNames("container", "bg-light", "pure-g");
-        layout.add(createPermitHeading(), createPermitDetails(), createPermitExplanation());
+        layout.addClassNames("container", "bg-light");
+        layout.add(createViewHeader("Driver-Permit"), createPermitDetails());
 
         return layout;
     }
 
-    private Component createPermitHeading() {
-        H2 heading = new H2("Driver-Permit");
-        heading.addClassNames("pure-u-1");
-        return heading;
-    }
-
-    private VerticalLayout createPermitDetails() {
+    private Component createPermitDetails() {
         Optional<Long> userId = securityService.getAuthenticatedUser()
                 .flatMap(UserPrincipal::getUserId);
 
         /* Permit details */
-        VerticalLayout permitDetailsLayout = new VerticalLayout();
-        permitDetailsLayout.setWidth(null);
-        permitDetailsLayout.addClassNames("pure-u-1", "pure-u-md-1-5");
+        Div permitDetailsLayout = new Div();
+        permitDetailsLayout.addClassNames("pure-g");
 
         Div basePermitLayout = new Div();
-        basePermitLayout.addClassNames("permit-details-container");
+        basePermitLayout.addClassNames("permit-details-container", "pure-u-1", "pure-u-sm-1-2");
 
         /* Base permit details > Permit Group */
         H4 basePermitStatusHeader = new H4("Base: ");
@@ -159,7 +152,7 @@ public class UserProfileView extends BaseView {
         permitDetailsLayout.add(basePermitLayout);
 
         Div nosPermitLayout = new Div();
-        nosPermitLayout.addClassNames("permit-details-container");
+        nosPermitLayout.addClassNames("permit-details-container", "pure-u-1", "pure-u-sm-1-2");
 
         /* NOS permit details > Permit Groups */
         H4 nosPermitStatusHeader = new H4("NOS: ");
@@ -201,102 +194,5 @@ public class UserProfileView extends BaseView {
         permitDetailsLayout.add(nosPermitLayout);
 
         return permitDetailsLayout;
-    }
-
-    private Component createPermitExplanation() {
-        Optional<Long> userId = securityService.getAuthenticatedUser()
-                .flatMap(UserPrincipal::getUserId);
-
-        /* Explanation */
-        VerticalLayout explanationLayout = new VerticalLayout();
-        explanationLayout.addClassNames("pure-u-1", "pure-u-md-4-5");
-        explanationLayout.setWidth(null);
-        explanationLayout.setSpacing(false);
-
-        Set<String> availablePermitGroups = permitService.map(PermitService::getAvailableBasePermitGroups).orElse(Set.of());
-        boolean hasBasePermit = false;
-        if (permitService.isPresent() && userId.isPresent()) {
-            hasBasePermit = permitService.get().hasBasePermitGroup(userId.get());
-        }
-
-        Paragraph introduction = new Paragraph(String.format("Participating drivers must have a permit %s for certain events. Drivers are assigned one of %s license levels based on their previous experience and performance. A driver may be reclassified by his behavior on- and off-track.", availablePermitGroups, availablePermitGroups.size()));
-        String newPermitExplanationHtml = """
-                <div class='permit-explanation'>
-                    <p><strong>STEP 1:</strong> To fulfill this step, you must complete a stint with the vehicle class corresponding to your desired license level, comprising the following components:</p>
-                    <ul>
-                        <li>Outlap</li>
-                        <li>1 Base lap</li>
-                        <li>3 Confirmation laps (Ensure the delta to the base lap remains within ±0.500s)</li>
-                        <li>2 Hotlaps (Strive to achieve your optimal time)</li>
-                        <li>Inlap</li>
-                    </ul>
-                    <p>Ensure that the laps are completed in the specified sequence and are valid. Submissions must include screenshots as proof: <a href='https://discord.com/channels/705817819459092500/1148637094672089200' target='_blank'>SUBMIT</a></p>
-                    <p><strong>STEP 2:</strong> In addition, participation in a sighting race is required. Any sprint event advertised by Sim2Real or a special sighting event can be used as a sighting race.</p>
-                </div>
-                """;
-        Details newPermitDetails = new Details("New Permit", new Html(newPermitExplanationHtml));
-
-        String upgradePermitExplanationHtml = """
-                <div class='permit-explanation'>
-                    <p>Drivers who have already acquired a permit may upgrade their license level by participating in a sighting race with the vehicle class corresponding to their desired license level. </p>
-                </div>
-                """;
-        Details upgradePermitDetails = new Details("Upgrade Permit", new Html(upgradePermitExplanationHtml));
-
-        String nosPermitExplanationHtml = """
-                <div class='permit-explanation'>
-                    <p>A supplementary "Permit-NOS" is mandatory for races held on the Nordschleife circuit. To acquire this permit extension, you must possess the foundational driver permit for your chosen vehicle class (or a higher tier), as well as the corresponding Permit-NOS-X.</p>
-                    <p>To obtain the Permit-NOS, you must fulfill the following requirements using a vehicle matching your desired license level:</p>
-                    <ul>
-                        <li>Outlap</li>
-                        <li>2 Hotlaps (with lap times below the maximum lap time)</li>
-                        <li>Inlap</li>
-                    </ul>
-                    <table>
-                        <tr>
-                            <th>Vehicle Class</th>
-                            <th>Permit-NOS</th>
-                            <th> Maximum Lap Time</th>
-                        </tr>
-                        <tr>
-                            <td>GT3</td>
-                            <td>Permit-NOS-SP9</td>
-                            <td>8:30.000</td>
-                        </tr>
-                        <tr>
-                            <td>GT2</td>
-                            <td>Permit-NOS-SPX</td>
-                            <td>8:35.000</td>
-                        </tr>
-                        <tr>
-                            <td>GTC</td>
-                            <td>Permit-NOS-CUP2</td>
-                            <td>8:45.000</td>
-                        </tr>
-                        <tr>
-                            <td>GT4</td>
-                            <td>Permit-NOS-SP10</td>
-                            <td>9:20.000</td>
-                        </tr>
-                        <tr>
-                            <td>TCX</td>
-                            <td>Permit-NOS-CUP5</td>
-                            <td>10:00.000</td>
-                        </tr>
-                    </table>
-                    <p>Ensure that the laps are completed in the specified sequence and are valid. Submissions must include screenshots as proof: <a href='https://discord.com/channels/705817819459092500/1148637094672089200' target='_blank'>SUBMIT</a></p>
-                </div>
-                """;
-        Details nosPermitDetails = new Details("Nordschleife Permit", new Html(nosPermitExplanationHtml));
-
-        if (!hasBasePermit) {
-            newPermitDetails.setOpened(true);
-        } else {
-            upgradePermitDetails.setOpened(true);
-            nosPermitDetails.setOpened(true);
-        }
-
-        explanationLayout.add(introduction, newPermitDetails, upgradePermitDetails, nosPermitDetails);
-        return explanationLayout;
     }
 }
