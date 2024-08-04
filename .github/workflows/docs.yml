@@ -3,7 +3,7 @@ name: Docs
 on:
   push:
     branches:
-      - 24-docs
+      - main
     paths:
       - docs/**
   workflow_dispatch:
@@ -17,7 +17,5 @@ jobs:
     steps:
       - uses: actions/checkout@v4
       - uses: actions/setup-python@v5
-        with:
-          python-version: 3.12
       - run: pip install "mkdocs-material[imaging]" mkdocs-git-revision-date-localized-plugin
       - run: mkdocs gh-deploy --force

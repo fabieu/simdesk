@@ -1,11 +1,18 @@
 # Site configuration
 site_name: SimDesk
-site_url: https://simdesk.eu
+site_url: https://www.simdesk.eu
 site_description: Sim Racing Management Tools
 site_author: Fabian Eulitz
 repo_name: fabieu/simdesk
 repo_url: https://github.com/fabieu/simdesk
 edit_uri: edit/main/docs
+
+# Navigation configuration
+nav:
+  - index.md
+  - Configuration:
+      - config/overview.md
+      - config/discord.md
 
 # Theme configuration
 theme:
@@ -34,7 +41,13 @@ theme:
     - search.suggest
     - search.highlight
     - search.share
-    - content.action.view
+    - navigation.instant
+    - navigation.instant.progress
+    - navigation.sections
+    - navigation.expand
+    - navigation.tracking
+    - navigation.top
+    - toc.follow
   icon:
     repo: fontawesome/brands/github
     logo: material/car
