@@ -6,6 +6,9 @@
 memory
 /src/main/resources/examples/
 
+### MKDocs template ###
+site/
+
 ### Java template
 # Compiled class file
 *.class
