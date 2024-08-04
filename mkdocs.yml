@@ -1,3 +1,62 @@
+# Site configuration
 site_name: SimDesk
+site_url: https://simdesk.eu
+site_description: Sim Racing Management Tools
+site_author: Fabian Eulitz
+repo_name: fabieu/simdesk
+repo_url: https://github.com/fabieu/simdesk
+edit_uri: edit/main/docs
+
+# Theme configuration
 theme:
   name: material
+  language: en
+  favicon: img/favicon.ico
+  palette:
+    # Palette toggle for dark mode
+    - media: "(prefers-color-scheme: dark)"
+      scheme: slate
+      toggle:
+        icon: material/weather-sunny
+        name: Switch to light mode
+      primary: black
+      accent: yellow
+
+    # Palette toggle for light mode
+    - media: "(prefers-color-scheme: light)"
+      scheme: default
+      toggle:
+        icon: material/weather-night
+        name: Switch to dark mode
+      primary: white
+      accent: yellow
+  features:
+    - search.suggest
+    - search.highlight
+    - search.share
+    - content.action.view
+  icon:
+    repo: fontawesome/brands/github
+    logo: material/car
+
+# Plugin configuration
+plugins:
+  - search:
+      lang: en
+  - social:
+      enabled: !ENV [ CI, false ]
+  - git-revision-date-localized:
+      enabled: !ENV [ CI, false ]
+
+# Footer configuration
+extra:
+  social:
+    - icon: fontawesome/brands/github
+      link: https://github.com/fabieu
+    - icon: fontawesome/brands/docker
+      link: https://hub.docker.com/u/fabieu
+    - icon: fontawesome/brands/discord
+      link: https://discordapp.com/users/199177472535822337
+  generator: false
+
+copyright: Copyright &copy; 2022- 2024 Fabian Eulitz
