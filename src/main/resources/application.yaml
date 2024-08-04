@@ -62,7 +62,7 @@ simdesk:
   results:
     folders: ${SIMDESK_ACC_RESULTS_FOLDERS:}
     scan-interval: ${SIMDESK_ACC_RESULTS_SCAN_INTERVAL:PT1M}
-    ignore-patterns: ${SIMDESK_ACC_RESULTS_IGNORE_PATTERNS:}
+    exclude-pattern: ${SIMDESK_ACC_RESULTS_EXCLUDE_PATTERN:}
   auth:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}

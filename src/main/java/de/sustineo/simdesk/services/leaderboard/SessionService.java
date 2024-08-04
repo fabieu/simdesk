@@ -26,7 +26,7 @@ public class SessionService {
     private final LapService lapService;
     private final LeaderboardService leaderboardService;
     private final PenaltyService penaltyService;
-    private List<Pattern> ignorePatterns;
+    private Pattern ignorePattern;
 
     @Autowired
     public SessionService(SessionConverter sessionConverter,
@@ -41,17 +41,13 @@ public class SessionService {
         this.penaltyService = penaltyService;
     }
 
-    @Value("${simdesk.results.ignore-patterns}")
-    private void setIgnorePatterns(String ignorePatterns) {
-        if (ignorePatterns == null || ignorePatterns.isBlank()) {
+    @Value("${simdesk.results.exclude-pattern}")
+    private void setIgnorePattern(String ignorePattern) {
+        if (ignorePattern == null || ignorePattern.isBlank()) {
             return;
         }
 
-        List<String> splitIgnorePatterns = List.of(ignorePatterns.split("\\|"));
-
-        this.ignorePatterns = splitIgnorePatterns.stream()
-                .map(Pattern::compile)
-                .toList();
+        this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
     public List<Session> getAllSessions(TimeRange timeRange) {
@@ -79,12 +75,10 @@ public class SessionService {
         }
 
         // Ignore session based on specific characters in server name
-        if (accSession.getServerName() != null && ignorePatterns != null) {
-            for (Pattern ignorePattern : ignorePatterns) {
-                if (ignorePattern.matcher(accSession.getServerName()).find()) {
-                    log.fine(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
-                    return;
-                }
+        if (accSession.getServerName() != null && ignorePattern != null) {
+            if (ignorePattern.matcher(accSession.getServerName()).find()) {
+                log.fine(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
+                return;
             }
         }
 
