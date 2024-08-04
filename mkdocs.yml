@@ -12,6 +12,7 @@ nav:
   - index.md
   - Configuration:
       - config/overview.md
+      - config/leaderboard.md
       - config/discord.md
 
 # Theme configuration

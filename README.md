@@ -19,7 +19,7 @@
 🐳 Docker
 
 ```bash
-docker run -d --restart=always -p 8085:8080 --name simdesk -v ./results:/app/results -v ./data:/app/data fabieu/simdesk:latest
+docker run -d -p 8080:8080 fabieu/simdesk:latest
 ```
 
 🐳 Docker Compose
@@ -30,14 +30,11 @@ services:
     image: fabieu/simdesk:latest
     ports:
       - "8080:8080"
-    volumes:
-      - ./data:/app/data
-      - ./results:/app/results
     restart: unless-stopped
 ```
 
 ```bash
-docker-compose up -d  
+docker-compose up -d
 ```
 
 # Configuration
