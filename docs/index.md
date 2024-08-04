@@ -1,28 +1,30 @@
+# Quick Start
+
 <p align="center">
-    <img src="docs/img/logo_h_200.png" alt="SimDesk Logo">
+    <img src="img/logo_h_200.png" alt="SimDesk Logo">
 </p>
 <p align="center">
     <em>Server leaderboard and tools for Assetto Corsa Competizione</em>
 </p>
 
-# Features
+## Features
 
-- ✅ Leaderboard for lap records
-- ✅ session overview
-- ✅ Balance of Performance overview with management interface
-- ✅ Entrylist validator
-- ✅ Balance of Performance Editor
-- ✅ Discord integration
+- Leaderboard for lap records
+- Detailed session overview
+- Balance of Performance overview with management interface
+- Entrylist validator
+- Balance of Performance Editor
+- Discord integration
 
-# Quick Start
+## Installation
 
-🐳 Docker
+### Using Docker
 
 ```bash
 docker run -d --restart=always -p 8085:8080 --name simdesk -v ./results:/app/results -v ./data:/app/data fabieu/simdesk:latest
 ```
 
-🐳 Docker Compose
+### Using Docker Compose
 
 ```yaml
 services:
@@ -37,14 +39,10 @@ services:
 ```
 
 ```bash
-docker-compose up -d  
+docker-compose up -d
 ```
 
-# Configuration
-
-For additional configuration options, please refer to the **official documentation**: https://simdesk.eu.
-
-# Changelog & Releases
+## Changelog & Releases
 
 This repository keeps a changelog using GitHub's releases functionality.
 
@@ -55,7 +53,7 @@ incremented based on the following:
 - `MINOR`: Backwards-compatible new features and enhancements.
 - `PATCH`: Backwards-compatible bugfixes and package updates.
 
-# Contributing
+## Contributing
 
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
 contributions you make are **greatly appreciated**.
@@ -70,25 +68,12 @@ Don't forget to give the project a star! Thanks again!
 4. Push to the Branch (`git push origin feature/AmazingFeature`)
 5. Open a Pull Request
 
-# License
+## License
 
 This project is licensed under the terms of the Apache License 2.0.
-
-# Built With
-
-[![Spring Boot][spring-boot]][spring-boot-url]
-[![Vaaadin][vaadin]][vaadin-url]
 
 [project-url]: https://github.com/fabieu/simdesk
 
 [issues-url]: https://github.com/fabieu/simdesk/issues
 
 [forks-url]: https://github.com/fabieu/simdesk/forks
-
-[spring-boot]: https://img.shields.io/badge/spring%20boot-6DB33F?logo=springboot&logoColor=white&style=for-the-badge
-
-[spring-boot-url]: https://spring.io/projects/spring-boot
-
-[vaadin]: https://img.shields.io/badge/vaadin-00B4F0?logo=vaadin&logoColor=white&style=for-the-badge
-
-[vaadin-url]: https://vaadin.com/
