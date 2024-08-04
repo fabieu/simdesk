@@ -18,7 +18,7 @@ concurrency:
 
 jobs:
   deployment:
-    runs-on: sustineo-01
+    runs-on: [ self-hosted, sustineo-01 ]
     environment:
       name: ${{ inputs.environment }}
       url: "https://${{ inputs.environment }}.simdesk.eu"
