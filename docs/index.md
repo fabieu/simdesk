@@ -1,5 +1,3 @@
-# Quick Start
-
 <p align="center">
     <img src="img/logo_h_200.png" alt="SimDesk Logo">
 </p>
@@ -21,7 +19,7 @@
 ### Using Docker
 
 ```bash
-docker run -d --restart=always -p 8085:8080 --name simdesk -v ./results:/app/results -v ./data:/app/data fabieu/simdesk:latest
+docker run -d -p 8080:8080 -v ./data:/app/data fabieu/simdesk:latest
 ```
 
 ### Using Docker Compose
@@ -34,7 +32,6 @@ services:
       - "8080:8080"
     volumes:
       - ./data:/app/data
-      - ./results:/app/results
     restart: unless-stopped
 ```
 
