@@ -61,9 +61,6 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         this.rankingService = rankingService;
         this.sessionService = sessionService;
         this.securityService = securityService;
-
-        setSizeFull();
-        setSpacing(false);
     }
 
     @Override
@@ -78,9 +75,14 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }
 
+            setSizeFull();
+            setSpacing(false);
+            setPadding(false);
+
             add(createViewHeader());
             add(createSessionInformation(session));
             addAndExpand(createLeaderboardGrid(session));
+            add(createFooter());
         } catch (IllegalArgumentException e) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
         }

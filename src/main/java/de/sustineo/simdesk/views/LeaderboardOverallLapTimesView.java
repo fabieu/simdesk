@@ -39,9 +39,6 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
 
     public LeaderboardOverallLapTimesView(RankingService rankingService) {
         this.rankingService = rankingService;
-
-        setSizeFull();
-        setSpacing(false);
     }
 
     @Override
@@ -56,9 +53,14 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
 
         this.rankingGrid = createRankingGrid(this.timeRange);
 
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
         addAndExpand(rankingGrid);
+        add(createFooter());
     }
 
     @Override

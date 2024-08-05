@@ -62,10 +62,12 @@ public class EntrylistValidatorView extends BaseView {
         this.notificationService = notificationService;
 
         setSizeFull();
-        setPadding(true);
+        setPadding(false);
+        setSpacing(false);
 
         add(createViewHeader());
-        add(createEntrylistValidationForm());
+        addAndExpand(createEntrylistValidationForm());
+        add(createFooter());
     }
 
     private Component createEntrylistValidationForm() {

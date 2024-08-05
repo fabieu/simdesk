@@ -37,17 +37,19 @@ public class UserProfileView extends BaseView {
         this.securityService = securityService;
         this.permitService = permitService;
 
-        setSizeFull();
-        setPadding(false);
-        setAlignItems(Alignment.CENTER);
-
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
         if (user.isEmpty()) {
             add(new Text("No user found"));
             return;
         }
 
-        add(createUserHeader(), createPermitContainer());
+        setSizeFull();
+        setPadding(false);
+        setAlignItems(Alignment.CENTER);
+
+        add(createUserHeader());
+        addAndExpand(createPermitContainer());
+        add(createFooter());
     }
 
     private Component createUserHeader() {

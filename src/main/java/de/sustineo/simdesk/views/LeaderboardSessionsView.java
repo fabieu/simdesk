@@ -39,9 +39,6 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
     public LeaderboardSessionsView(SessionService sessionService) {
         this.sessionService = sessionService;
-
-        setSizeFull();
-        setSpacing(false);
     }
 
     @Override
@@ -56,9 +53,14 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
         this.sessionGrid = createSessionGrid(this.timeRange);
 
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
         addAndExpand(sessionGrid);
+        add(createFooter());
     }
 
     @Override

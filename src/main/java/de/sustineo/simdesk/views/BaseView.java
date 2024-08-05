@@ -1,9 +1,12 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.H2;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.AbstractIcon;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -15,9 +18,14 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.StreamResource;
+import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.utils.ApplicationContextProvider;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
+
+import java.time.Year;
 
 public class BaseView extends VerticalLayout {
     protected static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
@@ -30,16 +38,19 @@ public class BaseView extends VerticalLayout {
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";
 
+    private final BuildProperties buildProperties;
+
+    public BaseView() {
+        this.buildProperties = ApplicationContextProvider.getApplicationContext().getBean(BuildProperties.class);
+    }
+
     protected Component createViewHeader() {
         return createViewHeader(getAnnotatedPageTitle());
     }
 
     protected Component createViewHeader(String heading) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setWidthFull();
-        layout.setPadding(true);
-        layout.setAlignItems(Alignment.CENTER);
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.addClassNames("header");
 
         H2 headerText = new H2(heading);
         headerText.getStyle()
@@ -48,6 +59,23 @@ public class BaseView extends VerticalLayout {
                 .setFontWeight(Style.FontWeight.BOLD);
 
         layout.add(headerText);
+
+        return layout;
+    }
+
+    protected Component createFooter() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.addClassNames("footer", "bg-light");
+
+        Span version = new Span("Version " + buildProperties.getVersion());
+        version.getElement().getThemeList().add("badge contrast");
+
+        Text copyright = new Text("Copyright © 2022 - " + Year.now().getValue());
+        Anchor creator = new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK);
+        creator.getStyle()
+                .setFontWeight(Style.FontWeight.BOLD);
+
+        layout.add(copyright, creator, version);
 
         return layout;
     }

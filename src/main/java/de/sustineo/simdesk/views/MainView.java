@@ -38,6 +38,7 @@ public class MainView extends BaseView {
 
         add(createHeader());
         addAndExpand(createMainMenu());
+        add(createFooter());
     }
 
     private Component createHeader() {
