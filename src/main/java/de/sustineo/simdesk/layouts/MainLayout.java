@@ -2,13 +2,15 @@ package de.sustineo.simdesk.layouts;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.AnchorTarget;
+import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
@@ -19,22 +21,18 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.RouterLink;
-import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.discord.PermitService;
-import de.sustineo.simdesk.utils.ApplicationContextProvider;
 import de.sustineo.simdesk.views.ComponentUtils;
 import de.sustineo.simdesk.views.LoginView;
 import de.sustineo.simdesk.views.MainView;
 import de.sustineo.simdesk.views.UserProfileView;
 import org.springframework.beans.factory.annotation.Value;
-import org.springframework.boot.info.BuildProperties;
 
-import java.time.Year;
 import java.util.*;
 
 
@@ -42,7 +40,6 @@ public class MainLayout extends AppLayout {
     private final SecurityService securityService;
     private final MenuService menuService;
     private final Optional<PermitService> permitService;
-    private final BuildProperties buildProperties;
     private final String privacyUrl;
     private final String impressumUrl;
     private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
@@ -50,13 +47,11 @@ public class MainLayout extends AppLayout {
     public MainLayout(SecurityService securityService,
                       MenuService menuService,
                       Optional<PermitService> permitService,
-                      ApplicationContextProvider applicationContextProvider,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.permitService = permitService;
-        this.buildProperties = applicationContextProvider.getBean(BuildProperties.class);
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
@@ -200,7 +195,10 @@ public class MainLayout extends AppLayout {
         footerLayout.setPadding(false);
 
         // Layout for custom links
-        VerticalLayout linkLayout = getDrawerLayout();
+        VerticalLayout linkLayout = new VerticalLayout();
+        linkLayout.setSpacing(false);
+        linkLayout.setPadding(false);
+        linkLayout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (impressumUrl != null && !impressumUrl.isEmpty()) {
             linkLayout.add(new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK));
@@ -210,37 +208,9 @@ public class MainLayout extends AppLayout {
             linkLayout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
         }
 
-        // Layout for creator information
-        VerticalLayout creatorLayout = getDrawerLayout();
-
-        Div creatorContainer = new Div();
-        creatorContainer.add(new Text("Made with ❤️ by "));
-        creatorContainer.add(new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK));
-
-        Span copyright = new Span("Copyright © 2022 - " + Year.now().getValue());
-
-        creatorLayout.add(creatorContainer, copyright);
-
-        // Layout for build information
-        VerticalLayout buildLayout = getDrawerLayout();
-
-        Span version = new Span("Version " + buildProperties.getVersion());
-        version.getElement().getThemeList().add("badge");
-
-        buildLayout.add(version);
-
         // Combine layouts
-        footerLayout.add(linkLayout, creatorLayout, buildLayout);
+        footerLayout.add(linkLayout);
         return footerLayout;
-    }
-
-    private static VerticalLayout getDrawerLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSpacing(false);
-        layout.setPadding(false);
-        layout.getThemeList().add("spacing-xs");
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-        return layout;
     }
 
     private Component createMenuHeader(String title) {

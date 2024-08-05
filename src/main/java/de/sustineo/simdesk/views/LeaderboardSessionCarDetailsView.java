@@ -73,9 +73,6 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         this.penaltyService = penaltyService;
         this.rankingService = rankingService;
         this.securityService = securityService;
-
-        setSizeFull();
-        setSpacing(false);
     }
 
     @Override
@@ -111,7 +108,13 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         if (securityService.hasAnyRole(Role.ADMIN)) {
             tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
         }
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
         addAndExpand(tabSheet);
+        add(createFooter());
     }
 
     private Component createSessionInformation(Session session) {

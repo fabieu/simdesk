@@ -2,6 +2,7 @@
 @import "component-styles/grid.css";
 @import "component-styles/dialog.css";
 @import "component-styles/menu-bar.css";
+@import "component-styles/tabs.css";
 @import "views/main.css";
 @import "views/error.css";
 @import "views/login.css";
@@ -75,4 +76,21 @@ hr.spacer {
     justify-content: end;
     align-items: center;
     padding: 0 var(--lumo-space-m);
+}
+
+.footer {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    margin-top: var(--lumo-space-m);
+    padding: var(--lumo-space-m);
+}
+
+.header {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    width: 100%;
+    padding: var(--lumo-space-l);
 }

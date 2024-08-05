@@ -72,9 +72,12 @@ public class BopEditorView extends BaseView {
         this.notificationService = notificationService;
 
         setSizeFull();
+        setPadding(false);
+        setSpacing(false);
 
         add(createViewHeader());
-        add(createFormLayout());
+        addAndExpand(createFormLayout());
+        add(createFooter());
 
         reloadComponents();
     }

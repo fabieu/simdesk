@@ -56,6 +56,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
 
+    private final Select<String> trackSelect = new Select<>();
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
     private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
@@ -64,7 +65,8 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         this.notificationService = notificationService;
 
         setSizeFull();
-        setSpacing(true);
+        setPadding(false);
+        setSpacing(false);
     }
 
     @Override
@@ -73,7 +75,9 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
         add(createViewHeader());
+        add(createTrackSelectionLayout());
         addAndExpand(createBopGrid());
+        add(createFooter());
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
@@ -81,20 +85,14 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         }
     }
 
-    private Component createBopGrid() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(false);
-
-        Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
-                .sorted(bopService.getComparator())
-                .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
-
+    private Component createTrackSelectionLayout() {
         // Track selection
         HorizontalLayout trackSelectionLayout = new HorizontalLayout();
         trackSelectionLayout.setWidthFull();
         trackSelectionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        trackSelectionLayout.getStyle()
+                .setPadding("0 var(--lumo-space-m)");
 
-        Select<String> trackSelect = new Select<>();
         trackSelect.setWidthFull();
         trackSelect.setPlaceholder("Jump to track");
         trackSelect.setItemLabelGenerator(Track::getTrackNameById);
@@ -109,7 +107,16 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         });
         trackSelectionLayout.add(trackSelect);
 
-        layout.add(trackSelectionLayout, ComponentUtils.createSpacer());
+        return trackSelectionLayout;
+    }
+
+    private Component createBopGrid() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(true);
+
+        Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
+                .sorted(bopService.getComparator())
+                .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
         for (Map.Entry<String, Set<Bop>> entry : bopsByTrack.entrySet()) {
             String trackId = entry.getKey();
