@@ -69,7 +69,7 @@ Don't forget to give the project a star! Thanks again!
 
 # License
 
-This project is licensed under the terms of the Apache License 2.0.
+This project is licensed under the terms of the MIT license.
 
 # Built With
 
