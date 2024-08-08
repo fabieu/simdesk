@@ -54,8 +54,8 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         this.rankingGrid = createRankingGrid(this.timeRange);
 
         setSizeFull();
-        setSpacing(false);
         setPadding(false);
+        setSpacing(false);
 
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
@@ -70,7 +70,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
 
     private Component createSelectHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassNames("selection-header");
+        layout.addClassNames("header", "selection");
 
         // Time range selection
         Select<TimeRange> timeRangeSelect = new Select<>();

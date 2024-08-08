@@ -110,8 +110,8 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         }
 
         setSizeFull();
-        setSpacing(false);
         setPadding(false);
+        setSpacing(false);
 
         addAndExpand(tabSheet);
         add(createFooter());

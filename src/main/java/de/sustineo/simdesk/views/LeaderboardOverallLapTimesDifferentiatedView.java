@@ -41,9 +41,6 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
     public LeaderboardOverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
-
-        setSizeFull();
-        setSpacing(false);
     }
 
     @Override
@@ -62,6 +59,10 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
             this.rankingGrid = createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, this.timeRange);
 
+            setSizeFull();
+            setSpacing(false);
+            setPadding(false);
+
             add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameById(trackId), carGroup.toUpperCase())));
             add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
@@ -78,7 +79,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
     private Component createSelectHeader(String carGroup, String trackId, TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassNames("selection-header");
+        layout.addClassNames("header", "selection");
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());

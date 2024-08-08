@@ -54,8 +54,8 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
         this.sessionGrid = createSessionGrid(this.timeRange);
 
         setSizeFull();
-        setSpacing(false);
         setPadding(false);
+        setSpacing(false);
 
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
@@ -70,7 +70,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
     private Component createSelectHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassNames("selection-header");
+        layout.addClassNames("header", "selection");
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());

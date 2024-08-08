@@ -71,26 +71,25 @@ hr.spacer {
     background-color: var(--lumo-contrast-5pct);
 }
 
-.selection-header {
+.header {
+    display: flex;
     width: 100%;
-    justify-content: end;
     align-items: center;
-    padding: 0 var(--lumo-space-m);
+    justify-content: center;
+    padding: var(--lumo-space-m);
+}
+
+.header.selection {
+    justify-content: end;
+    padding-top: 0;
+    padding-bottom: 0;
 }
 
 .footer {
     display: flex;
+    width: 100%;
     align-items: center;
     justify-content: center;
-    width: 100%;
     margin-top: var(--lumo-space-m);
     padding: var(--lumo-space-m);
-}
-
-.header {
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    width: 100%;
-    padding: var(--lumo-space-l);
 }
