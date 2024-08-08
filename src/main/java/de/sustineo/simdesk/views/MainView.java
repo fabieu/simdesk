@@ -21,7 +21,7 @@ import java.util.Optional;
 
 @Route(value = "", layout = MainLayout.class)
 @RouteAlias(value = "/home", layout = MainLayout.class)
-@PageTitle("Dashboard")
+@PageTitle("SimDesk")
 @AnonymousAllowed
 public class MainView extends BaseView {
     private final MenuService menuService;
