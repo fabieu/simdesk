@@ -44,6 +44,7 @@ public class MainView extends BaseView {
     private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
+        header.addClassNames("pattern-dots-md");
         String communityName = Optional.ofNullable(this.communityName)
                 .map(name -> "SimDesk by " + name)
                 .orElse("SimDesk");

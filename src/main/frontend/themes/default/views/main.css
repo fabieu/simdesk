@@ -3,14 +3,16 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 30vh;
-    background-color: black;
+    min-height: 20vh;
+    color: var(--lumo-contrast-10pct);
+    border-top: 1px solid var(--lumo-contrast-10pct);
+    border-bottom: 1px solid var(--lumo-contrast-10pct);
 }
 
 #home-header h1 {
-    color: var(--lumo-primary-color);
     font-size: 4rem;
     text-align: center;
+    text-transform: uppercase;
 }
 
 .home-menu-container {

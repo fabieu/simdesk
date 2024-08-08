@@ -13,6 +13,12 @@
 @import "assets/fontawesome/regular.min.css";
 @import "assets/purecss/pure-min.css";
 @import "assets/purecss/grids-responsive-min.css";
+@import "assets/patterncss/pattern.min.css";
+
+@font-face {
+    font-family: Roboto;
+    src: url("fonts/Roboto-Regular.ttf") format("truetype");
+}
 
 html {
     --weather-sunny-color: #ffb600;
