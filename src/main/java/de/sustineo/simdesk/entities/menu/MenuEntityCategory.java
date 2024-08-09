@@ -7,8 +7,7 @@ public enum MenuEntityCategory {
     MAIN("Main"),
     LEADERBOARD("Leaderboard"),
     BALANCE_OF_PERFORMANCE("Balance of Performance"),
-    TOOLS("Tools"),
-    EXTERNAL_LINKS("External Links");
+    TOOLS("Tools");
 
     private final String name;
 

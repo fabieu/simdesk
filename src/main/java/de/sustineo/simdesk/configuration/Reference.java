@@ -1,6 +1,9 @@
 package de.sustineo.simdesk.configuration;
 
 public class Reference {
+    public static final String SIMDESK = "https://simdesk.eu";
+    public static final String SIMDESK_CREDITS = SIMDESK + "/credits";
+    public static final String GITHUB = "https://github.com/fabieu/simdesk";
+    public static final String GITHUB_DISCUSSIONS = GITHUB + "/discussions";
     public static final String SUSTINEO = "https://sustineo.de";
-    public static final String FEEDBACK = "https://discord.com/channels/705817819459092500/1179820485689753640";
 }

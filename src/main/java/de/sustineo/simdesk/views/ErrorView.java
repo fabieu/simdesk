@@ -50,7 +50,7 @@ public class ErrorView extends BaseView implements BeforeEnterObserver {
     }
 
     private Component createSupportLink() {
-        Anchor supportLink = new Anchor(Reference.FEEDBACK, "Contact support (via Discord)", AnchorTarget.BLANK);
+        Anchor supportLink = new Anchor(Reference.GITHUB_DISCUSSIONS, "Contact support (GitHub)", AnchorTarget.BLANK);
         supportLink.addClassNames("button");
         return supportLink;
     }
