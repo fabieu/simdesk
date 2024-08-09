@@ -70,7 +70,7 @@ dependencies {
 
     // OpenAPI documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-    implementation 'org.webjars:webjars-locator:0.52'
+    implementation 'org.webjars:webjars-locator-lite:0.0.4'
 
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
