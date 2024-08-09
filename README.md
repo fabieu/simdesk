@@ -13,18 +13,18 @@
 ## Features
 
 - Leaderboard for lap records
-- session overview
-- Balance of Performance overview with management interface
-- Entrylist validator
+- Detailed session overview
+- Balance of Performance Management
 - Balance of Performance Editor
-- Discord integration
+- Entrylist Validator
+- Discord Integration
 
 ## Quick Start
 
 **Docker** 🐳
 
 ```bash 
-docker run -d -p 8080:8080 fabieu/simdesk:latest
+docker run -d -p 8080:8080 ghcr.io/fabieu/simdesk:latest
 ```
 
 **Docker Compose** 🐳
@@ -32,7 +32,9 @@ docker run -d -p 8080:8080 fabieu/simdesk:latest
 ```yaml
 services:
   app:
-    image: fabieu/simdesk:latest
+    image: ghcr.io/fabieu/simdesk:latest
+    volumes:
+      - ./data:/app/data
     ports:
       - "8080:8080"
     restart: unless-stopped
@@ -44,8 +46,7 @@ docker-compose up -d
 
 ## Configuration
 
-For additional configuration options, please refer to the **official documentation
-**: [https://simdesk.eu](https://simdesk.eu).
+For additional configuration options, please refer to the [**official documentation**][config-url]:
 
 ## Support Level
 
@@ -59,8 +60,8 @@ Bug reports, feature requests, questions, and pull requests are welcome.
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
 contributions you make are **greatly appreciated**.
 
-Please read [CONTRIBUTING.md](https://simdesk.eu/contributing/) for details on the process
-for submitting pull requests to us, and [CREDITS.md](https://simdesk.eu/credits/) for a listing of maintainers of,
+Please read [CONTRIBUTING][contributing-url] for details on the process
+for submitting pull requests to us, and [CREDITS][credits-url] for a listing of maintainers of,
 contributors to, and dependencies used by SimDesk.
 
 ## Changelog & Releases
@@ -81,4 +82,10 @@ This project is licensed under the terms of the Apache License 2.0.
 ## Credits
 
 For a full list of maintainers of, contributors to, and dependencies used by SimDesk, please refer
-to [CREDITS.md](https://simdesk.eu/credits/)
+to [CREDITS][credits-url].
+
+[config-url]: https://simdesk.eu/config/overview
+
+[credits-url]: https://simdesk.eu/credits/
+
+[contributing-url]: https://simdesk.eu/contributing/

@@ -12,8 +12,10 @@ nav:
   - Home: index.md
   - Configuration:
       - Overview: config/overview.md
-      - Leaderboard: config/leaderboard.md
-      - Discord: config/discord.md
+      - Features:
+          - Leaderboard: config/acc-leaderboard.md
+          - Entrylist: config/acc-entrylist.md
+          - Balance of Performance: config/acc-bop.md
   - Contributing: contributing.md
   - Credits: credits.md
 
