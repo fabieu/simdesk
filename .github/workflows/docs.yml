@@ -5,7 +5,11 @@ on:
     branches:
       - main
     paths:
+      - mkdocs.yml
       - docs/**
+      - README.md
+      - CREDITS.md
+      - CONTRIBUTING.md
   workflow_dispatch:
 
 permissions:
