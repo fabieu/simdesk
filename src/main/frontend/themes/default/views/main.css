@@ -3,14 +3,14 @@
     justify-content: center;
     align-items: center;
     width: 100%;
-    min-height: 20vh;
+    min-height: 30vh;
     color: var(--lumo-contrast-10pct);
     border-top: 1px solid var(--lumo-contrast-10pct);
     border-bottom: 1px solid var(--lumo-contrast-10pct);
 }
 
 #home-header h1 {
-    font-size: 4rem;
+    font-size: 4.5rem;
     text-align: center;
     text-transform: uppercase;
 }

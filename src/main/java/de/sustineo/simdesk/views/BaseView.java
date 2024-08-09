@@ -68,22 +68,30 @@ public class BaseView extends VerticalLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.addClassNames("footer", "bg-light");
 
-        Span version = new Span("Version " + buildProperties.getVersion());
-        version.getElement().getThemeList().add("badge contrast");
+        // Version badge + reference to GitHub release
+        String version = buildProperties.getVersion();
+        Span versionBadge = new Span("Version " + version);
+        versionBadge.getElement().getThemeList().add("badge contrast");
+        Anchor versionAnchor = new Anchor(Reference.getGitHubRelease(version));
+        versionAnchor.add(versionBadge);
+        versionAnchor.setTarget(AnchorTarget.BLANK);
 
-        Text copyright = new Text("Copyright © 2022 - " + Year.now().getValue());
-        Anchor creator = new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK);
-        creator.getStyle()
+        // Copyright text
+        Text copyrightText = new Text("Copyright © 2022 - " + Year.now().getValue());
+
+        // Maintainer + reference to Sustineo
+        Anchor maintainerAnchor = new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK);
+        maintainerAnchor.getStyle()
                 .setFontWeight(Style.FontWeight.BOLD);
 
-        Anchor github = new Anchor(Reference.GITHUB);
-        github.add(new FontIcon("fa-brands", "fa-github"));
-        github.setTarget(AnchorTarget.BLANK);
-        github.getStyle()
+        // GitHub icon + reference to GitHub repository
+        Anchor githubAnchor = new Anchor(Reference.GITHUB);
+        githubAnchor.add(new FontIcon("fa-brands", "fa-github"));
+        githubAnchor.setTarget(AnchorTarget.BLANK);
+        githubAnchor.getStyle()
                 .setColor("var(--lumo-body-text-color)");
 
-        layout.add(copyright, creator, github, version);
-
+        layout.add(copyrightText, maintainerAnchor, githubAnchor, versionAnchor);
         return layout;
     }
 
