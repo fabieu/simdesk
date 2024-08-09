@@ -21,6 +21,7 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.RouterLink;
+import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
@@ -207,6 +208,8 @@ public class MainLayout extends AppLayout {
         if (privacyUrl != null && !privacyUrl.isEmpty()) {
             linkLayout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
         }
+
+        linkLayout.add(new Anchor(Reference.SIMDESK_CREDITS, "Credits", AnchorTarget.BLANK));
 
         // Combine layouts
         footerLayout.add(linkLayout);

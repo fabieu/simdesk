@@ -44,7 +44,7 @@ public class MainView extends BaseView {
     private Component createHeader() {
         Div header = new Div();
         header.setId("home-header");
-        header.addClassNames("pattern-dots-md");
+        header.addClassNames("pattern-cross-dots-md");
         String communityName = Optional.ofNullable(this.communityName)
                 .map(name -> "SimDesk by " + name)
                 .orElse("SimDesk");
@@ -55,7 +55,6 @@ public class MainView extends BaseView {
     private Component createMainMenu() {
         Map<MenuEntityCategory, List<MenuEntity>> menuMap = menuService.getItemsByCategory();
         menuMap.remove(MenuEntityCategory.MAIN);
-        menuMap.remove(MenuEntityCategory.EXTERNAL_LINKS);
 
         Div menuContainer = new Div();
         menuContainer.addClassNames("home-menu-container", "pure-g");

@@ -8,6 +8,7 @@ import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.AbstractIcon;
+import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -75,7 +76,13 @@ public class BaseView extends VerticalLayout {
         creator.getStyle()
                 .setFontWeight(Style.FontWeight.BOLD);
 
-        layout.add(copyright, creator, version);
+        Anchor github = new Anchor(Reference.GITHUB);
+        github.add(new FontIcon("fa-brands", "fa-github"));
+        github.setTarget(AnchorTarget.BLANK);
+        github.getStyle()
+                .setColor("var(--lumo-body-text-color)");
+
+        layout.add(copyright, creator, github, version);
 
         return layout;
     }

@@ -3,7 +3,6 @@ package de.sustineo.simdesk.services;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
@@ -51,8 +50,6 @@ public class MenuService {
         if (ProfileManager.isBopProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "BoP Editor", VaadinIcon.SCALE, BopEditorView.class));
         }
-
-        items.add(MenuEntity.of(MenuEntityCategory.EXTERNAL_LINKS, "Feedback", VaadinIcon.CHAT, Reference.FEEDBACK));
 
         return items;
     }
