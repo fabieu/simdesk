@@ -1,5 +1,3 @@
-# Discord
-
 Enable the leaderboard feature by adding `discord` to `SPRING_PROFILES_ACTIVE`.
 
 ## Environment variables
