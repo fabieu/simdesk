@@ -10,7 +10,7 @@ spring:
     serialization:
       fail-on-empty-beans: false
   datasource:
-    url: jdbc:sqlite:./data/simdesk-db.db
+    url: jdbc:sqlite:./data/simdesk.db
     driver-class-name: org.sqlite.JDBC
     hikari:
       connection-init-sql: PRAGMA journal_mode = wal; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA busy_timeout = 300000
