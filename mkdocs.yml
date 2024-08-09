@@ -9,11 +9,13 @@ edit_uri: edit/main/docs
 
 # Navigation configuration
 nav:
-  - index.md
+  - Home: index.md
   - Configuration:
-      - config/overview.md
-      - config/leaderboard.md
-      - config/discord.md
+      - Overview: config/overview.md
+      - Leaderboard: config/leaderboard.md
+      - Discord: config/discord.md
+  - Contributing: contributing.md
+  - Credits: credits.md
 
 # Theme configuration
 theme:
@@ -28,7 +30,6 @@ theme:
         icon: material/weather-sunny
         name: Switch to light mode
       primary: black
-      accent: yellow
 
     # Palette toggle for light mode
     - media: "(prefers-color-scheme: light)"
@@ -37,7 +38,6 @@ theme:
         icon: material/weather-night
         name: Switch to dark mode
       primary: white
-      accent: yellow
   features:
     - search.suggest
     - search.highlight
@@ -61,6 +61,7 @@ plugins:
       enabled: !ENV [ CI, false ]
   - git-revision-date-localized:
       enabled: !ENV [ CI, false ]
+  - include-markdown:
 
 # Footer configuration
 extra:

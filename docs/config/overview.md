@@ -1,5 +1,3 @@
-# Overview
-
 Environment variables are used to configure the application.
 Feature based environment variables are described in the corresponding feature documentation.
 

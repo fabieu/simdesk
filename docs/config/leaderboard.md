@@ -1,5 +1,3 @@
-# Leaderboard
-
 Enable the leaderboard feature by adding `acc-leaderboard` to `SPRING_PROFILES_ACTIVE`.
 
 ## Docker Volume
