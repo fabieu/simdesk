@@ -32,7 +32,5 @@ jobs:
         uses: actions/checkout@v4
       - name: Login to container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
-      - name: Copy docker compose file
-        run: cp -f ${{ github.workspace }}/docker-compose.yml docker-compose.yml
-      - name: docker compose up
+      - name: Start Docker Compose Stack
         run: docker compose up -d
