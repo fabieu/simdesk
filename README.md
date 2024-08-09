@@ -59,8 +59,8 @@ Bug reports, feature requests, questions, and pull requests are welcome.
 Contributions are what make the open source community such an amazing place to learn, inspire, and create. Any
 contributions you make are **greatly appreciated**.
 
-Please read [CONTRIBUTING.md](https://sim2real.eu/contributing/) for details on the process
-for submitting pull requests to us, and [CREDITS.md](https://sim2real.eu/credits/) for a listing of maintainers of,
+Please read [CONTRIBUTING.md](https://simdesk.eu/contributing/) for details on the process
+for submitting pull requests to us, and [CREDITS.md](https://simdesk.eu/credits/) for a listing of maintainers of,
 contributors to, and dependencies used by SimDesk.
 
 ## Changelog & Releases
@@ -81,4 +81,4 @@ This project is licensed under the terms of the MIT license.
 ## Credits
 
 For a full list of maintainers of, contributors to, and dependencies used by SimDesk, please refer
-to [CREDITS.md](https://sim2real.eu/credits/)
+to [CREDITS.md](https://simdesk.eu/credits/)
