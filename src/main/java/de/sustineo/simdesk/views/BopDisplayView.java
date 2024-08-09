@@ -10,13 +10,11 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H2;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -207,14 +205,6 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         }
 
         trackSelect.setItems(new ArrayList<>(scrollTargets.keySet()));
-
-        // Disclaimer
-        H3 disclaimer = new H3("Disclaimer: We use data provided by Low Fuel Motorsport (LFM) and pitskill.io (PitBoP). The data is subject to change.");
-        disclaimer.setWidthFull();
-        disclaimer.getStyle()
-                .setColor("var(--lumo-secondary-text-color)")
-                .setTextAlign(Style.TextAlign.CENTER);
-        layout.add(disclaimer);
 
         return layout;
     }
