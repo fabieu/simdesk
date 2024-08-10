@@ -1,11 +1,11 @@
 ## Description
 
-The leaderboard feature enables processing of ACC result files to create a leaderboard for lap records as well as
-detailed
-session information.
+The `acc-leaderboard` feature enables processing of ACC result files to create a leaderboard for lap records as well as
+detailed session information.
 
-**View Demo
-**: [Lap-Records](https://sim2real.simdesk.eu/leaderboard/lap-records), [Sessions](https://sim2real.simdesk.eu/leaderboard/sessions)
+**View Demo:**
+[Lap-Records](https://sim2real.simdesk.eu/leaderboard/lap-records),
+[Sessions](https://sim2real.simdesk.eu/leaderboard/sessions)
 
 Enable the leaderboard feature by adding `acc-leaderboard` to `SPRING_PROFILES_ACTIVE`.
 
@@ -36,9 +36,9 @@ services:
       - ./results:/app/results # Bind mount for the result files
 ```
 
-## Environment variables
+## Environment Variables
 
-### `SIMDESK_ACC_RESULTS_SCAN_INTERVAL`
+`SIMDESK_ACC_RESULTS_SCAN_INTERVAL`
 
 > optional, default=1m
 
@@ -48,14 +48,14 @@ Overrides the default scan interval for the results folder. The following method
 - The standard ISO-8601 format used by `java.time.Duration`
 - A more readable format where the value and the unit are coupled (e.g. 10s means 10 seconds)
 
-### `SIMDESK_ACC_RESULTS_EXCLUDE_PATTERN`
+`SIMDESK_ACC_RESULTS_EXCLUDE_PATTERN`
 
 > optional, default=
 
 Define a regex pattern to ignore certain server names, which can be useful if you want to exclude certain servers from
 the leaderboard.
 
-### `SIMDESK_ACC_RESULTS_FOLDERS`
+`SIMDESK_ACC_RESULTS_FOLDERS`
 
 > optional, default=/app/results
 
