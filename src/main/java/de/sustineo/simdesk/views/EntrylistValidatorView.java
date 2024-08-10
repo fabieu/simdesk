@@ -74,6 +74,8 @@ public class EntrylistValidatorView extends BaseView {
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
 
+        VerticalLayout formLayout = new VerticalLayout();
+
         /* Validation rules start */
         VerticalLayout validationRulesLayout = new VerticalLayout();
         validationRulesLayout.setPadding(false);
@@ -135,7 +137,8 @@ public class EntrylistValidatorView extends BaseView {
         fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload, fileUploadExplanation);
         /* File upload end */
 
-        layout.add(validationRulesLayout, fileUploadLayout, createValidationRuleDetailsLayout());
+        formLayout.add(validationRulesLayout, fileUploadLayout, createValidationRuleDetailsLayout());
+        layout.add(formLayout);
         return layout;
     }
 
