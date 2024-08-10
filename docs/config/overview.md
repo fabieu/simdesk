@@ -17,35 +17,43 @@ services:
       - "8080:8080"
 ```
 
-## Environment variables
+## Authentication
 
-Environment variables are used to configure the application.
-Feature based environment variables are described in the corresponding feature sections.
+See [Authentication](auth.md) for more information.
 
-### `SPRING_PROFILES_ACTIVE`
+## Configuration Basics
+
+Environment variables are used to configure the application. Feature based environment variables are described in the
+corresponding feature sections.
+
+- [Leaderboard](acc-leaderboard.md)
+- [Entrylist](acc-entrylist.md)
+- [Balance of Performance](acc-bop.md)
+
+## Environment Variables
+
+`SPRING_PROFILES_ACTIVE`
 
 > optional
 
-Features can be enabled by setting the corresponding Spring profile.  
-When you want to enable additional features, you have to add the corresponding profile to the `SPRING_PROFILES_ACTIVE`
-variable.   
-The following profiles are set by default:
+To enable additional features, you have to add the corresponding feature profile to the `SPRING_PROFILES_ACTIVE`
+environment variable. If following profiles are set, when you do not override `SPRING_PROFILES_ACTIVE`:
 
-- `acc-entrylist, acc-bop`: Enable the entrylist validator and BoP editor.
+- `acc-entrylist,acc-bop`: Enable the Entrylist and Balance of Performance feature set.
 
-### `SIMDESK_COMMUNITY_NAME`
+`SIMDESK_COMMUNITY_NAME`
 
 > optional, default=SimDesk
 
 Set the community name for the main page. If not set, a generic name will be used.
 
-### `SIMDESK_IMPRESSUM_URL`
+`SIMDESK_IMPRESSUM_URL`
 
 > optional, default=
 
 The URL to the impressum page. If not set, no impressum link will be shown.
 
-### `SIMDESK_PRIVACY_URL`
+`SIMDESK_PRIVACY_URL`
 
 > optional, default=
 

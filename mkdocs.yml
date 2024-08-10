@@ -12,6 +12,7 @@ nav:
   - Home: index.md
   - Configuration:
       - Overview: config/overview.md
+      - Authentication: config/auth.md
       - Features:
           - Leaderboard: config/acc-leaderboard.md
           - Entrylist: config/acc-entrylist.md

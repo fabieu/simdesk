@@ -2,7 +2,7 @@
 
 Enable the leaderboard feature by adding `discord` to `SPRING_PROFILES_ACTIVE`.
 
-## Environment variables
+## Environment Variables
 
 ### `SIMDESK_DISCORD_CLIENT_ID`
 
