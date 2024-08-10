@@ -7,7 +7,8 @@
     <em>Server leaderboard and tools for Assetto Corsa Competizione</em>
 </p>
 <p align="center">
-    <a href="https://simdesk.eu/"><b>Documentation</b></a>
+    <a href="https://simdesk.eu/"><b>Documentation</b></a> • 
+    <a href="https://sim2real.simdesk.eu/"><b>Demo</b></a>
 </p>
 
 ## Features
@@ -17,7 +18,7 @@
 - Balance of Performance Management
 - Balance of Performance Editor
 - Entrylist Validator
-- Discord Integration
+- Responsive design for mobile and desktop
 
 ## Quick Start
 

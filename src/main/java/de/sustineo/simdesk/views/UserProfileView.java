@@ -12,19 +12,16 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.discord.PermitService;
 import jakarta.annotation.security.PermitAll;
-import org.springframework.context.annotation.Profile;
 
 import java.util.Optional;
 import java.util.Set;
 
-@Profile(ProfileManager.PROFILE_DISCORD)
 @Route(value = "/profile", layout = MainLayout.class)
 @PageTitle("Profile")
 @PermitAll
@@ -99,8 +96,11 @@ public class UserProfileView extends BaseView {
 
     private Component createPermitContainer() {
         Div layout = new Div();
-        layout.addClassNames("container", "bg-light");
-        layout.add(createViewHeader("Driver-Permit"), createPermitDetails());
+
+        if (permitService.isPresent()) {
+            layout.addClassNames("container", "bg-light");
+            layout.add(createViewHeader("Driver-Permit"), createPermitDetails());
+        }
 
         return layout;
     }
