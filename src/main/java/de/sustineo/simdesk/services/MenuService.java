@@ -41,14 +41,12 @@ public class MenuService {
             if (securityService.hasAnyRole(Role.ADMIN, Role.BOP_MANAGER)) {
                 items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
             }
+
+            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "Entrylist Validator", VaadinIcon.CLIPBOARD_CHECK, EntrylistValidatorView.class));
-        }
-
-        if (ProfileManager.isBopProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.TOOLS, "BoP Editor", VaadinIcon.SCALE, BopEditorView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Validator", VaadinIcon.CLIPBOARD_CHECK, EntrylistValidatorView.class));
         }
 
         return items;

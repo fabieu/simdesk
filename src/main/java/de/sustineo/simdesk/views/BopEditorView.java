@@ -52,7 +52,7 @@ import java.util.Set;
 @Profile(ProfileManager.PROFILE_BOP)
 @Log
 @Route(value = "/bop/editor", layout = MainLayout.class)
-@PageTitle("BoP - Editor")
+@PageTitle("Balance of Performance - Editor")
 @AnonymousAllowed
 public class BopEditorView extends BaseView {
     private final ValidationService validationService;
