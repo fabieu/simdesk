@@ -50,7 +50,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Run tests
         run: chmod +x gradlew && sh gradlew test
 
@@ -69,7 +69,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v3
+        uses: gradle/actions/setup-gradle@v4
       - name: Clean and build
         run: chmod +x gradlew && sh gradlew vaadinBuildFrontend bootJar
       - name: Upload artifact
