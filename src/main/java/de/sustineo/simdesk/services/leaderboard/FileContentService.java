@@ -65,13 +65,14 @@ public class FileContentService {
                     }
 
                     @Override
-                    public void onFileDelete(File file) {
-                        log.fine(String.format("Ignoring file delete event; File affected: %s", file.getAbsolutePath()));
+                    public void onFileChange(File file) {
+                        log.fine(String.format("Processing file change event; File affected: %s", file.getAbsolutePath()));
+                        handleSessionFile(file.toPath().toAbsolutePath());
                     }
 
                     @Override
-                    public void onFileChange(File file) {
-                        log.fine(String.format("Ignoring file change event; File affected: %s", file.getAbsolutePath()));
+                    public void onFileDelete(File file) {
+                        log.fine(String.format("Ignoring file delete event; File affected: %s", file.getAbsolutePath()));
                     }
                 };
                 observer.addListener(listener);
