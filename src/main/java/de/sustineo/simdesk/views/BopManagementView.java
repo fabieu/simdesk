@@ -41,7 +41,7 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/management", layout = MainLayout.class)
 @PageTitle("Balance of Performance - Management")
-@RolesAllowed({"ADMIN", "BOP-MANAGER"})
+@RolesAllowed({"ADMIN"})
 public class BopManagementView extends BaseView {
     private final BopService bopService;
     private final SecurityService securityService;
