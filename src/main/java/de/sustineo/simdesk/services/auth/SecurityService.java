@@ -44,14 +44,14 @@ public class SecurityService {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    private void initializeAdminUser() {
+    private void initializeSystemUsers() {
         // Generate random password if not set
         if (adminPassword == null || adminPassword.isEmpty()) {
             adminPassword = UUID.randomUUID().toString();
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userService.insertUser(adminUsername, passwordEncoder.encode(adminPassword));
+        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), UserService.USER_ID_DEFAULT_ADMIN);
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {

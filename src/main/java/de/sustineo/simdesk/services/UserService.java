@@ -15,6 +15,8 @@ public class UserService {
     private final UserMapper userMapper;
     private final DiscordUserMapper discordUserMapper;
 
+    public static final Long USER_ID_DEFAULT_ADMIN = 10000L;
+
     public UserService(UserMapper userMapper,
                        DiscordUserMapper discordUserMapper) {
         this.userMapper = userMapper;
@@ -25,14 +27,15 @@ public class UserService {
         return userMapper.findByUsername(username);
     }
 
-    public void insertUser(String username, String password) {
+    public void insertSystemUser(String username, String password, Long userId) {
         User user = User.builder()
+                .userId(userId)
                 .username(username)
                 .password(password)
                 .updateDatetime(Instant.now())
                 .build();
 
-        userMapper.insert(user);
+        userMapper.insertSystemUser(user);
     }
 
     @Cacheable(value = "discord_users", key = "#userId")
