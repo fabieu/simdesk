@@ -4,11 +4,8 @@ import lombok.AllArgsConstructor;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 import lombok.experimental.SuperBuilder;
-import org.springframework.security.core.GrantedAuthority;
 
 import java.time.Instant;
-import java.util.Collection;
-import java.util.Map;
 
 @Data
 @SuperBuilder
@@ -19,6 +16,4 @@ public class User {
     private String username;
     private String password;
     private Instant updateDatetime;
-    private Map<String, Object> attributes;
-    private Collection<? extends GrantedAuthority> authorities;
 }

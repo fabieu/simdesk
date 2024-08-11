@@ -18,7 +18,7 @@ public class UserRoleService {
         this.userRoleMapper = userRoleMapper;
     }
 
-    public Set<? extends GrantedAuthority> findAuthoritiesByUserId(Long userId) {
+    public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Long userId) {
         List<UserRole> userRoles = userRoleMapper.findByUserId(userId);
 
         return userRoles.stream()

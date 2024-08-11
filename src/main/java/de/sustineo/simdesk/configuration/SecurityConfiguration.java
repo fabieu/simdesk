@@ -39,11 +39,15 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     };
     private static final String LOGIN_URL = "/login";
     private static final String LOGIN_SUCCESS_URL = "/";
+
     public static final String ATTRIBUTE_AUTH_PROVIDER = "auth_provider";
     public static final String AUTH_PROVIDER_DISCORD = "discord";
     public static final String AUTH_PROVIDER_DATABASE = "database";
-    public static final String DISCORD_ROLE_PREFIX = "SIMDESK-";
+
     public static final String SPRING_ROLE_PREFIX = "ROLE_";
+    public static final String DISCORD_ROLE_PREFIX = "SIMDESK-";
+
+    public static final Long USER_ID_ADMIN = 10000L;
 
     private final Optional<DiscordService> discordService;
 

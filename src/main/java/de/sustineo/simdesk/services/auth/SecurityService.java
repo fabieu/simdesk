@@ -50,7 +50,7 @@ public class SecurityService {
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), UserService.USER_ID_DEFAULT_ADMIN);
+        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), SecurityConfiguration.USER_ID_ADMIN);
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {
@@ -80,7 +80,7 @@ public class SecurityService {
 
         for (GrantedAuthority authority : user.get().getAuthorities()) {
             for (Role role : roles) {
-                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role.getDefinition())) {
+                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role.name())) {
                     return true;
                 }
             }

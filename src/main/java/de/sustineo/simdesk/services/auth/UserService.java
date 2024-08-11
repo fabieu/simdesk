@@ -15,8 +15,6 @@ public class UserService {
     private final UserMapper userMapper;
     private final DiscordUserMapper discordUserMapper;
 
-    public static final Long USER_ID_DEFAULT_ADMIN = 10000L;
-
     public UserService(UserMapper userMapper,
                        DiscordUserMapper discordUserMapper) {
         this.userMapper = userMapper;

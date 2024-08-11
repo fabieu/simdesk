@@ -9,7 +9,6 @@ import org.springframework.security.core.userdetails.UserDetailsService;
 import org.springframework.security.core.userdetails.UsernameNotFoundException;
 import org.springframework.stereotype.Service;
 
-import java.util.Collections;
 import java.util.LinkedHashMap;
 import java.util.Set;
 
@@ -27,6 +26,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
         User user = userService.findByUsername(username);
+
         if (user == null) {
             throw new UsernameNotFoundException(username);
         }
@@ -35,12 +35,10 @@ public class DatabaseUserDetailsService implements UserDetailsService {
         LinkedHashMap<String, Object> attributes = new LinkedHashMap<>();
         attributes.put("id", String.valueOf(user.getUserId()));
         attributes.put(SecurityConfiguration.ATTRIBUTE_AUTH_PROVIDER, SecurityConfiguration.AUTH_PROVIDER_DATABASE);
-        user.setAttributes(Collections.unmodifiableMap(attributes));
 
         // Set authorities for the user
-        Set<? extends GrantedAuthority> authorities = userRoleService.findAuthoritiesByUserId(user.getUserId());
-        user.setAuthorities(authorities);
+        Set<? extends GrantedAuthority> authorities = userRoleService.getAuthoritiesByUserId(user.getUserId());
 
-        return new UserPrincipal(user);
+        return new UserPrincipal(user, attributes, authorities);
     }
 }

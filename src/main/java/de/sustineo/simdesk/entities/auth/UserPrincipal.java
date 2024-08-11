@@ -17,11 +17,11 @@ public class UserPrincipal implements UserDetails {
     private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(User user) {
+    public UserPrincipal(User user, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.attributes = user.getAttributes();
-        this.authorities = user.getAuthorities();
+        this.attributes = attributes;
+        this.authorities = authorities;
     }
 
     public UserPrincipal(DefaultOAuth2User user) {
