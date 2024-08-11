@@ -25,9 +25,7 @@ import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 
-import java.util.List;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log
@@ -41,7 +39,9 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     };
     private static final String LOGIN_URL = "/login";
     private static final String LOGIN_SUCCESS_URL = "/";
-    private static final String OAUTH2_PROVIDER_DISCORD = "discord";
+    public static final String ATTRIBUTE_AUTH_PROVIDER = "auth_provider";
+    public static final String AUTH_PROVIDER_DISCORD = "discord";
+    public static final String AUTH_PROVIDER_DATABASE = "database";
     public static final String DISCORD_ROLE_PREFIX = "SIMDESK-";
     public static final String SPRING_ROLE_PREFIX = "ROLE_";
 
@@ -116,7 +116,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             // Delegate to the default implementation for loading a user
             OAuth2User user = delegate.loadUser(request);
 
-            if (OAUTH2_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
+            if (AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
                 Optional<Long> memberId = Optional.ofNullable(user.getAttribute("id")).map(o -> Long.parseLong((String) o));
                 if (memberId.isEmpty()) {
                     log.severe("Failed to find id attribute for user: " + user.getName());
@@ -133,7 +133,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                             .map(role -> new SimpleGrantedAuthority(convertDiscordRoleToSpringRole(role.name())))
                             .collect(Collectors.toSet());
 
-                    return new DefaultOAuth2User(authorities, user.getAttributes(), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
+                    Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());
+                    attributes.put(ATTRIBUTE_AUTH_PROVIDER, AUTH_PROVIDER_DISCORD);
+
+                    return new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
                 } catch (Exception e) {
                     log.severe(String.format("Failed to load roles for user: %s, reason: %s", user.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));
