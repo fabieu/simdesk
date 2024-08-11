@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.services;
+package de.sustineo.simdesk.services.auth;
 
 import de.sustineo.simdesk.entities.auth.DiscordUser;
 import de.sustineo.simdesk.entities.auth.User;

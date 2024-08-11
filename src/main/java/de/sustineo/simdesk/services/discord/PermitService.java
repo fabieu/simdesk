@@ -5,7 +5,7 @@ import com.vaadin.flow.component.html.Span;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.auth.DiscordUser;
-import de.sustineo.simdesk.services.UserService;
+import de.sustineo.simdesk.services.auth.UserService;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.Id;

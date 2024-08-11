@@ -5,7 +5,6 @@ import com.vaadin.flow.server.VaadinServletRequest;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

@@ -1,7 +1,6 @@
-/** Recreate the user table and insert the default user */
-DROP TABLE IF EXISTS main.users;
+DROP TABLE IF EXISTS users;
 
-CREATE TABLE IF NOT EXISTS main.users
+CREATE TABLE IF NOT EXISTS users
 (
     user_id         INTEGER PRIMARY KEY AUTOINCREMENT,
     username        TEXT                                not null,
@@ -10,8 +9,7 @@ CREATE TABLE IF NOT EXISTS main.users
     UNIQUE (username)
 );
 
-/** Create the roles table */
-CREATE TABLE IF NOT EXISTS main.users_roles
+CREATE TABLE IF NOT EXISTS users_roles
 (
     role_id         INTEGER PRIMARY KEY AUTOINCREMENT,
     user_id         INTEGER                             not null,
@@ -19,3 +17,7 @@ CREATE TABLE IF NOT EXISTS main.users_roles
     insert_datetime TIMESTAMP default CURRENT_TIMESTAMP not null,
     UNIQUE (user_id, role_name)
 );
+
+INSERT INTO users_roles (user_id, role_name)
+VALUES (10000, 'ROLE_ADMIN')
+ON CONFLICT DO NOTHING;
