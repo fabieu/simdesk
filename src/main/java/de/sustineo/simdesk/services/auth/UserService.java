@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.services;
+package de.sustineo.simdesk.services.auth;
 
 import de.sustineo.simdesk.entities.auth.DiscordUser;
 import de.sustineo.simdesk.entities.auth.User;
@@ -25,14 +25,15 @@ public class UserService {
         return userMapper.findByUsername(username);
     }
 
-    public void insertUser(String username, String password) {
+    public void insertSystemUser(String username, String password, Long userId) {
         User user = User.builder()
+                .userId(userId)
                 .username(username)
                 .password(password)
                 .updateDatetime(Instant.now())
                 .build();
 
-        userMapper.insert(user);
+        userMapper.insertSystemUser(user);
     }
 
     @Cacheable(value = "discord_users", key = "#userId")

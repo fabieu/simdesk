@@ -1,11 +1,14 @@
 package de.sustineo.simdesk.entities.auth;
 
+import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
-import java.util.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Optional;
 
 @Data
 public class UserPrincipal implements UserDetails {
@@ -14,11 +17,11 @@ public class UserPrincipal implements UserDetails {
     private final Map<String, Object> attributes;
     private final Collection<? extends GrantedAuthority> authorities;
 
-    public UserPrincipal(User user) {
+    public UserPrincipal(User user, Map<String, Object> attributes, Collection<? extends GrantedAuthority> authorities) {
         this.username = user.getUsername();
         this.password = user.getPassword();
-        this.attributes = new HashMap<>();
-        this.authorities = new HashSet<>();
+        this.attributes = attributes;
+        this.authorities = authorities;
     }
 
     public UserPrincipal(DefaultOAuth2User user) {
@@ -43,33 +46,25 @@ public class UserPrincipal implements UserDetails {
         return this.username;
     }
 
-    @Override
-    public boolean isAccountNonExpired() {
-        return true;
+    public boolean isDiscordUser() {
+        return determineAuthProvider(SecurityConfiguration.AUTH_PROVIDER_DISCORD);
     }
 
-    @Override
-    public boolean isAccountNonLocked() {
-        return true;
+    public boolean isDatabaseUser() {
+        return determineAuthProvider(SecurityConfiguration.AUTH_PROVIDER_DATABASE);
     }
 
-    @Override
-    public boolean isCredentialsNonExpired() {
-        return true;
-    }
-
-    @Override
-    public boolean isEnabled() {
-        return true;
+    private boolean determineAuthProvider(String authProvider) {
+        return attributes != null && authProvider.equals(attributes.get(SecurityConfiguration.ATTRIBUTE_AUTH_PROVIDER));
     }
 
     public Optional<Long> getUserId() {
-        String key = "id";
+        String attributeName = "id";
 
-        if (attributes == null || !attributes.containsKey(key)) {
+        if (attributes == null || !attributes.containsKey(attributeName)) {
             return Optional.empty();
         }
 
-        return Optional.of(Long.parseLong((String) attributes.get(key)));
+        return Optional.of(Long.parseLong((String) attributes.get(attributeName)));
     }
 }

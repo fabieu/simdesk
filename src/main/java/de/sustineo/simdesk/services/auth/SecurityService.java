@@ -5,7 +5,6 @@ import com.vaadin.flow.server.VaadinServletRequest;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.services.UserService;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -44,14 +43,14 @@ public class SecurityService {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    private void initializeAdminUser() {
+    private void initializeSystemUsers() {
         // Generate random password if not set
         if (adminPassword == null || adminPassword.isEmpty()) {
             adminPassword = UUID.randomUUID().toString();
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userService.insertUser(adminUsername, passwordEncoder.encode(adminPassword));
+        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), SecurityConfiguration.USER_ID_ADMIN);
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {
@@ -81,7 +80,7 @@ public class SecurityService {
 
         for (GrantedAuthority authority : user.get().getAuthorities()) {
             for (Role role : roles) {
-                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role.getDefinition())) {
+                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role.name())) {
                     return true;
                 }
             }

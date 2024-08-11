@@ -128,9 +128,7 @@ public class MainLayout extends AppLayout {
         if (user.isEmpty()) {
             MenuItem loginMenuItem = menuBar.addItem("Login");
             loginMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
-        }
-
-        if (permitService.isPresent() && userId.isPresent()) {
+        } else if (user.get().isDiscordUser() && permitService.isPresent() && userId.isPresent()) {
             Component permitBadge = permitService.get().getBasePermitBadge(userId.get());
 
             MenuItem permitMenuItem = menuBar.addItem(permitBadge);

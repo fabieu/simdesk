@@ -38,7 +38,7 @@ public class MenuService {
         if (ProfileManager.isBopProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
 
-            if (securityService.hasAnyRole(Role.ADMIN, Role.BOP_MANAGER)) {
+            if (securityService.hasAnyRole(Role.ADMIN)) {
                 items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
             }
 
