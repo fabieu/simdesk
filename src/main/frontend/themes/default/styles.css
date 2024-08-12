@@ -1,4 +1,4 @@
-/* Import your application global css files here or add the styles directly to this file */
+@import "colors.css";
 @import "component-styles/grid.css";
 @import "component-styles/dialog.css";
 @import "component-styles/menu-bar.css";
@@ -18,20 +18,6 @@
 @font-face {
     font-family: Roboto;
     src: url("fonts/Roboto-Regular.ttf") format("truetype");
-}
-
-html {
-    --weather-sunny-color: #ffb600;
-    --weather-rainy-color: #00aeff;
-}
-
-[theme~="dark"] {
-    --lumo-base-color: hsl(0, 0%, 10%);
-    --lumo-primary-color-10pct: hsla(46, 95%, 45%, 0.2);
-    --lumo-primary-color-50pct: hsla(46, 95%, 60%, 0.59);
-    --lumo-primary-color: hsl(46, 95%, 58%);
-    --lumo-primary-text-color: hsl(46, 95%, 58%);
-    --lumo-primary-contrast-color: hsl(0, 0%, 10%);
 }
 
 .noselect {
