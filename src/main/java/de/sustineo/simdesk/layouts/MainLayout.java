@@ -12,7 +12,7 @@ import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
-import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.icon.Icon;
@@ -140,7 +140,6 @@ public class MainLayout extends AppLayout {
 
     private Component createNavbarContent() {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setId("header");
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -148,10 +147,8 @@ public class MainLayout extends AppLayout {
         // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        Image logo = new Image("assets/img/logo_full_white.png", "SimDesk Logo");
-        logo.setHeight("var(--lumo-size-l)");
-        logo.getStyle()
-                .setPaddingRight("var(--lumo-space-s)");
+        Div logo = new Div();
+        logo.setId("navbar-logo");
 
         RouterLink logoRouter = new RouterLink(MainView.class);
         logoRouter.add(logo);

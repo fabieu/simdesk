@@ -63,6 +63,20 @@ hr.spacer {
     background-color: var(--lumo-contrast-5pct);
 }
 
+#navbar-logo {
+    height: var(--lumo-size-l);
+    padding-right: var(--lumo-space-s);
+}
+
+[theme~="light"] #navbar-logo {
+    content: url("assets/img/logo_full_black.png");
+}
+
+[theme~="dark"] #navbar-logo {
+    content: url("assets/img/logo_full_white.png");
+}
+
+
 .header {
     display: flex;
     width: 100%;

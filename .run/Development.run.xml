@@ -6,6 +6,7 @@
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
+      <env name="SIMDESK_THEME" value="sim2real"/>
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.main" />
