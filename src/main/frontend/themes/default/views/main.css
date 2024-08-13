@@ -38,8 +38,7 @@
 }
 
 .home-menu-button:hover {
-    color: var(--lumo-primary-color);
-    background-color: var(--lumo-primary-contrast-color);
+    background-color: var(--lumo-primary-color-50pct);
     cursor: pointer;
 }
 

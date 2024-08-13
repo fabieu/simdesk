@@ -5,7 +5,6 @@ import com.vaadin.flow.component.page.Meta;
 import com.vaadin.flow.component.page.Viewport;
 import com.vaadin.flow.server.PWA;
 import com.vaadin.flow.theme.Theme;
-import com.vaadin.flow.theme.lumo.Lumo;
 
 /**
  * An interface to configure application features and the host page where the Vaadin application is running.
@@ -16,6 +15,6 @@ import com.vaadin.flow.theme.lumo.Lumo;
 @Meta(name = "robots", content = "noindex, nofollow")
 @Meta(name = "theme-color", content = "#1a1a1a")
 @PWA(name = "SimDesk", shortName = "SimDesk", description = "SimDesk - Sim Racing Utilities")
-@Theme(value = "default", variant = Lumo.DARK)
+@Theme(value = "default")
 public class VaadinConfiguration implements AppShellConfigurator {
 }

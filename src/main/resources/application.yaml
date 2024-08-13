@@ -54,6 +54,7 @@ vaadin:
     - /swagger-ui/**
     - /openapi/**
 simdesk:
+  theme: ${SIMDESK_THEME:#{null}}
   community:
     name: ${SIMDESK_COMMUNITY_NAME:#{null}}
   links:

@@ -2,25 +2,32 @@ package de.sustineo.simdesk.layouts;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
+import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
+import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.contextmenu.MenuItem;
 import com.vaadin.flow.component.contextmenu.SubMenu;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
-import com.vaadin.flow.component.html.Image;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
+import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
@@ -32,15 +39,20 @@ import de.sustineo.simdesk.views.ComponentUtils;
 import de.sustineo.simdesk.views.LoginView;
 import de.sustineo.simdesk.views.MainView;
 import de.sustineo.simdesk.views.UserProfileView;
+import de.sustineo.simdesk.views.enums.Theme;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
-
 public class MainLayout extends AppLayout {
+    private static final String DEFAULT_LUMO_THEME = Lumo.DARK;
+    private static final String SESSION_ATTRIBUTE_LUMO_THEME = "vaadin.lumo.theme";
+
     private final SecurityService securityService;
     private final MenuService menuService;
     private final Optional<PermitService> permitService;
+
     private final String privacyUrl;
     private final String impressumUrl;
     private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
@@ -48,6 +60,7 @@ public class MainLayout extends AppLayout {
     public MainLayout(SecurityService securityService,
                       MenuService menuService,
                       Optional<PermitService> permitService,
+                      @Value("${simdesk.theme}") String customThemeName,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
@@ -56,13 +69,49 @@ public class MainLayout extends AppLayout {
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
-
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(false, createNavbarContent(), createNavbarMenu());
+        addToNavbar(false, createNavbarContent());
+
+        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_LUMO_THEME, value -> {
+            String lumoThemeName = Optional.ofNullable(value).orElse(DEFAULT_LUMO_THEME);
+            setThemes(customThemeName, lumoThemeName);
+            addToNavbar(false, createNavbarMenu()); // Needs lumoThemeName to determine navbar icons
+        });
 
         createMenuTabs();
         addToDrawer(createDrawerContent());
         setDrawerOpened(false); // Set drawerOpened to ensure smooth animation, will be overridden
+    }
+
+    private void setThemes(String customTheme, String lumoTheme) {
+        Theme theme = EnumUtils.getEnumIgnoreCase(Theme.class, customTheme);
+
+        // Set default theme if the provided theme is not valid:
+        if (theme == null) {
+            theme = Theme.DEFAULT;
+        }
+
+        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+        themeList.clear();
+        themeList.add(theme.getThemeCssClass());
+
+        setLumoTheme(lumoTheme);
+    }
+
+
+    private String getLumoTheme() {
+        return UI.getCurrent().getElement().getThemeList().stream()
+                .filter(theme -> List.of(Lumo.DARK, Lumo.LIGHT).contains(theme))
+                .findFirst()
+                .orElse(DEFAULT_LUMO_THEME);
+    }
+
+    private void setLumoTheme(String lumoTheme) {
+        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
+        themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));
+        themeList.add(lumoTheme);
+
+        WebStorage.setItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_LUMO_THEME, lumoTheme);
     }
 
     private void createMenuTabs() {
@@ -91,7 +140,6 @@ public class MainLayout extends AppLayout {
 
     private Component createNavbarContent() {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setId("header");
         layout.setWidthFull();
         layout.setSpacing(false);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
@@ -99,10 +147,8 @@ public class MainLayout extends AppLayout {
         // Have the drawer toggle button on the left
         layout.add(new DrawerToggle());
 
-        Image logo = new Image("assets/img/logo_full_white.png", "SimDesk Logo");
-        logo.setHeight("var(--lumo-size-l)");
-        logo.getStyle()
-                .setPaddingRight("var(--lumo-space-s)");
+        Div logo = new Div();
+        logo.setId("navbar-logo");
 
         RouterLink logoRouter = new RouterLink(MainView.class);
         logoRouter.add(logo);
@@ -116,19 +162,48 @@ public class MainLayout extends AppLayout {
         MenuBar menuBar = new MenuBar();
         menuBar.addThemeVariants(MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_TERTIARY);
 
+        addThemeSwitcher(menuBar);
         addUserMenu(menuBar);
 
         return menuBar;
+    }
+
+    private void addThemeSwitcher(MenuBar menuBar) {
+        String currentLumoTheme = getLumoTheme();
+
+        FontIcon darkThemeIcon = new FontIcon("fa-regular", "fa-moon");
+        FontIcon lightThemeIcon = new FontIcon("fa-regular", "fa-sun");
+        String darkThemeLabel = "Enable dark theme";
+        String lightThemeLabel = "Enable light theme";
+        FontIcon themeButtonIcon = Lumo.DARK.equals(currentLumoTheme) ? lightThemeIcon : darkThemeIcon;
+        String label = Lumo.DARK.equals(currentLumoTheme) ? lightThemeLabel : darkThemeLabel;
+
+        Button themeSwitchButton = new Button(themeButtonIcon);
+        themeSwitchButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        themeSwitchButton.setTooltipText(label);
+        themeSwitchButton.setAriaLabel(label);
+        themeSwitchButton.addClickListener(e -> {
+            if (Lumo.DARK.equals(getLumoTheme())) {
+                setLumoTheme(Lumo.LIGHT);
+                themeSwitchButton.setIcon(darkThemeIcon);
+                themeSwitchButton.setTooltipText(darkThemeLabel);
+                themeSwitchButton.setAriaLabel(darkThemeLabel);
+            } else {
+                setLumoTheme(Lumo.DARK);
+                themeSwitchButton.setIcon(lightThemeIcon);
+                themeSwitchButton.setTooltipText(lightThemeLabel);
+                themeSwitchButton.setAriaLabel(lightThemeLabel);
+            }
+        });
+
+        menuBar.addItem(themeSwitchButton);
     }
 
     private void addUserMenu(MenuBar menuBar) {
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
         Optional<Long> userId = user.flatMap(UserPrincipal::getUserId);
 
-        if (user.isEmpty()) {
-            MenuItem loginMenuItem = menuBar.addItem("Login");
-            loginMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
-        } else if (user.get().isDiscordUser() && permitService.isPresent() && userId.isPresent()) {
+        if (user.isPresent() && user.get().isDiscordUser() && permitService.isPresent() && userId.isPresent()) {
             Component permitBadge = permitService.get().getBasePermitBadge(userId.get());
 
             MenuItem permitMenuItem = menuBar.addItem(permitBadge);
@@ -154,6 +229,9 @@ public class MainLayout extends AppLayout {
 
             MenuItem logoutMenuItem = userSubMenu.addItem("Logout");
             logoutMenuItem.addClickListener(event -> securityService.logout());
+        } else {
+            MenuItem loginMenuItem = userSubMenu.addItem("Login");
+            loginMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(LoginView.class)));
         }
     }
 
