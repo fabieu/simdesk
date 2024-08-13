@@ -4,8 +4,10 @@ on:
   workflow_dispatch:
     inputs:
       environment:
-        type: environment
+        type: choice
         description: 'Environment'
+        options:
+          - sim2real
         required: true
       version:
         type: string
