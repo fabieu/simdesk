@@ -1,12 +1,12 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Development" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug, discord"/>
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug" />
     <envs>
-      <env name="debug" value="false"/>
+      <env name="debug" value="false" />
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
-      <env name="SIMDESK_THEME" value="sim2real"/>
+      <env name="SIMDESK_THEME" value="default" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.main" />
