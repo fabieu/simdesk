@@ -8,6 +8,8 @@ updates:
       time: "07:00"
     labels:
       - "dependencies"
+    assignees:
+      - "fabieu"
     groups:
       major-updates:
         update-types:
@@ -27,6 +29,8 @@ updates:
       time: "07:00"
     labels:
       - "dependencies"
+    assignees:
+      - "fabieu"
     groups:
       gh-actions:
         patterns:
