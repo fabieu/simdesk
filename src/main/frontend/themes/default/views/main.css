@@ -16,6 +16,13 @@
     text-transform: uppercase;
 }
 
+/* Smartphone */
+@media screen and (max-width: 768px) {
+    #home-header h1 {
+        font-size: 3.5rem;
+    }
+}
+
 .home-menu-container {
     display: flex;
     flex-direction: column;
