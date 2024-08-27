@@ -2,7 +2,6 @@ package de.sustineo.simdesk.layouts;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ComponentUtil;
-import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.applayout.AppLayout;
 import com.vaadin.flow.component.applayout.DrawerToggle;
 import com.vaadin.flow.component.avatar.Avatar;
@@ -21,11 +20,9 @@ import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.dom.ThemeList;
 import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
@@ -35,20 +32,13 @@ import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.discord.PermitService;
-import de.sustineo.simdesk.views.ComponentUtils;
-import de.sustineo.simdesk.views.LoginView;
-import de.sustineo.simdesk.views.MainView;
-import de.sustineo.simdesk.views.UserProfileView;
-import de.sustineo.simdesk.views.enums.Theme;
-import org.apache.commons.lang3.EnumUtils;
+import de.sustineo.simdesk.views.*;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
 public class MainLayout extends AppLayout {
-    private static final String DEFAULT_LUMO_THEME = Lumo.DARK;
-    private static final String SESSION_ATTRIBUTE_LUMO_THEME = "vaadin.lumo.theme";
-
+    private final ThemeService themeService;
     private final SecurityService securityService;
     private final MenuService menuService;
     private final Optional<PermitService> permitService;
@@ -57,61 +47,28 @@ public class MainLayout extends AppLayout {
     private final String impressumUrl;
     private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
 
-    public MainLayout(SecurityService securityService,
+    public MainLayout(ThemeService themeService,
+                      SecurityService securityService,
                       MenuService menuService,
                       Optional<PermitService> permitService,
-                      @Value("${simdesk.theme}") String customThemeName,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.permitService = permitService;
+        this.themeService = themeService;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
-        setPrimarySection(Section.NAVBAR);
-        addToNavbar(false, createNavbarContent());
+        themeService.init();
 
-        WebStorage.getItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_LUMO_THEME, value -> {
-            String lumoThemeName = Optional.ofNullable(value).orElse(DEFAULT_LUMO_THEME);
-            setThemes(customThemeName, lumoThemeName);
-            addToNavbar(false, createNavbarMenu()); // Needs lumoThemeName to determine navbar icons
-        });
+        setPrimarySection(Section.NAVBAR);
+        addToNavbar(false, createNavbarContent(), createNavbarMenu());
 
         createMenuTabs();
+
         addToDrawer(createDrawerContent());
         setDrawerOpened(false); // Set drawerOpened to ensure smooth animation, will be overridden
-    }
-
-    private void setThemes(String customTheme, String lumoTheme) {
-        Theme theme = EnumUtils.getEnumIgnoreCase(Theme.class, customTheme);
-
-        // Set default theme if the provided theme is not valid:
-        if (theme == null) {
-            theme = Theme.DEFAULT;
-        }
-
-        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-        themeList.clear();
-        themeList.add(theme.getThemeCssClass());
-
-        setLumoTheme(lumoTheme);
-    }
-
-
-    private String getLumoTheme() {
-        return UI.getCurrent().getElement().getThemeList().stream()
-                .filter(theme -> List.of(Lumo.DARK, Lumo.LIGHT).contains(theme))
-                .findFirst()
-                .orElse(DEFAULT_LUMO_THEME);
-    }
-
-    private void setLumoTheme(String lumoTheme) {
-        ThemeList themeList = UI.getCurrent().getElement().getThemeList();
-        themeList.removeAll(List.of(Lumo.DARK, Lumo.LIGHT));
-        themeList.add(lumoTheme);
-
-        WebStorage.setItem(WebStorage.Storage.LOCAL_STORAGE, SESSION_ATTRIBUTE_LUMO_THEME, lumoTheme);
     }
 
     private void createMenuTabs() {
@@ -169,12 +126,14 @@ public class MainLayout extends AppLayout {
     }
 
     private void addThemeSwitcher(MenuBar menuBar) {
-        String currentLumoTheme = getLumoTheme();
+        String currentLumoTheme = themeService.getCurrentLumoTheme();
 
         FontIcon darkThemeIcon = new FontIcon("fa-regular", "fa-moon");
         FontIcon lightThemeIcon = new FontIcon("fa-regular", "fa-sun");
+
         String darkThemeLabel = "Enable dark theme";
         String lightThemeLabel = "Enable light theme";
+
         FontIcon themeButtonIcon = Lumo.DARK.equals(currentLumoTheme) ? lightThemeIcon : darkThemeIcon;
         String label = Lumo.DARK.equals(currentLumoTheme) ? lightThemeLabel : darkThemeLabel;
 
@@ -183,13 +142,13 @@ public class MainLayout extends AppLayout {
         themeSwitchButton.setTooltipText(label);
         themeSwitchButton.setAriaLabel(label);
         themeSwitchButton.addClickListener(e -> {
-            if (Lumo.DARK.equals(getLumoTheme())) {
-                setLumoTheme(Lumo.LIGHT);
+            if (Lumo.DARK.equals(themeService.getCurrentLumoTheme())) {
+                themeService.setLumoTheme(Lumo.LIGHT);
                 themeSwitchButton.setIcon(darkThemeIcon);
                 themeSwitchButton.setTooltipText(darkThemeLabel);
                 themeSwitchButton.setAriaLabel(darkThemeLabel);
             } else {
-                setLumoTheme(Lumo.DARK);
+                themeService.setLumoTheme(Lumo.DARK);
                 themeSwitchButton.setIcon(lightThemeIcon);
                 themeSwitchButton.setTooltipText(lightThemeLabel);
                 themeSwitchButton.setAriaLabel(lightThemeLabel);
