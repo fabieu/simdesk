@@ -8,6 +8,7 @@ on:
         description: 'Environment'
         options:
           - sim2real
+          - demo
         required: true
       version:
         type: string
@@ -20,13 +21,15 @@ concurrency:
 
 jobs:
   deployment:
-    runs-on: [ self-hosted, sustineo-01 ]
+    runs-on:
+      - self-hosted
+      - ${{ vars.RUNNER_LABEL }}
     environment:
       name: ${{ inputs.environment }}
       url: "https://${{ inputs.environment }}.simdesk.eu"
     defaults:
       run:
-        working-directory: ${{ vars.TARGET_DIR }}
+        working-directory: ${{ vars.TARGET_DIR || '/opt/simdesk' }}
     env:
       SIMDESK_VERSION: ${{ inputs.version }}
     steps:
