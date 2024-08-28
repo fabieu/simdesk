@@ -20,10 +20,18 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
+  prepare:
+    runs-on: ubuntu-latest
+    environment: ${{ inputs.environment }}
+    steps:
+      - name: Provision runner
+        run: |
+          echo "Provisioning ${{ vars.RUNNER_LABEL }} runner"
+    outputs:
+      runner: ${{ vars.RUNNER_LABEL }}
   deployment:
-    runs-on:
-      - self-hosted
-      - ${{ vars.RUNNER_LABEL }}
+    needs: prepare
+    runs-on: ${{ needs.prepare.outputs.runner }}
     environment:
       name: ${{ inputs.environment }}
       url: "https://${{ inputs.environment }}.simdesk.eu"
