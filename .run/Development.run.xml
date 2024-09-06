@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Development" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug" />
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug, discord"/>
     <envs>
       <env name="debug" value="false" />
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
