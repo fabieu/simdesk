@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.services.discord;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.discord.Command;
 import de.sustineo.simdesk.entities.discord.StageAttendanceEvent;
 import de.sustineo.simdesk.entities.discord.StageAttendanceRange;
 import de.sustineo.simdesk.entities.discord.StageEventType;
@@ -9,7 +10,12 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.event.domain.VoiceStateUpdateEvent;
 import discord4j.core.event.domain.message.MessageCreateEvent;
 import discord4j.core.object.VoiceState;
+import discord4j.core.object.command.ApplicationCommandInteraction;
+import discord4j.core.object.command.ApplicationCommandInteractionOption;
+import discord4j.core.object.command.ApplicationCommandOption;
 import discord4j.core.object.entity.Member;
+import discord4j.discordjson.json.ApplicationCommandOptionData;
+import discord4j.discordjson.json.ApplicationCommandRequest;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 import org.springframework.context.annotation.Lazy;
@@ -25,6 +31,7 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class StageAttendanceService {
+    private static final String COMMAND_REPORT_CHANNEL = "report-channel";
     public static final String PROPERTY_REPORT_CHANNEL_ID = "discord.reports.channel-id";
     private static final HashMap<Long, Instant> stageStartTimestamps = new HashMap<>();
     private static final HashMap<Long, List<StageAttendanceEvent>> stageAttendanceEvents = new HashMap<>();
@@ -36,6 +43,43 @@ public class StageAttendanceService {
                                   PropertyService propertyService) {
         this.discordService = discordService;
         this.propertyService = propertyService;
+    }
+
+    public void registerCommands(List<ApplicationCommandRequest> applicationCommandRequests, Map<String, Command> commandMap) {
+        ApplicationCommandOptionData optionChannel = ApplicationCommandOptionData.builder()
+                .name("channel")
+                .description("Define the channel where reports will be sent to")
+                .type(ApplicationCommandOption.Type.CHANNEL.getValue())
+                .required(false)
+                .build();
+
+        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
+                .name(COMMAND_REPORT_CHANNEL)
+                .description("Modify channel for reports sent by the bot")
+                .addOption(optionChannel)
+                .build();
+        applicationCommandRequests.add(applicationCommand);
+
+        commandMap.put(COMMAND_REPORT_CHANNEL, event -> {
+            if (!Snowflake.of(discordService.getGuildId()).equals(event.getInteraction().getGuildId().orElse(null))) {
+                return;
+            }
+
+            Optional<ApplicationCommandInteraction> commandInteraction = event.getInteraction().getCommandInteraction();
+
+            Optional<ApplicationCommandInteractionOption> commandInteractionChannel = commandInteraction
+                    .flatMap(applicationCommandInteraction -> applicationCommandInteraction.getOption(optionChannel.name()));
+
+            if (commandInteractionChannel.isPresent() && commandInteractionChannel.get().getValue().isPresent()) {
+                Snowflake reportChannelId = commandInteractionChannel.get().getValue().get().asSnowflake();
+                propertyService.setPropertyValue(StageAttendanceService.PROPERTY_REPORT_CHANNEL_ID, reportChannelId.asString());
+                event.reply(String.format("Successfully changed report channel to %s", DiscordUtils.getChannelMention(reportChannelId))).subscribe();
+            } else {
+                String reportChannelId = propertyService.getPropertyValue(StageAttendanceService.PROPERTY_REPORT_CHANNEL_ID);
+                String message = reportChannelId == null ? "No report channel set!" : String.format("Current report channel is %s", DiscordUtils.getChannelMention(Snowflake.of(reportChannelId)));
+                event.reply(message).subscribe();
+            }
+        });
     }
 
     public void handleStageStartEvent(MessageCreateEvent event, Instant receivedAt) {

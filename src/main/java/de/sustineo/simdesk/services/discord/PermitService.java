@@ -5,10 +5,12 @@ import com.vaadin.flow.component.html.Span;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.auth.DiscordUser;
+import de.sustineo.simdesk.entities.discord.Command;
 import de.sustineo.simdesk.services.auth.UserService;
 import discord4j.common.util.Snowflake;
 import discord4j.core.spec.EmbedCreateSpec;
 import discord4j.discordjson.Id;
+import discord4j.discordjson.json.ApplicationCommandRequest;
 import discord4j.discordjson.json.MemberData;
 import discord4j.rest.util.Color;
 import lombok.extern.java.Log;
@@ -27,6 +29,8 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class PermitService {
+    private static final String COMMAND_PERMIT = "permit";
+
     private final DiscordService discordService;
     private final UserService userService;
     private final Map<String, Set<CarGroup>> basePermitMap = new LinkedHashMap<>();
@@ -34,13 +38,16 @@ public class PermitService {
     private final Set<String> reviewRoles = new HashSet<>();
     private final Set<String> permitRoles = new HashSet<>();
     private final String communityName;
+    private final String guildId;
 
     public PermitService(@Value("${simdesk.community.name}") String communityName,
+                         @Value("${simdesk.auth.discord.guild-id}") String guildId,
                          DiscordService discordService,
                          UserService userService) {
         this.discordService = discordService;
         this.userService = userService;
         this.communityName = communityName;
+        this.guildId = guildId;
 
         // Ensure that the permit maps are sorted by permit level from highest to lowest
         basePermitMap.put("Permit-A", new LinkedHashSet<>(Arrays.asList(CarGroup.GT3, CarGroup.GT2, CarGroup.GTC, CarGroup.GT4, CarGroup.TCX)));
@@ -58,6 +65,25 @@ public class PermitService {
         permitRoles.addAll(basePermitMap.keySet());
         permitRoles.addAll(nosPermitMap.keySet());
         permitRoles.addAll(reviewRoles);
+    }
+
+    public void registerCommands(List<ApplicationCommandRequest> applicationCommandRequests, Map<String, Command> commands) {
+        ApplicationCommandRequest applicationCommand = ApplicationCommandRequest.builder()
+                .name(COMMAND_PERMIT)
+                .description("Display your current permit status")
+                .build();
+        applicationCommandRequests.add(applicationCommand);
+
+        commands.put(COMMAND_PERMIT, event -> {
+            if (!Snowflake.of(guildId).equals(event.getInteraction().getGuildId().orElse(null))) {
+                return;
+            }
+
+            event.reply()
+                    .withEmbeds(createPermitEmbed(event.getInteraction().getUser().getId().asLong()))
+                    .withEphemeral(true)
+                    .subscribe();
+        });
     }
 
     public Set<String> getAvailableBasePermitGroups() {
@@ -246,7 +272,7 @@ public class PermitService {
         return EmbedCreateSpec.builder()
                 .color(DiscordService.DEFAULT_EMBED_COLOR)
                 .title(String.format("%s Permit Status", communityName))
-                .description(String.format("Driver permit status for %s", DiscordService.getUserMention(Snowflake.of(userId))))
+                .description(String.format("Driver permit status for %s", DiscordUtils.getUserMention(Snowflake.of(userId))))
                 .addField("Base permit", basePermitValue, true)
                 .addField("NOS permits ", nosPermitValue, true)
                 .addField("\u200B", "\u200B", false)
