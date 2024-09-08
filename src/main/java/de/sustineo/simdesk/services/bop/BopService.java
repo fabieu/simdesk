@@ -88,13 +88,4 @@ public class BopService {
                 .restrictor(bop.getRestrictor())
                 .build();
     }
-
-    public Bop convertToBop(AccBopEntry accBopEntry) {
-        return Bop.builder()
-                .trackId(accBopEntry.getTrackId())
-                .carId(accBopEntry.getCarId())
-                .ballastKg(accBopEntry.getBallastKg())
-                .restrictor(accBopEntry.getRestrictor())
-                .build();
-    }
 }
