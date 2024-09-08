@@ -3,7 +3,10 @@ package de.sustineo.simdesk.entities.ranking;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
-import de.sustineo.simdesk.entities.*;
+import de.sustineo.simdesk.entities.Car;
+import de.sustineo.simdesk.entities.CarGroup;
+import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.services.converter.csv.CarModelConverter;
 import de.sustineo.simdesk.services.converter.csv.LapTimeConverter;
 import de.sustineo.simdesk.services.converter.csv.TotalTimeConverter;
@@ -44,10 +47,6 @@ public class SessionRanking {
 
     public String getCarModelName() {
         return Car.getCarNameById(carModelId);
-    }
-
-    public String getTrackName() {
-        return Track.getTrackNameById(session.getTrackId());
     }
 
     public boolean isValid() {

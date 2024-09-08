@@ -47,13 +47,4 @@ public class MenuEntity {
                 .navigationTarget(navigationTarget)
                 .build();
     }
-
-    public static MenuEntity of(MenuEntityCategory category, String name, IconFactory iconFactory, String href) {
-        return MenuEntity.builder()
-                .category(category)
-                .name(name)
-                .iconFactory(iconFactory)
-                .href(href)
-                .build();
-    }
 }

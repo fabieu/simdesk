@@ -31,7 +31,6 @@ import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.services.discord.PermitService;
 import de.sustineo.simdesk.views.*;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -41,7 +40,6 @@ public class MainLayout extends AppLayout {
     private final ThemeService themeService;
     private final SecurityService securityService;
     private final MenuService menuService;
-    private final Optional<PermitService> permitService;
 
     private final String privacyUrl;
     private final String impressumUrl;
@@ -50,12 +48,10 @@ public class MainLayout extends AppLayout {
     public MainLayout(ThemeService themeService,
                       SecurityService securityService,
                       MenuService menuService,
-                      Optional<PermitService> permitService,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
-        this.permitService = permitService;
         this.themeService = themeService;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
@@ -160,14 +156,6 @@ public class MainLayout extends AppLayout {
 
     private void addUserMenu(MenuBar menuBar) {
         Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
-        Optional<Long> userId = user.flatMap(UserPrincipal::getUserId);
-
-        if (user.isPresent() && user.get().isDiscordUser() && permitService.isPresent() && userId.isPresent()) {
-            Component permitBadge = permitService.get().getBasePermitBadge(userId.get());
-
-            MenuItem permitMenuItem = menuBar.addItem(permitBadge);
-            permitMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));
-        }
 
         Avatar avatar = new Avatar();
         avatar.setTooltipEnabled(true);

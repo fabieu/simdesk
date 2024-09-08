@@ -23,8 +23,4 @@ public class DriverRanking extends Entity {
     public String getCarModelName() {
         return Car.getCarNameById(carModelId);
     }
-
-    public String getTrackName() {
-        return Track.getTrackNameById(trackId);
-    }
 }
