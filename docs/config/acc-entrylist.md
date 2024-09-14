@@ -3,7 +3,7 @@
 The `acc-entrylist` feature enables the Entrylist Validator to check Assetto Corsa Competizione `entrylist.json` files
 for syntax errors and inconsistencies.
 
-**View Demo**: [Entrylist Validator](https://demo.simdesk.eu/entrylist/validator)
+**View Demo**: [Entrylist Validator](https://sim2real.simdesk.eu/entrylist/validator)
 
 Enable the leaderboard feature by adding `acc-entrylist` to `SPRING_PROFILES_ACTIVE`.
 

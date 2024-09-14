@@ -8,7 +8,7 @@
 </p>
 <p align="center">
     <a href="https://simdesk.eu/"><b>Documentation</b></a> • 
-    <a href="https://demo.simdesk.eu/"><b>Demo</b></a>
+    <a href="https://sim2real.simdesk.eu/"><b>Demo</b></a>
 </p>
 
 ## Features

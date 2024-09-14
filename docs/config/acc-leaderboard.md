@@ -4,8 +4,8 @@ The `acc-leaderboard` feature enables processing of ACC result files to create a
 detailed session information.
 
 **View Demo:**
-[Lap-Records](https://demo.simdesk.eu/leaderboard/lap-records),
-[Sessions](https://demo.simdesk.eu/leaderboard/sessions)
+[Lap-Records](https://sim2real.simdesk.eu/leaderboard/lap-records),
+[Sessions](https://sim2real.simdesk.eu/leaderboard/sessions)
 
 Enable the leaderboard feature by adding `acc-leaderboard` to `SPRING_PROFILES_ACTIVE`.
 
