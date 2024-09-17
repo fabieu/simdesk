@@ -41,6 +41,35 @@ environment variable. If following profiles are set, when you do not override `S
 
 - `acc-entrylist,acc-bop`: Enable the Entrylist and Balance of Performance feature set.
 
+`SIMDESK_DB_URL`
+
+> required
+
+The JDBC URL for the PostgreSQL database. The general form of the connection URL is:
+`jdbc:postgresql://[serverName[:portNumber]]/[databaseName][?property=value[;property=value]]`
+
+- **jdbc:postgresql://** (Required) - Is known as the subprotocol and is constant.
+- **serverName** (Required) - Is the address of the server to connect to. This address can be a DNS or IP address, or it
+  can be localhost or 127.0.0.1 for the local computer.
+- **portNumber** (Optional) - Is the port to connect to on serverName. The default is 5432. If you're using the default
+  port, you don't have to specify the port, nor the preceding : in the URL.
+- **databaseName** (Required) - Is the name of the database to connect to. The database name must be unique for each
+  database server.
+- **property** (Optional) - Is one or more option connection properties. Properties can only be delimited by using the
+  semicolon (;), and they can't be duplicated.
+
+`SIMDESK_DB_USERNAME`
+
+> required
+
+The username to connect to the PostgreSQL database.
+
+`SIMDESK_DB_PASSWORD`
+
+> required
+
+The password to connect to the PostgreSQL database.
+
 `SIMDESK_COMMUNITY_NAME`
 
 > optional, default=SimDesk
@@ -49,12 +78,12 @@ Set the community name for the main page. If not set, a generic name will be use
 
 `SIMDESK_IMPRESSUM_URL`
 
-> optional, default=
+> optional
 
 The URL to the impressum page. If not set, no impressum link will be shown.
 
 `SIMDESK_PRIVACY_URL`
 
-> optional, default=
+> optional
 
 The URL to the privacy page. If not set, no privacy link will be shown.
