@@ -7,6 +7,9 @@
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
       <env name="SIMDESK_THEME" value="default" />
+      <env name="SIMDESK_DB_URL" value="jdbc:postgresql://localhost:5432/simdesk"/>
+      <env name="SIMDESK_DB_USERNAME" value="postgres"/>
+      <env name="SIMDESK_DB_PASSWORD" value="development"/>
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.main" />

@@ -12,9 +12,9 @@ public interface UserMapper {
             @Result(property = "username", column = "username"),
             @Result(property = "password", column = "password")
     })
-    @Select("SELECT * FROM users WHERE username = #{username}")
+    @Select("SELECT * FROM simdesk.users WHERE username = #{username}")
     User findByUsername(String username);
 
-    @Insert("INSERT INTO users (user_id, username, password) VALUES (#{userId}, #{username}, #{password}) ON CONFLICT(user_id) DO UPDATE SET username = #{username}, password = #{password}")
+    @Insert("INSERT INTO simdesk.users (user_id, username, password) VALUES (#{userId}, #{username}, #{password}) ON CONFLICT(user_id) DO UPDATE SET username = #{username}, password = #{password}")
     void insertSystemUser(User user);
 }

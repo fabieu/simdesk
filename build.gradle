@@ -53,8 +53,9 @@ dependencies {
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.3"
-    implementation "org.xerial:sqlite-jdbc:3.46.1.0"
+    implementation "org.postgresql:postgresql:42.7.4"
     implementation "org.flywaydb:flyway-core:10.18.0"
+    implementation "org.flywaydb:flyway-database-postgresql:10.18.0"
 
     // Logging
     implementation "io.logz.logback:logzio-logback-appender:2.0.1"

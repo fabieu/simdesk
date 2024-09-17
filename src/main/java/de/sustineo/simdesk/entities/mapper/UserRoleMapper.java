@@ -18,7 +18,7 @@ public interface UserRoleMapper {
             @Result(property = "roleName", column = "role_name"),
             @Result(property = "insertDatetime", column = "insert_datetime"),
     })
-    @Select("SELECT * FROM users_roles WHERE user_id = #{userId}")
+    @Select("SELECT * FROM simdesk.users_roles WHERE user_id = #{userId}")
     List<UserRole> findByUserId(Long userId);
 
 }
