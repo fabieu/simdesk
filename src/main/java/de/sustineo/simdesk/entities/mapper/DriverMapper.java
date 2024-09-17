@@ -43,9 +43,9 @@ public interface DriverMapper {
     List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 
     @Insert("""
-            INSERT INTO simdesk.drivers (player_id, first_name, last_name, short_name, last_activity)
+            INSERT INTO simdesk.drivers AS d (player_id, first_name, last_name, short_name, last_activity)
             VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity})
-            ON CONFLICT(player_id) DO UPDATE SET first_name = excluded.first_name, last_name = excluded.last_name, short_name = excluded.short_name, last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < excluded.last_activity THEN excluded.last_activity ELSE last_activity END)
+            ON CONFLICT(player_id) DO UPDATE SET first_name = excluded.first_name, last_name = excluded.last_name, short_name = excluded.short_name, last_activity = (SELECT CASE WHEN d.last_activity IS NULL OR d.last_activity < excluded.last_activity THEN excluded.last_activity ELSE d.last_activity END)
             """)
     void upsert(Driver driver);
 }
