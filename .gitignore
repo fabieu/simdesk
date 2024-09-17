@@ -4,7 +4,6 @@
 *.db-shm
 *.db-wal
 memory
-/src/main/resources/examples/
 
 ### MKDocs template ###
 site/
@@ -45,6 +44,7 @@ replay_pid*
 .idea/**/usage.statistics.xml
 .idea/**/dictionaries
 .idea/**/shelf
+.idea/**/dataSources.xml
 
 # AWS User-specific
 .idea/**/aws.xml
@@ -161,4 +161,3 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-

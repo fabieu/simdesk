@@ -10,13 +10,13 @@ spring:
     serialization:
       fail-on-empty-beans: false
   datasource:
-    url: jdbc:sqlite:./data/simdesk.db
-    driver-class-name: org.sqlite.JDBC
-    hikari:
-      connection-init-sql: PRAGMA journal_mode = wal; PRAGMA synchronous = normal; PRAGMA temp_store = memory; PRAGMA busy_timeout = 300000
-      connection-test-query: SELECT 1
+    url: ${SIMDESK_DB_URL}
+    username: ${SIMDESK_DB_USERNAME}
+    password: ${SIMDESK_DB_PASSWORD}
   flyway:
     enabled: true
+    default-schema: simdesk
+    createSchemas: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -68,10 +68,6 @@ simdesk:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}
       password: ${SIMDESK_ADMIN_PASSWORD:#{null}}
-  features:
-    discord:
-      reports:
-        enabled: false
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true

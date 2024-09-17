@@ -21,23 +21,23 @@ public interface BopMapper {
             @Result(property = "username", column = "username"),
             @Result(property = "updateDatetime", column = "update_datetime"),
     })
-    @Select("SELECT * FROM bop")
+    @Select("SELECT * FROM simdesk.bop")
     List<Bop> findAll();
 
 
     @ResultMap("bopResultMap")
-    @Select("SELECT * FROM bop WHERE active = true")
+    @Select("SELECT * FROM simdesk.bop WHERE active = true")
     List<Bop> findActive();
 
     @Insert("""
-            INSERT INTO bop (track_id, car_id, restrictor, ballast_kg, username, active, update_datetime)
+            INSERT INTO simdesk.bop (track_id, car_id, restrictor, ballast_kg, username, active, update_datetime)
             VALUES (#{trackId}, #{carId}, #{restrictor}, #{ballastKg}, #{username}, #{active}, #{updateDatetime})
             """)
     void insert(Bop bop);
 
 
     @Update("""
-            UPDATE bop SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
+            UPDATE simdesk.bop SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
             WHERE track_id = #{trackId} AND car_id = #{carId}
             """)
     void update(Bop bop);
