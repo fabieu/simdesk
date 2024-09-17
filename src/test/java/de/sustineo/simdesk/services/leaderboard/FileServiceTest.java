@@ -1,13 +1,13 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import org.junit.jupiter.api.Test;
-import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.test.context.ContextConfiguration;
 
 import java.nio.file.Path;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@SpringBootTest
+@ContextConfiguration(classes = FileService.class)
 public class FileServiceTest {
     @Test
     public void isSessionFile() {
