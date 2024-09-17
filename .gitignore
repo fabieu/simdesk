@@ -4,7 +4,6 @@
 *.db-shm
 *.db-wal
 memory
-/src/main/resources/examples/
 
 ### MKDocs template ###
 site/
@@ -161,4 +160,3 @@ gradle-app.setting
 .project
 # JDT-specific (Eclipse Java Development Tools)
 .classpath
-
