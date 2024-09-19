@@ -1,21 +1,18 @@
 spring:
   application:
     name: simdesk
+  main:
+    banner-mode: off
+  flyway:
+    enabled: true
+    default-schema: simdesk
+    createSchemas: true
   jackson:
     default-property-inclusion: NON_NULL
     deserialization:
       fail-on-unknown-properties: false
-  flyway:
-    enabled: false
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-  main:
-    banner-mode: off
-logging:
-  level:
-    ROOT: WARN
+    serialization:
+      fail-on-empty-beans: false
 simdesk:
   theme: ${SIMDESK_THEME:#{null}}
   community:

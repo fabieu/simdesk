@@ -1,14 +1,10 @@
 spring:
-  profiles:
-    active: production, acc-entrylist, acc-bop
   application:
     name: simdesk
-  jackson:
-    default-property-inclusion: NON_NULL
-    deserialization:
-      fail-on-unknown-properties: false
-    serialization:
-      fail-on-empty-beans: false
+  profiles:
+    active: production, acc-entrylist, acc-bop
+  main:
+    banner-mode: off
   datasource:
     url: ${SIMDESK_DB_URL}
     username: ${SIMDESK_DB_USERNAME}
@@ -17,16 +13,20 @@ spring:
     enabled: true
     default-schema: simdesk
     createSchemas: true
-  servlet:
-    multipart:
-      max-file-size: 10MB
-      max-request-size: 10MB
-  main:
-    banner-mode: off
   task:
     scheduling:
       pool:
         size: 4
+  jackson:
+    default-property-inclusion: NON_NULL
+    deserialization:
+      fail-on-unknown-properties: false
+    serialization:
+      fail-on-empty-beans: false
+  servlet:
+    multipart:
+      max-file-size: 10MB
+      max-request-size: 10MB
 management:
   endpoints:
     enabled-by-default: false
@@ -94,6 +94,7 @@ vaadin:
   productionMode: false
   heartbeatInterval: 60
   closeIdleSessions: false
+
 ---
 spring:
   config:
