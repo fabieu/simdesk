@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.entities.mapper;
 
-import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserPermission;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -11,14 +11,13 @@ import java.util.List;
 
 @Component
 @Mapper
-public interface UserRoleMapper {
-    @Results(id = "userRoleResultMap", value = {
-            @Result(id = true, property = "roleId", column = "role_id"),
+public interface UserPermissionMapper {
+    @Results(id = "userPermissionResultMap", value = {
             @Result(property = "userId", column = "user_id"),
             @Result(property = "roleName", column = "role_name"),
             @Result(property = "insertDatetime", column = "insert_datetime"),
     })
-    @Select("SELECT * FROM simdesk.users_roles WHERE user_id = #{userId}")
-    List<UserRole> findByUserId(Long userId);
+    @Select("SELECT * FROM simdesk.user_permission WHERE user_id = #{userId}")
+    List<UserPermission> findByUserId(Long userId);
 
 }
