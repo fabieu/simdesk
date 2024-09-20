@@ -13,12 +13,10 @@ import java.util.List;
 @Mapper
 public interface UserRoleMapper {
     @Results(id = "userRoleResultMap", value = {
-            @Result(id = true, property = "roleId", column = "role_id"),
-            @Result(property = "userId", column = "user_id"),
-            @Result(property = "roleName", column = "role_name"),
-            @Result(property = "insertDatetime", column = "insert_datetime"),
+            @Result(property = "name", column = "name"),
+            @Result(property = "description", column = "description"),
+            @Result(property = "discordRoleId", column = "discord_role_id"),
     })
-    @Select("SELECT * FROM simdesk.users_roles WHERE user_id = #{userId}")
-    List<UserRole> findByUserId(Long userId);
-
+    @Select("SELECT * FROM simdesk.user_role")
+    List<UserRole> findAll();
 }

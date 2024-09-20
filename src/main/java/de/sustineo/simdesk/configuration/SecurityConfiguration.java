@@ -2,11 +2,10 @@ package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
-import discord4j.discordjson.json.RoleData;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
@@ -44,15 +43,15 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     public static final String AUTH_PROVIDER_DISCORD = "discord";
     public static final String AUTH_PROVIDER_DATABASE = "database";
 
-    public static final String SPRING_ROLE_PREFIX = "ROLE_";
-    public static final String DISCORD_ROLE_PREFIX = "SIMDESK-";
-
     public static final Long USER_ID_ADMIN = 10000L;
 
     private final Optional<DiscordService> discordService;
+    private final UserService userService;
 
-    public SecurityConfiguration(Optional<DiscordService> discordService) {
+    public SecurityConfiguration(Optional<DiscordService> discordService,
+                                 UserService userService) {
         this.discordService = discordService;
+        this.userService = userService;
     }
 
     @Override
@@ -121,20 +120,17 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             OAuth2User user = delegate.loadUser(request);
 
             if (AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
-                Optional<Long> memberId = Optional.ofNullable(user.getAttribute("id")).map(o -> Long.parseLong((String) o));
-                if (memberId.isEmpty()) {
-                    log.severe("Failed to find id attribute for user: " + user.getName());
-                    return user;
-                }
-
                 try {
+                    String accessToken = request.getAccessToken().getTokenValue();
+
                     // Get the roles of the user from the Discord bot installed in the guild
-                    List<RoleData> userRoles = discordService.get().getRolesOfMember(memberId.get());
+                    Set<Long> memberRoleIds = discordService.get().getMemberRoleIds(accessToken);
 
                     // Map the guild roles to Spring Security authorities
-                    Set<GrantedAuthority> authorities = userRoles.stream()
-                            .filter(role -> StringUtils.startsWith(role.name(), DISCORD_ROLE_PREFIX))
-                            .map(role -> new SimpleGrantedAuthority(convertDiscordRoleToSpringRole(role.name())))
+                    Set<GrantedAuthority> authorities = userService.getAllRoles().stream()
+                            .filter(userRole -> userRole.getDiscordRoleId() != null)
+                            .filter(userRole -> memberRoleIds.contains(userRole.getDiscordRoleId()))
+                            .map(userRole -> new SimpleGrantedAuthority(userRole.getName()))
                             .collect(Collectors.toSet());
 
                     Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());
@@ -149,9 +145,5 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
             return user;
         });
-    }
-
-    private String convertDiscordRoleToSpringRole(String discordRole) {
-        return SPRING_ROLE_PREFIX + StringUtils.removeStart(discordRole, DISCORD_ROLE_PREFIX);
     }
 }

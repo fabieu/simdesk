@@ -4,8 +4,9 @@ import lombok.Data;
 
 @Data
 public class UserRole {
-    private String roleId;
-    private String userId;
-    private String roleName;
-    private String insertDatetime;
+    public static final String ADMIN = "ROLE_ADMIN";
+
+    private String name;
+    private String description;
+    private Long discordRoleId;
 }

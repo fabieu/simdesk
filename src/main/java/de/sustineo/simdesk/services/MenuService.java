@@ -3,7 +3,7 @@ package de.sustineo.simdesk.services;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.auth.Role;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -38,7 +38,7 @@ public class MenuService {
         if (ProfileManager.isBopProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
 
-            if (securityService.hasAnyRole(Role.ADMIN)) {
+            if (securityService.hasAnyRole(UserRole.ADMIN)) {
                 items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
             }
 

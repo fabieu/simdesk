@@ -26,7 +26,7 @@ import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.auth.Role;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -105,7 +105,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
         tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
-        if (securityService.hasAnyRole(Role.ADMIN)) {
+        if (securityService.hasAnyRole(UserRole.ADMIN)) {
             tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
         }
 
