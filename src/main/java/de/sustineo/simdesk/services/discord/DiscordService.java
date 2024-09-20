@@ -1,68 +1,67 @@
 package de.sustineo.simdesk.services.discord;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import discord4j.common.util.Snowflake;
-import discord4j.core.DiscordClient;
+import discord4j.discordjson.Id;
 import discord4j.discordjson.json.MemberData;
-import discord4j.discordjson.json.RoleData;
-import discord4j.rest.http.client.ClientException;
 import lombok.Getter;
 import lombok.extern.java.Log;
+import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.HttpEntity;
+import org.springframework.http.HttpHeaders;
+import org.springframework.http.HttpMethod;
+import org.springframework.http.ResponseEntity;
 import org.springframework.stereotype.Service;
+import org.springframework.web.client.RestTemplate;
 
-import java.util.List;
+import java.util.Collections;
+import java.util.Set;
 import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class DiscordService {
-    private final DiscordClient client;
+    private static final String DISCORD_API_BASE_URL = "https://discord.com/api/v10";
+
+    private final RestTemplate restTemplate;
+
     @Getter
     private final Long guildId;
 
-    public DiscordService(@Value("${simdesk.auth.discord.token}") String discordApplicationToken,
+    public DiscordService(@Qualifier("discord") RestTemplate restTemplate,
                           @Value("${simdesk.auth.discord.guild-id}") String guildId) {
+        this.restTemplate = restTemplate;
         this.guildId = Long.parseLong(guildId);
-        this.client = DiscordClient.create(discordApplicationToken);
-
-        // Check if the Discord bot is connected to the guild
-        checkIfBotIsConnectedToGuild();
     }
 
-    private void checkIfBotIsConnectedToGuild() {
-        try {
-            client.getGuildById(Snowflake.of(guildId))
-                    .getSelfMember()
-                    .block();
-        } catch (ClientException e) {
-            String message = String.format("Discord bot is not connected to the guild with ID %s. Consider inviting the bot to the guild.", guildId);
-            log.severe(message);
-            throw new IllegalStateException(message, e);
+    public MemberData getMemberData(String accessToken) {
+        String url = String.format("%s/users/@me/guilds/%s/member ", DISCORD_API_BASE_URL, guildId);
+        ResponseEntity<MemberData> response = restTemplate.exchange(url, HttpMethod.GET, defaultEntity(accessToken), MemberData.class);
+
+        return response.getBody();
+    }
+
+    public Set<Long> getMemberRoleIds(String accessToken) {
+        MemberData memberData = getMemberData(accessToken);
+
+        if (memberData == null) {
+            return Collections.emptySet();
         }
+
+        return memberData.roles().stream()
+                .map(Id::asLong)
+                .collect(Collectors.toSet());
     }
 
-    public MemberData getMemberOfGuild(long memberId) throws ClientException {
-        return client.getGuildById(Snowflake.of(guildId))
-                .getMember(Snowflake.of(memberId))
-                .block();
+    private HttpEntity<?> defaultEntity(String authToken) {
+        return new HttpEntity<>(defaultHeadersWithBearer(authToken));
     }
 
-    public List<RoleData> getRolesOfGuild() throws ClientException {
-        return client.getGuildById(Snowflake.of(guildId))
-                .getRoles()
-                .collectList()
-                .block();
-    }
-
-    public List<RoleData> getRolesOfMember(long memberId) throws ClientException {
-        List<RoleData> guildRoles = getRolesOfGuild();
-        MemberData memberData = getMemberOfGuild(memberId);
-
-        return guildRoles.stream()
-                .filter(role -> memberData.roles().contains(role.id()))
-                .collect(Collectors.toList());
+    private HttpHeaders defaultHeadersWithBearer(String authToken) {
+        HttpHeaders headers = new HttpHeaders();
+        headers.setBearerAuth(authToken);
+        return headers;
     }
 }

@@ -19,5 +19,4 @@ public interface UserPermissionMapper {
     })
     @Select("SELECT * FROM simdesk.user_permission WHERE user_id = #{userId}")
     List<UserPermission> findByUserId(Long userId);
-
 }

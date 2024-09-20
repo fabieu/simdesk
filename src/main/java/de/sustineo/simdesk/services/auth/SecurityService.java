@@ -3,7 +3,6 @@ package de.sustineo.simdesk.services.auth;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
-import de.sustineo.simdesk.entities.auth.Role;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
@@ -71,7 +70,7 @@ public class SecurityService {
         return Optional.empty(); // Anonymous or no authentication
     }
 
-    public boolean hasAnyRole(Role... roles) {
+    public boolean hasAnyRole(String... roles) {
         Optional<UserPrincipal> user = getAuthenticatedUser();
 
         if (user.isEmpty()) {
@@ -79,8 +78,8 @@ public class SecurityService {
         }
 
         for (GrantedAuthority authority : user.get().getAuthorities()) {
-            for (Role role : roles) {
-                if (authority.getAuthority().equals(SecurityConfiguration.SPRING_ROLE_PREFIX + role.name())) {
+            for (String role : roles) {
+                if (authority.getAuthority().equals(role)) {
                     return true;
                 }
             }

@@ -22,7 +22,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
-import de.sustineo.simdesk.entities.auth.Role;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
 import de.sustineo.simdesk.layouts.MainLayout;
@@ -106,7 +106,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
 
         layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
-        if (securityService.hasAnyRole(Role.ADMIN)) {
+        if (securityService.hasAnyRole(UserRole.ADMIN)) {
             StreamResource csvResource = new StreamResource(
                     String.format("session_table_%s.csv", session.getFileChecksum()),
                     () -> {

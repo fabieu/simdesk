@@ -15,12 +15,9 @@ import java.util.Set;
 @Service
 public class DatabaseUserDetailsService implements UserDetailsService {
     private final UserService userService;
-    private final UserPermissionService userPermissionService;
 
-    public DatabaseUserDetailsService(UserService userService,
-                                      UserPermissionService userPermissionService) {
+    public DatabaseUserDetailsService(UserService userService) {
         this.userService = userService;
-        this.userPermissionService = userPermissionService;
     }
 
     @Override
@@ -37,7 +34,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
         attributes.put(SecurityConfiguration.ATTRIBUTE_AUTH_PROVIDER, SecurityConfiguration.AUTH_PROVIDER_DATABASE);
 
         // Set authorities for the user
-        Set<? extends GrantedAuthority> authorities = userPermissionService.getAuthoritiesByUserId(user.getUserId());
+        Set<? extends GrantedAuthority> authorities = userService.getAuthoritiesByUserId(user.getUserId());
 
         return new UserPrincipal(user, attributes, authorities);
     }

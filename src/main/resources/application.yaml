@@ -111,6 +111,7 @@ spring:
             authorizationGrantType: authorization_code
             scope:
               - identify
+              - guilds.members.read
             redirectUri: "{baseUrl}/login/oauth2/code/discord"
         provider:
           discord:
@@ -121,6 +122,5 @@ spring:
 simdesk:
   auth:
     discord:
-      token: ${SIMDESK_DISCORD_BOT_TOKEN}
       guild-id: ${SIMDESK_DISCORD_GUILD_ID}
 
