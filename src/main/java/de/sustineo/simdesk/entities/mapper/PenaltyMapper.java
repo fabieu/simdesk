@@ -24,10 +24,10 @@ public interface PenaltyMapper {
             @Result(property = "clearedLap", column = "cleared_lap"),
             @Result(property = "postRace", column = "post_race")
     })
-    @Select("SELECT * FROM simdesk.penalties WHERE session_id = #{sessionId} AND car_id = #{carId} ORDER BY id")
+    @Select("SELECT * FROM simdesk.penalty WHERE session_id = #{sessionId} AND car_id = #{carId} ORDER BY id")
     List<Penalty> findBySessionAndCarId(int sessionId, int carId);
 
-    @Insert("INSERT INTO simdesk.penalties (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race) " +
+    @Insert("INSERT INTO simdesk.penalty (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race) " +
             "VALUES (#{sessionId}, #{carId}, #{reason}, #{penalty}, #{penaltyValue}, #{violationLap}, #{clearedLap}, #{postRace})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Penalty penalty);
