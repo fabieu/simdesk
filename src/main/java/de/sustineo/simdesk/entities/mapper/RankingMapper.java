@@ -24,14 +24,14 @@ public interface RankingMapper {
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
     })
     @Select("""
-            SELECT laps.car_group, laps.car_model_id, laps.driver_id, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis
-            FROM simdesk.laps
-            LEFT JOIN simdesk.sessions ON laps.session_id = sessions.id
+            SELECT lap.car_group, lap.car_model_id, lap.driver_id, session.track_id, MIN(lap.lap_time_millis) AS lap_time_millis
+            FROM simdesk.lap
+            LEFT JOIN simdesk.session ON lap.session_id = session.id
             WHERE valid IS TRUE
-                AND sessions.session_datetime >= #{startTime}
-                AND sessions.session_datetime <= #{endTime}
-            GROUP BY laps.car_group, laps.car_model_id, sessions.track_id, laps.driver_id
-            ORDER BY MIN(laps.lap_time_millis)
+                AND session.session_datetime >= #{startTime}
+                AND session.session_datetime <= #{endTime}
+            GROUP BY lap.car_group, lap.car_model_id, session.track_id, lap.driver_id
+            ORDER BY MIN(lap.lap_time_millis)
             """)
     List<GroupRanking> findAllTimeFastestLaps(Instant startTime, Instant endTime);
 
@@ -47,18 +47,18 @@ public interface RankingMapper {
             @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.simdesk.entities.mapper.SessionMapper.findById")),
     })
     @Select("""
-            SELECT laps.*  FROM simdesk.laps
-                INNER JOIN (SELECT laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id, MIN(laps.lap_time_millis) AS lap_time_millis FROM simdesk.laps
-                             LEFT JOIN simdesk.sessions ON laps.session_id = sessions.id
+            SELECT lap.*  FROM simdesk.lap
+                INNER JOIN (SELECT lap.driver_id, lap.car_model_id, lap.car_group, session.track_id, MIN(lap.lap_time_millis) AS lap_time_millis FROM simdesk.lap
+                             LEFT JOIN simdesk.session ON lap.session_id = session.id
                                  WHERE valid IS TRUE
-                                   AND laps.car_group = #{carGroup}
-                                   AND sessions.track_id = #{trackId}
-                                   AND sessions.session_datetime >= #{startTime}
-                                   AND sessions.session_datetime <= #{endTime}
-                                 GROUP BY laps.driver_id, laps.car_model_id, laps.car_group, sessions.track_id) fastest_laps
-                            ON laps.driver_id = fastest_laps.driver_id AND laps.car_model_id = fastest_laps.car_model_id AND
-                               laps.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND
-                               laps.lap_time_millis = fastest_laps.lap_time_millis
+                                   AND lap.car_group = #{carGroup}
+                                   AND session.track_id = #{trackId}
+                                   AND session.session_datetime >= #{startTime}
+                                   AND session.session_datetime <= #{endTime}
+                                 GROUP BY lap.driver_id, lap.car_model_id, lap.car_group, session.track_id) fastest_laps
+                            ON lap.driver_id = fastest_laps.driver_id AND lap.car_model_id = fastest_laps.car_model_id AND
+                               lap.car_group = fastest_laps.car_group AND track_id = fastest_laps.track_id AND
+                               lap.lap_time_millis = fastest_laps.lap_time_millis
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant startTime, Instant endTime);
 
@@ -78,10 +78,10 @@ public interface RankingMapper {
             @Result(property = "totalTimeMillis", column = "total_time_millis"),
             @Result(property = "lapCount", column = "lap_count")
     })
-    @Select("SELECT * FROM simdesk.leaderboard_lines WHERE session_id = #{sessionId} ORDER BY ranking")
+    @Select("SELECT * FROM simdesk.leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
     List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
 
     @ResultType(List.class)
-    @Select("SELECT player_id FROM simdesk.leaderboard_drivers WHERE car_id = #{carId} AND session_id = #{sessionId}")
+    @Select("SELECT player_id FROM simdesk.leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")
     List<String> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 }

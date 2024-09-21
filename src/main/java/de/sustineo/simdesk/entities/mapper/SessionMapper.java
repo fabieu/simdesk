@@ -29,29 +29,29 @@ public interface SessionMapper {
     })
     @Select("""
             SELECT *
-            FROM simdesk.sessions
+            FROM simdesk.session
             WHERE session_datetime >= #{startTime}
               AND session_datetime <= #{endTime}
             ORDER BY session_datetime DESC
             """)
     List<Session> findAllByTimeRange(Instant startTime, Instant endTime);
 
-    @Select("SELECT COUNT(id) FROM simdesk.sessions")
+    @Select("SELECT COUNT(id) FROM simdesk.session")
     @ResultType(long.class)
     long count();
 
     @SuppressWarnings("unused")
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM simdesk.sessions WHERE id = #{id} LIMIT 1")
+    @Select("SELECT * FROM simdesk.session WHERE id = #{id} LIMIT 1")
     Session findById(Integer id);
 
 
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM simdesk.sessions WHERE file_checksum = #{fileChecksum} LIMIT 1")
+    @Select("SELECT * FROM simdesk.session WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);
 
     @Insert("""
-            INSERT INTO simdesk.sessions (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_content)
+            INSERT INTO simdesk.session (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_content)
             VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileContent})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")

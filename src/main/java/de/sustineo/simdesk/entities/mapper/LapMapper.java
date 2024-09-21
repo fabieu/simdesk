@@ -23,7 +23,7 @@ public interface LapMapper {
     })
     @Select("""
             <script>
-            SELECT * FROM simdesk.laps WHERE session_id = #{sessionId} AND driver_id IN 
+            SELECT * FROM simdesk.lap WHERE session_id = #{sessionId} AND driver_id IN 
                 <foreach item="item" index="index" collection="playerIds"
                     open="(" separator="," close=")">
                       #{item}
@@ -33,11 +33,11 @@ public interface LapMapper {
             """)
     List<Lap> findBySessionAndDrivers(int sessionId, List<String> playerIds);
 
-    @Select("SELECT COUNT(id) FROM simdesk.laps")
+    @Select("SELECT COUNT(id) FROM simdesk.lap")
     @ResultType(long.class)
     long count();
 
-    @Insert("INSERT INTO simdesk.laps (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
+    @Insert("INSERT INTO simdesk.lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
             "VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})")
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Lap lap);

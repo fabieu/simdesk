@@ -22,28 +22,28 @@ public interface DriverMapper {
             @Result(property = "driveTimeMillis", column = "drive_time_millis"),
             @Result(property = "lastActivity", column = "last_activity")
     })
-    @Select("SELECT * FROM simdesk.drivers")
+    @Select("SELECT * FROM simdesk.driver")
     List<Driver> findAll();
 
-    @Select("SELECT COUNT(player_id) FROM simdesk.drivers")
+    @Select("SELECT COUNT(player_id) FROM simdesk.driver")
     @ResultType(long.class)
     long count();
 
     @ResultMap("driverResultMap")
-    @Select("SELECT * FROM simdesk.drivers WHERE player_id = #{playerId}")
+    @Select("SELECT * FROM simdesk.driver WHERE player_id = #{playerId}")
     Driver findByPlayerId(String playerId);
 
     @SuppressWarnings("unused")
     @ResultMap("driverResultMap")
     @Select("""
-            SELECT drivers.*, leaderboard_drivers.drive_time_millis FROM simdesk.drivers
-            INNER JOIN simdesk.leaderboard_drivers on drivers.player_id = leaderboard_drivers.player_id
-            WHERE leaderboard_drivers.car_id = #{carId} and leaderboard_drivers.session_id = #{sessionId}
+            SELECT driver.*, leaderboard_driver.drive_time_millis FROM simdesk.driver
+            INNER JOIN simdesk.leaderboard_driver on driver.player_id = leaderboard_driver.player_id
+            WHERE leaderboard_driver.car_id = #{carId} and leaderboard_driver.session_id = #{sessionId}
             """)
     List<Driver> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
 
     @Insert("""
-            INSERT INTO simdesk.drivers AS d (player_id, first_name, last_name, short_name, last_activity)
+            INSERT INTO simdesk.driver AS d (player_id, first_name, last_name, short_name, last_activity)
             VALUES (#{playerId}, #{firstName}, #{lastName}, #{shortName}, #{lastActivity})
             ON CONFLICT(player_id) DO UPDATE SET first_name = excluded.first_name, last_name = excluded.last_name, short_name = excluded.short_name, last_activity = (SELECT CASE WHEN d.last_activity IS NULL OR d.last_activity < excluded.last_activity THEN excluded.last_activity ELSE d.last_activity END)
             """)
