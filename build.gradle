@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.4.7"
+        vaadinVersion = "24.4.12"
     }
     configurations.classpath {
         exclude group: 'com.vaadin', module: 'hilla-engine-core'
