@@ -17,7 +17,7 @@
 - Detailed session overview _(Assetto Corsa Competizione)_
 - Balance of Performance Management _(Assetto Corsa Competizione)_
 - Balance of Performance Editor _(Assetto Corsa Competizione)_
-- Entrylist Validator _(Assetto Corsa Competizione)_
+- Entrylist Editor with validation _(Assetto Corsa Competizione)_
 - Responsive design for mobile and desktop
 
 ## Quick Start

@@ -46,7 +46,7 @@ public class MenuService {
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Validator", VaadinIcon.CLIPBOARD_CHECK, EntrylistValidatorView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
         return items;
