@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
@@ -124,16 +123,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             StreamResource bopResource = new StreamResource(
                     String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())),
                     () -> {
-                        String json;
-                        try {
-                            List<AccBopEntry> accBopEntries = entry.getValue().stream()
-                                    .map(bopService::convertToAccBopEntry)
-                                    .toList();
-                            json = JsonUtils.toJson(new AccBop(accBopEntries));
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return new ByteArrayInputStream(json != null ? json.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                        List<AccBopEntry> accBopEntries = entry.getValue().stream()
+                                .map(bopService::convertToAccBopEntry)
+                                .toList();
+                        String json = JsonUtils.toJson(new AccBop(accBopEntries));
+                        return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
                     }
             );
 
