@@ -4,19 +4,24 @@ import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.accordion.Accordion;
-import com.vaadin.flow.component.accordion.AccordionPanel;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
-import com.vaadin.flow.component.details.DetailsVariant;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
-import com.vaadin.flow.component.html.*;
+import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.icon.FontIcon;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
+import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
+import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -24,6 +29,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
+import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -33,16 +39,16 @@ import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.utils.json.JsonUtils;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
+import org.springframework.http.MediaType;
 
 import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
@@ -53,6 +59,10 @@ public class EntrylistEditorView extends BaseView {
     private final EntrylistService entrylistService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
+
+    private Upload entrylistUpload;
+    private Entrylist entrylist;
+    private EntrylistMetadata entrylistMetadata;
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                ValidationService validationService,
@@ -66,122 +76,184 @@ public class EntrylistEditorView extends BaseView {
         setSpacing(false);
 
         add(createViewHeader());
-        addAndExpand(createEntrylistValidationForm());
+        addAndExpand(createEntrylistForm());
         add(createFooter());
     }
 
-    private Component createEntrylistValidationForm() {
+    private Component createEntrylistForm() {
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
 
         VerticalLayout formLayout = new VerticalLayout();
+        formLayout.add(createFileUploadLayout(), createButtonLayout());
 
-        /* Validation rules start */
-        VerticalLayout validationRulesLayout = new VerticalLayout();
-        validationRulesLayout.setPadding(false);
-        validationRulesLayout.setSpacing(false);
-
-        H4 validationRulesTitle = new H4("1. Choose validation rules");
-        CheckboxGroup<ValidationRule> validationRulesCheckboxGroup = new CheckboxGroup<>();
-        validationRulesCheckboxGroup.setItems(ValidationRule.values());
-        validationRulesCheckboxGroup.setItemLabelGenerator(ValidationRule::getFriendlyName);
-        validationRulesCheckboxGroup.select(ValidationRule.values());
-        validationRulesCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
-        add(validationRulesCheckboxGroup);
-
-        validationRulesLayout.add(validationRulesTitle, validationRulesCheckboxGroup);
-        /* Validation rules end */
-
-        /* File upload start */
-        VerticalLayout fileUploadLayout = new VerticalLayout();
-        fileUploadLayout.setPadding(false);
-        fileUploadLayout.setSpacing(false);
-
-        H4 fileUploadTitle = new H4("2. Upload one or more entrylist files");
-        Paragraph fileUploadHint = new Paragraph("File size must be less than or equal to 1 MB. Only valid JSON files are accepted.");
-        fileUploadHint.getStyle().setColor("var(--lumo-secondary-text-color)");
-        Paragraph fileUploadExplanation = new Paragraph("The entrylist files are validated against the selected validation rules during upload. The results of the validation are displayed immediately.");
-
-        MultiFileMemoryBuffer multiFileMemoryBuffer = new MultiFileMemoryBuffer();
-        Upload fileUpload = new Upload(multiFileMemoryBuffer);
-        fileUpload.setWidthFull();
-        fileUpload.setDropAllowed(true);
-        fileUpload.setAcceptedFileTypes("application/json", ".json");
-        fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
-        fileUpload.setI18n(configureUploadI18N());
-        fileUpload.addSucceededListener(event -> {
-            String fileName = event.getFileName();
-            InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
-
-            try {
-                Entrylist entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
-                validationService.validate(entrylist);
-                ValidationData validationData = entrylistService.validateRules(entrylist, new ArrayList<>(validationRulesCheckboxGroup.getSelectedItems()));
-
-                if (validationData.getErrors().isEmpty()) {
-                    createValidationSuccessNotification(fileName);
-                } else {
-                    for (ValidationError validationError : validationData.getErrors()) {
-                        createValidationErrorNotification(fileName, validationError);
-                    }
-                }
-            } catch (ConstraintViolationException e) {
-                throw new RuntimeException("Invalid entrylist file", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Invalid JSON file", e);
-            }
-        });
-        fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
-        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + TEXT_DELIMITER + event.getReason().getMessage()));
-
-        fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload, fileUploadExplanation);
-        /* File upload end */
-
-        formLayout.add(validationRulesLayout, fileUploadLayout, createValidationRuleDetailsLayout());
         layout.add(formLayout);
         return layout;
     }
 
-    private Component createValidationRuleDetailsLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(false);
+    private Component createFileUploadLayout() {
+        VerticalLayout fileUploadLayout = new VerticalLayout();
+        fileUploadLayout.setWidthFull();
+        fileUploadLayout.setPadding(false);
+        fileUploadLayout.setSpacing(false);
 
-        H4 title = new H4("Validation rule details");
+        Paragraph fileUploadHint = new Paragraph("Accepted file formats: JSON (.json). File size must be less than or equal to 1 MB.");
+        fileUploadHint.getStyle().setColor("var(--lumo-secondary-text-color)");
 
-        Accordion accordion = new Accordion();
-        accordion.setWidthFull();
+        MemoryBuffer memoryBuffer = new MemoryBuffer();
+        entrylistUpload = new Upload(memoryBuffer);
+        entrylistUpload.setWidthFull();
+        entrylistUpload.setDropAllowed(true);
+        entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        entrylistUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        entrylistUpload.setI18n(configureUploadI18N());
+        entrylistUpload.addSucceededListener(event -> {
+            InputStream fileData = memoryBuffer.getInputStream();
 
-        for (ValidationRule validationRule : ValidationRule.values()) {
-            AccordionPanel accordionPanel = accordion.add(validationRule.getFriendlyName(), new Text(validationRule.getDescription()));
-            accordionPanel.addThemeVariants(DetailsVariant.FILLED);
-            accordionPanel.setOpened(false);
-        }
+            try {
+                entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
+                entrylistMetadata = EntrylistMetadata.builder()
+                        .fileName(event.getFileName())
+                        .type(event.getMIMEType())
+                        .contentLength(event.getContentLength())
+                        .build();
 
-        layout.add(title, accordion);
+                // Validate entrylist file against syntax and semantic rules
+                validationService.validate(entrylist);
 
-        return layout;
+                createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
+            } catch (IOException e) {
+                throw new RuntimeException("Invalid JSON file", e);
+            }
+        });
+        entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        entrylistUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
+
+        fileUploadLayout.add(fileUploadHint, entrylistUpload);
+        return fileUploadLayout;
     }
 
     private UploadI18N configureUploadI18N() {
         UploadI18NDefaults i18n = new UploadI18NDefaults();
-
-        i18n.getAddFiles().setOne("Upload entrylist.json file...");
-        i18n.getAddFiles().setMany("Upload entrylist.json files...");
-        i18n.getDropFiles().setOne("Drop entrylist.json file here");
-        i18n.getDropFiles().setMany("Drop entrylist.json files here");
-        i18n.getError().setIncorrectFileType("The provided file does not have the correct format (JSON).");
-        i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB.");
-
+        i18n.getAddFiles().setOne("Upload entrylist.json...");
+        i18n.getDropFiles().setOne("Drop entrylist.json here");
+        i18n.getError().setIncorrectFileType("The provided file does not have the correct format (.json)");
+        i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB");
         return i18n;
     }
 
-    private void createValidationSuccessNotification(String fileName) {
+    private Component createButtonLayout() {
+        HorizontalLayout buttonLayout = new HorizontalLayout();
+        buttonLayout.setWidthFull();
+        buttonLayout.setAlignItems(Alignment.CENTER);
+        buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        // Validation
+        Dialog validationDialog = createValidationDialog();
+        Button validateButton = new Button("Validate");
+        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        validateButton.addClickListener(e -> validationDialog.open());
+
+        // Reset
+        ConfirmDialog resetDialog = createResetDialog();
+        Button resetButton = new Button("Reset");
+        resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        resetButton.addClickListener(e -> resetDialog.open());
+
+        buttonLayout.add(validateButton, resetButton);
+        return buttonLayout;
+    }
+
+    private Dialog createValidationDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Validation Rules");
+
+        CheckboxGroup<ValidationRule> validationRulesCheckboxGroup = new CheckboxGroup<>();
+        validationRulesCheckboxGroup.setItems(ValidationRule.values());
+        validationRulesCheckboxGroup.setRenderer(new ComponentRenderer<Component, ValidationRule>(validationRule -> {
+            HorizontalLayout layout = new HorizontalLayout();
+            layout.setAlignItems(Alignment.CENTER);
+            layout.setPadding(false);
+            layout.setSpacing(false);
+            layout.getStyle()
+                    .set("gap", "var(--lumo-space-s)");
+
+            Text validationRuleName = new Text(validationRule.getFriendlyName());
+
+            FontIcon infoIcon = new FontIcon("fa-solid", "fa-circle-info");
+            infoIcon.setSize("var(--lumo-font-size-m)");
+
+            Tooltip.forComponent(infoIcon)
+                    .withText(validationRule.getDescription())
+                    .withPosition(Tooltip.TooltipPosition.END);
+
+            layout.add(validationRuleName, infoIcon);
+            return layout;
+        }));
+        validationRulesCheckboxGroup.select(ValidationRule.values());
+        validationRulesCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+
+        VerticalLayout validationRulesLayout = new VerticalLayout();
+        validationRulesLayout.setPadding(false);
+        validationRulesLayout.setSpacing(false);
+        validationRulesLayout.add(validationRulesCheckboxGroup);
+
+        dialog.add(validationRulesCheckboxGroup);
+
+        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        cancelButton.getStyle().set("margin-right", "auto");
+        dialog.getFooter().add(cancelButton);
+
+        Button validateButton = new Button("Validate", (e) -> {
+            validateEntrylist(validationRulesCheckboxGroup.getSelectedItems());
+            dialog.close();
+        });
+        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        dialog.getFooter().add(validateButton);
+
+        return dialog;
+    }
+
+    private ConfirmDialog createResetDialog() {
+        ConfirmDialog resetDialog = new ConfirmDialog();
+        resetDialog.setHeader("Reset current entrylist");
+        resetDialog.setText("Do you really want to discard the current entrylist?");
+        resetDialog.setConfirmText("Reset");
+        resetDialog.addConfirmListener(event -> resetEntrylist());
+        resetDialog.setCancelable(true);
+        return resetDialog;
+    }
+
+    private void validateEntrylist(Set<ValidationRule> validationRules) {
+        if (entrylist == null) {
+            notificationService.showErrorNotification("No entrylist file uploaded");
+            return;
+        }
+
+        ValidationData validationData = entrylistService.validateRules(entrylist, validationRules);
+        if (validationData.getErrors().isEmpty()) {
+            createValidationSuccessNotification(entrylistMetadata.getFileName(), "Validation passed");
+        } else {
+            for (ValidationError validationError : validationData.getErrors()) {
+                createValidationErrorNotification(entrylistMetadata.getFileName(), validationError);
+            }
+        }
+    }
+
+    private void resetEntrylist() {
+        entrylist = null;
+        entrylistMetadata = null;
+        entrylistUpload.clearFileList();
+    }
+
+    private void createValidationSuccessNotification(String fileName, String message) {
         Div header = new Div(new Text(fileName));
         header.getStyle()
                 .setFontSize("var(--lumo-font-size-m)")
                 .setFontWeight(Style.FontWeight.BOLD);
 
-        Div description = new Div(new Text("Validation passed"));
+        Div description = new Div(new Text(message));
         description.getStyle()
                 .setFontSize("var(--lumo-font-size-s)");
 

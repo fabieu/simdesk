@@ -24,12 +24,12 @@ import java.util.logging.Level;
 @Log
 @Service
 public class EntrylistService {
-    public ValidationData validateRules(Entrylist entrylist, List<ValidationRule> rules) {
+    public ValidationData validateRules(Entrylist entrylist, Set<ValidationRule> rules) {
         return validate(entrylist, rules);
     }
 
     @SuppressWarnings("unchecked")
-    private ValidationData validate(Entrylist entrylist, List<ValidationRule> rules) {
+    private ValidationData validate(Entrylist entrylist, Set<ValidationRule> rules) {
         List<ValidationError> errors = new ArrayList<>();
 
         for (ValidationRule validationRule : rules) {
