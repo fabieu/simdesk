@@ -46,17 +46,17 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
-@Route(value = "/entrylist/validator", layout = MainLayout.class)
-@PageTitle("Entrylist - Validator")
+@Route(value = "/entrylist/editor", layout = MainLayout.class)
+@PageTitle("Entrylist - Editor")
 @AnonymousAllowed
-public class EntrylistValidatorView extends BaseView {
+public class EntrylistEditorView extends BaseView {
     private final EntrylistService entrylistService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
-    public EntrylistValidatorView(EntrylistService entrylistService,
-                                  ValidationService validationService,
-                                  NotificationService notificationService) {
+    public EntrylistEditorView(EntrylistService entrylistService,
+                               ValidationService validationService,
+                               NotificationService notificationService) {
         this.entrylistService = entrylistService;
         this.validationService = validationService;
         this.notificationService = notificationService;

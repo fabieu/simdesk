@@ -17,7 +17,7 @@
 - Detailed session overview
 - Balance of Performance Management
 - Balance of Performance Editor
-- Entrylist Validator
+- Entrylist Editor with validation
 - Responsive design for mobile and desktop
 
 ## Quick Start
