@@ -25,7 +25,6 @@ public class Entry {
     private Integer restrictor;
     @NotNull
     private String customCar;
-    @NotNull
     private Integer overrideCarModelForCustomCar;
     @NotNull
     private Integer isServerAdmin;
