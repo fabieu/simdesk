@@ -17,5 +17,6 @@ public class Driver {
     @JsonProperty("playerID")
     @NotNull
     private String playerId;
+    @NotNull
     private String nationality;
 }
