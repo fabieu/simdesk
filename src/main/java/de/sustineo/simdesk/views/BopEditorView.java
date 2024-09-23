@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
@@ -41,7 +40,6 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
 
 import java.io.ByteArrayInputStream;
-import java.io.IOException;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
@@ -131,8 +129,6 @@ public class BopEditorView extends BaseView {
                 reloadComponents();
             } catch (ConstraintViolationException e) {
                 throw new RuntimeException("Invalid bop file", e);
-            } catch (IOException e) {
-                throw new RuntimeException("Invalid JSON file", e);
             }
         });
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
@@ -276,16 +272,7 @@ public class BopEditorView extends BaseView {
     private StreamResource downloadBop() {
         return new StreamResource(
                 "bop.json",
-                () -> {
-                    try {
-                        return new ByteArrayInputStream(JsonUtils.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
-                    } catch (JsonProcessingException e) {
-                        String errorMessage = "Failed to create download resource for BoP file";
-                        notificationService.showErrorNotification(errorMessage);
-                        log.severe(errorMessage + TEXT_DELIMITER + e.getMessage());
-                        return null;
-                    }
-                }
+                () -> new ByteArrayInputStream(JsonUtils.toJson(currentBop).getBytes(StandardCharsets.UTF_8))
         );
     }
 
@@ -298,14 +285,8 @@ public class BopEditorView extends BaseView {
     }
 
     private void reloadComponents() {
-        try {
-            previewTextArea.setValue(JsonUtils.toJsonPretty(currentBop));
-            carsLayout.removeAll();
-            carsLayout.add(currentCarComponents.values());
-        } catch (JsonProcessingException e) {
-            String errorMessage = "Failed to update preview";
-            notificationService.showErrorNotification(errorMessage);
-            log.severe(errorMessage + TEXT_DELIMITER + e.getMessage());
-        }
+        previewTextArea.setValue(JsonUtils.toJsonPretty(currentBop));
+        carsLayout.removeAll();
+        carsLayout.add(currentCarComponents.values());
     }
 }

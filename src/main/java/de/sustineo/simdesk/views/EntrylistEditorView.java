@@ -1,11 +1,11 @@
 package de.sustineo.simdesk.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
@@ -18,6 +18,7 @@ import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -44,7 +45,6 @@ import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 
-import java.io.IOException;
 import java.io.InputStream;
 import java.time.Duration;
 import java.util.List;
@@ -60,9 +60,14 @@ public class EntrylistEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
-    private Upload entrylistUpload;
     private Entrylist entrylist;
     private EntrylistMetadata entrylistMetadata;
+
+    private Upload entrylistUpload;
+    private TextArea entrylistOutput;
+
+    private final ConfirmDialog resetDialog = createResetDialog();
+    private final Dialog validationDialog = createValidationDialog();
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                ValidationService validationService,
@@ -85,7 +90,7 @@ public class EntrylistEditorView extends BaseView {
         layout.addClassNames("container", "bg-light");
 
         VerticalLayout formLayout = new VerticalLayout();
-        formLayout.add(createFileUploadLayout(), createButtonLayout());
+        formLayout.add(createFileUploadLayout(), createButtonLayout(), createEntrylistOutput());
 
         layout.add(formLayout);
         return layout;
@@ -110,24 +115,23 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            try {
-                entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
-                entrylistMetadata = EntrylistMetadata.builder()
-                        .fileName(event.getFileName())
-                        .type(event.getMIMEType())
-                        .contentLength(event.getContentLength())
-                        .build();
+            entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
+            entrylistMetadata = EntrylistMetadata.builder()
+                    .fileName(event.getFileName())
+                    .type(event.getMIMEType())
+                    .contentLength(event.getContentLength())
+                    .build();
 
-                // Validate entrylist file against syntax and semantic rules
-                validationService.validate(entrylist);
+            // Validate entrylist file against syntax and semantic rules
+            validationService.validate(entrylist);
 
-                createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
-            } catch (IOException e) {
-                throw new RuntimeException("Invalid JSON file", e);
-            }
+            refreshEntrylistOutput();
+
+            createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
         });
         entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         entrylistUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
+        entrylistUpload.addFileRemovedListener(event -> resetDialog.open());
 
         fileUploadLayout.add(fileUploadHint, entrylistUpload);
         return fileUploadLayout;
@@ -142,6 +146,24 @@ public class EntrylistEditorView extends BaseView {
         return i18n;
     }
 
+    private Component createEntrylistOutput() {
+        TextArea textArea = new TextArea();
+        textArea.setWidthFull();
+        textArea.setReadOnly(true);
+
+        this.entrylistOutput = textArea;
+
+        return textArea;
+    }
+
+    private void refreshEntrylistOutput() {
+        if (entrylist != null) {
+            entrylistOutput.setValue(JsonUtils.toJsonPretty(entrylist));
+        } else {
+            entrylistOutput.clear();
+        }
+    }
+
     private Component createButtonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
@@ -149,13 +171,11 @@ public class EntrylistEditorView extends BaseView {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
         // Validation
-        Dialog validationDialog = createValidationDialog();
         Button validateButton = new Button("Validate");
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         validateButton.addClickListener(e -> validationDialog.open());
 
         // Reset
-        ConfirmDialog resetDialog = createResetDialog();
         Button resetButton = new Button("Reset");
         resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         resetButton.addClickListener(e -> resetDialog.open());
@@ -166,10 +186,17 @@ public class EntrylistEditorView extends BaseView {
 
     private Dialog createValidationDialog() {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Validation Rules");
+        dialog.setHeaderTitle("Entrylist validation");
+
+        ValidationRule[] items = ValidationRule.values();
+
+        Checkbox selectAllCheckbox = new Checkbox("Select all");
+        selectAllCheckbox.setValue(true);
 
         CheckboxGroup<ValidationRule> validationRulesCheckboxGroup = new CheckboxGroup<>();
-        validationRulesCheckboxGroup.setItems(ValidationRule.values());
+        validationRulesCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        validationRulesCheckboxGroup.setLabel("Validation Rules");
+        validationRulesCheckboxGroup.setItems(items);
         validationRulesCheckboxGroup.setRenderer(new ComponentRenderer<Component, ValidationRule>(validationRule -> {
             HorizontalLayout layout = new HorizontalLayout();
             layout.setAlignItems(Alignment.CENTER);
@@ -191,14 +218,32 @@ public class EntrylistEditorView extends BaseView {
             return layout;
         }));
         validationRulesCheckboxGroup.select(ValidationRule.values());
-        validationRulesCheckboxGroup.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
+        validationRulesCheckboxGroup.addValueChangeListener(event -> {
+            if (event.getValue().size() == items.length) {
+                selectAllCheckbox.setValue(true);
+                selectAllCheckbox.setIndeterminate(false);
+            } else if (event.getValue().isEmpty()) {
+                selectAllCheckbox.setValue(false);
+                selectAllCheckbox.setIndeterminate(false);
+            } else {
+                selectAllCheckbox.setIndeterminate(true);
+            }
+        });
+
+        selectAllCheckbox.addValueChangeListener(event -> {
+            if (selectAllCheckbox.getValue()) {
+                validationRulesCheckboxGroup.select(ValidationRule.values());
+            } else {
+                validationRulesCheckboxGroup.deselectAll();
+            }
+        });
 
         VerticalLayout validationRulesLayout = new VerticalLayout();
         validationRulesLayout.setPadding(false);
         validationRulesLayout.setSpacing(false);
-        validationRulesLayout.add(validationRulesCheckboxGroup);
+        validationRulesLayout.add(selectAllCheckbox, validationRulesCheckboxGroup);
 
-        dialog.add(validationRulesCheckboxGroup);
+        dialog.add(validationRulesLayout);
 
         Button cancelButton = new Button("Cancel", (e) -> dialog.close());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
@@ -220,7 +265,7 @@ public class EntrylistEditorView extends BaseView {
         resetDialog.setHeader("Reset current entrylist");
         resetDialog.setText("Do you really want to discard the current entrylist?");
         resetDialog.setConfirmText("Reset");
-        resetDialog.addConfirmListener(event -> resetEntrylist());
+        resetDialog.addConfirmListener(event -> resetForm());
         resetDialog.setCancelable(true);
         return resetDialog;
     }
@@ -241,10 +286,11 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-    private void resetEntrylist() {
+    private void resetForm() {
         entrylist = null;
         entrylistMetadata = null;
         entrylistUpload.clearFileList();
+        refreshEntrylistOutput();
     }
 
     private void createValidationSuccessNotification(String fileName, String message) {
@@ -292,13 +338,7 @@ public class EntrylistEditorView extends BaseView {
             dialogLayout.add(errorMessage);
 
             for (Object reference : errorReferences) {
-                String referenceRepresentation;
-                try {
-                    referenceRepresentation = JsonUtils.toJsonPretty(reference);
-                } catch (JsonProcessingException e) {
-                    referenceRepresentation = reference.toString();
-                }
-                Span referenceSpan = new Span(referenceRepresentation);
+                Span referenceSpan = new Span(JsonUtils.toJsonPretty(reference));
                 referenceSpan.setWhiteSpace(HasText.WhiteSpace.PRE_LINE);
 
                 dialogLayout.add(new Div(referenceSpan));
