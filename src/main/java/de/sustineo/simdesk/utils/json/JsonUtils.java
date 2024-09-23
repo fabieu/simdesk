@@ -1,12 +1,11 @@
 package de.sustineo.simdesk.utils.json;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
+import lombok.SneakyThrows;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.stereotype.Service;
 
-import java.io.IOException;
 import java.io.InputStream;
 
 @Service
@@ -18,27 +17,33 @@ public class JsonUtils {
         JsonUtils.objectMapper = objectMapper;
     }
 
-    public static String toJson(Object entity) throws JsonProcessingException {
+    @SneakyThrows
+    public static String toJson(Object entity) {
         return objectMapper.writeValueAsString(entity);
     }
 
-    public static String toJsonPretty(Object entity) throws JsonProcessingException {
+    @SneakyThrows
+    public static String toJsonPretty(Object entity) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
     }
 
-    public static <T> T fromJson(String json, Class<T> valueType) throws JsonProcessingException {
+    @SneakyThrows
+    public static <T> T fromJson(String json, Class<T> valueType) {
         return objectMapper.readValue(json, valueType);
     }
 
-    public static <T> T fromJson(String json, TypeReference<T> valueTypeRef) throws JsonProcessingException {
+    @SneakyThrows
+    public static <T> T fromJson(String json, TypeReference<T> valueTypeRef) {
         return objectMapper.readValue(json, valueTypeRef);
     }
 
-    public static <T> T fromJson(InputStream inputStream, Class<T> valueType) throws IOException {
+    @SneakyThrows
+    public static <T> T fromJson(InputStream inputStream, Class<T> valueType) {
         return objectMapper.readValue(inputStream, valueType);
     }
 
-    public static <T> T fromJson(InputStream inputStream, TypeReference<T> valueTypeRef) throws IOException {
+    @SneakyThrows
+    public static <T> T fromJson(InputStream inputStream, TypeReference<T> valueTypeRef) {
         return objectMapper.readValue(inputStream, valueTypeRef);
     }
 }
