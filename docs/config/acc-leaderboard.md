@@ -20,20 +20,35 @@ The default path inside the docker container, which needs to be mounted, is `/ap
 > For more information about bind mounts, please refer to
 > the [Docker documentation](https://docs.docker.com/storage/bind-mounts/).
 
-**Example:**
+**Examples:**
+
+Single result folder:
+```yaml
+# compose.yaml (Docker Compose)
+services:
+  app:
+    image: ghcr.io/fabieu/simdesk:latest
+    environment:
+      - SPRING_PROFILES_ACTIVE=acc-leaderboard
+    volumes:
+      - ./results:/app/results
+    ...
+```
+
+Multiple result folders:
 
 ```yaml
 # compose.yaml (Docker Compose)
 services:
   app:
     image: ghcr.io/fabieu/simdesk:latest
-    ports:
-      - "8080:8080"
     environment:
       - SPRING_PROFILES_ACTIVE=acc-leaderboard
     volumes:
-      - ./data:/app/data # Bind mount for data persistence
-      - ./results:/app/results # Bind mount for the result files
+      - ./results/1:/app/results/1
+      - ./results/2:/app/results/2
+      - ./results/3:/app/results/3
+    ...
 ```
 
 ## Environment Variables
