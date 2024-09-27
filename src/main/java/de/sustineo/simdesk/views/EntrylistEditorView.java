@@ -64,7 +64,7 @@ public class EntrylistEditorView extends BaseView {
     private EntrylistMetadata entrylistMetadata;
 
     private Upload entrylistUpload;
-    private TextArea entrylistOutput;
+    private final TextArea entrylistOutput;
 
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
@@ -75,6 +75,7 @@ public class EntrylistEditorView extends BaseView {
         this.entrylistService = entrylistService;
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.entrylistOutput = initEntrylistOutput();
 
         setSizeFull();
         setPadding(false);
@@ -85,25 +86,89 @@ public class EntrylistEditorView extends BaseView {
         add(createFooter());
     }
 
+    private TextArea initEntrylistOutput() {
+        TextArea textArea = new TextArea();
+        textArea.setWidthFull();
+        textArea.setReadOnly(true);
+        return textArea;
+    }
+
+    private void resetForm() {
+        entrylist = null;
+        entrylistMetadata = null;
+        entrylistUpload.clearFileList();
+        refreshEntrylistOutput();
+    }
+
+    private void refreshEntrylistOutput() {
+        if (entrylist != null) {
+            entrylistOutput.setValue(JsonUtils.toJsonPretty(entrylist));
+        } else {
+            entrylistOutput.clear();
+        }
+    }
+
     private Component createEntrylistForm() {
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
 
         VerticalLayout formLayout = new VerticalLayout();
-        formLayout.add(createFileUploadLayout(), createButtonLayout(), createEntrylistOutput());
+        formLayout.setSizeFull();
+        formLayout.setPadding(false);
+        formLayout.add(entrylistCreateLayout(), ComponentUtils.createSpacer(), buttonLayout(), ComponentUtils.createSpacer(), entrylistOutput);
 
         layout.add(formLayout);
         return layout;
     }
 
-    private Component createFileUploadLayout() {
+    private Component entrylistCreateLayout() {
+        Span spacer = new Span(new Text("OR"));
+        spacer.getStyle()
+                .setFontWeight(Style.FontWeight.BOLD);
+
+        VerticalLayout spacerLayout = new VerticalLayout();
+        spacerLayout.setPadding(false);
+        spacerLayout.setAlignItems(Alignment.CENTER);
+        spacerLayout.add(spacer);
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+        layout.add(newEntrylistLayout(), spacerLayout, fileUploadLayout());
+
+        return layout;
+    }
+
+    private Component newEntrylistLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+        layout.setAlignItems(Alignment.CENTER);
+
+        ConfirmDialog createEntrylistDialog = createEntrylistDialog();
+        createEntrylistDialog.addConfirmListener(event -> {
+            resetForm();
+            this.entrylist = new Entrylist();
+            refreshEntrylistOutput();
+        });
+
+        Button createEntrylistButton = new Button("Create new entrylist");
+        createEntrylistButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        createEntrylistButton.addClickListener(event -> createEntrylistDialog.open());
+
+        layout.add(createEntrylistButton);
+
+        return layout;
+    }
+
+    private Component fileUploadLayout() {
         VerticalLayout fileUploadLayout = new VerticalLayout();
         fileUploadLayout.setWidthFull();
         fileUploadLayout.setPadding(false);
         fileUploadLayout.setSpacing(false);
 
         Paragraph fileUploadHint = new Paragraph("Accepted file formats: JSON (.json). File size must be less than or equal to 1 MB.");
-        fileUploadHint.getStyle().setColor("var(--lumo-secondary-text-color)");
+        fileUploadHint.getStyle()
+                .setFontSize("var(--lumo-font-size-s)")
+                .setColor("var(--lumo-secondary-text-color)");
 
         MemoryBuffer memoryBuffer = new MemoryBuffer();
         entrylistUpload = new Upload(memoryBuffer);
@@ -115,8 +180,8 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
-            entrylistMetadata = EntrylistMetadata.builder()
+            Entrylist entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
+            EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
                     .fileName(event.getFileName())
                     .type(event.getMIMEType())
                     .contentLength(event.getContentLength())
@@ -125,15 +190,22 @@ public class EntrylistEditorView extends BaseView {
             // Validate entrylist file against syntax and semantic rules
             validationService.validate(entrylist);
 
-            refreshEntrylistOutput();
+            ConfirmDialog dialog = createEntrylistDialog();
+            dialog.addConfirmListener(dialogEvent -> {
+                this.entrylist = entrylist;
+                this.entrylistMetadata = entrylistMetadata;
+                refreshEntrylistOutput();
 
-            createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
+                createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
+            });
+            dialog.addCancelListener(dialogEvent -> entrylistUpload.clearFileList());
+            dialog.open();
         });
         entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         entrylistUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
         entrylistUpload.addFileRemovedListener(event -> resetDialog.open());
 
-        fileUploadLayout.add(fileUploadHint, entrylistUpload);
+        fileUploadLayout.add(entrylistUpload, fileUploadHint);
         return fileUploadLayout;
     }
 
@@ -146,25 +218,7 @@ public class EntrylistEditorView extends BaseView {
         return i18n;
     }
 
-    private Component createEntrylistOutput() {
-        TextArea textArea = new TextArea();
-        textArea.setWidthFull();
-        textArea.setReadOnly(true);
-
-        this.entrylistOutput = textArea;
-
-        return textArea;
-    }
-
-    private void refreshEntrylistOutput() {
-        if (entrylist != null) {
-            entrylistOutput.setValue(JsonUtils.toJsonPretty(entrylist));
-        } else {
-            entrylistOutput.clear();
-        }
-    }
-
-    private Component createButtonLayout() {
+    private Component buttonLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         buttonLayout.setAlignItems(Alignment.CENTER);
@@ -260,16 +314,6 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private ConfirmDialog createResetDialog() {
-        ConfirmDialog resetDialog = new ConfirmDialog();
-        resetDialog.setHeader("Reset current entrylist");
-        resetDialog.setText("Do you really want to discard the current entrylist?");
-        resetDialog.setConfirmText("Reset");
-        resetDialog.addConfirmListener(event -> resetForm());
-        resetDialog.setCancelable(true);
-        return resetDialog;
-    }
-
     private void validateEntrylist(Set<ValidationRule> validationRules) {
         if (entrylist == null) {
             notificationService.showErrorNotification("No entrylist file uploaded");
@@ -286,11 +330,23 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-    private void resetForm() {
-        entrylist = null;
-        entrylistMetadata = null;
-        entrylistUpload.clearFileList();
-        refreshEntrylistOutput();
+    private ConfirmDialog createEntrylistDialog() {
+        ConfirmDialog confirmDialog = new ConfirmDialog();
+        confirmDialog.setHeader("Create new entrylist");
+        confirmDialog.setText("Your current entrylist will be discarded. Do you want to proceed?");
+        confirmDialog.setConfirmText("Continue");
+        confirmDialog.setCancelable(true);
+        return confirmDialog;
+    }
+
+    private ConfirmDialog createResetDialog() {
+        ConfirmDialog confirmDialog = new ConfirmDialog();
+        confirmDialog.setHeader("Reset current entrylist");
+        confirmDialog.setText("Do you really want to discard the current entrylist?");
+        confirmDialog.setConfirmText("Reset");
+        confirmDialog.addConfirmListener(event -> resetForm());
+        confirmDialog.setCancelable(true);
+        return confirmDialog;
     }
 
     private void createValidationSuccessNotification(String fileName, String message) {
