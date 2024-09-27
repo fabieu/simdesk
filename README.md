@@ -4,7 +4,7 @@
 
 <!--include-docs-start-->
 <p align="center">
-    <em>Server leaderboard and tools for Assetto Corsa Competizione</em>
+    <em>Modern server leaderboard and various services for sim racing organizers.</em>
 </p>
 <p align="center">
     <a href="https://simdesk.eu/"><b>Documentation</b></a> • 
@@ -13,11 +13,11 @@
 
 ## Features
 
-- Leaderboard for lap records
-- Detailed session overview
-- Balance of Performance Management
-- Balance of Performance Editor
-- Entrylist Validator
+- Leaderboard for lap records _(Assetto Corsa Competizione)_
+- Detailed session overview _(Assetto Corsa Competizione)_
+- Balance of Performance Management _(Assetto Corsa Competizione)_
+- Balance of Performance Editor _(Assetto Corsa Competizione)_
+- Entrylist Validator _(Assetto Corsa Competizione)_
 - Responsive design for mobile and desktop
 
 ## Quick Start
@@ -47,7 +47,7 @@ docker-compose up -d
 
 ## Configuration
 
-For additional configuration options, please refer to the [**official documentation**][config-url]:
+For an extensive overview of the configuration options, please refer to the [**official documentation**][config-url]:
 
 ## Support Level
 
