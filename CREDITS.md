@@ -88,3 +88,7 @@ and [MIT License](https://github.com/projectlombok/lombok/blob/master/LICENSE)
 
 [JUnit 5](https://github.com/junit-team/junit5) by [JUnit Team](https://junit.org/junit5/)
 and [Eclipse Public License 2.0](https://github.com/junit-team/junit5/blob/main/LICENSE.md)
+
+[Testcontainers Java](https://github.com/testcontainers/testcontainers-java)
+by [Testcontainers](https://www.testcontainers.org/)
+and [MIT License](https://github.com/testcontainers/testcontainers-java/blob/main/LICENSE)
