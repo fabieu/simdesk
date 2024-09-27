@@ -1,8 +1,9 @@
 ## Persistence
 
-The application uses an SQLite database file named `simdesk.db` to store data. If you want to persist the data across
-container restarts, you have to mount a volume to
-`/app/data` in the container.
+The application requires a PostgreSQL database to store data. It is recommended to use the official PostgreSQL images
+from
+Docker Hub.
+To configure the database connection, take a look at the [Environment Variables](#environment-variables) section.
 
 **Example:**
 
@@ -11,10 +12,25 @@ container restarts, you have to mount a volume to
 services:
   app:
     image: ghcr.io/fabieu/simdesk:latest
-    volumes:
-      - ./data:/app/data # You can use bind mounts or volumes here
+    environment:
+      SIMDESK_DB_URL: jdbc:postgresql://database:5432/simdesk
+      SIMDESK_DB_USERNAME: postgres
+      SIMDESK_DB_PASSWORD: development
     ports:
       - "8080:8080"
+    restart: unless-stopped
+  database:
+    image: postgres:16
+    shm_size: 128mb
+    environment:
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: development
+      POSTGRES_DB: simdesk
+    ports:
+      - "5432:5432"
+    volumes:
+      - simdesk-db:/var/lib/postgresql/data
+    restart: unless-stopped
 ```
 
 ## Authentication
