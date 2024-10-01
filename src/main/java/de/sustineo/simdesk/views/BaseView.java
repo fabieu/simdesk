@@ -26,8 +26,6 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.time.Year;
-
 public class BaseView extends VerticalLayout {
     protected static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     protected static final String QUERY_PARAMETER_TRACK_ID = "track";
@@ -76,13 +74,10 @@ public class BaseView extends VerticalLayout {
         versionAnchor.add(versionBadge);
         versionAnchor.setTarget(AnchorTarget.BLANK);
 
-        // Copyright text
-        Text copyrightText = new Text("Copyright © 2022 - " + Year.now().getValue());
-
-        // Maintainer + reference to Sustineo
-        Anchor maintainerAnchor = new Anchor(Reference.SUSTINEO, "Fabian Eulitz", AnchorTarget.BLANK);
-        maintainerAnchor.getStyle()
-                .setFontWeight(Style.FontWeight.BOLD);
+        // Maintainer
+        Span maintainerSpan = new Span(new Text("Created by Fabian Eulitz"));
+        maintainerSpan.getStyle()
+                .setColor("var(--lumo-tertiary-text-color)");
 
         // GitHub icon + reference to GitHub repository
         Anchor githubAnchor = new Anchor(Reference.GITHUB);
@@ -91,7 +86,7 @@ public class BaseView extends VerticalLayout {
         githubAnchor.getStyle()
                 .setColor("var(--lumo-body-text-color)");
 
-        layout.add(copyrightText, maintainerAnchor, githubAnchor, versionAnchor);
+        layout.add(githubAnchor, maintainerSpan, versionAnchor);
         return layout;
     }
 
