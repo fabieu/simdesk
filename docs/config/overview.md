@@ -1,52 +1,17 @@
-## Persistence
+Environment variables are used to configure the application. The following sections describe the available configuration
+options.
 
-The application requires a PostgreSQL database to store data. It is recommended to use the official PostgreSQL images
-from
-Docker Hub.
-To configure the database connection, take a look at the [Environment Variables](#environment-variables) section.
+- [Basic configuration](#basic-configuration)
+- [Persistence](persistence.md)
+- [Authentication](auth.md)
 
-**Example:**
-
-```yaml
-# compose.yml (Docker Compose)
-services:
-  app:
-    image: ghcr.io/fabieu/simdesk:latest
-    environment:
-      SIMDESK_DB_URL: jdbc:postgresql://database:5432/simdesk
-      SIMDESK_DB_USERNAME: postgres
-      SIMDESK_DB_PASSWORD: development
-    ports:
-      - "8080:8080"
-    restart: unless-stopped
-  database:
-    image: postgres:16
-    shm_size: 128mb
-    environment:
-      POSTGRES_USER: postgres
-      POSTGRES_PASSWORD: development
-      POSTGRES_DB: simdesk
-    ports:
-      - "5432:5432"
-    volumes:
-      - simdesk-db:/var/lib/postgresql/data
-    restart: unless-stopped
-```
-
-## Authentication
-
-See [Authentication](auth.md) for more information.
-
-## Configuration Basics
-
-Environment variables are used to configure the application. Feature based environment variables are described in the
-corresponding feature sections.
+**Features:**
 
 - [Leaderboard](acc-leaderboard.md)
 - [Entrylist](acc-entrylist.md)
 - [Balance of Performance](acc-bop.md)
 
-## Environment Variables
+## Basic configuration
 
 `SPRING_PROFILES_ACTIVE`
 
@@ -56,35 +21,6 @@ To enable additional features, you have to add the corresponding feature profile
 environment variable. If following profiles are set, when you do not override `SPRING_PROFILES_ACTIVE`:
 
 - `acc-entrylist,acc-bop`: Enable the Entrylist and Balance of Performance feature set.
-
-`SIMDESK_DB_URL`
-
-> required
-
-The JDBC URL for the PostgreSQL database. The general form of the connection URL is:
-`jdbc:postgresql://[serverName[:portNumber]]/[databaseName][?property=value[;property=value]]`
-
-- **jdbc:postgresql://** (Required) - Is known as the subprotocol and is constant.
-- **serverName** (Required) - Is the address of the server to connect to. This address can be a DNS or IP address, or it
-  can be localhost or 127.0.0.1 for the local computer.
-- **portNumber** (Optional) - Is the port to connect to on serverName. The default is 5432. If you're using the default
-  port, you don't have to specify the port, nor the preceding : in the URL.
-- **databaseName** (Required) - Is the name of the database to connect to. The database name must be unique for each
-  database server.
-- **property** (Optional) - Is one or more option connection properties. Properties can only be delimited by using the
-  semicolon (;), and they can't be duplicated.
-
-`SIMDESK_DB_USERNAME`
-
-> required
-
-The username to connect to the PostgreSQL database.
-
-`SIMDESK_DB_PASSWORD`
-
-> required
-
-The password to connect to the PostgreSQL database.
 
 `SIMDESK_COMMUNITY_NAME`
 

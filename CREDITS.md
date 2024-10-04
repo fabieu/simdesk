@@ -55,6 +55,9 @@ and [Apache License 2.0](https://github.com/mybatis/spring-boot-starter/blob/mas
 [sqlite-jdbc](https://github.com/xerial/sqlite-jdbc) by [xerial](https://github.com/xerial)
 and [Apache License 2.0](https://github.com/xerial/sqlite-jdbc/blob/master/LICENSE)
 
+[pgjdbc](https://github.com/pgjdbc/pgjdbc) by [The PostgreSQL Global Development Group](http://jdbc.postgresql.org)
+and [BSD 2-Clause "Simplified" License](https://github.com/pgjdbc/pgjdbc/blob/master/LICENSE)
+
 [Flyway](https://flywaydb.org/) by [Redgate](https://www.red-gate.com)
 and [Apache License 2.0](https://github.com/flyway/flyway/blob/main/LICENSE.md)
 
