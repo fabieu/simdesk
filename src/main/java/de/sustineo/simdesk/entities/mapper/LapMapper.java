@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.entities.mapper;
 
 import de.sustineo.simdesk.entities.Lap;
+import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -31,14 +32,31 @@ public interface LapMapper {
                 ORDER BY id ASC;
             </script>
             """)
+    @Select(databaseId = DatabaseVendor.SQLITE, value = """
+            <script>
+            SELECT * FROM lap WHERE session_id = #{sessionId} AND driver_id IN 
+                <foreach item="item" index="index" collection="playerIds"
+                    open="(" separator="," close=")">
+                      #{item}
+                </foreach>
+                ORDER BY id ASC;
+            </script>
+            """)
     List<Lap> findBySessionAndDrivers(int sessionId, List<String> playerIds);
 
     @Select("SELECT COUNT(id) FROM simdesk.lap")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT COUNT(id) FROM lap")
     @ResultType(long.class)
     long count();
 
-    @Insert("INSERT INTO simdesk.lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid) " +
-            "VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})")
+    @Insert("""
+                        INSERT INTO simdesk.lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)
+                        VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})
+            """)
+    @Insert(databaseId = DatabaseVendor.SQLITE, value = """
+                        INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)
+                        VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})
+            """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Lap lap);
 }

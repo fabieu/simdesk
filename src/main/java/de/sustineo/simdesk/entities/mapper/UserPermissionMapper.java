@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.entities.mapper;
 
 import de.sustineo.simdesk.entities.auth.UserPermission;
+import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
@@ -18,5 +19,6 @@ public interface UserPermissionMapper {
             @Result(property = "insertDatetime", column = "insert_datetime"),
     })
     @Select("SELECT * FROM simdesk.user_permission WHERE user_id = #{userId}")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM user_permission WHERE user_id = #{userId}")
     List<UserPermission> findByUserId(Long userId);
 }

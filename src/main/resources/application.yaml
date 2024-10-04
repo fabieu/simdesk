@@ -5,14 +5,8 @@ spring:
     active: production, acc-entrylist, acc-bop
   main:
     banner-mode: off
-  datasource:
-    url: ${SIMDESK_DB_URL}
-    username: ${SIMDESK_DB_USERNAME}
-    password: ${SIMDESK_DB_PASSWORD}
   flyway:
     enabled: true
-    default-schema: simdesk
-    createSchemas: true
   task:
     scheduling:
       pool:
@@ -54,6 +48,11 @@ vaadin:
     - /swagger-ui/**
     - /openapi/**
 simdesk:
+  datasource:
+    vendor: ${SIMDESK_DB_TYPE:sqlite}
+    url: ${SIMDESK_DB_URL:#{null}}
+    username: ${SIMDESK_DB_USERNAME:#{null}}
+    password: ${SIMDESK_DB_PASSWORD:#{null}}
   theme: ${SIMDESK_THEME:#{null}}
   community:
     name: ${SIMDESK_COMMUNITY_NAME:#{null}}

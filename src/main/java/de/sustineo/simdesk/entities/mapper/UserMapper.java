@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.entities.mapper;
 
 import de.sustineo.simdesk.entities.auth.User;
+import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -13,8 +14,10 @@ public interface UserMapper {
             @Result(property = "password", column = "password")
     })
     @Select("SELECT * FROM simdesk.user WHERE username = #{username}")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM user WHERE username = #{username}")
     User findByUsername(String username);
 
     @Insert("INSERT INTO simdesk.user (user_id, username, password) VALUES (#{userId}, #{username}, #{password}) ON CONFLICT(user_id) DO UPDATE SET username = #{username}, password = #{password}")
+    @Insert(databaseId = DatabaseVendor.SQLITE, value = "INSERT INTO user (user_id, username, password) VALUES (#{userId}, #{username}, #{password}) ON CONFLICT(user_id) DO UPDATE SET username = #{username}, password = #{password}")
     void insertSystemUser(User user);
 }
