@@ -70,7 +70,7 @@ public class BaseView extends VerticalLayout {
         String version = buildProperties.getVersion();
         Span versionBadge = new Span("Version " + version);
         versionBadge.getElement().getThemeList().add("badge contrast");
-        Anchor versionAnchor = new Anchor(Reference.getGitHubRelease(version));
+        Anchor versionAnchor = new Anchor(Reference.GITHUB_RELEASES);
         versionAnchor.add(versionBadge);
         versionAnchor.setTarget(AnchorTarget.BLANK);
 
