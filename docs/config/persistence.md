@@ -21,7 +21,7 @@ this variable.
 **Docker** 🐳
 
 ```bash 
-docker run -d -p 8080:8080 -e SIMDESK_DB_TYPE=sqlite ghcr.io/fabieu/simdesk:latest
+docker run -d -p 8080:8080 -v "simdesk-data:/app/data" ghcr.io/fabieu/simdesk:latest
 ```
 
 **Docker Compose** 🐳
@@ -32,7 +32,7 @@ services:
   app:
     image: ghcr.io/fabieu/simdesk:latest
     environment:
-      SIMDESK_DB_TYPE: sqlite
+      SIMDESK_DB_TYPE: sqlite # optional
     volumes:
       - simdesk-data:/app/data
     ports:

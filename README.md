@@ -22,29 +22,22 @@
 
 ## Quick Start
 
+**Docker** 🐳
+
+```bash
+docker run -d -p 8080:8080 -v "simdesk-data:/app/data" ghcr.io/fabieu/simdesk:latest
+```
+
 **Docker Compose** 🐳
 
 ```yaml
 services:
   app:
     image: ghcr.io/fabieu/simdesk:latest
-    environment:
-      SIMDESK_DB_URL: jdbc:postgresql://database:5432/simdesk
-      SIMDESK_DB_USERNAME: postgres
-      SIMDESK_DB_PASSWORD: development
+    volumes:
+      - simdesk-data:/app/data
     ports:
       - "8080:8080"
-    restart: unless-stopped
-  database:
-    image: postgres:16
-    shm_size: 128mb
-    environment:
-      POSTGRES_DB: simdesk
-      POSTGRES_PASSWORD: development
-    ports:
-      - "5432:5432"
-    volumes:
-      - simdesk-db:/var/lib/postgresql/data
     restart: unless-stopped
 ```
 
