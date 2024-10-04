@@ -2,6 +2,7 @@ package de.sustineo.simdesk.entities.mapper;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
+import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -22,15 +23,21 @@ public interface BopMapper {
             @Result(property = "updateDatetime", column = "update_datetime"),
     })
     @Select("SELECT * FROM simdesk.bop")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM bop")
     List<Bop> findAll();
 
 
     @ResultMap("bopResultMap")
     @Select("SELECT * FROM simdesk.bop WHERE active = true")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM bop WHERE active = true")
     List<Bop> findActive();
 
     @Insert("""
             INSERT INTO simdesk.bop (track_id, car_id, restrictor, ballast_kg, username, active, update_datetime)
+            VALUES (#{trackId}, #{carId}, #{restrictor}, #{ballastKg}, #{username}, #{active}, #{updateDatetime})
+            """)
+    @Insert(databaseId = DatabaseVendor.SQLITE, value = """
+            INSERT INTO bop (track_id, car_id, restrictor, ballast_kg, username, active, update_datetime)
             VALUES (#{trackId}, #{carId}, #{restrictor}, #{ballastKg}, #{username}, #{active}, #{updateDatetime})
             """)
     void insert(Bop bop);
@@ -38,6 +45,10 @@ public interface BopMapper {
 
     @Update("""
             UPDATE simdesk.bop SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
+            WHERE track_id = #{trackId} AND car_id = #{carId}
+            """)
+    @Update(databaseId = DatabaseVendor.SQLITE, value = """
+            UPDATE bop SET restrictor = #{restrictor}, ballast_kg = #{ballastKg}, username = #{username}, active = #{active}, update_datetime = #{updateDatetime}
             WHERE track_id = #{trackId} AND car_id = #{carId}
             """)
     void update(Bop bop);

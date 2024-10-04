@@ -1,0 +1,31 @@
+<component name="ProjectRunConfigurationManager">
+  <configuration default="false" name="Development SQLite" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug, discord" />
+    <envs>
+      <env name="debug" value="false" />
+      <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="examples/acc-results" />
+      <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
+      <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
+      <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
+      <env name="SIMDESK_THEME" value="default" />
+    </envs>
+    <option name="HIDE_BANNER" value="true" />
+    <module name="simdesk.main" />
+    <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
+    <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.simdesk.SimDeskApplication" />
+    <extension name="net.ashald.envfile">
+      <option name="IS_ENABLED" value="true" />
+      <option name="IS_SUBST" value="false" />
+      <option name="IS_PATH_MACRO_SUPPORTED" value="false" />
+      <option name="IS_IGNORE_MISSING_FILES" value="true" />
+      <option name="IS_ENABLE_EXPERIMENTAL_INTEGRATIONS" value="false" />
+      <ENTRIES>
+        <ENTRY IS_ENABLED="true" PARSER="runconfig" IS_EXECUTABLE="false" />
+        <ENTRY IS_ENABLED="true" PARSER="env" IS_EXECUTABLE="false" PATH=".env" />
+      </ENTRIES>
+    </extension>
+    <method v="2">
+      <option name="Make" enabled="true" />
+    </method>
+  </configuration>
+</component>
