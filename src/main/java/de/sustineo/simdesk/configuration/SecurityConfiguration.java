@@ -35,6 +35,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     private final String[] PUBLIC_PATHS = {
             "/public/**",
             "/assets/**",
+            "/icons/**",
     };
     private static final String LOGIN_URL = "/login";
     private static final String LOGIN_SUCCESS_URL = "/";
