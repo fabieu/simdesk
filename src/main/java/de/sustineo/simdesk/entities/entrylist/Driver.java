@@ -10,13 +10,9 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class Driver {
-    @NotNull
     private String firstName;
-    @NotNull
     private String lastName;
-    @NotNull
     private String shortName;
-    @NotNull
     private Integer driverCategory;
     @JsonProperty("playerID")
     @NotNull
