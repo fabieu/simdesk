@@ -29,6 +29,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.entrylist.Entry;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
 import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
 import de.sustineo.simdesk.entities.validation.ValidationData;
@@ -47,7 +48,9 @@ import org.springframework.http.MediaType;
 
 import java.io.InputStream;
 import java.time.Duration;
+import java.util.Collections;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
@@ -65,6 +68,7 @@ public class EntrylistEditorView extends BaseView {
 
     private Upload entrylistUpload;
     private final TextArea entrylistOutput;
+    private final VerticalLayout entrylistEditorLayout;
 
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
@@ -75,7 +79,11 @@ public class EntrylistEditorView extends BaseView {
         this.entrylistService = entrylistService;
         this.validationService = validationService;
         this.notificationService = notificationService;
-        this.entrylistOutput = initEntrylistOutput();
+
+        this.entrylistEditorLayout = new VerticalLayout();
+        this.entrylistOutput = new TextArea();
+        this.entrylistOutput.setWidthFull();
+        this.entrylistOutput.setReadOnly(true);
 
         setSizeFull();
         setPadding(false);
@@ -86,17 +94,11 @@ public class EntrylistEditorView extends BaseView {
         add(createFooter());
     }
 
-    private TextArea initEntrylistOutput() {
-        TextArea textArea = new TextArea();
-        textArea.setWidthFull();
-        textArea.setReadOnly(true);
-        return textArea;
-    }
-
     private void resetForm() {
         entrylist = null;
         entrylistMetadata = null;
         entrylistUpload.clearFileList();
+        refreshEntrylistEditor();
         refreshEntrylistOutput();
     }
 
@@ -115,7 +117,7 @@ public class EntrylistEditorView extends BaseView {
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setSizeFull();
         formLayout.setPadding(false);
-        formLayout.add(entrylistCreateLayout(), ComponentUtils.createSpacer(), buttonLayout(), ComponentUtils.createSpacer(), entrylistOutput);
+        formLayout.add(entrylistCreateLayout(), buttonLayout(), entrylistEditorLayout, entrylistOutput);
 
         layout.add(formLayout);
         return layout;
@@ -147,6 +149,7 @@ public class EntrylistEditorView extends BaseView {
         createEntrylistDialog.addConfirmListener(event -> {
             resetForm();
             this.entrylist = new Entrylist();
+            refreshEntrylistEditor();
             refreshEntrylistOutput();
         });
 
@@ -194,6 +197,7 @@ public class EntrylistEditorView extends BaseView {
             dialog.addConfirmListener(dialogEvent -> {
                 this.entrylist = entrylist;
                 this.entrylistMetadata = entrylistMetadata;
+                refreshEntrylistEditor();
                 refreshEntrylistOutput();
 
                 createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
@@ -236,6 +240,67 @@ public class EntrylistEditorView extends BaseView {
 
         buttonLayout.add(validateButton, resetButton);
         return buttonLayout;
+    }
+
+    private void refreshEntrylistEditor() {
+        entrylistEditorLayout.removeAll();
+
+        if (entrylist == null) {
+            return;
+        }
+
+        entrylistEditorLayout.add(createEntrylistBaseInformation());
+
+        List<Entry> entries = Optional.of(entrylist)
+                .map(Entrylist::getEntries)
+                .orElse(Collections.emptyList());
+
+        for (Entry entry : entries) {
+            entrylistEditorLayout.add(createEntrylistEntryLayout(entry));
+        }
+    }
+
+    private Component createEntrylistBaseInformation() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+
+        Checkbox forceEntrylistCheckbox = new Checkbox();
+        forceEntrylistCheckbox.setLabel("Force entrylist");
+        forceEntrylistCheckbox.setValue(entrylist.getForceEntryList() == 1);
+        forceEntrylistCheckbox.addClickListener(event -> {
+            entrylist.setForceEntryList(forceEntrylistCheckbox.getValue() ? 1 : 0);
+            refreshEntrylistOutput();
+        });
+
+        layout.add(forceEntrylistCheckbox);
+        return layout;
+    }
+
+    private Component createEntrylistEntryLayout(Entry entry) {
+        Div entryLayout = new Div();
+        entryLayout.setWidthFull();
+        entryLayout.addClassNames("pure-g");
+        entryLayout.getStyle()
+                .setBorder("1px solid var(--lumo-contrast-10pct)");
+
+        VerticalLayout entrylistMainLayout = new VerticalLayout();
+        entrylistMainLayout.add("Entrylist main data");
+        //TODO: Implement inputs for entrylist main data
+
+        VerticalLayout entrylistDriverLayout = new VerticalLayout();
+        entrylistDriverLayout.add("Entrylist driver data");
+        //TODO: Implement inputs for entrylist driver data
+
+        Div entrylistMainLayoutWrapper = new Div();
+        entrylistMainLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
+        entrylistMainLayoutWrapper.add(entrylistMainLayout);
+
+        Div entrylistDriverLayoutWrapper = new Div();
+        entrylistDriverLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
+        entrylistDriverLayoutWrapper.add(entrylistDriverLayout);
+
+        entryLayout.add(entrylistMainLayoutWrapper, entrylistDriverLayoutWrapper);
+        return entryLayout;
     }
 
     private Dialog createValidationDialog() {
