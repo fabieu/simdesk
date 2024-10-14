@@ -6,11 +6,12 @@ import lombok.NoArgsConstructor;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Set;
 
 @Data
 @NoArgsConstructor
 @AllArgsConstructor
 public class ValidationData {
-    private List<ValidationRule> rules;
+    private Set<ValidationRule> rules;
     private List<ValidationError> errors = new ArrayList<>();
 }
