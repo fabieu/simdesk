@@ -8,8 +8,10 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
@@ -18,7 +20,9 @@ import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.component.textfield.TextArea;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
@@ -32,6 +36,9 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.entrylist.Entry;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
 import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
+import de.sustineo.simdesk.entities.json.kunos.AccDriver;
+import de.sustineo.simdesk.entities.json.kunos.AccDriverCategory;
+import de.sustineo.simdesk.entities.json.kunos.AccNationality;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -283,18 +290,129 @@ public class EntrylistEditorView extends BaseView {
         entryLayout.getStyle()
                 .setBorder("1px solid var(--lumo-contrast-10pct)");
 
-        VerticalLayout entrylistMainLayout = new VerticalLayout();
-        entrylistMainLayout.add("Entrylist main data");
-        //TODO: Implement inputs for entrylist main data
+        // Race number
+        IntegerField raceNumberField = new IntegerField("Car Number");
+        raceNumberField.setValue(entry.getRaceNumber());
+        raceNumberField.setPrefixComponent(new Span("#"));
+        raceNumberField.setMin(0);
+        raceNumberField.setMax(999);
+        raceNumberField.addValueChangeListener(event -> {
+            entry.setRaceNumber(event.getValue());
+            refreshEntrylistOutput();
+        });
 
-        VerticalLayout entrylistDriverLayout = new VerticalLayout();
-        entrylistDriverLayout.add("Entrylist driver data");
-        //TODO: Implement inputs for entrylist driver data
+        // Ballast
+        IntegerField ballastField = new IntegerField("Ballast");
+        ballastField.setValue(entry.getBallastKg());
+        ballastField.setSuffixComponent(new Span("kg"));
+        ballastField.setMin(-40);
+        ballastField.setMax(40);
+        ballastField.addValueChangeListener(event -> {
+            if (event.getValue() >= -40 && event.getValue() <= 40) {
+                entry.setBallastKg(event.getValue());
+                refreshEntrylistOutput();
+            }
+        });
 
+        // Restrictor
+        IntegerField restrictorField = new IntegerField("Restrictor");
+        restrictorField.setValue(entry.getRestrictor());
+        restrictorField.setSuffixComponent(new Span("%"));
+        restrictorField.setMin(0);
+        restrictorField.setMax(20);
+        restrictorField.addValueChangeListener(event -> {
+            if (event.getValue() >= 0 && event.getValue() <= 20) {
+                entry.setRestrictor(event.getValue());
+                refreshEntrylistOutput();
+            }
+        });
+
+        FormLayout entrylistMainFormLayout = new FormLayout();
+        entrylistMainFormLayout.add(raceNumberField, ballastField, restrictorField);
+        entrylistMainFormLayout.setResponsiveSteps(
+                // Use one column by default
+                new FormLayout.ResponsiveStep("0", 1),
+                // Use two columns, if layout's width exceeds 500px
+                new FormLayout.ResponsiveStep("500px", 3));
+
+        VerticalLayout entrylistMainLayout = new VerticalLayout(entrylistMainFormLayout);
         Div entrylistMainLayoutWrapper = new Div();
         entrylistMainLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
         entrylistMainLayoutWrapper.add(entrylistMainLayout);
 
+        Checkbox overrideDriverInfoCheckbox = new Checkbox("Override driver info");
+        overrideDriverInfoCheckbox.setValue(entry.getOverrideDriverInfo() == 1);
+        overrideDriverInfoCheckbox.addClickListener(event -> {
+            entry.setOverrideDriverInfo(overrideDriverInfoCheckbox.getValue() ? 1 : 0);
+            refreshEntrylistOutput();
+        });
+
+        VerticalLayout entrylistDriverListLayout = new VerticalLayout();
+        entrylistDriverListLayout.setPadding(false);
+
+        for (AccDriver driver : entry.getDrivers()) {
+            TextField firstNameField = new TextField("First Name");
+            firstNameField.setValue(driver.getFirstName());
+            firstNameField.addValueChangeListener(event -> {
+                driver.setFirstName(event.getValue());
+                refreshEntrylistOutput();
+            });
+
+            TextField lastNameField = new TextField("Last Name");
+            lastNameField.setValue(driver.getLastName());
+            lastNameField.addValueChangeListener(event -> {
+                driver.setLastName(event.getValue());
+                refreshEntrylistOutput();
+            });
+
+            TextField shortNameField = new TextField("Short Name");
+            shortNameField.setValue(driver.getShortName());
+            shortNameField.setMinLength(3);
+            shortNameField.setMaxLength(3);
+            shortNameField.addValueChangeListener(event -> {
+                if (event.getValue().length() == 3) {
+                    driver.setShortName(event.getValue());
+                    refreshEntrylistOutput();
+                }
+            });
+
+            TextField playerIdField = new TextField("Steam ID");
+            playerIdField.setValue(driver.getPlayerId());
+            playerIdField.addValueChangeListener(event -> {
+                driver.setPlayerId(event.getValue());
+                refreshEntrylistOutput();
+            });
+
+            ComboBox<AccDriverCategory> driverCategorySelect = new ComboBox<>("Category");
+            driverCategorySelect.setItems(AccDriverCategory.values());
+            driverCategorySelect.setItemLabelGenerator(AccDriverCategory::getName);
+            driverCategorySelect.setValue(driver.getDriverCategory());
+            driverCategorySelect.addValueChangeListener(event -> {
+                driver.setDriverCategory(event.getValue());
+                refreshEntrylistOutput();
+            });
+
+            ComboBox<AccNationality> nationalyComboBox = new ComboBox<>("Nationality");
+            nationalyComboBox.setItems(AccNationality.values());
+            nationalyComboBox.setItemLabelGenerator(AccNationality::getName);
+            nationalyComboBox.setValue(driver.getNationality());
+            nationalyComboBox.addValueChangeListener(event -> {
+                driver.setNationality(event.getValue());
+                refreshEntrylistOutput();
+            });
+
+            FormLayout entrylistDriverFormLayout = new FormLayout();
+            entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategorySelect, nationalyComboBox);
+            entrylistDriverFormLayout.setResponsiveSteps(
+                    // Use one column by default
+                    new FormLayout.ResponsiveStep("0", 1),
+                    // Use two columns, if layout's width exceeds 500px
+                    new FormLayout.ResponsiveStep("500px", 3));
+            entrylistDriverListLayout.add(entrylistDriverFormLayout);
+        }
+
+
+        VerticalLayout entrylistDriverLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistDriverListLayout);
         Div entrylistDriverLayoutWrapper = new Div();
         entrylistDriverLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
         entrylistDriverLayoutWrapper.add(entrylistDriverLayout);

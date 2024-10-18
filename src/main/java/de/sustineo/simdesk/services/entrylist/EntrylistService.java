@@ -1,9 +1,9 @@
 package de.sustineo.simdesk.services.entrylist;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.entrylist.Driver;
 import de.sustineo.simdesk.entities.entrylist.Entry;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
+import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -54,10 +54,10 @@ public class EntrylistService {
 
         List<Entry> entries = entrylist.getEntries();
         for (Entry entry : entries) {
-            List<Driver> drivers = entry.getDrivers();
+            List<AccDriver> drivers = entry.getDrivers();
 
             if (entry.getOverrideDriverInfo() == 1) {
-                for (Driver driver : drivers) {
+                for (AccDriver driver : drivers) {
                     if (StringUtils.isBlank(driver.getFirstName())) {
                         String message = String.format("firstName of %s for car number #%s is missing or empty", driver, entry.getRaceNumber());
                         errors.add(new ValidationError(validationRule, message, driver));
@@ -85,10 +85,10 @@ public class EntrylistService {
 
         List<Entry> entries = entrylist.getEntries();
         for (Entry entry : entries) {
-            List<Driver> drivers = entry.getDrivers();
+            List<AccDriver> drivers = entry.getDrivers();
 
             if (entry.getOverrideDriverInfo() == 1) {
-                for (Driver driver : drivers) {
+                for (AccDriver driver : drivers) {
                     if (!Set.of(0, 1, 2, 3).contains(driver.getDriverCategory())) {
                         String message = String.format("driverCategory of %s for car number #%s has to be one of [0, 1, 2, 3]", driver, entry.getRaceNumber());
                         errors.add(new ValidationError(validationRule, message, driver));
@@ -103,20 +103,20 @@ public class EntrylistService {
     @SuppressWarnings("unused")
     protected static List<ValidationError> validateSteamIDs(Entrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
-        HashMap<String, Driver> seenSteamIds = new HashMap<>();
+        HashMap<String, AccDriver> seenSteamIds = new HashMap<>();
 
         List<Entry> entries = entrylist.getEntries();
         for (Entry entry : entries) {
-            List<Driver> drivers = entry.getDrivers();
+            List<AccDriver> drivers = entry.getDrivers();
 
-            for (Driver driver : drivers) {
+            for (AccDriver driver : drivers) {
                 if (StringUtils.isBlank(driver.getPlayerId()) || !driver.getPlayerId().startsWith("S") || driver.getPlayerId().length() != 18) {
                     String message = String.format("steamID of %s for car number #%s is missing or invalid", driver, entry.getRaceNumber());
                     errors.add(new ValidationError(validationRule, message, driver));
                 }
 
                 if (seenSteamIds.containsKey(driver.getPlayerId())) {
-                    Driver seenDriver = seenSteamIds.get(driver.getPlayerId());
+                    AccDriver seenDriver = seenSteamIds.get(driver.getPlayerId());
                     String message = String.format("%s and %s have the same SteamID", seenDriver, driver);
                     errors.add(new ValidationError(validationRule, message, List.of(seenDriver, driver)));
                 } else {
