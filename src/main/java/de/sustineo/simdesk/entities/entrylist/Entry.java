@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.entities.entrylist;
 
+import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
@@ -9,7 +10,7 @@ import java.util.List;
 @Data
 public class Entry {
     @NotEmpty
-    private List<@Valid Driver> drivers;
+    private List<@Valid AccDriver> drivers;
     private Integer raceNumber;
     private Integer forcedCarModel;
     private Integer overrideDriverInfo;
