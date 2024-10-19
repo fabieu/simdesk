@@ -300,12 +300,12 @@ public class EntrylistEditorView extends BaseView {
         IntegerField raceNumberField = new IntegerField("Car Number");
         raceNumberField.setValue(entry.getRaceNumber());
         raceNumberField.setPrefixComponent(new Span("#"));
-        raceNumberField.setMin(0);
-        raceNumberField.setMax(999);
+        raceNumberField.setMin(1);
+        raceNumberField.setMax(998);
         raceNumberField.addValueChangeListener(event -> {
             if (event.getValue() == null) {
                 entry.setRaceNumber(null);
-            } else if (event.getValue() >= 0 && event.getValue() <= 999) {
+            } else if (event.getValue() >= 1 && event.getValue() <= 998) {
                 entry.setRaceNumber(event.getValue());
             }
             refreshEntrylistOutput();

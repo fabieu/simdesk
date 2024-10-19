@@ -137,8 +137,8 @@ public class EntrylistService {
         for (Entry entry : entries) {
             Integer raceNumber = entry.getRaceNumber();
 
-            if (raceNumber == null || raceNumber < 1 || raceNumber > 999) {
-                String message = String.format("RaceNumber of %s is missing or not between 1 and 999", raceNumber);
+            if (raceNumber == null || raceNumber < 1 || raceNumber > 998) {
+                String message = String.format("RaceNumber of %s is missing or not between 1 and 998", raceNumber);
                 errors.add(new ValidationError(validationRule, message, entry));
             }
 
