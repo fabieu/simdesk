@@ -37,11 +37,7 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.EntrylistMetadata;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylist;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylistEntry;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccDriverCategory;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccNationality;
+import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -145,12 +141,12 @@ public class EntrylistEditorView extends BaseView {
 
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
-        layout.add(newEntrylistLayout(), spacerLayout, fileUploadLayout());
+        layout.add(createNewEntrylistLayout(), spacerLayout, createFileUploadLayout());
 
         return layout;
     }
 
-    private Component newEntrylistLayout() {
+    private Component createNewEntrylistLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
         layout.setAlignItems(Alignment.CENTER);
@@ -173,7 +169,7 @@ public class EntrylistEditorView extends BaseView {
         return layout;
     }
 
-    private Component fileUploadLayout() {
+    private Component createFileUploadLayout() {
         VerticalLayout fileUploadLayout = new VerticalLayout();
         fileUploadLayout.setWidthFull();
         fileUploadLayout.setPadding(false);
@@ -270,6 +266,31 @@ public class EntrylistEditorView extends BaseView {
         for (AccEntrylistEntry entry : entrylist.getEntries()) {
             entrylistLayout.add(createEntrylistEntryLayout(entry));
         }
+
+        entrylistLayout.add(createEntrylistActionLayout());
+    }
+
+    private Component createEntrylistActionLayout() {
+        Button addEntrylistEntryButton = new Button("Add entry");
+        addEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addEntrylistEntryButton.addClickListener(event -> {
+            AccEntrylistEntry entry = new AccEntrylistEntry();
+            entrylist.getEntries().add(entry);
+
+            // Add new entry before the last element (which is the action layout)
+            Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
+            entrylistLayout.addComponentAtIndex(entrylistLayout.getComponentCount() - 1, entrylistEntryLayout);
+            refreshEntrylistOutput();
+
+            // Scroll to newly added entry
+            scrollToComponent(entrylistEntryLayout);
+        });
+
+        HorizontalLayout entrylistActionLayout = new HorizontalLayout(addEntrylistEntryButton);
+        entrylistActionLayout.setWidthFull();
+        entrylistActionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        return entrylistActionLayout;
     }
 
     private Component createEntrylistMainLayout() {
@@ -421,7 +442,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistEntryBaseSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
 
         Checkbox overrideDriverInfoCheckbox = new Checkbox("Override driver info");
-        overrideDriverInfoCheckbox.setValue(entry.getOverrideDriverInfo() == 1);
+        overrideDriverInfoCheckbox.setValue(Integer.valueOf(1).equals(entry.getOverrideDriverInfo()));
         overrideDriverInfoCheckbox.addValueChangeListener(event -> {
             entry.setOverrideDriverInfo(overrideDriverInfoCheckbox.getValue() ? 1 : 0);
             refreshEntrylistOutput();

@@ -4,10 +4,15 @@ import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;
 
+import java.util.ArrayList;
 import java.util.List;
 
 @Data
 public class AccEntrylistEntry {
+    public AccEntrylistEntry() {
+        this.drivers = new ArrayList<>(List.of(new AccDriver()));
+    }
+
     @NotEmpty
     private List<@Valid AccDriver> drivers;
     private Integer raceNumber;

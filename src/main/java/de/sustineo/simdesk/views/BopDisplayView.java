@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -55,7 +54,6 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     private final Select<String> trackSelect = new Select<>();
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
-    private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
     public BopDisplayView(BopService bopService, NotificationService notificationService) {
         this.bopService = bopService;
@@ -78,7 +76,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
-            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(component -> component.scrollIntoView(scrollOptions));
+            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(this::scrollToComponent);
         }
     }
 
@@ -98,7 +96,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             if (trackId != null) {
                 Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
                     updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, trackId));
-                    component.scrollIntoView(scrollOptions);
+                    scrollToComponent(component);
                 });
             }
         });
