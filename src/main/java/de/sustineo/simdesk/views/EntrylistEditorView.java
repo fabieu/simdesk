@@ -33,6 +33,7 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.entrylist.Entry;
 import de.sustineo.simdesk.entities.entrylist.Entrylist;
 import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
@@ -273,8 +274,8 @@ public class EntrylistEditorView extends BaseView {
 
         Checkbox forceEntrylistCheckbox = new Checkbox();
         forceEntrylistCheckbox.setLabel("Force entrylist");
-        forceEntrylistCheckbox.setValue(entrylist.getForceEntryList() == 1);
-        forceEntrylistCheckbox.addClickListener(event -> {
+        forceEntrylistCheckbox.setValue(Integer.valueOf(1).equals(entrylist.getForceEntryList()));
+        forceEntrylistCheckbox.addValueChangeListener(event -> {
             entrylist.setForceEntryList(forceEntrylistCheckbox.getValue() ? 1 : 0);
             refreshEntrylistOutput();
         });
@@ -288,7 +289,8 @@ public class EntrylistEditorView extends BaseView {
         entryLayout.setWidthFull();
         entryLayout.addClassNames("pure-g");
         entryLayout.getStyle()
-                .setBorder("1px solid var(--lumo-contrast-10pct)");
+                .setBorder("1px solid var(--lumo-contrast-10pct)")
+                .setBorderRadius("var(--lumo-border-radius-m)");
 
         // Race number
         IntegerField raceNumberField = new IntegerField("Car Number");
@@ -297,7 +299,11 @@ public class EntrylistEditorView extends BaseView {
         raceNumberField.setMin(0);
         raceNumberField.setMax(999);
         raceNumberField.addValueChangeListener(event -> {
-            entry.setRaceNumber(event.getValue());
+            if (event.getValue() == null) {
+                entry.setRaceNumber(null);
+            } else if (event.getValue() >= 0 && event.getValue() <= 999) {
+                entry.setRaceNumber(event.getValue());
+            }
             refreshEntrylistOutput();
         });
 
@@ -308,10 +314,12 @@ public class EntrylistEditorView extends BaseView {
         ballastField.setMin(-40);
         ballastField.setMax(40);
         ballastField.addValueChangeListener(event -> {
-            if (event.getValue() >= -40 && event.getValue() <= 40) {
+            if (event.getValue() == null) {
+                entry.setBallastKg(null);
+            } else if (event.getValue() >= -40 && event.getValue() <= 40) {
                 entry.setBallastKg(event.getValue());
-                refreshEntrylistOutput();
             }
+            refreshEntrylistOutput();
         });
 
         // Restrictor
@@ -321,28 +329,97 @@ public class EntrylistEditorView extends BaseView {
         restrictorField.setMin(0);
         restrictorField.setMax(20);
         restrictorField.addValueChangeListener(event -> {
-            if (event.getValue() >= 0 && event.getValue() <= 20) {
+            if (event.getValue() == null) {
+                entry.setRestrictor(null);
+            } else if (event.getValue() >= 0 && event.getValue() <= 20) {
                 entry.setRestrictor(event.getValue());
-                refreshEntrylistOutput();
             }
+            refreshEntrylistOutput();
+        });
+
+        ComboBox<Car> forcedCarModelComboBox = new ComboBox<>("Car Model");
+        forcedCarModelComboBox.setItems(Car.getAllSortedByName());
+        forcedCarModelComboBox.setItemLabelGenerator(Car::getCarName);
+        forcedCarModelComboBox.setValue(Car.getCarById(entry.getForcedCarModel()));
+        forcedCarModelComboBox.addValueChangeListener(event -> {
+            Integer carId = Optional.of(event)
+                    .map(ComboBox.ValueChangeEvent::getValue)
+                    .map(Car::getCarId)
+                    .orElse(null);
+
+            entry.setForcedCarModel(carId);
+            refreshEntrylistOutput();
+        });
+
+        Checkbox overrideCarModelForCustomCarCheckbox = new Checkbox("Enabled");
+        overrideCarModelForCustomCarCheckbox.setTooltipText("Enable this option to override the car model for the custom car");
+        overrideCarModelForCustomCarCheckbox.setValue(Integer.valueOf(1).equals(entry.getOverrideCarModelForCustomCar()));
+        overrideCarModelForCustomCarCheckbox.addValueChangeListener(event -> {
+            entry.setOverrideCarModelForCustomCar(overrideCarModelForCustomCarCheckbox.getValue() ? 1 : 0);
+            refreshEntrylistOutput();
+        });
+
+        CheckboxGroup<Checkbox> overrideCarModelForCustomCarCheckboxGroup = new CheckboxGroup<>("Override car model for custom car");
+        overrideCarModelForCustomCarCheckboxGroup.setTooltipText("Override car model for custom car");
+        overrideCarModelForCustomCarCheckboxGroup.setItems(overrideCarModelForCustomCarCheckbox);
+        overrideCarModelForCustomCarCheckboxGroup.setItemLabelGenerator(Checkbox::getLabel);
+
+        TextField customCarField = new TextField("Custom Car");
+        customCarField.setValue(entry.getCustomCar());
+        customCarField.addValueChangeListener(event -> {
+            if (event.getValue() == null || event.getValue().isEmpty()) {
+                entry.setCustomCar(null);
+            } else {
+                entry.setCustomCar(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        IntegerField defaultGridPositionField = new IntegerField("Grid Position");
+        defaultGridPositionField.setValue(entry.getDefaultGridPosition());
+        defaultGridPositionField.setMin(1);
+        defaultGridPositionField.setMax(120);
+        defaultGridPositionField.addValueChangeListener(event -> {
+            if (event.getValue() == null) {
+                entry.setDefaultGridPosition(null);
+            } else if (event.getValue() >= 1 && event.getValue() <= 120) {
+                entry.setDefaultGridPosition(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        Checkbox isServerAdminCheckbox = new Checkbox("Server Admin");
+        isServerAdminCheckbox.setValue(Integer.valueOf(1).equals(entry.getIsServerAdmin()));
+        isServerAdminCheckbox.addValueChangeListener(event -> {
+            entry.setIsServerAdmin(isServerAdminCheckbox.getValue() ? 1 : 0);
+            setBackGroundColorForServerAdmins(entryLayout, isServerAdminCheckbox.getValue());
+            refreshEntrylistOutput();
         });
 
         FormLayout entrylistMainFormLayout = new FormLayout();
-        entrylistMainFormLayout.add(raceNumberField, ballastField, restrictorField);
+        entrylistMainFormLayout.add(
+                raceNumberField, ballastField, restrictorField,
+                forcedCarModelComboBox, overrideCarModelForCustomCarCheckboxGroup, customCarField,
+                defaultGridPositionField,
+                isServerAdminCheckbox
+        );
         entrylistMainFormLayout.setResponsiveSteps(
                 // Use one column by default
                 new FormLayout.ResponsiveStep("0", 1),
                 // Use two columns, if layout's width exceeds 500px
                 new FormLayout.ResponsiveStep("500px", 3));
+        entrylistMainFormLayout.setColspan(forcedCarModelComboBox, 3);
+        entrylistMainFormLayout.setColspan(customCarField, 2);
+        entrylistMainFormLayout.setColspan(defaultGridPositionField, 3);
 
-        VerticalLayout entrylistMainLayout = new VerticalLayout(entrylistMainFormLayout);
+        VerticalLayout entrylistMainLayout = new VerticalLayout(entrylistMainFormLayout, isServerAdminCheckbox);
         Div entrylistMainLayoutWrapper = new Div();
         entrylistMainLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
         entrylistMainLayoutWrapper.add(entrylistMainLayout);
 
         Checkbox overrideDriverInfoCheckbox = new Checkbox("Override driver info");
         overrideDriverInfoCheckbox.setValue(entry.getOverrideDriverInfo() == 1);
-        overrideDriverInfoCheckbox.addClickListener(event -> {
+        overrideDriverInfoCheckbox.addValueChangeListener(event -> {
             entry.setOverrideDriverInfo(overrideDriverInfoCheckbox.getValue() ? 1 : 0);
             refreshEntrylistOutput();
         });
@@ -354,14 +431,22 @@ public class EntrylistEditorView extends BaseView {
             TextField firstNameField = new TextField("First Name");
             firstNameField.setValue(driver.getFirstName());
             firstNameField.addValueChangeListener(event -> {
-                driver.setFirstName(event.getValue());
+                if (event.getValue() == null || event.getValue().isEmpty()) {
+                    driver.setFirstName(null);
+                } else {
+                    driver.setFirstName(event.getValue());
+                }
                 refreshEntrylistOutput();
             });
 
             TextField lastNameField = new TextField("Last Name");
             lastNameField.setValue(driver.getLastName());
             lastNameField.addValueChangeListener(event -> {
-                driver.setLastName(event.getValue());
+                if (event.getValue() == null || event.getValue().isEmpty()) {
+                    driver.setLastName(null);
+                } else {
+                    driver.setLastName(event.getValue());
+                }
                 refreshEntrylistOutput();
             });
 
@@ -370,16 +455,21 @@ public class EntrylistEditorView extends BaseView {
             shortNameField.setMinLength(3);
             shortNameField.setMaxLength(3);
             shortNameField.addValueChangeListener(event -> {
-                if (event.getValue().length() == 3) {
+                if (event.getValue() == null || event.getValue().isEmpty()) {
+                    driver.setShortName(null);
+                } else if (event.getValue().length() == 3) {
                     driver.setShortName(event.getValue());
-                    refreshEntrylistOutput();
                 }
+                refreshEntrylistOutput();
             });
 
             TextField playerIdField = new TextField("Steam ID");
+            playerIdField.setRequired(true);
             playerIdField.setValue(driver.getPlayerId());
             playerIdField.addValueChangeListener(event -> {
-                driver.setPlayerId(event.getValue());
+                if (event.getValue() != null) {
+                    driver.setPlayerId(event.getValue());
+                }
                 refreshEntrylistOutput();
             });
 
@@ -408,7 +498,13 @@ public class EntrylistEditorView extends BaseView {
                     new FormLayout.ResponsiveStep("0", 1),
                     // Use two columns, if layout's width exceeds 500px
                     new FormLayout.ResponsiveStep("500px", 3));
+            entrylistDriverFormLayout.getStyle()
+                    .setBorder("1px solid var(--lumo-contrast-10pct)")
+                    .setBorderRadius("var(--lumo-border-radius-m)")
+                    .setPadding("var(--lumo-space-m)");
             entrylistDriverListLayout.add(entrylistDriverFormLayout);
+
+            setBackGroundColorForServerAdmins(entryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         }
 
 
@@ -419,6 +515,16 @@ public class EntrylistEditorView extends BaseView {
 
         entryLayout.add(entrylistMainLayoutWrapper, entrylistDriverLayoutWrapper);
         return entryLayout;
+    }
+
+    public void setBackGroundColorForServerAdmins(Component component, boolean isServerAdmin) {
+        if (isServerAdmin) {
+            component.getStyle()
+                    .set("background-color", "var(--lumo-primary-color-10pct)");
+        } else {
+            component.getStyle()
+                    .remove("background-color");
+        }
     }
 
     private Dialog createValidationDialog() {
