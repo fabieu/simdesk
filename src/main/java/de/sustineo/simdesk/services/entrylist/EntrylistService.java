@@ -1,9 +1,9 @@
 package de.sustineo.simdesk.services.entrylist;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.json.acc.AccEntrylist;
-import de.sustineo.simdesk.entities.json.acc.AccEntrylistEntry;
-import de.sustineo.simdesk.entities.json.kunos.AccDriver;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylist;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylistEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;

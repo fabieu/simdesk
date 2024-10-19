@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.json.acc;
+package de.sustineo.simdesk.entities.json.kunos.acc;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;

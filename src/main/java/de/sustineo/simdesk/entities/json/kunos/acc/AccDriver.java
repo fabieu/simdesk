@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.json.kunos;
+package de.sustineo.simdesk.entities.json.kunos.acc;
 
 import com.fasterxml.jackson.annotation.JsonAlias;
 import com.fasterxml.jackson.annotation.JsonProperty;

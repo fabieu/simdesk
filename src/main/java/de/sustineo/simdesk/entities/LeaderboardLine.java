@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.entities;
 
-import de.sustineo.simdesk.entities.json.kunos.AccCupCategory;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccCupCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;

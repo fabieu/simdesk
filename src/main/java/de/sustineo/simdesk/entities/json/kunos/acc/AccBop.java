@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.json.kunos;
+package de.sustineo.simdesk.entities.json.kunos.acc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
 import de.sustineo.simdesk.entities.Car;

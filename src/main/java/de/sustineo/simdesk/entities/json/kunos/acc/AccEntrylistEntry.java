@@ -1,6 +1,5 @@
-package de.sustineo.simdesk.entities.json.acc;
+package de.sustineo.simdesk.entities.json.kunos.acc;
 
-import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
 import lombok.Data;

@@ -4,7 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.LeaderboardLine;
-import de.sustineo.simdesk.entities.json.kunos.AccSession;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.entities.mapper.LeaderboardMapper;
 import de.sustineo.simdesk.services.converter.LeaderboardConverter;
 import org.springframework.context.annotation.Profile;
