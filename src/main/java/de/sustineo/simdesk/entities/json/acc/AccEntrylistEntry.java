@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.entrylist;
+package de.sustineo.simdesk.entities.json.acc;
 
 import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import jakarta.validation.Valid;
@@ -8,7 +8,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class Entry {
+public class AccEntrylistEntry {
     @NotEmpty
     private List<@Valid AccDriver> drivers;
     private Integer raceNumber;

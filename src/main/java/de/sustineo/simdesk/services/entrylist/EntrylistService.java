@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.services.entrylist;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.entrylist.Entry;
-import de.sustineo.simdesk.entities.entrylist.Entrylist;
+import de.sustineo.simdesk.entities.json.acc.AccEntrylist;
+import de.sustineo.simdesk.entities.json.acc.AccEntrylistEntry;
 import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
@@ -24,17 +24,17 @@ import java.util.logging.Level;
 @Log
 @Service
 public class EntrylistService {
-    public ValidationData validateRules(Entrylist entrylist, Set<ValidationRule> rules) {
+    public ValidationData validateRules(AccEntrylist entrylist, Set<ValidationRule> rules) {
         return validate(entrylist, rules);
     }
 
     @SuppressWarnings("unchecked")
-    private ValidationData validate(Entrylist entrylist, Set<ValidationRule> rules) {
+    private ValidationData validate(AccEntrylist entrylist, Set<ValidationRule> rules) {
         List<ValidationError> errors = new ArrayList<>();
 
         for (ValidationRule validationRule : rules) {
             try {
-                Method method = EntrylistService.class.getDeclaredMethod(validationRule.getMethodName(), Entrylist.class, ValidationRule.class);
+                Method method = EntrylistService.class.getDeclaredMethod(validationRule.getMethodName(), AccEntrylist.class, ValidationRule.class);
                 List<ValidationError> validationErrors = (List<ValidationError>) method.invoke(method, entrylist, validationRule);
 
                 errors.addAll(validationErrors);
@@ -49,11 +49,11 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateDriverNames(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateDriverNames(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             List<AccDriver> drivers = entry.getDrivers();
 
             if (entry.getOverrideDriverInfo() == 1) {
@@ -80,11 +80,11 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateDriverCategories(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateDriverCategories(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             List<AccDriver> drivers = entry.getDrivers();
 
             if (entry.getOverrideDriverInfo() == 1) {
@@ -101,12 +101,12 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateSteamIDs(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateSteamIDs(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
         HashMap<String, AccDriver> seenSteamIds = new HashMap<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             List<AccDriver> drivers = entry.getDrivers();
 
             for (AccDriver driver : drivers) {
@@ -129,12 +129,12 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateRaceNumbers(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateRaceNumbers(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
-        HashMap<Integer, Entry> seenRaceNumbers = new HashMap<>();
+        HashMap<Integer, AccEntrylistEntry> seenRaceNumbers = new HashMap<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             Integer raceNumber = entry.getRaceNumber();
 
             if (raceNumber == null || raceNumber < 1 || raceNumber > 998) {
@@ -143,7 +143,7 @@ public class EntrylistService {
             }
 
             if (seenRaceNumbers.containsKey(raceNumber)) {
-                Entry seenEntry = seenRaceNumbers.get(raceNumber);
+                AccEntrylistEntry seenEntry = seenRaceNumbers.get(raceNumber);
                 String message = String.format("The following entries have the same raceNumber #%s", raceNumber);
                 errors.add(new ValidationError(validationRule, message, List.of(seenEntry, entry)));
             } else {
@@ -155,17 +155,17 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateGridPositions(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateGridPositions(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
-        HashMap<Integer, Entry> seenGridPositions = new HashMap<>();
+        HashMap<Integer, AccEntrylistEntry> seenGridPositions = new HashMap<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             Integer defaultGridPosition = entry.getDefaultGridPosition();
 
             if (defaultGridPosition != null && defaultGridPosition > 0) {
                 if (seenGridPositions.containsKey(defaultGridPosition)) {
-                    Entry seenEntry = seenGridPositions.get(defaultGridPosition);
+                    AccEntrylistEntry seenEntry = seenGridPositions.get(defaultGridPosition);
                     String message = String.format("The following raceNumbers have the same grid position %s - #%s and #%s", defaultGridPosition, seenEntry.getRaceNumber(), entry.getRaceNumber());
                     errors.add(new ValidationError(validationRule, message, List.of(seenEntry, entry)));
                 } else {
@@ -178,11 +178,11 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateBallast(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateBallast(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             Integer ballastKg = entry.getBallastKg();
 
             if (ballastKg == null || ballastKg < 0 || ballastKg > 100) {
@@ -195,11 +195,11 @@ public class EntrylistService {
     }
 
     @SuppressWarnings("unused")
-    protected static List<ValidationError> validateRestrictor(Entrylist entrylist, ValidationRule validationRule) {
+    protected static List<ValidationError> validateRestrictor(AccEntrylist entrylist, ValidationRule validationRule) {
         List<ValidationError> errors = new ArrayList<>();
 
-        List<Entry> entries = entrylist.getEntries();
-        for (Entry entry : entries) {
+        List<AccEntrylistEntry> entries = entrylist.getEntries();
+        for (AccEntrylistEntry entry : entries) {
             Integer restrictor = entry.getRestrictor();
 
             if (restrictor == null || restrictor < 0 || restrictor > 20) {

@@ -36,9 +36,9 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.entrylist.Entry;
-import de.sustineo.simdesk.entities.entrylist.Entrylist;
-import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
+import de.sustineo.simdesk.entities.EntrylistMetadata;
+import de.sustineo.simdesk.entities.json.acc.AccEntrylist;
+import de.sustineo.simdesk.entities.json.acc.AccEntrylistEntry;
 import de.sustineo.simdesk.entities.json.kunos.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.AccDriverCategory;
 import de.sustineo.simdesk.entities.json.kunos.AccNationality;
@@ -73,7 +73,7 @@ public class EntrylistEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
 
-    private Entrylist entrylist;
+    private AccEntrylist entrylist;
     private EntrylistMetadata entrylistMetadata;
 
     private Upload entrylistUpload;
@@ -156,7 +156,7 @@ public class EntrylistEditorView extends BaseView {
         layout.setAlignItems(Alignment.CENTER);
 
         ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
-        createNewEntrylistConfirmDialog.addConfirmListener(event -> createNewEntrylist(new Entrylist(), new EntrylistMetadata()));
+        createNewEntrylistConfirmDialog.addConfirmListener(event -> createNewEntrylist(new AccEntrylist(), new EntrylistMetadata()));
 
         Button createEntrylistButton = new Button("Create new entrylist");
         createEntrylistButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -164,7 +164,7 @@ public class EntrylistEditorView extends BaseView {
             if (this.entrylist != null) {
                 createNewEntrylistConfirmDialog.open();
             } else {
-                createNewEntrylist(new Entrylist(), new EntrylistMetadata());
+                createNewEntrylist(new AccEntrylist(), new EntrylistMetadata());
             }
         });
 
@@ -194,7 +194,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            Entrylist entrylist = JsonUtils.fromJson(fileData, Entrylist.class);
+            AccEntrylist entrylist = JsonUtils.fromJson(fileData, AccEntrylist.class);
             EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
                     .fileName(event.getFileName())
                     .type(event.getMIMEType())
@@ -267,7 +267,7 @@ public class EntrylistEditorView extends BaseView {
 
         entrylistLayout.add(createEntrylistMainLayout());
 
-        for (Entry entry : entrylist.getEntries()) {
+        for (AccEntrylistEntry entry : entrylist.getEntries()) {
             entrylistLayout.add(createEntrylistEntryLayout(entry));
         }
     }
@@ -288,7 +288,7 @@ public class EntrylistEditorView extends BaseView {
         return entrylistMainLayout;
     }
 
-    private Component createEntrylistEntryLayout(Entry entry) {
+    private Component createEntrylistEntryLayout(AccEntrylistEntry entry) {
         Div entrylistEntryLayout = new Div();
         entrylistEntryLayout.setWidthFull();
         entrylistEntryLayout.addClassNames("pure-g");
@@ -477,7 +477,7 @@ public class EntrylistEditorView extends BaseView {
         return entrylistEntryLayout;
     }
 
-    private Component createEntrylistDriverLayout(AccDriver driver, Entry entry) {
+    private Component createEntrylistDriverLayout(AccDriver driver, AccEntrylistEntry entry) {
         TextField firstNameField = new TextField("First Name");
         firstNameField.setValue(Objects.requireNonNullElse(driver.getFirstName(), ""));
         firstNameField.addValueChangeListener(event -> {
@@ -674,7 +674,7 @@ public class EntrylistEditorView extends BaseView {
     }
 
 
-    private void createNewEntrylist(Entrylist entrylist, EntrylistMetadata entrylistMetadata) {
+    private void createNewEntrylist(AccEntrylist entrylist, EntrylistMetadata entrylistMetadata) {
         entrylistUpload.clearFileList();
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;

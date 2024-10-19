@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.entrylist;
+package de.sustineo.simdesk.entities.json.acc;
 
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotEmpty;
@@ -9,14 +9,14 @@ import java.util.ArrayList;
 import java.util.List;
 
 @Data
-public class Entrylist {
-    public Entrylist() {
+public class AccEntrylist {
+    public AccEntrylist() {
         this.entries = new ArrayList<>();
-        this.forceEntryList = 1;
+        this.forceEntryList = 0;
     }
 
     @NotEmpty
-    private List<@Valid Entry> entries;
+    private List<@Valid AccEntrylistEntry> entries;
     @NotNull
     private Integer forceEntryList;
 }
