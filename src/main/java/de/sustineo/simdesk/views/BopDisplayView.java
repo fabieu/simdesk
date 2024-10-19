@@ -22,7 +22,6 @@ import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -42,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
-@Route(value = "/bop/overview", layout = MainLayout.class)
+@Route(value = "/bop/overview")
 @PageTitle("Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {

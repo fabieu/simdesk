@@ -27,7 +27,6 @@ import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.PenaltyService;
@@ -50,7 +49,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId", layout = MainLayout.class)
+@Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId")
 @PageTitle("Leaderboard - Session Car Details")
 @AnonymousAllowed
 public class LeaderboardSessionCarDetailsView extends BaseView implements BeforeEnterObserver {

@@ -27,7 +27,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class BaseView extends VerticalLayout {
+public abstract class BaseView extends VerticalLayout {
     protected static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     protected static final String QUERY_PARAMETER_TRACK_ID = "track";
     protected static final String ROUTE_PARAMETER_CAR_ID = "carId";

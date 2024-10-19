@@ -12,7 +12,6 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
@@ -26,7 +25,7 @@ import java.util.Map;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-records", layout = MainLayout.class)
+@Route(value = "/leaderboard/lap-records")
 @PageTitle("Leaderboard - Lap records")
 @AnonymousAllowed
 public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {

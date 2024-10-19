@@ -41,7 +41,6 @@ import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
@@ -61,7 +60,7 @@ import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
-@Route(value = "/entrylist/editor", layout = MainLayout.class)
+@Route(value = "/entrylist/editor")
 @PageTitle("Entrylist - Editor")
 @AnonymousAllowed
 public class EntrylistEditorView extends BaseView {

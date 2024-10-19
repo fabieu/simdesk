@@ -13,7 +13,6 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.enums.TimeRange;
@@ -26,7 +25,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/sessions", layout = MainLayout.class)
+@Route(value = "/leaderboard/sessions")
 @PageTitle("Leaderboard - Sessions")
 @AnonymousAllowed
 public class LeaderboardSessionsView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {

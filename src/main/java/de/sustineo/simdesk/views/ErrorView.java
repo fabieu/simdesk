@@ -9,14 +9,13 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.Reference;
-import de.sustineo.simdesk.layouts.MainLayout;
 import lombok.extern.java.Log;
 
 import java.util.Map;
 import java.util.stream.Collectors;
 
 @Log
-@Route(layout = MainLayout.class)
+@Route
 @PageTitle("Error")
 @AnonymousAllowed
 public class ErrorView extends BaseView implements BeforeEnterObserver {

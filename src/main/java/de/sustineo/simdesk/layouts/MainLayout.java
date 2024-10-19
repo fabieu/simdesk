@@ -23,19 +23,27 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.Tabs;
 import com.vaadin.flow.dom.Style;
+import com.vaadin.flow.router.Layout;
 import com.vaadin.flow.router.RouterLink;
+import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
+import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.views.*;
+import de.sustineo.simdesk.views.ComponentUtils;
+import de.sustineo.simdesk.views.LoginView;
+import de.sustineo.simdesk.views.MainView;
+import de.sustineo.simdesk.views.UserProfileView;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
 
+@Layout
+@AnonymousAllowed
 public class MainLayout extends AppLayout {
     private final ThemeService themeService;
     private final SecurityService securityService;

@@ -28,7 +28,6 @@ import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.utils.json.JsonUtils;
@@ -49,7 +48,7 @@ import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_BOP)
 @Log
-@Route(value = "/bop/editor", layout = MainLayout.class)
+@Route(value = "/bop/editor")
 @PageTitle("Balance of Performance - Editor")
 @AnonymousAllowed
 public class BopEditorView extends BaseView {

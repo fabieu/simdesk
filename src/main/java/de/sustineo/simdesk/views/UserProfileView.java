@@ -9,13 +9,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import jakarta.annotation.security.PermitAll;
 
 import java.util.Optional;
 
-@Route(value = "/profile", layout = MainLayout.class)
+@Route(value = "/profile")
 @PageTitle("Profile")
 @PermitAll
 public class UserProfileView extends BaseView {
