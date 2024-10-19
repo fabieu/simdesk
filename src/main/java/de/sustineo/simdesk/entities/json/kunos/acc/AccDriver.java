@@ -11,6 +11,15 @@ import lombok.NoArgsConstructor;
 @AllArgsConstructor
 @NoArgsConstructor
 public class AccDriver {
+    public AccDriver(AccDriver other) {
+        this.firstName = other.firstName;
+        this.lastName = other.lastName;
+        this.shortName = other.shortName;
+        this.driverCategory = other.driverCategory;
+        this.playerId = other.playerId;
+        this.nationality = other.nationality;
+    }
+
     private String firstName;
     private String lastName;
     private String shortName;

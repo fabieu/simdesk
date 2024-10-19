@@ -9,8 +9,27 @@ import java.util.List;
 
 @Data
 public class AccEntrylistEntry {
+    public static final int MAX_DRIVERS = 5;
+
     public AccEntrylistEntry() {
         this.drivers = new ArrayList<>(List.of(new AccDriver()));
+    }
+
+    public AccEntrylistEntry(AccEntrylistEntry other) {
+        if (other.drivers != null) {
+            this.drivers = other.drivers.stream()
+                    .map(AccDriver::new)
+                    .toList();
+        }
+        this.raceNumber = other.raceNumber;
+        this.forcedCarModel = other.forcedCarModel;
+        this.overrideDriverInfo = other.overrideDriverInfo;
+        this.defaultGridPosition = other.defaultGridPosition;
+        this.ballastKg = other.ballastKg;
+        this.restrictor = other.restrictor;
+        this.customCar = other.customCar;
+        this.overrideCarModelForCustomCar = other.overrideCarModelForCustomCar;
+        this.isServerAdmin = other.isServerAdmin;
     }
 
     @NotEmpty

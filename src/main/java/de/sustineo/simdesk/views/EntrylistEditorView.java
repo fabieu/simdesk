@@ -276,11 +276,11 @@ public class EntrylistEditorView extends BaseView {
         addEntrylistEntryButton.addClickListener(event -> {
             AccEntrylistEntry entry = new AccEntrylistEntry();
             entrylist.getEntries().add(entry);
+            refreshEntrylistOutput();
 
             // Add new entry before the last element (which is the action layout)
             Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
             entrylistLayout.addComponentAtIndex(entrylistLayout.getComponentCount() - 1, entrylistEntryLayout);
-            refreshEntrylistOutput();
 
             // Scroll to newly added entry
             scrollToComponent(entrylistEntryLayout);
@@ -314,6 +314,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistEntryLayout.setWidthFull();
         entrylistEntryLayout.addClassNames("pure-g");
         entrylistEntryLayout.getStyle()
+                .setPadding("var(--lumo-space-m)")
                 .setBorder("1px solid var(--lumo-contrast-10pct)")
                 .setBorderRadius("var(--lumo-border-radius-m)");
 
@@ -417,8 +418,10 @@ public class EntrylistEditorView extends BaseView {
         isServerAdminCheckbox.setValue(Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         isServerAdminCheckbox.addValueChangeListener(event -> {
             entry.setIsServerAdmin(isServerAdminCheckbox.getValue() ? 1 : 0);
-            setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
             refreshEntrylistOutput();
+
+            // Override background color for server admins
+            setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
         });
 
         FormLayout entrylistMainFormLayout = new FormLayout();
@@ -438,6 +441,10 @@ public class EntrylistEditorView extends BaseView {
         entrylistMainFormLayout.setColspan(defaultGridPositionField, 3);
 
         VerticalLayout entrylistEntryBaseSideLayout = new VerticalLayout(entrylistMainFormLayout, isServerAdminCheckbox);
+        entrylistEntryBaseSideLayout.setPadding(false);
+        entrylistEntryBaseSideLayout.getStyle()
+                .setPaddingRight("var(--lumo-space-m)");
+
         Div entrylistEntryBaseSideLayoutWrapper = new Div(entrylistEntryBaseSideLayout);
         entrylistEntryBaseSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
 
@@ -452,7 +459,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistEntryDriverSideListLayout.setPadding(false);
 
         for (AccDriver driver : entry.getDrivers()) {
-            entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry));
+            entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
             setBackGroundColorForServerAdmins(entrylistEntryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         }
 
@@ -460,11 +467,12 @@ public class EntrylistEditorView extends BaseView {
         addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addDriverButton.addClickListener(event -> {
             List<AccDriver> drivers = entry.getDrivers();
-            if (drivers.size() < 5) {
+            if (drivers.size() < AccEntrylistEntry.MAX_DRIVERS) {
                 AccDriver driver = new AccDriver();
                 drivers.add(driver);
-                entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry));
                 refreshEntrylistOutput();
+
+                entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
             } else {
                 notificationService.showErrorNotification("Maximum number of drivers reached");
             }
@@ -475,6 +483,8 @@ public class EntrylistEditorView extends BaseView {
         entrylistEntryDriverSideActionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
         VerticalLayout entrylistEntryDriverSideLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistEntryDriverSideListLayout, entrylistEntryDriverSideActionLayout);
+        entrylistEntryDriverSideLayout.setPadding(false);
+
         Div entrylistEntryDriverSideLayoutWrapper = new Div(entrylistEntryDriverSideLayout);
         entrylistEntryDriverSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
 
@@ -483,13 +493,29 @@ public class EntrylistEditorView extends BaseView {
         removeEntrylistEntryButton.setAriaLabel("Remove entry");
         removeEntrylistEntryButton.addClickListener(event -> {
             entrylist.getEntries().remove(entry);
-            entrylistLayout.remove(entrylistEntryLayout);
             refreshEntrylistOutput();
+
+            entrylistLayout.remove(entrylistEntryLayout);
         });
 
-        HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(removeEntrylistEntryButton);
+        Button cloneEntrylistEntryButton = new Button("Clone");
+        cloneEntrylistEntryButton.setAriaLabel("Clone entry");
+        cloneEntrylistEntryButton.addClickListener(event -> {
+            AccEntrylistEntry clonedEntry = new AccEntrylistEntry(entry);
+            entrylist.getEntries().add(clonedEntry);
+            refreshEntrylistOutput();
+
+            // Add new entry before the last element (which is the action layout)
+            Component clonedEntrylistEntryLayout = createEntrylistEntryLayout(clonedEntry);
+            entrylistLayout.addComponentAtIndex(entrylistLayout.getComponentCount() - 1, clonedEntrylistEntryLayout);
+
+            // Scroll to newly added entry
+            scrollToComponent(clonedEntrylistEntryLayout);
+        });
+
+        HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(cloneEntrylistEntryButton, removeEntrylistEntryButton);
         entrylistEntryHeaderLayout.setWidthFull();
-        entrylistEntryHeaderLayout.setJustifyContentMode(JustifyContentMode.END);
+        entrylistEntryHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
 
         Div entrylistEntryHeaderLayoutWrapper = new Div(entrylistEntryHeaderLayout);
         entrylistEntryHeaderLayoutWrapper.addClassNames("pure-u-1");
@@ -498,7 +524,15 @@ public class EntrylistEditorView extends BaseView {
         return entrylistEntryLayout;
     }
 
-    private Component createEntrylistDriverLayout(AccDriver driver, AccEntrylistEntry entry) {
+    private Component createEntrylistDriverLayout(AccDriver driver, AccEntrylistEntry entry, VerticalLayout entrylistEntryDriverSideListLayout) {
+        VerticalLayout entrylistDriverLayout = new VerticalLayout();
+        entrylistDriverLayout.setPadding(false);
+        entrylistDriverLayout.setSpacing(false);
+        entrylistDriverLayout.getStyle()
+                .setBorder("1px solid var(--lumo-contrast-10pct)")
+                .setBorderRadius("var(--lumo-border-radius-m)")
+                .setPadding("var(--lumo-space-m)");
+
         TextField firstNameField = new TextField("First Name");
         firstNameField.setValue(Objects.requireNonNullElse(driver.getFirstName(), ""));
         firstNameField.addValueChangeListener(event -> {
@@ -569,26 +603,37 @@ public class EntrylistEditorView extends BaseView {
                 new FormLayout.ResponsiveStep("0", 1),
                 // Use two columns, if layout's width exceeds 500px
                 new FormLayout.ResponsiveStep("500px", 3));
-        entrylistDriverFormLayout.getStyle()
-                .setBorder("1px solid var(--lumo-contrast-10pct)")
-                .setBorderRadius("var(--lumo-border-radius-m)")
-                .setPadding("var(--lumo-space-m)");
 
-
-        Button removeDriverButton = new Button(new Icon(VaadinIcon.CLOSE));
+        Button removeDriverButton = new Button(new Icon(VaadinIcon.CLOSE_SMALL));
         removeDriverButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
         removeDriverButton.setAriaLabel("Remove driver");
         removeDriverButton.addClickListener(event -> {
             entry.getDrivers().remove(driver);
             refreshEntrylistOutput();
+
+            entrylistEntryDriverSideListLayout.remove(entrylistDriverLayout);
         });
 
-        HorizontalLayout driverHeaderLayout = new HorizontalLayout(removeDriverButton);
-        driverHeaderLayout.setJustifyContentMode(JustifyContentMode.END);
+        Button cloneDriverButton = new Button("Clone");
+        cloneDriverButton.setAriaLabel("Clone driver");
+        cloneDriverButton.addClickListener(event -> {
+            List<AccDriver> drivers = entry.getDrivers();
+            if (drivers.size() < AccEntrylistEntry.MAX_DRIVERS) {
+                AccDriver clonedDriver = new AccDriver(driver);
+                drivers.add(clonedDriver);
+                refreshEntrylistOutput();
 
-        VerticalLayout entrylistDriverLayout = new VerticalLayout(entrylistDriverFormLayout);
-        entrylistDriverLayout.setPadding(false);
+                entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(clonedDriver, entry, entrylistEntryDriverSideListLayout));
+            } else {
+                notificationService.showErrorNotification("Maximum number of drivers reached");
+            }
+        });
 
+        HorizontalLayout driverHeaderLayout = new HorizontalLayout(cloneDriverButton, removeDriverButton);
+        driverHeaderLayout.setWidthFull();
+        driverHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+
+        entrylistDriverLayout.add(driverHeaderLayout, entrylistDriverFormLayout);
         return entrylistDriverLayout;
     }
 
