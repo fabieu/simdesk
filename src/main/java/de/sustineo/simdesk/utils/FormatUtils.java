@@ -78,8 +78,4 @@ public class FormatUtils {
 
         return dateFormatter.format(instant);
     }
-
-    public static String formatLargeNumber(long number) {
-        return String.format("%,d", number).replace(",", ".");
-    }
 }
