@@ -3,26 +3,16 @@ html {
     --weather-rainy-color: #00aeff;
 }
 
-[theme~="dark"] {
+body[theme] {
+    --lumo-primary-text-color: var(--lumo-primary-color);
+}
+
+body[theme~="dark"] {
     --lumo-base-color: rgb(26, 26, 26);
 }
 
 /* ThemeVariant: DEFAULT */
 body[theme~="default"] {
-    --lumo-primary-text-color: var(--lumo-primary-color);
-    --lumo-primary-contrast-color: var(--lumo-base-color);
-}
-
-body[theme~="default"][theme~="light"] {
-    --lumo-primary-color: rgb(0, 127, 128);
-    --lumo-primary-color-10pct: rgba(0, 127, 128, 0.15);
-    --lumo-primary-color-50pct: rgba(0, 127, 128, 0.7);
-}
-
-body[theme~="default"][theme~="dark"] {
-    --lumo-primary-color: rgb(69, 232, 216);
-    --lumo-primary-color-10pct: rgba(69, 232, 216, 0.15);
-    --lumo-primary-color-50pct: rgba(69, 232, 216, 0.7);
 }
 
 /* ThemeVariant: SIM2REAL */
@@ -30,6 +20,5 @@ body[theme~="sim2real"] {
     --lumo-primary-color: rgb(250, 202, 48);
     --lumo-primary-color-10pct: rgba(224, 173, 6, 0.2);
     --lumo-primary-color-50pct: rgba(250, 205, 56, 0.59);
-    --lumo-primary-text-color: var(--lumo-primary-color);
     --lumo-primary-contrast-color: rgb(26, 26, 26);
 }
