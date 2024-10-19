@@ -6,6 +6,7 @@ import lombok.Data;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.stream.Collectors;
 
 @Data
 public class AccEntrylistEntry {
@@ -19,7 +20,7 @@ public class AccEntrylistEntry {
         if (other.drivers != null) {
             this.drivers = other.drivers.stream()
                     .map(AccDriver::new)
-                    .toList();
+                    .collect(Collectors.toCollection(ArrayList::new));
         }
         this.raceNumber = other.raceNumber;
         this.forcedCarModel = other.forcedCarModel;

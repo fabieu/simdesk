@@ -474,7 +474,7 @@ public class EntrylistEditorView extends BaseView {
 
                 entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
             } else {
-                notificationService.showErrorNotification("Maximum number of drivers reached");
+                notificationService.showWarningNotification("Maximum number of drivers reached");
             }
         });
 
@@ -489,7 +489,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistEntryDriverSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
 
         Button removeEntrylistEntryButton = new Button(new Icon(VaadinIcon.CLOSE));
-        removeEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+        removeEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         removeEntrylistEntryButton.setAriaLabel("Remove entry");
         removeEntrylistEntryButton.addClickListener(event -> {
             entrylist.getEntries().remove(entry);
@@ -605,13 +605,17 @@ public class EntrylistEditorView extends BaseView {
                 new FormLayout.ResponsiveStep("500px", 3));
 
         Button removeDriverButton = new Button(new Icon(VaadinIcon.CLOSE_SMALL));
-        removeDriverButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+        removeDriverButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         removeDriverButton.setAriaLabel("Remove driver");
         removeDriverButton.addClickListener(event -> {
-            entry.getDrivers().remove(driver);
-            refreshEntrylistOutput();
+            if (entry.getDrivers().size() > 1) {
+                entry.getDrivers().remove(driver);
+                refreshEntrylistOutput();
 
-            entrylistEntryDriverSideListLayout.remove(entrylistDriverLayout);
+                entrylistEntryDriverSideListLayout.remove(entrylistDriverLayout);
+            } else {
+                notificationService.showWarningNotification("At least one driver is required");
+            }
         });
 
         Button cloneDriverButton = new Button("Clone");
@@ -625,7 +629,7 @@ public class EntrylistEditorView extends BaseView {
 
                 entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(clonedDriver, entry, entrylistEntryDriverSideListLayout));
             } else {
-                notificationService.showErrorNotification("Maximum number of drivers reached");
+                notificationService.showWarningNotification("Maximum number of drivers reached");
             }
         });
 
