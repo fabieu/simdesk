@@ -153,17 +153,20 @@ public class EntrylistEditorView extends BaseView {
         layout.setPadding(false);
         layout.setAlignItems(Alignment.CENTER);
 
-        ConfirmDialog createEntrylistDialog = createEntrylistDialog();
-        createEntrylistDialog.addConfirmListener(event -> {
-            resetForm();
-            this.entrylist = new Entrylist();
-            refreshEntrylistEditor();
-            refreshEntrylistOutput();
+        ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
+        createNewEntrylistConfirmDialog.addConfirmListener(event -> {
+            createNewEntrylist(new Entrylist(), new EntrylistMetadata());
         });
 
         Button createEntrylistButton = new Button("Create new entrylist");
         createEntrylistButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        createEntrylistButton.addClickListener(event -> createEntrylistDialog.open());
+        createEntrylistButton.addClickListener(event -> {
+            if (this.entrylist != null) {
+                createNewEntrylistConfirmDialog.open();
+            } else {
+                createNewEntrylist(new Entrylist(), new EntrylistMetadata());
+            }
+        });
 
         layout.add(createEntrylistButton);
 
@@ -201,17 +204,18 @@ public class EntrylistEditorView extends BaseView {
             // Validate entrylist file against syntax and semantic rules
             validationService.validate(entrylist);
 
-            ConfirmDialog dialog = createEntrylistDialog();
-            dialog.addConfirmListener(dialogEvent -> {
-                this.entrylist = entrylist;
-                this.entrylistMetadata = entrylistMetadata;
-                refreshEntrylistEditor();
-                refreshEntrylistOutput();
-
+            if (this.entrylist != null) {
+                ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
+                createNewEntrylistConfirmDialog.addConfirmListener(dialogEvent -> {
+                    createNewEntrylist(entrylist, entrylistMetadata);
+                    createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
+                });
+                createNewEntrylistConfirmDialog.addCancelListener(dialogEvent -> entrylistUpload.clearFileList());
+                createNewEntrylistConfirmDialog.open();
+            } else {
+                createNewEntrylist(entrylist, entrylistMetadata);
                 createValidationSuccessNotification(entrylistMetadata.getFileName(), "File uploaded successfully");
-            });
-            dialog.addCancelListener(dialogEvent -> entrylistUpload.clearFileList());
-            dialog.open();
+            }
         });
         entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         entrylistUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
@@ -627,7 +631,16 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-    private ConfirmDialog createEntrylistDialog() {
+
+    private void createNewEntrylist(Entrylist entrylist, EntrylistMetadata entrylistMetadata) {
+        entrylistUpload.clearFileList();
+        this.entrylist = entrylist;
+        this.entrylistMetadata = entrylistMetadata;
+        refreshEntrylistEditor();
+        refreshEntrylistOutput();
+    }
+
+    private ConfirmDialog createNewEntrylistConfirmDialog() {
         ConfirmDialog confirmDialog = new ConfirmDialog();
         confirmDialog.setHeader("Create new entrylist");
         confirmDialog.setText("Your current entrylist will be discarded. Do you want to proceed?");
