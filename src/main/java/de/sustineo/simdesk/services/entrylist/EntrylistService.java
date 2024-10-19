@@ -89,8 +89,8 @@ public class EntrylistService {
 
             if (entry.getOverrideDriverInfo() == 1) {
                 for (AccDriver driver : drivers) {
-                    if (!Set.of(0, 1, 2, 3).contains(driver.getDriverCategory())) {
-                        String message = String.format("driverCategory of %s for car number #%s has to be one of [0, 1, 2, 3]", driver, entry.getRaceNumber());
+                    if (driver.getDriverCategory() == null) {
+                        String message = String.format("driverCategory of %s for car number #%s is missing", driver, entry.getRaceNumber());
                         errors.add(new ValidationError(validationRule, message, driver));
                     }
                 }

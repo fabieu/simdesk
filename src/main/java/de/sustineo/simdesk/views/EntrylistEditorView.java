@@ -365,7 +365,9 @@ public class EntrylistEditorView extends BaseView {
         overrideCarModelForCustomCarCheckboxGroup.setItemLabelGenerator(Checkbox::getLabel);
 
         TextField customCarField = new TextField("Custom Car");
-        customCarField.setValue(entry.getCustomCar());
+        if (entry.getCustomCar() != null) {
+            customCarField.setValue(entry.getCustomCar());
+        }
         customCarField.addValueChangeListener(event -> {
             if (event.getValue() == null || event.getValue().isEmpty()) {
                 entry.setCustomCar(null);
@@ -376,7 +378,7 @@ public class EntrylistEditorView extends BaseView {
         });
 
         IntegerField defaultGridPositionField = new IntegerField("Grid Position");
-        defaultGridPositionField.setValue(entry.getDefaultGridPosition());
+        defaultGridPositionField.setValue(Integer.valueOf(-1).equals(entry.getDefaultGridPosition()) ? null : entry.getDefaultGridPosition());
         defaultGridPositionField.setMin(1);
         defaultGridPositionField.setMax(120);
         defaultGridPositionField.addValueChangeListener(event -> {
@@ -429,7 +431,9 @@ public class EntrylistEditorView extends BaseView {
 
         for (AccDriver driver : entry.getDrivers()) {
             TextField firstNameField = new TextField("First Name");
-            firstNameField.setValue(driver.getFirstName());
+            if (driver.getFirstName() != null) {
+                firstNameField.setValue(driver.getFirstName());
+            }
             firstNameField.addValueChangeListener(event -> {
                 if (event.getValue() == null || event.getValue().isEmpty()) {
                     driver.setFirstName(null);
@@ -440,7 +444,9 @@ public class EntrylistEditorView extends BaseView {
             });
 
             TextField lastNameField = new TextField("Last Name");
-            lastNameField.setValue(driver.getLastName());
+            if (driver.getLastName() != null) {
+                lastNameField.setValue(driver.getLastName());
+            }
             lastNameField.addValueChangeListener(event -> {
                 if (event.getValue() == null || event.getValue().isEmpty()) {
                     driver.setLastName(null);
@@ -451,7 +457,9 @@ public class EntrylistEditorView extends BaseView {
             });
 
             TextField shortNameField = new TextField("Short Name");
-            shortNameField.setValue(driver.getShortName());
+            if (driver.getShortName() != null) {
+                shortNameField.setValue(driver.getShortName());
+            }
             shortNameField.setMinLength(3);
             shortNameField.setMaxLength(3);
             shortNameField.addValueChangeListener(event -> {

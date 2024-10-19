@@ -10,7 +10,7 @@ public enum ValidationRule {
     BALLAST_INVALID("validateBallast", "Invalid ballast values", "Check if ballast values are inside the allowed threshold."),
     RESTRICTOR_INVALID("validateRestrictor", "Invalid restrictor values", "Check if restrictor values are inside the allowed threshold."),
     DRIVER_NAMES_MISSING("validateDriverNames", "Missing driver names", "Check if firstName, lastName and shortName are set if overrideDriverInfo is set to 1."),
-    DRIVER_CATEGORIES_INVALID("validateDriverCategories", "Invalid driver categories", "Check if driver categories are valid if overrideDriverInfo is set to 1.");
+    DRIVER_CATEGORIES_INVALID("validateDriverCategories", "Missing driver categories", "Check if driver categories are set if overrideDriverInfo is set to 1.");
 
     private final String methodName;
     private final String friendlyName;

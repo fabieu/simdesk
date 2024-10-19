@@ -19,6 +19,5 @@ public class AccDriver {
     @JsonAlias("playerID")
     @NotNull
     private String playerId;
-    @NotNull
     private AccNationality nationality;
 }
