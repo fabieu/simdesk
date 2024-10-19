@@ -17,6 +17,8 @@ import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.FontIcon;
+import com.vaadin.flow.component.icon.Icon;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.shared.Tooltip;
@@ -56,8 +58,8 @@ import org.springframework.http.MediaType;
 
 import java.io.InputStream;
 import java.time.Duration;
-import java.util.Collections;
 import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 
@@ -76,7 +78,7 @@ public class EntrylistEditorView extends BaseView {
 
     private Upload entrylistUpload;
     private final TextArea entrylistOutput;
-    private final VerticalLayout entrylistEditorLayout;
+    private final VerticalLayout entrylistLayout;
 
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
@@ -88,7 +90,7 @@ public class EntrylistEditorView extends BaseView {
         this.validationService = validationService;
         this.notificationService = notificationService;
 
-        this.entrylistEditorLayout = new VerticalLayout();
+        this.entrylistLayout = new VerticalLayout();
         this.entrylistOutput = new TextArea();
         this.entrylistOutput.setWidthFull();
         this.entrylistOutput.setReadOnly(true);
@@ -125,13 +127,13 @@ public class EntrylistEditorView extends BaseView {
         VerticalLayout formLayout = new VerticalLayout();
         formLayout.setSizeFull();
         formLayout.setPadding(false);
-        formLayout.add(entrylistCreateLayout(), buttonLayout(), entrylistEditorLayout, entrylistOutput);
+        formLayout.add(createPopulateEntrylistLayout(), createActionLayout(), entrylistLayout, entrylistOutput);
 
         layout.add(formLayout);
         return layout;
     }
 
-    private Component entrylistCreateLayout() {
+    private Component createPopulateEntrylistLayout() {
         Span spacer = new Span(new Text("OR"));
         spacer.getStyle()
                 .setFontWeight(Style.FontWeight.BOLD);
@@ -154,9 +156,7 @@ public class EntrylistEditorView extends BaseView {
         layout.setAlignItems(Alignment.CENTER);
 
         ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
-        createNewEntrylistConfirmDialog.addConfirmListener(event -> {
-            createNewEntrylist(new Entrylist(), new EntrylistMetadata());
-        });
+        createNewEntrylistConfirmDialog.addConfirmListener(event -> createNewEntrylist(new Entrylist(), new EntrylistMetadata()));
 
         Button createEntrylistButton = new Button("Create new entrylist");
         createEntrylistButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -234,47 +234,47 @@ public class EntrylistEditorView extends BaseView {
         return i18n;
     }
 
-    private Component buttonLayout() {
+    private Component createActionLayout() {
         HorizontalLayout buttonLayout = new HorizontalLayout();
         buttonLayout.setWidthFull();
         buttonLayout.setAlignItems(Alignment.CENTER);
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
+        // Download
+        Button downloadButton = new Button("Download");
+        downloadButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
+
         // Validation
         Button validateButton = new Button("Validate");
-        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        validateButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS);
         validateButton.addClickListener(e -> validationDialog.open());
 
         // Reset
         Button resetButton = new Button("Reset");
-        resetButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        resetButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         resetButton.addClickListener(e -> resetDialog.open());
 
-        buttonLayout.add(validateButton, resetButton);
+        buttonLayout.add(downloadButton, validateButton, resetButton);
         return buttonLayout;
     }
 
     private void refreshEntrylistEditor() {
-        entrylistEditorLayout.removeAll();
+        entrylistLayout.removeAll();
 
-        if (entrylist == null) {
+        if (entrylist == null || entrylist.getEntries() == null) {
             return;
         }
 
-        entrylistEditorLayout.add(createEntrylistBaseInformation());
+        entrylistLayout.add(createEntrylistMainLayout());
 
-        List<Entry> entries = Optional.of(entrylist)
-                .map(Entrylist::getEntries)
-                .orElse(Collections.emptyList());
-
-        for (Entry entry : entries) {
-            entrylistEditorLayout.add(createEntrylistEntryLayout(entry));
+        for (Entry entry : entrylist.getEntries()) {
+            entrylistLayout.add(createEntrylistEntryLayout(entry));
         }
     }
 
-    private Component createEntrylistBaseInformation() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(false);
+    private Component createEntrylistMainLayout() {
+        VerticalLayout entrylistMainLayout = new VerticalLayout();
+        entrylistMainLayout.setPadding(false);
 
         Checkbox forceEntrylistCheckbox = new Checkbox();
         forceEntrylistCheckbox.setLabel("Force entrylist");
@@ -284,15 +284,15 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistOutput();
         });
 
-        layout.add(forceEntrylistCheckbox);
-        return layout;
+        entrylistMainLayout.add(forceEntrylistCheckbox);
+        return entrylistMainLayout;
     }
 
     private Component createEntrylistEntryLayout(Entry entry) {
-        Div entryLayout = new Div();
-        entryLayout.setWidthFull();
-        entryLayout.addClassNames("pure-g");
-        entryLayout.getStyle()
+        Div entrylistEntryLayout = new Div();
+        entrylistEntryLayout.setWidthFull();
+        entrylistEntryLayout.addClassNames("pure-g");
+        entrylistEntryLayout.getStyle()
                 .setBorder("1px solid var(--lumo-contrast-10pct)")
                 .setBorderRadius("var(--lumo-border-radius-m)");
 
@@ -369,9 +369,7 @@ public class EntrylistEditorView extends BaseView {
         overrideCarModelForCustomCarCheckboxGroup.setItemLabelGenerator(Checkbox::getLabel);
 
         TextField customCarField = new TextField("Custom Car");
-        if (entry.getCustomCar() != null) {
-            customCarField.setValue(entry.getCustomCar());
-        }
+        customCarField.setValue(Objects.requireNonNullElse(entry.getCustomCar(), ""));
         customCarField.addValueChangeListener(event -> {
             if (event.getValue() == null || event.getValue().isEmpty()) {
                 entry.setCustomCar(null);
@@ -398,7 +396,7 @@ public class EntrylistEditorView extends BaseView {
         isServerAdminCheckbox.setValue(Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         isServerAdminCheckbox.addValueChangeListener(event -> {
             entry.setIsServerAdmin(isServerAdminCheckbox.getValue() ? 1 : 0);
-            setBackGroundColorForServerAdmins(entryLayout, isServerAdminCheckbox.getValue());
+            setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
             refreshEntrylistOutput();
         });
 
@@ -418,10 +416,9 @@ public class EntrylistEditorView extends BaseView {
         entrylistMainFormLayout.setColspan(customCarField, 2);
         entrylistMainFormLayout.setColspan(defaultGridPositionField, 3);
 
-        VerticalLayout entrylistMainLayout = new VerticalLayout(entrylistMainFormLayout, isServerAdminCheckbox);
-        Div entrylistMainLayoutWrapper = new Div();
-        entrylistMainLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
-        entrylistMainLayoutWrapper.add(entrylistMainLayout);
+        VerticalLayout entrylistEntryBaseSideLayout = new VerticalLayout(entrylistMainFormLayout, isServerAdminCheckbox);
+        Div entrylistEntryBaseSideLayoutWrapper = new Div(entrylistEntryBaseSideLayout);
+        entrylistEntryBaseSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
 
         Checkbox overrideDriverInfoCheckbox = new Checkbox("Override driver info");
         overrideDriverInfoCheckbox.setValue(entry.getOverrideDriverInfo() == 1);
@@ -430,103 +427,148 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistOutput();
         });
 
-        VerticalLayout entrylistDriverListLayout = new VerticalLayout();
-        entrylistDriverListLayout.setPadding(false);
+        VerticalLayout entrylistEntryDriverSideListLayout = new VerticalLayout();
+        entrylistEntryDriverSideListLayout.setPadding(false);
 
         for (AccDriver driver : entry.getDrivers()) {
-            TextField firstNameField = new TextField("First Name");
-            if (driver.getFirstName() != null) {
-                firstNameField.setValue(driver.getFirstName());
-            }
-            firstNameField.addValueChangeListener(event -> {
-                if (event.getValue() == null || event.getValue().isEmpty()) {
-                    driver.setFirstName(null);
-                } else {
-                    driver.setFirstName(event.getValue());
-                }
-                refreshEntrylistOutput();
-            });
-
-            TextField lastNameField = new TextField("Last Name");
-            if (driver.getLastName() != null) {
-                lastNameField.setValue(driver.getLastName());
-            }
-            lastNameField.addValueChangeListener(event -> {
-                if (event.getValue() == null || event.getValue().isEmpty()) {
-                    driver.setLastName(null);
-                } else {
-                    driver.setLastName(event.getValue());
-                }
-                refreshEntrylistOutput();
-            });
-
-            TextField shortNameField = new TextField("Short Name");
-            if (driver.getShortName() != null) {
-                shortNameField.setValue(driver.getShortName());
-            }
-            shortNameField.setMinLength(3);
-            shortNameField.setMaxLength(3);
-            shortNameField.addValueChangeListener(event -> {
-                if (event.getValue() == null || event.getValue().isEmpty()) {
-                    driver.setShortName(null);
-                } else if (event.getValue().length() == 3) {
-                    driver.setShortName(event.getValue());
-                }
-                refreshEntrylistOutput();
-            });
-
-            TextField playerIdField = new TextField("Steam ID");
-            playerIdField.setRequired(true);
-            playerIdField.setValue(driver.getPlayerId());
-            playerIdField.addValueChangeListener(event -> {
-                if (event.getValue() != null) {
-                    driver.setPlayerId(event.getValue());
-                }
-                refreshEntrylistOutput();
-            });
-
-            ComboBox<AccDriverCategory> driverCategorySelect = new ComboBox<>("Category");
-            driverCategorySelect.setItems(AccDriverCategory.values());
-            driverCategorySelect.setItemLabelGenerator(AccDriverCategory::getName);
-            driverCategorySelect.setValue(driver.getDriverCategory());
-            driverCategorySelect.addValueChangeListener(event -> {
-                driver.setDriverCategory(event.getValue());
-                refreshEntrylistOutput();
-            });
-
-            ComboBox<AccNationality> nationalyComboBox = new ComboBox<>("Nationality");
-            nationalyComboBox.setItems(AccNationality.values());
-            nationalyComboBox.setItemLabelGenerator(AccNationality::getName);
-            nationalyComboBox.setValue(driver.getNationality());
-            nationalyComboBox.addValueChangeListener(event -> {
-                driver.setNationality(event.getValue());
-                refreshEntrylistOutput();
-            });
-
-            FormLayout entrylistDriverFormLayout = new FormLayout();
-            entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategorySelect, nationalyComboBox);
-            entrylistDriverFormLayout.setResponsiveSteps(
-                    // Use one column by default
-                    new FormLayout.ResponsiveStep("0", 1),
-                    // Use two columns, if layout's width exceeds 500px
-                    new FormLayout.ResponsiveStep("500px", 3));
-            entrylistDriverFormLayout.getStyle()
-                    .setBorder("1px solid var(--lumo-contrast-10pct)")
-                    .setBorderRadius("var(--lumo-border-radius-m)")
-                    .setPadding("var(--lumo-space-m)");
-            entrylistDriverListLayout.add(entrylistDriverFormLayout);
-
-            setBackGroundColorForServerAdmins(entryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
+            entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry));
+            setBackGroundColorForServerAdmins(entrylistEntryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         }
 
+        Button addDriverButton = new Button("Add driver");
+        addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addDriverButton.addClickListener(event -> {
+            List<AccDriver> drivers = entry.getDrivers();
+            if (drivers.size() < 5) {
+                AccDriver driver = new AccDriver();
+                drivers.add(driver);
+                entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry));
+                refreshEntrylistOutput();
+            } else {
+                notificationService.showErrorNotification("Maximum number of drivers reached");
+            }
+        });
 
-        VerticalLayout entrylistDriverLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistDriverListLayout);
-        Div entrylistDriverLayoutWrapper = new Div();
-        entrylistDriverLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
-        entrylistDriverLayoutWrapper.add(entrylistDriverLayout);
+        HorizontalLayout entrylistEntryDriverSideActionLayout = new HorizontalLayout(addDriverButton);
+        entrylistEntryDriverSideActionLayout.setWidthFull();
+        entrylistEntryDriverSideActionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
 
-        entryLayout.add(entrylistMainLayoutWrapper, entrylistDriverLayoutWrapper);
-        return entryLayout;
+        VerticalLayout entrylistEntryDriverSideLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistEntryDriverSideListLayout, entrylistEntryDriverSideActionLayout);
+        Div entrylistEntryDriverSideLayoutWrapper = new Div(entrylistEntryDriverSideLayout);
+        entrylistEntryDriverSideLayoutWrapper.addClassNames("pure-u-1", "pure-u-md-1-2");
+
+        Button removeEntrylistEntryButton = new Button(new Icon(VaadinIcon.CLOSE));
+        removeEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+        removeEntrylistEntryButton.setAriaLabel("Remove entry");
+        removeEntrylistEntryButton.addClickListener(event -> {
+            entrylist.getEntries().remove(entry);
+            entrylistLayout.remove(entrylistEntryLayout);
+            refreshEntrylistOutput();
+        });
+
+        HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(removeEntrylistEntryButton);
+        entrylistEntryHeaderLayout.setWidthFull();
+        entrylistEntryHeaderLayout.setJustifyContentMode(JustifyContentMode.END);
+
+        Div entrylistEntryHeaderLayoutWrapper = new Div(entrylistEntryHeaderLayout);
+        entrylistEntryHeaderLayoutWrapper.addClassNames("pure-u-1");
+
+        entrylistEntryLayout.add(entrylistEntryHeaderLayoutWrapper, entrylistEntryBaseSideLayoutWrapper, entrylistEntryDriverSideLayoutWrapper);
+        return entrylistEntryLayout;
+    }
+
+    private Component createEntrylistDriverLayout(AccDriver driver, Entry entry) {
+        TextField firstNameField = new TextField("First Name");
+        firstNameField.setValue(Objects.requireNonNullElse(driver.getFirstName(), ""));
+        firstNameField.addValueChangeListener(event -> {
+            if (event.getValue() == null || event.getValue().isEmpty()) {
+                driver.setFirstName(null);
+            } else {
+                driver.setFirstName(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        TextField lastNameField = new TextField("Last Name");
+        lastNameField.setValue(Objects.requireNonNullElse(driver.getLastName(), ""));
+        lastNameField.addValueChangeListener(event -> {
+            if (event.getValue() == null || event.getValue().isEmpty()) {
+                driver.setLastName(null);
+            } else {
+                driver.setLastName(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        TextField shortNameField = new TextField("Short Name");
+        shortNameField.setValue(Objects.requireNonNullElse(driver.getShortName(), ""));
+        shortNameField.setMinLength(3);
+        shortNameField.setMaxLength(3);
+        shortNameField.addValueChangeListener(event -> {
+            if (event.getValue() == null || event.getValue().isEmpty()) {
+                driver.setShortName(null);
+            } else if (event.getValue().length() == 3) {
+                driver.setShortName(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        TextField playerIdField = new TextField("Steam ID");
+        playerIdField.setRequired(true);
+        playerIdField.setValue(Objects.requireNonNullElse(driver.getPlayerId(), ""));
+        playerIdField.addValueChangeListener(event -> {
+            if (event.getValue() != null || !event.getValue().isEmpty()) {
+                driver.setPlayerId(event.getValue());
+            }
+            refreshEntrylistOutput();
+        });
+
+        ComboBox<AccDriverCategory> driverCategorySelect = new ComboBox<>("Category");
+        driverCategorySelect.setItems(AccDriverCategory.values());
+        driverCategorySelect.setItemLabelGenerator(AccDriverCategory::getName);
+        driverCategorySelect.setValue(driver.getDriverCategory());
+        driverCategorySelect.addValueChangeListener(event -> {
+            driver.setDriverCategory(event.getValue());
+            refreshEntrylistOutput();
+        });
+
+        ComboBox<AccNationality> nationalyComboBox = new ComboBox<>("Nationality");
+        nationalyComboBox.setItems(AccNationality.values());
+        nationalyComboBox.setItemLabelGenerator(AccNationality::getName);
+        nationalyComboBox.setValue(driver.getNationality());
+        nationalyComboBox.addValueChangeListener(event -> {
+            driver.setNationality(event.getValue());
+            refreshEntrylistOutput();
+        });
+
+        FormLayout entrylistDriverFormLayout = new FormLayout();
+        entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategorySelect, nationalyComboBox);
+        entrylistDriverFormLayout.setResponsiveSteps(
+                // Use one column by default
+                new FormLayout.ResponsiveStep("0", 1),
+                // Use two columns, if layout's width exceeds 500px
+                new FormLayout.ResponsiveStep("500px", 3));
+        entrylistDriverFormLayout.getStyle()
+                .setBorder("1px solid var(--lumo-contrast-10pct)")
+                .setBorderRadius("var(--lumo-border-radius-m)")
+                .setPadding("var(--lumo-space-m)");
+
+
+        Button removeDriverButton = new Button(new Icon(VaadinIcon.CLOSE));
+        removeDriverButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY);
+        removeDriverButton.setAriaLabel("Remove driver");
+        removeDriverButton.addClickListener(event -> {
+            entry.getDrivers().remove(driver);
+            refreshEntrylistOutput();
+        });
+
+        HorizontalLayout driverHeaderLayout = new HorizontalLayout(removeDriverButton);
+        driverHeaderLayout.setJustifyContentMode(JustifyContentMode.END);
+
+        VerticalLayout entrylistDriverLayout = new VerticalLayout(entrylistDriverFormLayout);
+        entrylistDriverLayout.setPadding(false);
+
+        return entrylistDriverLayout;
     }
 
     public void setBackGroundColorForServerAdmins(Component component, boolean isServerAdmin) {
