@@ -7,8 +7,8 @@
     <em>Modern server leaderboard and various services for sim racing organizers.</em>
 </p>
 <p align="center">
-    <a href="https://simdesk.eu/"><b>Documentation</b></a> • 
-    <a href="https://sim2real.simdesk.eu/"><b>Demo</b></a>
+    <a href="https://docs.simdesk.eu/"><b>Documentation</b></a> • 
+    <a href="https://simdesk.eu/"><b>Demo</b></a>
 </p>
 
 ## Features
@@ -85,8 +85,8 @@ This project is licensed under the terms of the Apache License 2.0.
 For a full list of maintainers of, contributors to, and dependencies used by SimDesk, please refer
 to [CREDITS][credits-url].
 
-[config-url]: https://simdesk.eu/config/overview
+[config-url]: https://docs.simdesk.eu/config/overview
 
-[credits-url]: https://simdesk.eu/credits/
+[credits-url]: https://docs.simdesk.eu/credits/
 
-[contributing-url]: https://simdesk.eu/contributing/
+[contributing-url]: https://docs.simdesk.eu/contributing/
