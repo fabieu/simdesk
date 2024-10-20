@@ -1,6 +1,6 @@
 # Site configuration
 site_name: SimDesk
-site_url: https://www.simdesk.eu
+site_url: https://docs.simdesk.eu
 site_description: Sim Racing Management Tools
 site_author: Fabian Eulitz
 repo_name: fabieu/simdesk
