@@ -67,7 +67,7 @@ public class MainLayout extends AppLayout {
         themeService.init();
 
         setPrimarySection(Section.NAVBAR);
-        addToNavbar(false, createNavbarContent(), createNavbarMenu());
+        addToNavbar(false, createNavbarContent());
 
         createMenuTabs();
 
@@ -103,10 +103,15 @@ public class MainLayout extends AppLayout {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setSpacing(false);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.BETWEEN);
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.add(createNavbarNavigation(), createNavbarMenu());
+        return layout;
+    }
 
-        // Have the drawer toggle button on the left
-        layout.add(new DrawerToggle());
+    private Component createNavbarNavigation() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setSpacing(false);
 
         Div logo = new Div();
         logo.setId("navbar-logo");
@@ -114,19 +119,18 @@ public class MainLayout extends AppLayout {
         RouterLink logoRouter = new RouterLink(MainView.class);
         logoRouter.add(logo);
 
-        layout.add(logoRouter);
-
+        layout.add(new DrawerToggle(), logoRouter);
         return layout;
     }
 
-    private MenuBar createNavbarMenu() {
+    private Component createNavbarMenu() {
         MenuBar menuBar = new MenuBar();
-        menuBar.addThemeVariants(MenuBarVariant.LUMO_END_ALIGNED, MenuBarVariant.LUMO_TERTIARY);
+        menuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
 
         addThemeSwitcher(menuBar);
         addUserMenu(menuBar);
 
-        return menuBar;
+        return new HorizontalLayout(menuBar);
     }
 
     private void addThemeSwitcher(MenuBar menuBar) {
