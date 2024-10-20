@@ -23,7 +23,6 @@ import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -39,7 +38,7 @@ import java.util.List;
 
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
-@Route(value = "/bop/management", layout = MainLayout.class)
+@Route(value = "/bop/management")
 @PageTitle("Balance of Performance - Management")
 @RolesAllowed({"ADMIN"})
 public class BopManagementView extends BaseView {

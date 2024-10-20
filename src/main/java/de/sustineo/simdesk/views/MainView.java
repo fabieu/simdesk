@@ -7,11 +7,9 @@ import com.vaadin.flow.component.html.H1;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.router.RouteAlias;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.MenuService;
 import org.springframework.beans.factory.annotation.Value;
 
@@ -19,8 +17,7 @@ import java.util.List;
 import java.util.Map;
 import java.util.Optional;
 
-@Route(value = "", layout = MainLayout.class)
-@RouteAlias(value = "/home", layout = MainLayout.class)
+@Route(value = "")
 @PageTitle("SimDesk")
 @AnonymousAllowed
 public class MainView extends BaseView {

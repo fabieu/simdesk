@@ -25,7 +25,6 @@ import de.sustineo.simdesk.entities.SessionType;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
@@ -45,7 +44,7 @@ import java.util.stream.Stream;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/sessions/:fileChecksum", layout = MainLayout.class)
+@Route(value = "/leaderboard/sessions/:fileChecksum")
 @PageTitle("Leaderboard - Session Details")
 @AnonymousAllowed
 public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnterObserver {

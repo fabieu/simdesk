@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Anchor;
@@ -26,7 +27,7 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-public class BaseView extends VerticalLayout {
+public abstract class BaseView extends VerticalLayout {
     protected static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     protected static final String QUERY_PARAMETER_TRACK_ID = "track";
     protected static final String ROUTE_PARAMETER_CAR_ID = "carId";
@@ -38,9 +39,14 @@ public class BaseView extends VerticalLayout {
     protected static final String GRID_RANKING_WIDTH = "70px";
 
     private final BuildProperties buildProperties;
+    private final ScrollOptions defaultScrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
     public BaseView() {
         this.buildProperties = ApplicationContextProvider.getApplicationContext().getBean(BuildProperties.class);
+    }
+
+    public void scrollToComponent(Component component) {
+        component.scrollIntoView(defaultScrollOptions);
     }
 
     protected Component createViewHeader() {

@@ -49,7 +49,7 @@ public class NotificationService {
     }
 
     public void showWarningNotification(Duration duration, Component... components) {
-        showNotification(NotificationType.SUCCESS, duration, components);
+        showNotification(NotificationType.WARNING, duration, components);
     }
 
     public void showErrorNotification(String errorMessage) {
@@ -118,9 +118,10 @@ public class NotificationService {
 
     private Icon getNotificationIcon(NotificationType notificationType) {
         return switch (notificationType) {
-            case ERROR -> VaadinIcon.WARNING.create();
-            case SUCCESS -> VaadinIcon.CHECK_CIRCLE_O.create();
-            default -> VaadinIcon.INFO.create();
+            case SUCCESS -> VaadinIcon.CHECK_CIRCLE.create();
+            case WARNING -> VaadinIcon.EXCLAMATION_CIRCLE.create();
+            case ERROR -> VaadinIcon.CLOSE_CIRCLE.create();
+            default -> VaadinIcon.INFO_CIRCLE.create();
         };
     }
 }

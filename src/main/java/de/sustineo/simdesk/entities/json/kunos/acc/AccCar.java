@@ -1,6 +1,5 @@
-package de.sustineo.simdesk.entities.json.kunos;
+package de.sustineo.simdesk.entities.json.kunos.acc;
 
-import de.sustineo.simdesk.entities.CupCategory;
 import lombok.Data;
 
 import java.util.List;
@@ -11,7 +10,7 @@ public class AccCar {
     private Integer carId;
     private Integer raceNumber;
     private Integer carModel;
-    private CupCategory cupCategory;
+    private AccCupCategory cupCategory;
     private String carGroup; // unused
     private String teamName;
     private Integer nationality;

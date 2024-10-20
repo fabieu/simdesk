@@ -117,6 +117,7 @@ fabric.properties
 ### Vaadin template
 .vaadin-designer
 .designer
+.copilot-plugin
 /target/
 
 # The following files are generated/updated by vaadin-maven-plugin or vaadin-gradle-plugin

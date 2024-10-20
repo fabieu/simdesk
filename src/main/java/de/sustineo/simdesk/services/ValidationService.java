@@ -7,8 +7,13 @@ import java.util.Set;
 
 @Service
 public class ValidationService {
-    ValidatorFactory factory = Validation.buildDefaultValidatorFactory();
-    Validator validator = factory.getValidator();
+    private final Validator validator;
+
+    public ValidationService() {
+        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
+            this.validator = factory.getValidator();
+        }
+    }
 
     public <T> void validate(T input) {
         Set<ConstraintViolation<T>> violations = validator.validate(input);

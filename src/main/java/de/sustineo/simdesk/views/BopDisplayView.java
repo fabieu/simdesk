@@ -1,8 +1,6 @@
 package de.sustineo.simdesk.views;
 
-import com.fasterxml.jackson.core.JsonProcessingException;
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
@@ -22,9 +20,8 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.json.kunos.AccBop;
-import de.sustineo.simdesk.entities.json.kunos.AccBopEntry;
-import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -44,7 +41,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
-@Route(value = "/bop/overview", layout = MainLayout.class)
+@Route(value = "/bop/overview")
 @PageTitle("Balance of Performance - Overview")
 @AnonymousAllowed
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
@@ -56,7 +53,6 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     private final Select<String> trackSelect = new Select<>();
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
-    private final ScrollOptions scrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
     public BopDisplayView(BopService bopService, NotificationService notificationService) {
         this.bopService = bopService;
@@ -79,7 +75,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
-            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(component -> component.scrollIntoView(scrollOptions));
+            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(this::scrollToComponent);
         }
     }
 
@@ -99,7 +95,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             if (trackId != null) {
                 Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
                     updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, trackId));
-                    component.scrollIntoView(scrollOptions);
+                    scrollToComponent(component);
                 });
             }
         });
@@ -124,16 +120,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             StreamResource bopResource = new StreamResource(
                     String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())),
                     () -> {
-                        String json;
-                        try {
-                            List<AccBopEntry> accBopEntries = entry.getValue().stream()
-                                    .map(bopService::convertToAccBopEntry)
-                                    .toList();
-                            json = JsonUtils.toJson(new AccBop(accBopEntries));
-                        } catch (JsonProcessingException e) {
-                            throw new RuntimeException(e);
-                        }
-                        return new ByteArrayInputStream(json != null ? json.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                        List<AccBopEntry> accBopEntries = entry.getValue().stream()
+                                .map(bopService::convertToAccBopEntry)
+                                .toList();
+                        String json = JsonUtils.toJson(new AccBop(accBopEntries));
+                        return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
                     }
             );
 

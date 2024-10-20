@@ -3,8 +3,8 @@ package de.sustineo.simdesk.services.converter;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
-import de.sustineo.simdesk.entities.json.kunos.AccDriver;
-import de.sustineo.simdesk.entities.json.kunos.AccLeaderboardLine;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 

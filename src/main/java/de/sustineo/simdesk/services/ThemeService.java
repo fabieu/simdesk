@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.views;
+package de.sustineo.simdesk.services;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.dom.ThemeList;

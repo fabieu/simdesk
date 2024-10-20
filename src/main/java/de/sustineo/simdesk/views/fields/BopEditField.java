@@ -7,7 +7,7 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.json.kunos.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import lombok.Getter;
 import org.apache.commons.lang3.math.NumberUtils;
 

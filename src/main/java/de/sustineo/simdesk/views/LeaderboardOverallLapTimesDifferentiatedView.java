@@ -14,7 +14,6 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
-import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
@@ -28,7 +27,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
-@Route(value = "/leaderboard/lap-records/:carGroup/:trackId", layout = MainLayout.class)
+@Route(value = "/leaderboard/lap-records/:carGroup/:trackId")
 @PageTitle("Leaderboard - All lap records")
 @AnonymousAllowed
 public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {

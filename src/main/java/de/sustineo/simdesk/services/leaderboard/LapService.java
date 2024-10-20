@@ -3,7 +3,7 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
-import de.sustineo.simdesk.entities.json.kunos.AccSession;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.entities.mapper.LapMapper;
 import de.sustineo.simdesk.services.converter.LapConverter;
 import lombok.extern.java.Log;

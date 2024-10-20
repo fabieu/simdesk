@@ -4,7 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.json.kunos.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.mapper.BopMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;

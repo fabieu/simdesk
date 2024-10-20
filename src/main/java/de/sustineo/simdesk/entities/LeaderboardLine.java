@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.entities;
 
+import de.sustineo.simdesk.entities.json.kunos.acc.AccCupCategory;
 import lombok.AllArgsConstructor;
 import lombok.Builder;
 import lombok.Data;
@@ -15,7 +16,7 @@ public class LeaderboardLine {
     private Integer id;
     private Integer sessionId;
     private Integer ranking;
-    private CupCategory cupCategory;
+    private AccCupCategory cupCategory;
     private Integer carId;
     @Deprecated
     private CarGroup carGroup;

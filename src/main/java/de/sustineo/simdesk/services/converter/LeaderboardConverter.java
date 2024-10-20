@@ -4,8 +4,8 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.LeaderboardLine;
-import de.sustineo.simdesk.entities.json.kunos.AccLeaderboardLine;
-import de.sustineo.simdesk.entities.json.kunos.AccSession;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 

@@ -2,7 +2,7 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Penalty;
-import de.sustineo.simdesk.entities.json.kunos.AccSession;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.entities.mapper.PenaltyMapper;
 import de.sustineo.simdesk.services.converter.PenaltyConverter;
 import lombok.extern.java.Log;
