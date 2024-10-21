@@ -347,13 +347,13 @@ public class EntrylistEditorView extends BaseView {
 
         // Race number
         IntegerField raceNumberField = new IntegerField("Car Number");
-        raceNumberField.setValue(entry.getRaceNumber());
+        raceNumberField.setValue(Integer.valueOf(AccEntrylistEntry.DEFAULT_RACE_NUMBER).equals(entry.getRaceNumber()) ? null : entry.getRaceNumber());
         raceNumberField.setPrefixComponent(new Span("#"));
         raceNumberField.setMin(1);
         raceNumberField.setMax(998);
         raceNumberField.addValueChangeListener(event -> {
             if (event.getValue() == null) {
-                entry.setRaceNumber(null);
+                entry.setRaceNumber(AccEntrylistEntry.DEFAULT_RACE_NUMBER);
             } else if (event.getValue() >= 1 && event.getValue() <= 998) {
                 entry.setRaceNumber(event.getValue());
             }
@@ -368,7 +368,7 @@ public class EntrylistEditorView extends BaseView {
         ballastField.setMax(40);
         ballastField.addValueChangeListener(event -> {
             if (event.getValue() == null) {
-                entry.setBallastKg(null);
+                entry.setBallastKg(AccEntrylistEntry.DEFAULT_BALLAST_KG);
             } else if (event.getValue() >= -40 && event.getValue() <= 40) {
                 entry.setBallastKg(event.getValue());
             }
@@ -383,7 +383,7 @@ public class EntrylistEditorView extends BaseView {
         restrictorField.setMax(20);
         restrictorField.addValueChangeListener(event -> {
             if (event.getValue() == null) {
-                entry.setRestrictor(null);
+                entry.setRestrictor(AccEntrylistEntry.DEFAULT_RESTRICTOR);
             } else if (event.getValue() >= 0 && event.getValue() <= 20) {
                 entry.setRestrictor(event.getValue());
             }
@@ -398,7 +398,7 @@ public class EntrylistEditorView extends BaseView {
             Integer carId = Optional.of(event)
                     .map(ComboBox.ValueChangeEvent::getValue)
                     .map(Car::getCarId)
-                    .orElse(null);
+                    .orElse(AccEntrylistEntry.DEFAULT_FORCED_CAR_MODEL);
 
             entry.setForcedCarModel(carId);
             refreshEntrylistPreview();
@@ -407,21 +407,21 @@ public class EntrylistEditorView extends BaseView {
         Checkbox overrideCarModelForCustomCarCheckbox = new Checkbox("Enabled");
         overrideCarModelForCustomCarCheckbox.setTooltipText("Enable this option to override the car model for the custom car");
         overrideCarModelForCustomCarCheckbox.setValue(Integer.valueOf(1).equals(entry.getOverrideCarModelForCustomCar()));
-        overrideCarModelForCustomCarCheckbox.addValueChangeListener(event -> {
-            entry.setOverrideCarModelForCustomCar(overrideCarModelForCustomCarCheckbox.getValue() ? 1 : 0);
-            refreshEntrylistPreview();
-        });
 
         CheckboxGroup<Checkbox> overrideCarModelForCustomCarCheckboxGroup = new CheckboxGroup<>("Override car model for custom car");
         overrideCarModelForCustomCarCheckboxGroup.setTooltipText("Override car model for custom car");
         overrideCarModelForCustomCarCheckboxGroup.setItems(overrideCarModelForCustomCarCheckbox);
         overrideCarModelForCustomCarCheckboxGroup.setItemLabelGenerator(Checkbox::getLabel);
+        overrideCarModelForCustomCarCheckboxGroup.addValueChangeListener(event -> {
+            entry.setOverrideCarModelForCustomCar(event.getValue().contains(overrideCarModelForCustomCarCheckbox) ? 1 : 0);
+            refreshEntrylistPreview();
+        });
 
         TextField customCarField = new TextField("Custom Car");
         customCarField.setValue(Objects.requireNonNullElse(entry.getCustomCar(), ""));
         customCarField.addValueChangeListener(event -> {
             if (event.getValue() == null || event.getValue().isEmpty()) {
-                entry.setCustomCar(null);
+                entry.setCustomCar("");
             } else {
                 entry.setCustomCar(event.getValue());
             }
@@ -429,12 +429,12 @@ public class EntrylistEditorView extends BaseView {
         });
 
         IntegerField defaultGridPositionField = new IntegerField("Grid Position");
-        defaultGridPositionField.setValue(Integer.valueOf(-1).equals(entry.getDefaultGridPosition()) ? null : entry.getDefaultGridPosition());
+        defaultGridPositionField.setValue(Integer.valueOf(AccEntrylistEntry.DEFAULT_DEFAULT_GRID_POSITION).equals(entry.getDefaultGridPosition()) ? null : entry.getDefaultGridPosition());
         defaultGridPositionField.setMin(1);
         defaultGridPositionField.setMax(120);
         defaultGridPositionField.addValueChangeListener(event -> {
             if (event.getValue() == null) {
-                entry.setDefaultGridPosition(null);
+                entry.setDefaultGridPosition(AccEntrylistEntry.DEFAULT_DEFAULT_GRID_POSITION);
             } else if (event.getValue() >= 1 && event.getValue() <= 120) {
                 entry.setDefaultGridPosition(event.getValue());
             }
