@@ -24,8 +24,8 @@ public class AccDriver {
     private String lastName;
     private String shortName;
     private AccDriverCategory driverCategory;
-    @JsonProperty("playerId")
-    @JsonAlias("playerID")
+    @JsonProperty("playerID")
+    @JsonAlias("playerId")
     @NotNull
     private String playerId;
     private AccNationality nationality;
