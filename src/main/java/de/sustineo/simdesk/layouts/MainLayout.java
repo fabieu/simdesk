@@ -28,10 +28,12 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.views.ComponentUtils;
@@ -48,6 +50,7 @@ public class MainLayout extends AppLayout {
     private final ThemeService themeService;
     private final SecurityService securityService;
     private final MenuService menuService;
+    private final NotificationService notificationService;
 
     private final String privacyUrl;
     private final String impressumUrl;
@@ -56,11 +59,13 @@ public class MainLayout extends AppLayout {
     public MainLayout(ThemeService themeService,
                       SecurityService securityService,
                       MenuService menuService,
+                      NotificationService notificationService,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.themeService = themeService;
+        this.notificationService = notificationService;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
@@ -111,7 +116,6 @@ public class MainLayout extends AppLayout {
 
     private Component createNavbarNavigation() {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.setSpacing(false);
 
         Div logo = new Div();
         logo.setId("navbar-logo");
@@ -123,14 +127,45 @@ public class MainLayout extends AppLayout {
         return layout;
     }
 
-    private Component createNavbarMenu() {
+    private MenuBar createNavbarMenuBar() {
         MenuBar menuBar = new MenuBar();
         menuBar.addThemeVariants(MenuBarVariant.LUMO_TERTIARY);
+        menuBar.getStyle()
+                .setMargin("0");
+        return menuBar;
+    }
 
-        addThemeSwitcher(menuBar);
-        addUserMenu(menuBar);
+    private Component createNavbarMenu() {
+        MenuBar simulationUserBar = createNavbarMenuBar();
+        simulationUserBar.addThemeVariants(MenuBarVariant.LUMO_DROPDOWN_INDICATORS);
+        addSimulationSelector(simulationUserBar);
 
-        return new HorizontalLayout(menuBar);
+        MenuBar userMenuBar = createNavbarMenuBar();
+        addThemeSwitcher(userMenuBar);
+        addUserMenu(userMenuBar);
+
+        HorizontalLayout menuBarLayout = new HorizontalLayout(simulationUserBar, userMenuBar);
+        menuBarLayout.setSpacing(false);
+        menuBarLayout.getStyle()
+                .setMarginRight("var(--lumo-space-m)");
+
+        return menuBarLayout;
+    }
+
+    private void addSimulationSelector(MenuBar menuBar) {
+        Simulation currentSimulation = Simulation.ACC;
+
+        MenuItem simulationMenuItem = menuBar.addItem(currentSimulation.getName());
+
+        SubMenu simulationSubMenu = simulationMenuItem.getSubMenu();
+        for (Simulation simulation : Simulation.values()) {
+            MenuItem item = simulationSubMenu.addItem(simulation.getName());
+            item.setEnabled(simulation.isActive());
+            item.addClickListener(event -> {
+                notificationService.showInfoNotification("Mode changed to " + simulation.getName());
+                simulationMenuItem.setText(simulation.getName());
+            });
+        }
     }
 
     private void addThemeSwitcher(MenuBar menuBar) {
