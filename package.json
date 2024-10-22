@@ -69,6 +69,7 @@
     "@vaadin/virtual-list": "24.5.0",
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
+    "flag-icons": "^7.2.3",
     "lit": "3.2.1"
   },
   "devDependencies": {
@@ -180,7 +181,7 @@
       "workbox-core": "7.1.0",
       "workbox-precaching": "7.1.0"
     },
-    "hash": "350fba814aae9d2013f700948a99e9126f57ee973491b5bb48c6a7464e42e9eb"
+    "hash": "a456830f4137fe97ccbe4b3c0131ced8a7a3c00e7abc462bf9942c6c6c091e6f"
   },
   "overrides": {
     "@vaadin/bundles": "$@vaadin/bundles",
@@ -250,7 +251,8 @@
     "@vaadin/upload": "$@vaadin/upload",
     "@vaadin/vertical-layout": "$@vaadin/vertical-layout",
     "@vaadin/virtual-list": "$@vaadin/virtual-list",
-    "@vaadin/popover": "$@vaadin/popover"
+    "@vaadin/popover": "$@vaadin/popover",
+    "flag-icons": "$flag-icons"
   },
   "type": "module"
 }

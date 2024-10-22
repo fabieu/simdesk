@@ -10,6 +10,7 @@ import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
@@ -49,6 +50,7 @@ import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.utils.json.JsonUtils;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
+import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
@@ -65,6 +67,7 @@ import java.util.Set;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
+@CssImport("flag-icons/css/flag-icons.min.css")
 @Route(value = "/entrylist/editor")
 @PageTitle("Entrylist - Editor")
 @AnonymousAllowed
@@ -393,6 +396,7 @@ public class EntrylistEditorView extends BaseView {
         ComboBox<Car> forcedCarModelComboBox = new ComboBox<>("Car Model");
         forcedCarModelComboBox.setItems(Car.getAllSortedByName());
         forcedCarModelComboBox.setItemLabelGenerator(Car::getCarName);
+        forcedCarModelComboBox.setClassNameGenerator(car -> car.getCarGroup().name().toLowerCase());
         forcedCarModelComboBox.setValue(Car.getCarById(entry.getForcedCarModel()));
         forcedCarModelComboBox.addValueChangeListener(event -> {
             Integer carId = Optional.of(event)
@@ -609,26 +613,29 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistPreview();
         });
 
-        ComboBox<AccDriverCategory> driverCategorySelect = new ComboBox<>("Category");
-        driverCategorySelect.setItems(AccDriverCategory.values());
-        driverCategorySelect.setItemLabelGenerator(AccDriverCategory::getName);
-        driverCategorySelect.setValue(driver.getDriverCategory());
-        driverCategorySelect.addValueChangeListener(event -> {
+        ComboBox<AccDriverCategory> driverCategoryComboBox = new ComboBox<>("Category");
+        driverCategoryComboBox.setItems(AccDriverCategory.values());
+        driverCategoryComboBox.setItemLabelGenerator(AccDriverCategory::getName);
+        driverCategoryComboBox.setRenderer(EntrylistRenderer.createAccDriverCategoryRenderer());
+        driverCategoryComboBox.setValue(driver.getDriverCategory());
+        driverCategoryComboBox.addValueChangeListener(event -> {
             driver.setDriverCategory(event.getValue());
             refreshEntrylistPreview();
         });
 
         ComboBox<AccNationality> nationalyComboBox = new ComboBox<>("Nationality");
         nationalyComboBox.setItems(AccNationality.values());
-        nationalyComboBox.setItemLabelGenerator(AccNationality::getName);
+        nationalyComboBox.setItemLabelGenerator(AccNationality::getShortName);
+        nationalyComboBox.setRenderer(EntrylistRenderer.createAccNationalityRenderer());
         nationalyComboBox.setValue(driver.getNationality());
         nationalyComboBox.addValueChangeListener(event -> {
             driver.setNationality(event.getValue());
             refreshEntrylistPreview();
         });
+        nationalyComboBox.setOverlayWidth("225px");
 
         FormLayout entrylistDriverFormLayout = new FormLayout();
-        entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategorySelect, nationalyComboBox);
+        entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategoryComboBox, nationalyComboBox);
         entrylistDriverFormLayout.setResponsiveSteps(
                 // Use one column by default
                 new FormLayout.ResponsiveStep("0", 1),
