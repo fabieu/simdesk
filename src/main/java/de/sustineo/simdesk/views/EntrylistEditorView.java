@@ -22,6 +22,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
@@ -41,6 +42,8 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.EntrylistMetadata;
+import de.sustineo.simdesk.entities.EntrylistSortingMode;
+import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
@@ -60,10 +63,7 @@ import java.io.ByteArrayInputStream;
 import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
-import java.util.List;
-import java.util.Objects;
-import java.util.Optional;
-import java.util.Set;
+import java.util.*;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
@@ -79,10 +79,24 @@ public class EntrylistEditorView extends BaseView {
     private AccEntrylist entrylist;
     private EntrylistMetadata entrylistMetadata;
 
-    private Upload entrylistUpload;
-    private final TextArea entrylistPreview;
-    private final VerticalLayout entrylistLayout;
-    private final Anchor downloadAnchor;
+    private final Upload entrylistUpload = new Upload();
+    private final Anchor downloadAnchor = new Anchor();
+    private final Select<EntrylistSortingMode> sortingModeSelect = new Select<>();
+    private final TextArea entrylistPreview = new TextArea();
+    private final VerticalLayout entrylistLayout = new VerticalLayout();
+    private final VerticalLayout entrylistEntriesLayout = new VerticalLayout();
+
+    private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
+    private final Comparator<Map.Entry<AccEntrylistEntry, Component>> noopComparator = Comparator.comparing(entry -> 0);
+    private final Comparator<Map.Entry<AccEntrylistEntry, Component>> gridPositionComparator = Comparator.comparing(
+            entry -> entry.getKey().getDefaultGridPosition(), Comparator.nullsLast(new AccEntrylistEntryDefaultIntegerComparator())
+    );
+    private final Comparator<Map.Entry<AccEntrylistEntry, Component>> raceNumberComparator = Comparator.comparing(
+            entry -> entry.getKey().getRaceNumber(), Comparator.nullsLast(new AccEntrylistEntryDefaultIntegerComparator())
+    );
+    private final Comparator<Map.Entry<AccEntrylistEntry, Component>> adminComparator = Comparator.comparing(
+            entry -> entry.getKey().getIsServerAdmin(), Comparator.nullsLast(Comparator.reverseOrder())
+    );
 
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
@@ -94,11 +108,8 @@ public class EntrylistEditorView extends BaseView {
         this.validationService = validationService;
         this.notificationService = notificationService;
 
-        this.entrylistLayout = new VerticalLayout();
-        this.entrylistPreview = new TextArea();
         this.entrylistPreview.setWidthFull();
         this.entrylistPreview.setReadOnly(true);
-        this.downloadAnchor = new Anchor();
 
         setSizeFull();
         setPadding(false);
@@ -114,7 +125,6 @@ public class EntrylistEditorView extends BaseView {
         entrylistMetadata = null;
         entrylistUpload.clearFileList();
         refreshEntrylistEditor();
-        refreshEntrylistPreview();
     }
 
     private void refreshEntrylistPreview() {
@@ -125,7 +135,7 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-    private Component createTabSheet() {
+    private Component createTabSheets() {
         TabSheet tabSheet = new TabSheet();
         tabSheet.setWidthFull();
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
@@ -138,7 +148,7 @@ public class EntrylistEditorView extends BaseView {
         VerticalLayout entrylistContainer = new VerticalLayout();
         entrylistContainer.setSizeFull();
         entrylistContainer.setPadding(false);
-        entrylistContainer.add(createPopulateEntrylistLayout(), createActionLayout(), createTabSheet());
+        entrylistContainer.add(createPopulateEntrylistLayout(), createActionLayout(), createSortingLayout(), createTabSheets());
 
         Div entrylistContainerWrapper = new Div(entrylistContainer);
         entrylistContainerWrapper.addClassNames("container", "bg-light");
@@ -198,7 +208,7 @@ public class EntrylistEditorView extends BaseView {
                 .setColor("var(--lumo-secondary-text-color)");
 
         MemoryBuffer memoryBuffer = new MemoryBuffer();
-        entrylistUpload = new Upload(memoryBuffer);
+        entrylistUpload.setReceiver(memoryBuffer);
         entrylistUpload.setWidthFull();
         entrylistUpload.setDropAllowed(true);
         entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
@@ -257,8 +267,8 @@ public class EntrylistEditorView extends BaseView {
         Button downloadButton = new Button("Download", getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
 
-        downloadAnchor.getElement().setAttribute("download", true);
-        downloadAnchor.add(downloadButton);
+        this.downloadAnchor.getElement().setAttribute("download", true);
+        this.downloadAnchor.add(downloadButton);
 
         // Validation
         Button validateButton = new Button("Validate");
@@ -287,36 +297,79 @@ public class EntrylistEditorView extends BaseView {
         );
     }
 
+    private Component createSortingLayout() {
+        this.sortingModeSelect.setLabel("Sort by");
+        this.sortingModeSelect.setItems(EntrylistSortingMode.values());
+        this.sortingModeSelect.setItemLabelGenerator(EntrylistSortingMode::getLabel);
+        this.sortingModeSelect.setValue(EntrylistSortingMode.NONE);
+        this.sortingModeSelect.addValueChangeListener(event -> {
+            refreshEntrylistEntriesFromMap();
+        });
+
+        HorizontalLayout entrylistSortingLayout = new HorizontalLayout(sortingModeSelect);
+        entrylistSortingLayout.setWidthFull();
+        entrylistSortingLayout.setJustifyContentMode(JustifyContentMode.END);
+
+        return entrylistSortingLayout;
+    }
+
     private void refreshEntrylistEditor() {
         entrylistLayout.removeAll();
+        entrylistEntriesLayout.removeAll();
 
         if (entrylist == null || entrylist.getEntries() == null) {
             return;
         }
 
-        entrylistLayout.add(createEntrylistMainLayout());
-
         for (AccEntrylistEntry entry : entrylist.getEntries()) {
-            entrylistLayout.add(createEntrylistEntryLayout(entry));
+            entrylistEntriesMap.put(entry, createEntrylistEntryLayout(entry));
         }
+        refreshEntrylistEntriesFromMap();
 
-        entrylistLayout.add(createEntrylistActionLayout());
+        entrylistLayout.add(createEntrylistMainLayout(), entrylistEntriesLayout, createEntrylistActionLayout());
+    }
+
+    private void refreshEntrylistEntriesFromMap() {
+        Comparator<Map.Entry<AccEntrylistEntry, Component>> comparator = switch (getEntrylistSortingMode()) {
+            case GRID_POSITION -> gridPositionComparator;
+            case CAR_NUMBER -> raceNumberComparator;
+            case ADMIN -> adminComparator.thenComparing(raceNumberComparator);
+            default -> noopComparator;
+        };
+
+        LinkedHashMap<AccEntrylistEntry, Component> sortedEntrylistEntryMap = new LinkedHashMap<>();
+        entrylistEntriesMap.entrySet().stream()
+                .sorted(comparator)
+                .forEachOrdered(entry -> sortedEntrylistEntryMap.put(entry.getKey(), entry.getValue()));
+
+        entrylist.setEntries(new ArrayList<>(sortedEntrylistEntryMap.keySet()));
+        refreshEntrylistPreview();
+
+        entrylistEntriesLayout.removeAll();
+        entrylistEntriesLayout.add(sortedEntrylistEntryMap.values());
+
+        entrylistEntriesMap = sortedEntrylistEntryMap;
+    }
+
+    private void addEntrylistEntry(AccEntrylistEntry entry) {
+        Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
+        entrylistEntriesMap.put(entry, entrylistEntryLayout);
+
+        refreshEntrylistEntriesFromMap();
+        scrollToComponent(entrylistEntryLayout);
+    }
+
+    private void removeEntrylistEntry(AccEntrylistEntry entry) {
+        entrylistEntriesMap.remove(entry);
+
+        refreshEntrylistEntriesFromMap();
     }
 
     private Component createEntrylistActionLayout() {
         Button addEntrylistEntryButton = new Button("Add entry");
         addEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         addEntrylistEntryButton.addClickListener(event -> {
-            AccEntrylistEntry entry = new AccEntrylistEntry();
-            entrylist.getEntries().add(entry);
-            refreshEntrylistPreview();
-
-            // Add new entry before the last element (which is the action layout)
-            Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
-            entrylistLayout.addComponentAtIndex(entrylistLayout.getComponentCount() - 1, entrylistEntryLayout);
-
-            // Scroll to newly added entry
-            scrollToComponent(entrylistEntryLayout);
+            addEntrylistEntry(new AccEntrylistEntry());
         });
 
         HorizontalLayout entrylistActionLayout = new HorizontalLayout(addEntrylistEntryButton);
@@ -360,7 +413,13 @@ public class EntrylistEditorView extends BaseView {
             } else if (event.getValue() >= 1 && event.getValue() <= 998) {
                 entry.setRaceNumber(event.getValue());
             }
-            refreshEntrylistPreview();
+
+            if (EntrylistSortingMode.CAR_NUMBER.equals(getEntrylistSortingMode())) {
+                refreshEntrylistEntriesFromMap();
+                scrollToComponent(entrylistEntryLayout);
+            } else {
+                refreshEntrylistPreview();
+            }
         });
 
         // Ballast
@@ -442,17 +501,29 @@ public class EntrylistEditorView extends BaseView {
             } else if (event.getValue() >= 1 && event.getValue() <= 120) {
                 entry.setDefaultGridPosition(event.getValue());
             }
-            refreshEntrylistPreview();
+
+            if (EntrylistSortingMode.GRID_POSITION.equals(getEntrylistSortingMode())) {
+                refreshEntrylistEntriesFromMap();
+                scrollToComponent(entrylistEntryLayout);
+            } else {
+                refreshEntrylistPreview();
+            }
         });
 
         Checkbox isServerAdminCheckbox = new Checkbox("Server Admin");
         isServerAdminCheckbox.setValue(Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         isServerAdminCheckbox.addValueChangeListener(event -> {
             entry.setIsServerAdmin(isServerAdminCheckbox.getValue() ? 1 : 0);
-            refreshEntrylistPreview();
 
             // Override background color for server admins
             setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
+
+            if (EntrylistSortingMode.ADMIN.equals(getEntrylistSortingMode())) {
+                refreshEntrylistEntriesFromMap();
+                scrollToComponent(entrylistEntryLayout);
+            } else {
+                refreshEntrylistPreview();
+            }
         });
 
         FormLayout entrylistMainFormLayout = new FormLayout();
@@ -523,25 +594,13 @@ public class EntrylistEditorView extends BaseView {
         removeEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         removeEntrylistEntryButton.setAriaLabel("Remove entry");
         removeEntrylistEntryButton.addClickListener(event -> {
-            entrylist.getEntries().remove(entry);
-            refreshEntrylistPreview();
-
-            entrylistLayout.remove(entrylistEntryLayout);
+            removeEntrylistEntry(entry);
         });
 
         Button cloneEntrylistEntryButton = new Button("Clone");
         cloneEntrylistEntryButton.setAriaLabel("Clone entry");
         cloneEntrylistEntryButton.addClickListener(event -> {
-            AccEntrylistEntry clonedEntry = new AccEntrylistEntry(entry);
-            entrylist.getEntries().add(clonedEntry);
-            refreshEntrylistPreview();
-
-            // Add new entry before the last element (which is the action layout)
-            Component clonedEntrylistEntryLayout = createEntrylistEntryLayout(clonedEntry);
-            entrylistLayout.addComponentAtIndex(entrylistLayout.getComponentCount() - 1, clonedEntrylistEntryLayout);
-
-            // Scroll to newly added entry
-            scrollToComponent(clonedEntrylistEntryLayout);
+            addEntrylistEntry(new AccEntrylistEntry(entry));
         });
 
         HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(cloneEntrylistEntryButton, removeEntrylistEntryButton);
@@ -769,6 +828,10 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
+    private EntrylistSortingMode getEntrylistSortingMode() {
+        return sortingModeSelect.getValue();
+    }
+
     private void validateEntrylist(Set<ValidationRule> validationRules) {
         if (entrylist == null) {
             notificationService.showErrorNotification("Validation failed. Entrylist is missing");
@@ -785,14 +848,12 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-
     private void createNewEntrylist(AccEntrylist entrylist, EntrylistMetadata entrylistMetadata) {
         entrylistUpload.clearFileList();
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
         this.downloadAnchor.setHref(downloadEntrylist(entrylistMetadata));
         refreshEntrylistEditor();
-        refreshEntrylistPreview();
     }
 
     private ConfirmDialog createNewEntrylistConfirmDialog() {
