@@ -7,23 +7,23 @@ vaadin-grid::part(font-weight-bold) {
 }
 
 vaadin-grid::part(car-group-gt3) {
-    background-color: var(--lumo-contrast-5pct);
+    background-color: var(--car-group-gt3-color);
 }
 
 vaadin-grid::part(car-group-gt2) {
-    background-color: rgba(255, 49, 0, 0.2);
+    background-color: var(--car-group-gt2-color);
 }
 
 vaadin-grid::part(car-group-gt4) {
-    background-color: rgba(38, 38, 96, 0.2)
+    background-color: var(--car-group-gt4-color);
 }
 
 vaadin-grid::part(car-group-gtc) {
-    background-color: rgba(245, 126, 0, 0.2);
+    background-color: var(--car-group-gtc-color);
 }
 
 vaadin-grid::part(car-group-tcx) {
-    background-color: rgb(0, 124, 168, 0.2);
+    background-color: var(--car-group-tcx-color);
 }
 
 vaadin-grid::part(ranking-podium-first) {

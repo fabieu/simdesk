@@ -1,6 +1,7 @@
 @import "colors.css";
-@import "component-styles/grid.css";
+@import "component-styles/combo-box.css";
 @import "component-styles/dialog.css";
+@import "component-styles/grid.css";
 @import "component-styles/menu-bar.css";
 @import "component-styles/tabs.css";
 @import "views/main.css";

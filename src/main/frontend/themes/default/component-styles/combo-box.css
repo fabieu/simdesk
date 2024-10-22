@@ -1,0 +1,19 @@
+vaadin-combo-box-item.gt2 {
+    background-color: var(--car-group-gt2-color);
+}
+
+vaadin-combo-box-item.gt3 {
+    background-color: var(--car-group-gt3-color);
+}
+
+vaadin-combo-box-item.gt4 {
+    background-color: var(--car-group-gt4-color);
+}
+
+vaadin-combo-box-item.gtc {
+    background-color: var(--car-group-gtc-color);
+}
+
+vaadin-combo-box-item.tcx {
+    background-color: var(--car-group-tcx-color);
+}

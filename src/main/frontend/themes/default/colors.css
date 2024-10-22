@@ -1,6 +1,20 @@
 html {
+    /* Weather */
     --weather-sunny-color: #ffb600;
     --weather-rainy-color: #00aeff;
+
+    /* Driver Category */
+    --driver-category-bronze-color: #cd7f32;
+    --driver-category-silver-color: #c0c0c0;
+    --driver-category-gold-color: #ffd700;
+    --driver-category-platinum-color: #121212;
+
+    /* Car Group */
+    --car-group-gt2-color: rgba(255, 49, 0, 0.2);
+    --car-group-gt3-color: var(--lumo-contrast-5pct);
+    --car-group-gt4-color: rgba(38, 38, 96, 0.2);
+    --car-group-gtc-color: rgba(245, 126, 0, 0.2);
+    --car-group-tcx-color: rgba(0, 124, 168, 0.2);
 }
 
 body[theme] {
