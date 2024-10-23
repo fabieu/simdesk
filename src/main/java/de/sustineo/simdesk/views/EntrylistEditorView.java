@@ -22,6 +22,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.page.WebStorage;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.shared.Tooltip;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -57,6 +58,7 @@ import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
+import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 
@@ -73,6 +75,10 @@ import java.util.*;
 @PageTitle("Entrylist - Editor")
 @AnonymousAllowed
 public class EntrylistEditorView extends BaseView {
+    private static final String WEB_STORAGE_KEY_SORTING_MODE = "vaadin.custom.entrylist.sorting.mode";
+    private static final String WEB_STORAGE_KEY_SORTING_DIRECTION = "vaadin.custom.entrylist.sorting.direction";
+    private final WebStorage.Storage webStorageType = WebStorage.Storage.SESSION_STORAGE;
+
     private final EntrylistService entrylistService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
@@ -112,6 +118,14 @@ public class EntrylistEditorView extends BaseView {
 
         this.entrylistPreview.setWidthFull();
         this.entrylistPreview.setReadOnly(true);
+
+        WebStorage.getItem(webStorageType, WEB_STORAGE_KEY_SORTING_MODE, (value) ->
+                this.sortingModeSelect.setValue(EnumUtils.getEnum(SortingModeEntrylist.class, value, SortingModeEntrylist.NONE))
+        );
+
+        WebStorage.getItem(webStorageType, WEB_STORAGE_KEY_SORTING_DIRECTION, (value) ->
+                this.sortdirectionSelect.setValue(EnumUtils.getEnum(SortingDirection.class, value, SortingDirection.ASC))
+        );
 
         setSizeFull();
         setPadding(false);
@@ -303,14 +317,18 @@ public class EntrylistEditorView extends BaseView {
         this.sortingModeSelect.setLabel("Sort mode");
         this.sortingModeSelect.setItems(SortingModeEntrylist.values());
         this.sortingModeSelect.setItemLabelGenerator(SortingModeEntrylist::getLabel);
-        this.sortingModeSelect.setValue(SortingModeEntrylist.NONE);
-        this.sortingModeSelect.addValueChangeListener(event -> refreshEntrylistEntriesFromMap());
+        this.sortingModeSelect.addValueChangeListener(event -> {
+            WebStorage.setItem(webStorageType, WEB_STORAGE_KEY_SORTING_MODE, event.getValue().name());
+            refreshEntrylistEntriesFromMap();
+        });
 
         this.sortdirectionSelect.setLabel("Sort direction");
         this.sortdirectionSelect.setItems(SortingDirection.values());
         this.sortdirectionSelect.setItemLabelGenerator(SortingDirection::getLabel);
-        this.sortdirectionSelect.setValue(SortingDirection.ASC);
-        this.sortdirectionSelect.addValueChangeListener(event -> refreshEntrylistEntriesFromMap());
+        this.sortdirectionSelect.addValueChangeListener(event -> {
+            WebStorage.setItem(webStorageType, WEB_STORAGE_KEY_SORTING_DIRECTION, event.getValue().name());
+            refreshEntrylistEntriesFromMap();
+        });
 
         HorizontalLayout entrylistSortingLayout = new HorizontalLayout(sortingModeSelect, sortdirectionSelect);
         entrylistSortingLayout.setWidthFull();
@@ -336,6 +354,10 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private void refreshEntrylistEntriesFromMap() {
+        if (entrylistEntriesMap.isEmpty()) {
+            return;
+        }
+
         Comparator<Map.Entry<AccEntrylistEntry, Component>> comparator = switch (getSortingMode()) {
             case GRID_POSITION -> gridPositionComparator;
             case CAR_NUMBER -> raceNumberComparator;
