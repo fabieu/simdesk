@@ -155,7 +155,9 @@ public class MainLayout extends AppLayout {
     private void addSimulationSelector(MenuBar menuBar) {
         Simulation currentSimulation = Simulation.ACC;
 
-        MenuItem simulationMenuItem = menuBar.addItem(currentSimulation.getName());
+        MenuItem simulationMenuItem = menuBar.addItem(currentSimulation.getShortName());
+        simulationMenuItem.getStyle()
+                .setFontWeight(Style.FontWeight.BOLD);
 
         SubMenu simulationSubMenu = simulationMenuItem.getSubMenu();
         for (Simulation simulation : Simulation.values()) {
@@ -163,7 +165,7 @@ public class MainLayout extends AppLayout {
             item.setEnabled(simulation.isActive());
             item.addClickListener(event -> {
                 notificationService.showInfoNotification("Mode changed to " + simulation.getName());
-                simulationMenuItem.setText(simulation.getName());
+                simulationMenuItem.setText(simulation.getShortName());
             });
         }
     }

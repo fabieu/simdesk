@@ -112,7 +112,7 @@ public class NotificationService {
             case SUCCESS -> NotificationVariant.LUMO_SUCCESS;
             case WARNING -> NotificationVariant.LUMO_WARNING;
             case ERROR -> NotificationVariant.LUMO_ERROR;
-            case INFO -> NotificationVariant.LUMO_CONTRAST;
+            case INFO -> NotificationVariant.LUMO_PRIMARY;
         };
     }
 
