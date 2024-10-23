@@ -9,7 +9,6 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H4;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -90,11 +89,12 @@ public class BopEditorView extends BaseView {
 
     private Component createFileUploadForm() {
         VerticalLayout fileUploadLayout = new VerticalLayout();
-        fileUploadLayout.setPadding(false);
+        fileUploadLayout.setSpacing(false);
 
-        H4 fileUploadTitle = new H4("Upload bop.json");
-        Paragraph fileUploadHint = new Paragraph("File size must be less than or equal to 1 MB. Only valid JSON files are accepted.");
-        fileUploadHint.getStyle().setColor("var(--lumo-secondary-text-color)");
+        Paragraph fileUploadHint = new Paragraph("Accepted file formats: JSON (.json). File size must be less than or equal to 1 MB.");
+        fileUploadHint.getStyle()
+                .setFontSize("var(--lumo-font-size-s)")
+                .setColor("var(--lumo-secondary-text-color)");
 
         MultiFileMemoryBuffer multiFileMemoryBuffer = new MultiFileMemoryBuffer();
         Upload fileUpload = new Upload(multiFileMemoryBuffer);
@@ -133,7 +133,7 @@ public class BopEditorView extends BaseView {
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
         fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + TEXT_DELIMITER + event.getReason().getMessage()));
 
-        fileUploadLayout.add(fileUploadTitle, fileUploadHint, fileUpload);
+        fileUploadLayout.add(fileUpload, fileUploadHint);
         return fileUploadLayout;
     }
 
@@ -173,7 +173,6 @@ public class BopEditorView extends BaseView {
 
     private Component createEditingForm() {
         VerticalLayout verticalLayout = new VerticalLayout();
-        verticalLayout.setPadding(false);
 
         trackComboBox.setItems(Track.getAllSortedByName());
         trackComboBox.setItemLabelGenerator(Track::getTrackName);
@@ -189,6 +188,7 @@ public class BopEditorView extends BaseView {
         ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getCarName().toLowerCase().contains(filterString.toLowerCase()) || car.getCarGroup().name().equalsIgnoreCase(filterString);
         carsComboBox.setItems(carFilter, Car.getAllSortedByName());
         carsComboBox.setItemLabelGenerator(Car::getCarName);
+        carsComboBox.setClassNameGenerator(car -> car.getCarGroup().name());
         carsComboBox.setPlaceholder("Select cars...");
         carsComboBox.setHelperText(String.format("Available filters: Car Name, Car Group (%s)", String.join(", ", CarGroup.getValidNames())));
         carsComboBox.addValueChangeListener(event -> {

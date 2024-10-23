@@ -453,9 +453,10 @@ public class EntrylistEditorView extends BaseView {
         });
 
         ComboBox<Car> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        forcedCarModelComboBox.setItems(Car.getAllSortedByName());
+        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getCarName().toLowerCase().contains(filterString.toLowerCase()) || car.getCarGroup().name().equalsIgnoreCase(filterString);
+        forcedCarModelComboBox.setItems(carFilter, Car.getAllSortedByName());
         forcedCarModelComboBox.setItemLabelGenerator(Car::getCarName);
-        forcedCarModelComboBox.setClassNameGenerator(car -> car.getCarGroup().name().toLowerCase());
+        forcedCarModelComboBox.setClassNameGenerator(car -> car.getCarGroup().name());
         forcedCarModelComboBox.setValue(Car.getCarById(entry.getForcedCarModel()));
         forcedCarModelComboBox.addValueChangeListener(event -> {
             Integer carId = Optional.of(event)
