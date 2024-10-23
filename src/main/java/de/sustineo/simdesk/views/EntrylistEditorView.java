@@ -42,7 +42,8 @@ import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.EntrylistMetadata;
-import de.sustineo.simdesk.entities.EntrylistSortingMode;
+import de.sustineo.simdesk.entities.SortingDirection;
+import de.sustineo.simdesk.entities.SortingModeEntrylist;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
@@ -81,7 +82,8 @@ public class EntrylistEditorView extends BaseView {
 
     private final Upload entrylistUpload = new Upload();
     private final Anchor downloadAnchor = new Anchor();
-    private final Select<EntrylistSortingMode> sortingModeSelect = new Select<>();
+    private final Select<SortingModeEntrylist> sortingModeSelect = new Select<>();
+    private final Select<SortingDirection> sortdirectionSelect = new Select<>();
     private final TextArea entrylistPreview = new TextArea();
     private final VerticalLayout entrylistLayout = new VerticalLayout();
     private final VerticalLayout entrylistEntriesLayout = new VerticalLayout();
@@ -298,15 +300,19 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private Component createSortingLayout() {
-        this.sortingModeSelect.setLabel("Sort by");
-        this.sortingModeSelect.setItems(EntrylistSortingMode.values());
-        this.sortingModeSelect.setItemLabelGenerator(EntrylistSortingMode::getLabel);
-        this.sortingModeSelect.setValue(EntrylistSortingMode.NONE);
-        this.sortingModeSelect.addValueChangeListener(event -> {
-            refreshEntrylistEntriesFromMap();
-        });
+        this.sortingModeSelect.setLabel("Sort mode");
+        this.sortingModeSelect.setItems(SortingModeEntrylist.values());
+        this.sortingModeSelect.setItemLabelGenerator(SortingModeEntrylist::getLabel);
+        this.sortingModeSelect.setValue(SortingModeEntrylist.NONE);
+        this.sortingModeSelect.addValueChangeListener(event -> refreshEntrylistEntriesFromMap());
 
-        HorizontalLayout entrylistSortingLayout = new HorizontalLayout(sortingModeSelect);
+        this.sortdirectionSelect.setLabel("Sort direction");
+        this.sortdirectionSelect.setItems(SortingDirection.values());
+        this.sortdirectionSelect.setItemLabelGenerator(SortingDirection::getLabel);
+        this.sortdirectionSelect.setValue(SortingDirection.ASC);
+        this.sortdirectionSelect.addValueChangeListener(event -> refreshEntrylistEntriesFromMap());
+
+        HorizontalLayout entrylistSortingLayout = new HorizontalLayout(sortingModeSelect, sortdirectionSelect);
         entrylistSortingLayout.setWidthFull();
         entrylistSortingLayout.setJustifyContentMode(JustifyContentMode.END);
 
@@ -330,12 +336,17 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private void refreshEntrylistEntriesFromMap() {
-        Comparator<Map.Entry<AccEntrylistEntry, Component>> comparator = switch (getEntrylistSortingMode()) {
+        Comparator<Map.Entry<AccEntrylistEntry, Component>> comparator = switch (getSortingMode()) {
             case GRID_POSITION -> gridPositionComparator;
             case CAR_NUMBER -> raceNumberComparator;
             case ADMIN -> adminComparator.thenComparing(raceNumberComparator);
             default -> noopComparator;
         };
+
+        // Reverse comparator if sorting direction is descending
+        if (SortingDirection.DESC.equals(getSortingDirection())) {
+            comparator = comparator.reversed();
+        }
 
         LinkedHashMap<AccEntrylistEntry, Component> sortedEntrylistEntryMap = new LinkedHashMap<>();
         entrylistEntriesMap.entrySet().stream()
@@ -368,9 +379,7 @@ public class EntrylistEditorView extends BaseView {
     private Component createEntrylistActionLayout() {
         Button addEntrylistEntryButton = new Button("Add entry");
         addEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addEntrylistEntryButton.addClickListener(event -> {
-            addEntrylistEntry(new AccEntrylistEntry());
-        });
+        addEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(new AccEntrylistEntry()));
 
         HorizontalLayout entrylistActionLayout = new HorizontalLayout(addEntrylistEntryButton);
         entrylistActionLayout.setWidthFull();
@@ -414,7 +423,7 @@ public class EntrylistEditorView extends BaseView {
                 entry.setRaceNumber(event.getValue());
             }
 
-            if (EntrylistSortingMode.CAR_NUMBER.equals(getEntrylistSortingMode())) {
+            if (SortingModeEntrylist.CAR_NUMBER.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -503,7 +512,7 @@ public class EntrylistEditorView extends BaseView {
                 entry.setDefaultGridPosition(event.getValue());
             }
 
-            if (EntrylistSortingMode.GRID_POSITION.equals(getEntrylistSortingMode())) {
+            if (SortingModeEntrylist.GRID_POSITION.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -519,7 +528,7 @@ public class EntrylistEditorView extends BaseView {
             // Override background color for server admins
             setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
 
-            if (EntrylistSortingMode.ADMIN.equals(getEntrylistSortingMode())) {
+            if (SortingModeEntrylist.ADMIN.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -594,15 +603,11 @@ public class EntrylistEditorView extends BaseView {
         Button removeEntrylistEntryButton = new Button(new Icon(VaadinIcon.CLOSE));
         removeEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
         removeEntrylistEntryButton.setAriaLabel("Remove entry");
-        removeEntrylistEntryButton.addClickListener(event -> {
-            removeEntrylistEntry(entry);
-        });
+        removeEntrylistEntryButton.addClickListener(event -> removeEntrylistEntry(entry));
 
         Button cloneEntrylistEntryButton = new Button("Clone");
         cloneEntrylistEntryButton.setAriaLabel("Clone entry");
-        cloneEntrylistEntryButton.addClickListener(event -> {
-            addEntrylistEntry(new AccEntrylistEntry(entry));
-        });
+        cloneEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(new AccEntrylistEntry(entry)));
 
         HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(cloneEntrylistEntryButton, removeEntrylistEntryButton);
         entrylistEntryHeaderLayout.setWidthFull();
@@ -829,8 +834,12 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private EntrylistSortingMode getEntrylistSortingMode() {
+    private SortingModeEntrylist getSortingMode() {
         return sortingModeSelect.getValue();
+    }
+
+    private SortingDirection getSortingDirection() {
+        return sortdirectionSelect.getValue();
     }
 
     private void validateEntrylist(Set<ValidationRule> validationRules) {
