@@ -351,6 +351,7 @@ public class EntrylistEditorView extends BaseView {
 
     private void refreshEntrylistEntriesFromMap() {
         if (entrylistEntriesMap.isEmpty()) {
+            entrylistEntriesLayout.removeAll();
             return;
         }
 
