@@ -65,4 +65,8 @@ public class AccEntrylistEntry {
         this.overrideCarModelForCustomCar = other.overrideCarModelForCustomCar;
         this.isServerAdmin = other.isServerAdmin;
     }
+
+    public boolean hasDefaultGridPosition() {
+        return defaultGridPosition != null && defaultGridPosition != DEFAULT_DEFAULT_GRID_POSITION;
+    }
 }

@@ -104,6 +104,14 @@ public abstract class BaseView extends VerticalLayout {
         return new Icon(VaadinIcon.SHARE_SQUARE);
     }
 
+    protected AbstractIcon<?> getResetIcon() {
+        return new Icon(VaadinIcon.ARROW_BACKWARD);
+    }
+
+    protected AbstractIcon<?> getValidateIcon() {
+        return new Icon(VaadinIcon.CLIPBOARD_CHECK);
+    }
+
     protected Icon getWeatherIcon(Session session) {
         Icon icon;
 

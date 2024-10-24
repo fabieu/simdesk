@@ -1,0 +1,4 @@
+vaadin-button.break-word::part(label) {
+    white-space: normal;
+    word-break: break-word;
+}
