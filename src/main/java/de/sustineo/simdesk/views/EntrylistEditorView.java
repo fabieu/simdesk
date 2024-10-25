@@ -13,9 +13,7 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
@@ -41,10 +39,7 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.EntrylistMetadata;
-import de.sustineo.simdesk.entities.SortingDirection;
-import de.sustineo.simdesk.entities.SortingModeEntrylist;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
@@ -67,6 +62,9 @@ import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
+import java.util.concurrent.atomic.AtomicReference;
+import java.util.function.Function;
+import java.util.stream.Collectors;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
@@ -108,6 +106,7 @@ public class EntrylistEditorView extends BaseView {
 
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
+    private final Dialog resultsUploadDialog = createResultsUploadDialog();
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                ValidationService validationService,
@@ -136,11 +135,15 @@ public class EntrylistEditorView extends BaseView {
         add(createFooter());
     }
 
-    private void reset() {
+    private void resetEntities() {
         entrylist = null;
         entrylistMetadata = null;
         entrylistEntriesMap.clear();
+    }
+
+    private void reset() {
         entrylistUpload.clearFileList();
+        resetEntities();
         refreshEntrylistEditor();
         refreshEntrylistPreview();
     }
@@ -216,7 +219,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.setDropAllowed(true);
         entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
         entrylistUpload.setMaxFileSize((int) FileUtils.ONE_MB);
-        entrylistUpload.setI18n(configureUploadI18N());
+        entrylistUpload.setI18n(configureUploadI18N("entrylist.json"));
         entrylistUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
@@ -252,20 +255,23 @@ public class EntrylistEditorView extends BaseView {
         return entrylistUpload;
     }
 
-    private UploadI18N configureUploadI18N() {
+    private UploadI18N configureUploadI18N(String fileName) {
         UploadI18NDefaults i18n = new UploadI18NDefaults();
-        i18n.getAddFiles().setOne("Upload entrylist.json...");
-        i18n.getDropFiles().setOne("Drop entrylist.json here");
+        i18n.getAddFiles().setOne(String.format("Upload %s...", fileName));
+        i18n.getDropFiles().setOne(String.format("Drop %s here", fileName));
         i18n.getError().setIncorrectFileType("The provided file does not have the correct format (.json)");
         i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB");
         return i18n;
     }
 
     private Component createActionLayout() {
-        HorizontalLayout buttonLayout = new HorizontalLayout();
+        FlexLayout buttonLayout = new FlexLayout();
         buttonLayout.setWidthFull();
         buttonLayout.setAlignItems(Alignment.CENTER);
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        buttonLayout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-m)");
 
         // Download
         Button downloadButton = new Button("Download", getDownloadIcon());
@@ -320,10 +326,13 @@ public class EntrylistEditorView extends BaseView {
 
         Button reverseGridButton = new Button("Reverse grid positions", new Icon(VaadinIcon.REFRESH));
         reverseGridButton.addClickListener(event -> reverseEntrylistEntries());
-        reverseGridButton.getStyle()
+
+        Button importResultsButton = new Button("Import results", getUploadIcon());
+        importResultsButton.addClickListener(event -> resultsUploadDialog.open());
+        importResultsButton.getStyle()
                 .setMarginRight("auto");
 
-        FlexLayout entrylistHeaderLayout = new FlexLayout(reverseGridButton, sortingModeSelect, sortdirectionSelect);
+        FlexLayout entrylistHeaderLayout = new FlexLayout(reverseGridButton, importResultsButton, sortingModeSelect, sortdirectionSelect);
         entrylistHeaderLayout.setWidthFull();
         entrylistHeaderLayout.setAlignItems(Alignment.END);
         entrylistHeaderLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -356,7 +365,7 @@ public class EntrylistEditorView extends BaseView {
         }
 
         Comparator<Map.Entry<AccEntrylistEntry, Component>> comparator = switch (getSortingMode()) {
-            case GRID_POSITION -> gridPositionComparator;
+            case GRID_POSITION -> gridPositionComparator.thenComparing(raceNumberComparator);
             case CAR_NUMBER -> raceNumberComparator;
             case ADMIN -> adminComparator.thenComparing(raceNumberComparator);
             default -> noopComparator;
@@ -390,6 +399,20 @@ public class EntrylistEditorView extends BaseView {
         entrylistPreview.setValue(JsonUtils.toJsonPretty(entrylist));
     }
 
+    private void addEntrylistEntry(AccEntrylistEntry entry) {
+        Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
+        entrylistEntriesMap.put(entry, entrylistEntryLayout);
+
+        refreshEntrylistEntriesFromMap();
+        scrollToComponent(entrylistEntryLayout);
+    }
+
+    private void removeEntrylistEntry(AccEntrylistEntry entry) {
+        entrylistEntriesMap.remove(entry);
+
+        refreshEntrylistEntriesFromMap();
+    }
+
     private void reverseEntrylistEntries() {
         if (entrylist == null || entrylist.getEntries() == null) {
             notificationService.showErrorNotification("Reverse grid positions failed - Entrylist is missing");
@@ -413,22 +436,53 @@ public class EntrylistEditorView extends BaseView {
 
         refreshEntrylistEditor();
 
-        notificationService.showSuccessNotification("Grid positions successfully reversed");
+        notificationService.showSuccessNotification("Grid positions reversed successfully");
     }
 
+    private void updateEntrylistWithResults(AccSession accSession, Optional<Integer> gridStartPosition) {
+        if (entrylist == null || entrylist.getEntries() == null) {
+            notificationService.showErrorNotification("Results import failed - Entrylist is missing");
+            return;
+        }
 
-    private void addEntrylistEntry(AccEntrylistEntry entry) {
-        Component entrylistEntryLayout = createEntrylistEntryLayout(entry);
-        entrylistEntriesMap.put(entry, entrylistEntryLayout);
+        if (accSession == null || accSession.getSessionResult() == null || accSession.getSessionResult().getLeaderboardLines() == null) {
+            notificationService.showErrorNotification("Results import failed - No results found");
+            return;
+        }
 
-        refreshEntrylistEntriesFromMap();
-        scrollToComponent(entrylistEntryLayout);
-    }
+        if (!SessionType.Q.equals(accSession.getSessionType())) {
+            notificationService.showWarningNotification("Results import failed - Only qualifying results are currently supported");
+            return;
+        }
 
-    private void removeEntrylistEntry(AccEntrylistEntry entry) {
-        entrylistEntriesMap.remove(entry);
+        Map<Integer, AccEntrylistEntry> entrylistEntryMap = entrylist.getEntries().stream()
+                .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
 
-        refreshEntrylistEntriesFromMap();
+        List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
+        for (int i = 0; i < leaderboardLines.size(); i++) {
+            int gridPosition = i + 1;
+
+            if (gridStartPosition.isPresent()) {
+                gridPosition += gridStartPosition.get();
+            }
+
+            AccLeaderboardLine leaderboardLine = leaderboardLines.get(i);
+            // Skip entries without laps
+            if (leaderboardLine.getTiming().getLapCount() == 0) {
+                continue;
+            }
+
+            // Skip entries without matching entrylist entry
+            AccEntrylistEntry entrylistEntry = entrylistEntryMap.get(leaderboardLine.getCar().getRaceNumber());
+            if (entrylistEntry == null) {
+                continue;
+            }
+
+            entrylistEntry.setDefaultGridPosition(gridPosition);
+        }
+
+        refreshEntrylistEditor();
+        notificationService.showSuccessNotification("Entrylist updated successfully");
     }
 
     private Component createEntrylistFooterLayout() {
@@ -890,6 +944,68 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
+    private Dialog createResultsUploadDialog() {
+        AtomicReference<AccSession> uploadedSession = new AtomicReference<>();
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Upload results");
+
+        IntegerField gridStartPositionField = new IntegerField("Grid start position");
+        gridStartPositionField.setWidthFull();
+        gridStartPositionField.setMin(1);
+        gridStartPositionField.setMax(120);
+        gridStartPositionField.setPlaceholder("optional");
+        gridStartPositionField.setHelperText("Set the starting position for the grid. Leave empty to start from the first position.");
+
+        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        cancelButton.getStyle()
+                .set("margin-right", "auto");
+
+        Button validateButton = new Button("Update");
+        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        validateButton.setEnabled(false);
+        validateButton.addClickListener(event -> {
+            updateEntrylistWithResults(uploadedSession.get(), Optional.ofNullable(gridStartPositionField.getValue()));
+            dialog.close();
+        });
+
+        dialog.getFooter().add(cancelButton, validateButton);
+
+        Upload resultsUpload = new Upload();
+        MemoryBuffer memoryBuffer = new MemoryBuffer();
+        resultsUpload.setReceiver(memoryBuffer);
+        resultsUpload.setDropAllowed(true);
+        resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        resultsUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        resultsUpload.setI18n(configureUploadI18N("results.json"));
+        resultsUpload.addSucceededListener(event -> {
+            InputStream fileData = memoryBuffer.getInputStream();
+
+            AccSession session = JsonUtils.fromJson(fileData, AccSession.class);
+
+            // Validate results file against syntax and semantic rules
+            validationService.validate(session);
+
+            uploadedSession.set(session);
+            validateButton.setEnabled(true);
+        });
+        resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        resultsUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
+        resultsUpload.addFileRemovedListener(event -> validateButton.setEnabled(false));
+
+        Paragraph importantNote = new Paragraph("IMPORTANT: The car number (raceNumber) will be used to match the results with the entrylist entries. Make sure that the car numbers are matching.");
+        importantNote.getStyle()
+                .setFontWeight(Style.FontWeight.BOLD)
+                .setMarginTop("var(--lumo-space-l)");
+
+        Paragraph updateAttributesText = new Paragraph("The session results will be used to update the following fields of the entrylist:");
+        UnorderedList updatedAttributesList = new UnorderedList();
+        updatedAttributesList.add(new ListItem("Default grid position"));
+        dialog.add(resultsUpload, gridStartPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        return dialog;
+    }
+
     private SortingModeEntrylist getSortingMode() {
         return sortingModeSelect.getValue();
     }
@@ -915,6 +1031,7 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private void createNewEntrylist(AccEntrylist entrylist, EntrylistMetadata entrylistMetadata) {
+        resetEntities();
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
         this.downloadAnchor.setHref(downloadEntrylist(entrylistMetadata));
@@ -928,6 +1045,8 @@ public class EntrylistEditorView extends BaseView {
         confirmDialog.setText("Your current entrylist will be discarded. Do you want to proceed?");
         confirmDialog.setConfirmText("Continue");
         confirmDialog.setCancelable(true);
+        confirmDialog.setCancelButtonTheme("tertiary error");
+        confirmDialog.setConfirmButtonTheme("primary error");
         return confirmDialog;
     }
 

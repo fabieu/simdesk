@@ -100,6 +100,11 @@ public abstract class BaseView extends VerticalLayout {
         return new Icon(VaadinIcon.CLOUD_DOWNLOAD_O);
     }
 
+
+    protected AbstractIcon<?> getUploadIcon() {
+        return new Icon(VaadinIcon.CLOUD_UPLOAD_O);
+    }
+
     protected AbstractIcon<?> getShareIcon() {
         return new Icon(VaadinIcon.SHARE_SQUARE);
     }
