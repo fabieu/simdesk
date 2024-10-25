@@ -100,8 +100,21 @@ public abstract class BaseView extends VerticalLayout {
         return new Icon(VaadinIcon.CLOUD_DOWNLOAD_O);
     }
 
+
+    protected AbstractIcon<?> getUploadIcon() {
+        return new Icon(VaadinIcon.CLOUD_UPLOAD_O);
+    }
+
     protected AbstractIcon<?> getShareIcon() {
         return new Icon(VaadinIcon.SHARE_SQUARE);
+    }
+
+    protected AbstractIcon<?> getResetIcon() {
+        return new Icon(VaadinIcon.ARROW_BACKWARD);
+    }
+
+    protected AbstractIcon<?> getValidateIcon() {
+        return new Icon(VaadinIcon.CLIPBOARD_CHECK);
     }
 
     protected Icon getWeatherIcon(Session session) {
