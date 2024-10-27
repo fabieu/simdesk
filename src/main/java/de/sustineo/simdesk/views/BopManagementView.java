@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -11,11 +12,13 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
 import com.vaadin.flow.component.icon.VaadinIcon;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -23,6 +26,8 @@ import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -44,19 +49,86 @@ import java.util.List;
 public class BopManagementView extends BaseView {
     private final BopService bopService;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
 
     public BopManagementView(BopService bopService,
-                             SecurityService securityService) {
+                             SecurityService securityService,
+                             NotificationService notificationService) {
         this.bopService = bopService;
         this.securityService = securityService;
+        this.notificationService = notificationService;
 
         setSizeFull();
         setPadding(false);
         setSpacing(false);
 
         add(createViewHeader());
+        add(createActionsLayout());
         addAndExpand(createBopGrid());
         add(createFooter());
+    }
+
+    private Component createActionsLayout() {
+        ComboBox<Track> trackComboBox = new ComboBox<>("Track");
+
+        Button enableTrackButton = new Button("Enable");
+        enableTrackButton.setEnabled(false);
+        enableTrackButton.addClickListener(e -> {
+            Track track = trackComboBox.getValue();
+            if (track != null) {
+                bopService.enableAllForTrack(track.getTrackId());
+                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been enabled");
+            }
+        });
+
+        Button disableTrackButton = new Button("Disable");
+        disableTrackButton.setEnabled(false);
+        disableTrackButton.addClickListener(e -> {
+            Track track = trackComboBox.getValue();
+            if (track != null) {
+                bopService.disableAllForTrack(track.getTrackId());
+                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been disabled");
+            }
+        });
+
+        Button resetAllForTrackButton = new Button("Reset");
+        resetAllForTrackButton.setEnabled(false);
+        resetAllForTrackButton.addClickListener(e -> {
+            Track track = trackComboBox.getValue();
+            if (track != null) {
+                bopService.resetAllForTrack(track.getTrackId());
+                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been reset");
+            }
+        });
+
+        trackComboBox.setItems(Track.getAllSortedByName());
+        trackComboBox.setItemLabelGenerator(Track::getTrackName);
+        ;
+        trackComboBox.setClearButtonVisible(true);
+        trackComboBox.setPlaceholder("Select track");
+        trackComboBox.addValueChangeListener(e -> {
+            Track track = e.getValue();
+            if (track != null) {
+                enableTrackButton.setEnabled(true);
+                disableTrackButton.setEnabled(true);
+                resetAllForTrackButton.setEnabled(true);
+            } else {
+                enableTrackButton.setEnabled(false);
+                disableTrackButton.setEnabled(false);
+                resetAllForTrackButton.setEnabled(false);
+            }
+        });
+
+        FlexLayout trackActionLayout = new FlexLayout(trackComboBox, enableTrackButton, disableTrackButton, resetAllForTrackButton);
+        trackActionLayout.setAlignItems(Alignment.END);
+        trackActionLayout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-m)");
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.add(trackActionLayout);
+
+        return layout;
     }
 
     private Component createBopGrid() {
@@ -64,7 +136,7 @@ public class BopManagementView extends BaseView {
         layout.setPadding(true);
 
         List<Bop> bops = bopService.getAll().stream()
-                .sorted(bopService.getComparator())
+                .sorted(new BopComparator())
                 .toList();
 
         Grid<Bop> grid = new Grid<>(Bop.class, false);

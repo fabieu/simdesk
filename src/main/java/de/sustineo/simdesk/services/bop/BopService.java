@@ -15,8 +15,9 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import javax.annotation.Nonnull;
 import java.util.List;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -24,10 +25,6 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_BOP)
 @Service
 public class BopService {
-    private static final Comparator<Bop> BOP_COMPARATOR = Comparator.comparing(Bop::getTrackId)
-            .thenComparing(bop -> Car.getCarGroupById(bop.getCarId()))
-            .thenComparing(bop -> Car.getCarNameById(bop.getCarId()));
-
     private final BopMapper bopMapper;
 
     public BopService(BopMapper bopMapper) {
@@ -76,8 +73,25 @@ public class BopService {
         bopMapper.update(bop);
     }
 
-    public Comparator<Bop> getComparator() {
-        return BOP_COMPARATOR;
+    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
+    public void enableAllForTrack(@Nonnull String trackId) {
+        Objects.requireNonNull(trackId);
+
+        bopMapper.enableAllForTrack(trackId);
+    }
+
+    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
+    public void disableAllForTrack(@Nonnull String trackId) {
+        Objects.requireNonNull(trackId);
+
+        bopMapper.disableAllForTrack(trackId);
+    }
+
+    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
+    public void resetAllForTrack(@Nonnull String trackId) {
+        Objects.requireNonNull(trackId);
+
+        bopMapper.resetAllForTrack(trackId);
     }
 
     public AccBopEntry convertToAccBopEntry(Bop bop) {
