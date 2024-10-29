@@ -1,9 +1,8 @@
 package de.sustineo.simdesk.services.entrylist;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylist;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylistEntry;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
+import de.sustineo.simdesk.entities.CustomCar;
+import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -14,16 +13,89 @@ import org.springframework.stereotype.Service;
 
 import java.lang.reflect.InvocationTargetException;
 import java.lang.reflect.Method;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Set;
+import java.util.*;
+import java.util.function.Function;
 import java.util.logging.Level;
+import java.util.stream.Collectors;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Service
 public class EntrylistService {
+    public void updateFromResults(AccEntrylist entrylist, AccSession accSession, Optional<Integer> gridStartPosition) {
+        Map<Integer, AccEntrylistEntry> entrylistEntryMap = entrylist.getEntries().stream()
+                .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
+
+        List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
+        for (int i = 0; i < leaderboardLines.size(); i++) {
+            int gridPosition = i + 1;
+
+            if (gridStartPosition.isPresent()) {
+                gridPosition += gridStartPosition.get();
+            }
+
+            AccLeaderboardLine leaderboardLine = leaderboardLines.get(i);
+            // Skip entries without laps
+            if (leaderboardLine.getTiming().getLapCount() == 0) {
+                continue;
+            }
+
+            // Skip entries without matching entrylist entry
+            AccEntrylistEntry entrylistEntry = entrylistEntryMap.get(leaderboardLine.getCar().getRaceNumber());
+            if (entrylistEntry == null) {
+                continue;
+            }
+
+            entrylistEntry.setDefaultGridPosition(gridPosition);
+        }
+    }
+
+    public void updateFromCustomCars(AccEntrylist entrylist, CustomCar[] customCars) {
+        Map<Integer, CustomCar> customCarByCarIdMap = Arrays.stream(customCars)
+                .collect(Collectors.toMap(CustomCar::getCarId, Function.identity()));
+
+        Map<Integer, CustomCar> customCarByCarNumberMap = Arrays.stream(customCars)
+                .collect(Collectors.toMap(CustomCar::getCarNumber, Function.identity()));
+
+        for (AccEntrylistEntry entrylistEntry : entrylist.getEntries()) {
+            if (StringUtils.isNotBlank(entrylistEntry.getCustomCar())) {
+                continue;
+            }
+
+            CustomCar customCarByCarId = customCarByCarIdMap.get(entrylistEntry.getForcedCarModel());
+            CustomCar customCarByCarNumber = customCarByCarNumberMap.get(entrylistEntry.getRaceNumber());
+
+            CustomCar customCar;
+            if (customCarByCarNumber != null) {
+                entrylistEntry.setCustomCar(customCarByCarNumber.getCustomCar());
+                customCar = customCarByCarNumber;
+            } else if (customCarByCarId != null) {
+                entrylistEntry.setCustomCar(customCarByCarId.getCustomCar());
+                customCar = customCarByCarId;
+            } else {
+                continue;
+            }
+
+            if (Boolean.TRUE.equals(customCar.getOverrideCarModelForCustomCar())) {
+                entrylistEntry.setOverrideCarModelForCustomCar(1);
+            } else if (Boolean.FALSE.equals(customCar.getOverrideCarModelForCustomCar())) {
+                entrylistEntry.setOverrideCarModelForCustomCar(0);
+            }
+        }
+    }
+
+    public void reverseGridPositions(AccEntrylist entrylist) {
+        long numberOfEntriesWithGridPosition = entrylist.getEntries().stream()
+                .filter(AccEntrylistEntry::hasDefaultGridPosition)
+                .count();
+
+        for (AccEntrylistEntry entrylistEntry : entrylist.getEntries()) {
+            if (entrylistEntry.hasDefaultGridPosition()) {
+                entrylistEntry.setDefaultGridPosition((int) (numberOfEntriesWithGridPosition + 1 - entrylistEntry.getDefaultGridPosition()));
+            }
+        }
+    }
+
     public ValidationData validateRules(AccEntrylist entrylist, Set<ValidationRule> rules) {
         return validate(entrylist, rules);
     }
