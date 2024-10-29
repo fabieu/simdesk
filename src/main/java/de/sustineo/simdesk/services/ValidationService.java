@@ -1,6 +1,9 @@
 package de.sustineo.simdesk.services;
 
-import jakarta.validation.*;
+
+import jakarta.validation.ConstraintViolation;
+import jakarta.validation.ConstraintViolationException;
+import jakarta.validation.Validator;
 import org.springframework.stereotype.Service;
 
 import java.util.Set;
@@ -9,10 +12,8 @@ import java.util.Set;
 public class ValidationService {
     private final Validator validator;
 
-    public ValidationService() {
-        try (ValidatorFactory factory = Validation.buildDefaultValidatorFactory()) {
-            this.validator = factory.getValidator();
-        }
+    public ValidationService(Validator validator) {
+        this.validator = validator;
     }
 
     public <T> void validate(T input) {

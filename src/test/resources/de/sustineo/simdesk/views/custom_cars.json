@@ -1,0 +1,12 @@
+[
+  {
+    "carId": 1,
+    "carNumber": 100,
+    "customCar": "CustomCar.json"
+  },
+  {
+    "carId": 2,
+    "carNumber": 200,
+    "customCar": "CustomCar2.json"
+  }
+]

@@ -63,8 +63,6 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
-import java.util.function.Function;
-import java.util.stream.Collectors;
 
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
@@ -107,6 +105,7 @@ public class EntrylistEditorView extends BaseView {
     private final ConfirmDialog resetDialog = createResetDialog();
     private final Dialog validationDialog = createValidationDialog();
     private final Dialog resultsUploadDialog = createResultsUploadDialog();
+    private final Dialog customCarsUploadDialog = createCustomCarsUploadDialog();
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                ValidationService validationService,
@@ -329,10 +328,13 @@ public class EntrylistEditorView extends BaseView {
 
         Button importResultsButton = new Button("Import results", getUploadIcon());
         importResultsButton.addClickListener(event -> resultsUploadDialog.open());
-        importResultsButton.getStyle()
+
+        Button loadDefaultCustomCarsButton = new Button("Load custom cars", new Icon(VaadinIcon.CAR));
+        loadDefaultCustomCarsButton.addClickListener(event -> customCarsUploadDialog.open());
+        loadDefaultCustomCarsButton.getStyle()
                 .setMarginRight("auto");
 
-        FlexLayout entrylistHeaderLayout = new FlexLayout(reverseGridButton, importResultsButton, sortingModeSelect, sortdirectionSelect);
+        FlexLayout entrylistHeaderLayout = new FlexLayout(reverseGridButton, importResultsButton, loadDefaultCustomCarsButton, sortingModeSelect, sortdirectionSelect);
         entrylistHeaderLayout.setWidthFull();
         entrylistHeaderLayout.setAlignItems(Alignment.END);
         entrylistHeaderLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -419,27 +421,13 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        long numberOfEntriesWithGridPosition = entrylist.getEntries().stream()
-                .filter(AccEntrylistEntry::hasDefaultGridPosition)
-                .count();
-
-        if (numberOfEntriesWithGridPosition == 0) {
-            notificationService.showWarningNotification("Reverse grid positions failed - No grid positions found");
-            return;
-        }
-
-        for (AccEntrylistEntry entry : entrylist.getEntries()) {
-            if (entry.hasDefaultGridPosition()) {
-                entry.setDefaultGridPosition((int) (numberOfEntriesWithGridPosition + 1 - entry.getDefaultGridPosition()));
-            }
-        }
-
+        entrylistService.reverseGridPositions(entrylist);
         refreshEntrylistEditor();
 
         notificationService.showSuccessNotification("Grid positions reversed successfully");
     }
 
-    private void updateEntrylistWithResults(AccSession accSession, Optional<Integer> gridStartPosition) {
+    private void updateEntrylistFromResults(AccSession accSession, Optional<Integer> gridStartPosition) {
         if (entrylist == null || entrylist.getEntries() == null) {
             notificationService.showErrorNotification("Results import failed - Entrylist is missing");
             return;
@@ -455,34 +443,27 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        Map<Integer, AccEntrylistEntry> entrylistEntryMap = entrylist.getEntries().stream()
-                .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
+        entrylistService.updateFromResults(entrylist, accSession, gridStartPosition);
+        refreshEntrylistEditor();
 
-        List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
-        for (int i = 0; i < leaderboardLines.size(); i++) {
-            int gridPosition = i + 1;
+        notificationService.showSuccessNotification("Entrylist updated successfully");
+    }
 
-            if (gridStartPosition.isPresent()) {
-                gridPosition += gridStartPosition.get();
-            }
-
-            AccLeaderboardLine leaderboardLine = leaderboardLines.get(i);
-            // Skip entries without laps
-            if (leaderboardLine.getTiming().getLapCount() == 0) {
-                continue;
-            }
-
-            // Skip entries without matching entrylist entry
-            AccEntrylistEntry entrylistEntry = entrylistEntryMap.get(leaderboardLine.getCar().getRaceNumber());
-            if (entrylistEntry == null) {
-                continue;
-            }
-
-            entrylistEntry.setDefaultGridPosition(gridPosition);
+    private void updateEntrylistFromCustomCars(CustomCar[] customCars) {
+        if (entrylist == null || entrylist.getEntries() == null) {
+            notificationService.showErrorNotification("Custom cars import failed - Entrylist is missing");
+            return;
         }
 
+        if (customCars == null || customCars.length == 0) {
+            notificationService.showErrorNotification("Custom cars import failed - No custom cars found");
+            return;
+        }
+
+        entrylistService.updateFromCustomCars(entrylist, customCars);
         refreshEntrylistEditor();
-        notificationService.showSuccessNotification("Entrylist updated successfully");
+
+        notificationService.showSuccessNotification("Custom cars updated successfully");
     }
 
     private Component createEntrylistFooterLayout() {
@@ -588,7 +569,6 @@ public class EntrylistEditorView extends BaseView {
 
         Checkbox overrideCarModelForCustomCarCheckbox = new Checkbox("Enabled");
         overrideCarModelForCustomCarCheckbox.setTooltipText("Enable this option to override the car model for the custom car");
-        overrideCarModelForCustomCarCheckbox.setValue(Integer.valueOf(1).equals(entry.getOverrideCarModelForCustomCar()));
 
         CheckboxGroup<Checkbox> overrideCarModelForCustomCarCheckboxGroup = new CheckboxGroup<>("Override car model for custom car");
         overrideCarModelForCustomCarCheckboxGroup.setTooltipText("Override car model for custom car");
@@ -598,6 +578,10 @@ public class EntrylistEditorView extends BaseView {
             entry.setOverrideCarModelForCustomCar(event.getValue().contains(overrideCarModelForCustomCarCheckbox) ? 1 : 0);
             refreshEntrylistPreview();
         });
+        if (Integer.valueOf(1).equals(entry.getOverrideCarModelForCustomCar())) {
+            overrideCarModelForCustomCarCheckboxGroup.deselectAll();
+            overrideCarModelForCustomCarCheckboxGroup.select(overrideCarModelForCustomCarCheckbox);
+        }
 
         TextField customCarField = new TextField("Custom Car");
         customCarField.setValue(Objects.requireNonNullElse(entry.getCustomCar(), ""));
@@ -966,7 +950,7 @@ public class EntrylistEditorView extends BaseView {
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         validateButton.setEnabled(false);
         validateButton.addClickListener(event -> {
-            updateEntrylistWithResults(uploadedSession.get(), Optional.ofNullable(gridStartPositionField.getValue()));
+            updateEntrylistFromResults(uploadedSession.get(), Optional.ofNullable(gridStartPositionField.getValue()));
             dialog.close();
         });
 
@@ -1002,7 +986,62 @@ public class EntrylistEditorView extends BaseView {
         Paragraph updateAttributesText = new Paragraph("The session results will be used to update the following fields of the entrylist:");
         UnorderedList updatedAttributesList = new UnorderedList();
         updatedAttributesList.add(new ListItem("Default grid position"));
+
         dialog.add(resultsUpload, gridStartPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        return dialog;
+    }
+
+    private Dialog createCustomCarsUploadDialog() {
+        AtomicReference<CustomCar[]> uploadedCustomCars = new AtomicReference<>();
+
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Upload default custom cars");
+
+        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        cancelButton.getStyle()
+                .set("margin-right", "auto");
+
+        Button validateButton = new Button("Update");
+        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        validateButton.setEnabled(false);
+        validateButton.addClickListener(event -> {
+            updateEntrylistFromCustomCars(uploadedCustomCars.get());
+            dialog.close();
+        });
+
+        dialog.getFooter().add(cancelButton, validateButton);
+
+        Upload defaultCustomCarUpload = new Upload();
+        MemoryBuffer memoryBuffer = new MemoryBuffer();
+        defaultCustomCarUpload.setReceiver(memoryBuffer);
+        defaultCustomCarUpload.setDropAllowed(true);
+        defaultCustomCarUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        defaultCustomCarUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
+        defaultCustomCarUpload.addSucceededListener(event -> {
+            InputStream fileData = memoryBuffer.getInputStream();
+
+            CustomCar[] customCars = JsonUtils.fromJson(fileData, CustomCar[].class);
+
+            // Validate results file against syntax and semantic rules
+            for (CustomCar customCar : customCars) {
+                validationService.validate(customCar);
+            }
+
+            uploadedCustomCars.set(customCars);
+            validateButton.setEnabled(true);
+        });
+        defaultCustomCarUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        defaultCustomCarUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
+        defaultCustomCarUpload.addFileRemovedListener(event -> validateButton.setEnabled(false));
+
+        Paragraph updateAttributesText = new Paragraph("The custom cars file will be used to update the following fields of the entrylist:");
+        UnorderedList updatedAttributesList = new UnorderedList();
+        updatedAttributesList.add(new ListItem("Custom Car"));
+        updatedAttributesList.add(new ListItem("Override car model for custom car"));
+
+        dialog.add(defaultCustomCarUpload, updateAttributesText, updatedAttributesList);
         return dialog;
     }
 
