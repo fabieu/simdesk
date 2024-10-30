@@ -15,9 +15,8 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import javax.annotation.Nonnull;
+import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -43,7 +42,16 @@ public class BopService {
 
         availableTrackCarPairs.forEach(pair -> {
             if (!currentTrackCarPairs.contains(pair)) {
-                bopMapper.insert(new Bop(pair.getLeft(), pair.getRight(), false));
+                Bop defaultBop = Bop.builder()
+                        .trackId(pair.getLeft())
+                        .carId(pair.getRight())
+                        .restrictor(0)
+                        .ballastKg(0)
+                        .active(false)
+                        .updateDatetime(Instant.now())
+                        .build();
+
+                bopMapper.insert(defaultBop);
             }
         });
     }
@@ -66,32 +74,10 @@ public class BopService {
     @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
     public void update(Bop bop) {
         if (bop.getTrackId() == null || bop.getCarId() == null) {
-            log.severe(String.format("Cannot update %s because trackId or carId is null", bop));
             return;
         }
 
         bopMapper.update(bop);
-    }
-
-    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
-    public void enableAllForTrack(@Nonnull String trackId) {
-        Objects.requireNonNull(trackId);
-
-        bopMapper.enableAllForTrack(trackId);
-    }
-
-    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
-    public void disableAllForTrack(@Nonnull String trackId) {
-        Objects.requireNonNull(trackId);
-
-        bopMapper.disableAllForTrack(trackId);
-    }
-
-    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
-    public void resetAllForTrack(@Nonnull String trackId) {
-        Objects.requireNonNull(trackId);
-
-        bopMapper.resetAllForTrack(trackId);
     }
 
     public AccBopEntry convertToAccBopEntry(Bop bop) {

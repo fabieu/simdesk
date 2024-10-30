@@ -6,7 +6,7 @@ import de.sustineo.simdesk.entities.Bop;
 public class InactiveBopPartNameGenerator implements SerializableFunction<Bop, String> {
     @Override
     public String apply(Bop bop) {
-        if (bop == null || bop.isActive()) {
+        if (bop == null || bop.getActive()) {
             return null;
         }
 

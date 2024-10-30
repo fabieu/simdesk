@@ -52,34 +52,4 @@ public interface BopMapper {
             WHERE track_id = #{trackId} AND car_id = #{carId}
             """)
     void update(Bop bop);
-
-    @Update("""
-            UPDATE simdesk.bop SET active = true, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    @Update(databaseId = DatabaseVendor.SQLITE, value = """
-            UPDATE bop SET active = true, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    void enableAllForTrack(String trackId);
-
-    @Update("""
-            UPDATE simdesk.bop SET active = false, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    @Update(databaseId = DatabaseVendor.SQLITE, value = """
-            UPDATE bop SET active = false, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    void disableAllForTrack(String trackId);
-
-    @Update("""
-            UPDATE simdesk.bop SET restrictor = 0, ballast_kg = 0, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    @Update(databaseId = DatabaseVendor.SQLITE, value = """
-            UPDATE bop SET restrictor = 0, ballast_kg = 0, update_datetime = now()
-            WHERE track_id = #{trackId}
-            """)
-    void resetAllForTrack(String trackId);
 }

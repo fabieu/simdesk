@@ -25,7 +25,6 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -33,12 +32,15 @@ import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.filter.BopManagementFilter;
 import de.sustineo.simdesk.views.filter.GridFilter;
+import de.sustineo.simdesk.views.generators.BopCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.BopRenderer;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
+import javax.annotation.Nullable;
 import java.time.Instant;
+import java.util.ArrayList;
 import java.util.List;
 
 @Log
@@ -50,6 +52,10 @@ public class BopManagementView extends BaseView {
     private final BopService bopService;
     private final SecurityService securityService;
     private final NotificationService notificationService;
+
+    private final List<Bop> bopList = new ArrayList<>();
+    private final Grid<Bop> grid = new Grid<>(Bop.class, false);
+    private final GridListDataView<Bop> gridDataView = grid.setItems(bopList);
 
     public BopManagementView(BopService bopService,
                              SecurityService securityService,
@@ -66,6 +72,17 @@ public class BopManagementView extends BaseView {
         add(createActionsLayout());
         addAndExpand(createBopGrid());
         add(createFooter());
+
+        initializeBopList();
+    }
+
+    private void initializeBopList() {
+        List<Bop> sortedBops = bopService.getAll().stream()
+                .sorted(new BopComparator())
+                .toList();
+        this.bopList.addAll(sortedBops);
+
+        gridDataView.refreshAll();
     }
 
     private Component createActionsLayout() {
@@ -76,7 +93,7 @@ public class BopManagementView extends BaseView {
         enableTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                bopService.enableAllForTrack(track.getTrackId());
+                enableAllForTrack(track.getTrackId());
                 notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been enabled");
             }
         });
@@ -86,7 +103,7 @@ public class BopManagementView extends BaseView {
         disableTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                bopService.disableAllForTrack(track.getTrackId());
+                disableAllForTrack(track.getTrackId());
                 notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been disabled");
             }
         });
@@ -96,14 +113,15 @@ public class BopManagementView extends BaseView {
         resetAllForTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                bopService.resetAllForTrack(track.getTrackId());
+                resetAllForTrack(track.getTrackId());
                 notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been reset");
             }
         });
+        resetAllForTrackButton.getStyle()
+                .setMarginRight("auto");
 
         trackComboBox.setItems(Track.getAllSortedByName());
         trackComboBox.setItemLabelGenerator(Track::getTrackName);
-        ;
         trackComboBox.setClearButtonVisible(true);
         trackComboBox.setPlaceholder("Select track");
         trackComboBox.addValueChangeListener(e -> {
@@ -133,30 +151,21 @@ public class BopManagementView extends BaseView {
 
     private Component createBopGrid() {
         VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(true);
+        layout.setPadding(false);
 
-        List<Bop> bops = bopService.getAll().stream()
-                .sorted(new BopComparator())
-                .toList();
-
-        Grid<Bop> grid = new Grid<>(Bop.class, false);
         Editor<Bop> editor = grid.getEditor();
-        GridListDataView<Bop> dataView = grid.setItems(bops);
         grid.setSizeFull();
         grid.setMultiSort(true, true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setPartNameGenerator(new BopCarGroupPartNameGenerator());
 
         Binder<Bop> binder = new Binder<>(Bop.class);
         editor.setBinder(binder);
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<Bop>) event -> {
-            String authenticatedUsername = securityService.getAuthenticatedUser()
-                    .map(UserPrincipal::getUsername)
-                    .orElse(null);
-
             Bop bop = event.getItem();
-            bop.setUsername(authenticatedUsername);
+            bop.setUsername(securityService.getAuthenticatedUsername());
             bop.setUpdateDatetime(Instant.now());
             bopService.update(bop);
         });
@@ -181,7 +190,7 @@ public class BopManagementView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Bop::getBallastKg);
-        Grid.Column<Bop> activeColumn = grid.addColumn(Bop::isActive)
+        Grid.Column<Bop> activeColumn = grid.addColumn(Bop::getActive)
                 .setHeader("Active")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -231,7 +240,7 @@ public class BopManagementView extends BaseView {
         activeField.setWidthFull();
         binder.forField(activeField)
                 .asRequired()
-                .bind(Bop::isActive, Bop::setActive);
+                .bind(Bop::getActive, Bop::setActive);
         activeColumn.setEditorComponent(activeField);
 
         Button saveButton = new Button("Save", e -> editor.save());
@@ -241,7 +250,7 @@ public class BopManagementView extends BaseView {
         actions.setPadding(false);
         editColumn.setEditorComponent(actions);
 
-        BopManagementFilter filter = new BopManagementFilter(dataView);
+        BopManagementFilter filter = new BopManagementFilter(gridDataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(filter::setTrackName));
         headerRow.getCell(carNameColumn).setComponent(GridFilter.createHeader(filter::setCarName));
@@ -249,7 +258,64 @@ public class BopManagementView extends BaseView {
         headerRow.getCell(usernameColumn).setComponent(GridFilter.createHeader(filter::setUsername));
 
         layout.add(grid);
-
         return layout;
+    }
+
+    private void enableAllForTrack(@Nullable String trackId) {
+        if (trackId == null) {
+            return;
+        }
+
+        for (Bop bop : bopList) {
+            if (!trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            bop.setActive(true);
+            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUpdateDatetime(Instant.now());
+
+            bopService.update(bop);
+            gridDataView.refreshItem(bop);
+        }
+    }
+
+    private void disableAllForTrack(@Nullable String trackId) {
+        if (trackId == null) {
+            return;
+        }
+
+        for (Bop bop : bopList) {
+            if (!trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            bop.setActive(false);
+            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUpdateDatetime(Instant.now());
+
+            bopService.update(bop);
+            gridDataView.refreshItem(bop);
+        }
+    }
+
+    private void resetAllForTrack(@Nullable String trackId) {
+        if (trackId == null) {
+            return;
+        }
+
+        for (Bop bop : bopList) {
+            if (!trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            bop.setRestrictor(0);
+            bop.setBallastKg(0);
+            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUpdateDatetime(Instant.now());
+
+            bopService.update(bop);
+            gridDataView.refreshItem(bop);
+        }
     }
 }
