@@ -19,11 +19,13 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.Style;
+import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
+import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.services.NotificationService;
@@ -41,7 +43,9 @@ import org.springframework.context.annotation.Profile;
 import javax.annotation.Nullable;
 import java.time.Instant;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
@@ -49,6 +53,10 @@ import java.util.List;
 @PageTitle("Balance of Performance - Management")
 @RolesAllowed({"ADMIN"})
 public class BopManagementView extends BaseView {
+    private final static String GRID_FILTER_TRACK = "TRACK";
+    private final static String GRID_FILTER_CAR_GROUP = "CAR_GROUP";
+    private final static String GRID_FILTER_ACTIVE = "ACTIVE";
+
     private final BopService bopService;
     private final SecurityService securityService;
     private final NotificationService notificationService;
@@ -56,6 +64,7 @@ public class BopManagementView extends BaseView {
     private final List<Bop> bopList = new ArrayList<>();
     private final Grid<Bop> grid = new Grid<>(Bop.class, false);
     private final GridListDataView<Bop> gridDataView = grid.setItems(bopList);
+    private final Map<String, SerializablePredicate<Bop>> gridFilters = new HashMap<>();
 
     public BopManagementView(BopService bopService,
                              SecurityService securityService,
@@ -83,6 +92,13 @@ public class BopManagementView extends BaseView {
         this.bopList.addAll(sortedBops);
 
         gridDataView.refreshAll();
+    }
+
+    private void refreshFilters() {
+        SerializablePredicate<Bop> filters = gridFilters.values().stream()
+                .reduce(SerializablePredicate::and)
+                .orElse(null);
+        gridDataView.setFilter(filters);
     }
 
     private Component createActionsLayout() {
@@ -117,8 +133,6 @@ public class BopManagementView extends BaseView {
                 notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been reset");
             }
         });
-        resetAllForTrackButton.getStyle()
-                .setMarginRight("auto");
 
         trackComboBox.setItems(Track.getAllSortedByName());
         trackComboBox.setItemLabelGenerator(Track::getTrackName);
@@ -137,14 +151,63 @@ public class BopManagementView extends BaseView {
             }
         });
 
-        FlexLayout trackActionLayout = new FlexLayout(trackComboBox, enableTrackButton, disableTrackButton, resetAllForTrackButton);
-        trackActionLayout.setAlignItems(Alignment.END);
+        ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
+        trackFilterComboxBox.setLabel("Track");
+        trackFilterComboxBox.setItems(Track.getAllSortedByName());
+        trackFilterComboxBox.setItemLabelGenerator(Track::getTrackName);
+        trackFilterComboxBox.setClearButtonVisible(true);
+        trackFilterComboxBox.addValueChangeListener(e -> {
+            Track track = e.getValue();
+            if (track != null) {
+                gridFilters.put(GRID_FILTER_TRACK, bop -> track.getTrackId().equals(bop.getTrackId()));
+            } else {
+                gridFilters.remove(GRID_FILTER_TRACK);
+            }
+            refreshFilters();
+        });
+
+        ComboBox<CarGroup> carGroupFilterComboBox = new ComboBox<>();
+        carGroupFilterComboBox.setLabel("Car Group");
+        carGroupFilterComboBox.setItems(CarGroup.values());
+        carGroupFilterComboBox.setItemLabelGenerator(CarGroup::name);
+        carGroupFilterComboBox.setClearButtonVisible(true);
+        carGroupFilterComboBox.addValueChangeListener(e -> {
+            CarGroup carGroup = e.getValue();
+            if (carGroup != null) {
+                gridFilters.put(GRID_FILTER_CAR_GROUP, bop -> carGroup.equals(Car.getCarGroupById(bop.getCarId())));
+            } else {
+                gridFilters.remove(GRID_FILTER_CAR_GROUP);
+            }
+            refreshFilters();
+        });
+
+        ComboBox<Boolean> activeFilterComboBox = new ComboBox<>();
+        activeFilterComboBox.setLabel("Active");
+        activeFilterComboBox.setItems(true, false);
+        activeFilterComboBox.setClearButtonVisible(true);
+        activeFilterComboBox.addValueChangeListener(e -> {
+            Boolean active = e.getValue();
+            if (active != null) {
+                gridFilters.put(GRID_FILTER_ACTIVE, bop -> active.equals(bop.getActive()));
+            } else {
+                gridFilters.remove(GRID_FILTER_ACTIVE);
+            }
+            refreshFilters();
+        });
+
+        HorizontalLayout trackActionLayout = new HorizontalLayout(enableTrackButton, disableTrackButton, resetAllForTrackButton);
         trackActionLayout.getStyle()
+                .setMarginRight("auto");
+
+        FlexLayout bopActionLayout = new FlexLayout(trackComboBox, trackActionLayout, trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
+        bopActionLayout.setWidthFull();
+        bopActionLayout.setAlignItems(Alignment.END);
+        bopActionLayout.getStyle()
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-m)");
 
         VerticalLayout layout = new VerticalLayout();
-        layout.add(trackActionLayout);
+        layout.add(bopActionLayout);
 
         return layout;
     }
