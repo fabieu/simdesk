@@ -52,10 +52,12 @@ public class EntrylistService {
 
     public void updateFromCustomCars(AccEntrylist entrylist, CustomCar[] customCars) {
         Map<Integer, CustomCar> customCarByCarIdMap = Arrays.stream(customCars)
-                .collect(Collectors.toMap(CustomCar::getCarId, Function.identity()));
+                .filter(customCar -> customCar.getCarId() != null)
+                .collect(Collectors.toMap(CustomCar::getCarId, Function.identity(), (customCar1, customCar2) -> customCar1));
 
         Map<Integer, CustomCar> customCarByCarNumberMap = Arrays.stream(customCars)
-                .collect(Collectors.toMap(CustomCar::getCarNumber, Function.identity()));
+                .filter(customCar -> customCar.getCarNumber() != null)
+                .collect(Collectors.toMap(CustomCar::getCarNumber, Function.identity(), (customCar1, customCar2) -> customCar1));
 
         for (AccEntrylistEntry entrylistEntry : entrylist.getEntries()) {
             if (StringUtils.isNotBlank(entrylistEntry.getCustomCar())) {
