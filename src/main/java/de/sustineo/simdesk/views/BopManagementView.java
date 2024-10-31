@@ -110,7 +110,7 @@ public class BopManagementView extends BaseView {
             Track track = trackComboBox.getValue();
             if (track != null) {
                 enableAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been enabled");
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been enabled", track.getTrackName()));
             }
         });
 
@@ -120,7 +120,7 @@ public class BopManagementView extends BaseView {
             Track track = trackComboBox.getValue();
             if (track != null) {
                 disableAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been disabled");
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been disabled", track.getTrackName()));
             }
         });
 
@@ -130,7 +130,7 @@ public class BopManagementView extends BaseView {
             Track track = trackComboBox.getValue();
             if (track != null) {
                 resetAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification("All BOPs for track " + track.getTrackName() + " have been reset");
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been reset", track.getTrackName()));
             }
         });
 
