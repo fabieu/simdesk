@@ -70,6 +70,17 @@ public class SecurityService {
         return Optional.empty(); // Anonymous or no authentication
     }
 
+    /**
+     * Get the username of the currently authenticated user
+     *
+     * @return the username or null if not authenticated
+     */
+    public String getAuthenticatedUsername() {
+        return getAuthenticatedUser()
+                .map(UserPrincipal::getUsername)
+                .orElse(null);
+    }
+
     public boolean hasAnyRole(String... roles) {
         Optional<UserPrincipal> user = getAuthenticatedUser();
 

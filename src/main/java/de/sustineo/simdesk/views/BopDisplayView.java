@@ -20,6 +20,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.services.NotificationService;
@@ -109,7 +110,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         layout.setPadding(true);
 
         Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
-                .sorted(bopService.getComparator())
+                .sorted(new BopComparator())
                 .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
         for (Map.Entry<String, Set<Bop>> entry : bopsByTrack.entrySet()) {

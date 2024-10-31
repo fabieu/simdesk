@@ -15,7 +15,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
-import java.util.Comparator;
+import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -24,10 +24,6 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_BOP)
 @Service
 public class BopService {
-    private static final Comparator<Bop> BOP_COMPARATOR = Comparator.comparing(Bop::getTrackId)
-            .thenComparing(bop -> Car.getCarGroupById(bop.getCarId()))
-            .thenComparing(bop -> Car.getCarNameById(bop.getCarId()));
-
     private final BopMapper bopMapper;
 
     public BopService(BopMapper bopMapper) {
@@ -46,7 +42,16 @@ public class BopService {
 
         availableTrackCarPairs.forEach(pair -> {
             if (!currentTrackCarPairs.contains(pair)) {
-                bopMapper.insert(new Bop(pair.getLeft(), pair.getRight(), false));
+                Bop defaultBop = Bop.builder()
+                        .trackId(pair.getLeft())
+                        .carId(pair.getRight())
+                        .restrictor(0)
+                        .ballastKg(0)
+                        .active(false)
+                        .updateDatetime(Instant.now())
+                        .build();
+
+                bopMapper.insert(defaultBop);
             }
         });
     }
@@ -69,15 +74,10 @@ public class BopService {
     @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
     public void update(Bop bop) {
         if (bop.getTrackId() == null || bop.getCarId() == null) {
-            log.severe(String.format("Cannot update %s because trackId or carId is null", bop));
             return;
         }
 
         bopMapper.update(bop);
-    }
-
-    public Comparator<Bop> getComparator() {
-        return BOP_COMPARATOR;
     }
 
     public AccBopEntry convertToAccBopEntry(Bop bop) {
