@@ -1,12 +1,12 @@
 package de.sustineo.simdesk.utils;
 
 import de.sustineo.simdesk.entities.Entity;
+import de.sustineo.simdesk.views.BrowserTimeZone;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
-import java.time.Instant;
-import java.time.ZoneId;
 import java.time.format.DateTimeFormatter;
+import java.time.temporal.TemporalAccessor;
 
 public class FormatUtils {
     private static final String DRIVE_TIME_FORMAT = "HH:mm:ss";
@@ -15,9 +15,9 @@ public class FormatUtils {
     private static final String DATE_FORMAT = "dd.MM.yyyy";
     private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
     private static final String DATETIME_FORMAT_SAFE = "yyyyMMdd_HHmmss";
-    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT).withZone(ZoneId.systemDefault());
-    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT).withZone(ZoneId.systemDefault());
-    private static final DateTimeFormatter dateTimeFormatterSafe = DateTimeFormatter.ofPattern(DATETIME_FORMAT_SAFE).withZone(ZoneId.systemDefault());
+    private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
+    private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
+    private static final DateTimeFormatter dateTimeFormatterSafe = DateTimeFormatter.ofPattern(DATETIME_FORMAT_SAFE);
 
     public static String formatLapTime(Long millis) {
         if (millis == null) {
@@ -55,27 +55,27 @@ public class FormatUtils {
         return DurationFormatUtils.formatDuration(millis, DRIVE_TIME_FORMAT, true);
     }
 
-    public static String formatDatetime(Instant instant) {
-        if (instant == null) {
+    public static String formatDatetime(TemporalAccessor temporalAccessor) {
+        if (temporalAccessor == null) {
             return Entity.EMPTY;
         }
 
-        return dateTimeFormatter.format(instant);
+        return dateTimeFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);
     }
 
-    public static String formatDatetimeSafe(Instant instant) {
-        if (instant == null) {
+    public static String formatDatetimeSafe(TemporalAccessor intemporalAccessor) {
+        if (intemporalAccessor == null) {
             return Entity.EMPTY;
         }
 
-        return dateTimeFormatterSafe.format(instant);
+        return dateTimeFormatterSafe.withZone(BrowserTimeZone.get()).format(intemporalAccessor);
     }
 
-    public static String formatDate(Instant instant) {
-        if (instant == null) {
+    public static String formatDate(TemporalAccessor temporalAccessor) {
+        if (temporalAccessor == null) {
             return Entity.EMPTY;
         }
 
-        return dateFormatter.format(instant);
+        return dateFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);
     }
 }
