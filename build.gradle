@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.5.1"
+        vaadinVersion = "24.5.2"
         flywayVersion = "10.20.1"
     }
     configurations.classpath {
@@ -74,7 +74,7 @@ dependencies {
 
     // OpenAPI documentation
     implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.6.0'
-    implementation 'org.webjars:webjars-locator-lite:1.0.0'
+    implementation 'org.webjars:webjars-locator-lite:1.0.1'
 
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
