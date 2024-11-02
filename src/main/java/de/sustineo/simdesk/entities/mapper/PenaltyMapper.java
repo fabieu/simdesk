@@ -34,7 +34,7 @@ public interface PenaltyMapper {
             VALUES (#{sessionId}, #{carId}, #{reason}, #{penalty}, #{penaltyValue}, #{violationLap}, #{clearedLap}, #{postRace})
             """)
     @Insert(databaseId = DatabaseVendor.SQLITE, value = """
-            INSERT INTO simdesk.penalty (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race)
+            INSERT INTO penalty (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race)
             VALUES (#{sessionId}, #{carId}, #{reason}, #{penalty}, #{penaltyValue}, #{violationLap}, #{clearedLap}, #{postRace})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
