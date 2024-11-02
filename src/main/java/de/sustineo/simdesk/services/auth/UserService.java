@@ -55,4 +55,8 @@ public class UserService {
     public List<UserRole> getAllRoles() {
         return userRoleMapper.findAll();
     }
+
+    public void updateUserRole(UserRole userRole) {
+        userRoleMapper.update(userRole);
+    }
 }

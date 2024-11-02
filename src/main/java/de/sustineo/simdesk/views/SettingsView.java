@@ -3,12 +3,23 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.editor.Editor;
+import com.vaadin.flow.component.grid.editor.EditorSaveListener;
+import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.UserService;
@@ -46,14 +57,20 @@ public class SettingsView extends BaseView {
 
     private Component createTabSheet() {
         TabSheet tabSheet = new TabSheet();
-        tabSheet.setWidthFull();
+        tabSheet.setSizeFull();
+
         tabSheet.add("General", createGeneralTab());
-        tabSheet.add("Discord", createDiscordTab());
+
+        if (ProfileManager.isDiscordProfileEnabled()) {
+            tabSheet.add("Discord", createDiscordTab());
+        }
+
         return tabSheet;
     }
 
     private Component createGeneralTab() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
 
         Button saveButton = new Button("Save");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
@@ -72,6 +89,7 @@ public class SettingsView extends BaseView {
 
     private Component createDiscordTab() {
         VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
 
         Button saveButton = new Button("Save");
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
@@ -84,7 +102,70 @@ public class SettingsView extends BaseView {
         actionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         actionLayout.setAlignItems(Alignment.END);
 
-        layout.add(actionLayout);
+        layout.add(createUserRoleLayout(), actionLayout);
+        return layout;
+    }
+
+    private Component createUserRoleLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+
+        H3 title = new H3("User Roles");
+
+        Grid<UserRole> grid = new Grid<>(UserRole.class, false);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setItems(userService.getAllRoles());
+        grid.setAllRowsVisible(true);
+
+        Editor<UserRole> editor = grid.getEditor();
+        Binder<UserRole> binder = new Binder<>(UserRole.class);
+        editor.setBinder(binder);
+        editor.setBuffered(true);
+        editor.addSaveListener((EditorSaveListener<UserRole>) event -> {
+            userService.updateUserRole(event.getItem());
+        });
+
+        Grid.Column<UserRole> roleNameColumn = grid.addColumn(UserRole::getName)
+                .setHeader("Role")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<UserRole> descriptionColumn = grid.addColumn(UserRole::getDescription)
+                .setHeader("Description");
+        Grid.Column<UserRole> discordRoleIdColumn = grid.addColumn(UserRole::getDiscordRoleId)
+                .setHeader("Discord Role ID")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<UserRole> updateColumn = grid.addComponentColumn(userRole -> {
+                    Button updateButton = new Button("Update");
+                    updateButton.addClickListener(e -> {
+                        if (editor.isOpen()) {
+                            editor.cancel();
+                        }
+                        editor.editItem(userRole);
+                    });
+                    return updateButton;
+                })
+                .setTextAlign(ColumnTextAlign.END)
+                .setWidth("170px")
+                .setFlexGrow(0);
+
+        TextField discordRoleIdField = new TextField();
+        discordRoleIdField.setWidthFull();
+        binder.forField(discordRoleIdField)
+                .withConverter(Long::valueOf, String::valueOf)
+                .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
+        discordRoleIdColumn.setEditorComponent(discordRoleIdField);
+
+        Button saveButton = new Button("Save", e -> editor.save());
+        Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR);
+        HorizontalLayout actions = new HorizontalLayout(saveButton, cancelButton);
+        actions.setPadding(false);
+        updateColumn.setEditorComponent(actions);
+
+        layout.add(title, grid);
         return layout;
     }
 }

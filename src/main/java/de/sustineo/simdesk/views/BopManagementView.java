@@ -216,13 +216,13 @@ public class BopManagementView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
 
-        Editor<Bop> editor = grid.getEditor();
         grid.setSizeFull();
         grid.setMultiSort(true, true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setPartNameGenerator(new BopCarGroupPartNameGenerator());
 
+        Editor<Bop> editor = grid.getEditor();
         Binder<Bop> binder = new Binder<>(Bop.class);
         editor.setBinder(binder);
         editor.setBuffered(true);
