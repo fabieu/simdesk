@@ -43,7 +43,7 @@ public class DiscordService {
         return response.getBody();
     }
 
-    public Set<Long> getMemberRoleIds(String accessToken) {
+    public Set<String> getMemberRoleIds(String accessToken) {
         MemberData memberData = getMemberData(accessToken);
 
         if (memberData == null) {
@@ -51,7 +51,7 @@ public class DiscordService {
         }
 
         return memberData.roles().stream()
-                .map(Id::asLong)
+                .map(Id::asString)
                 .collect(Collectors.toSet());
     }
 

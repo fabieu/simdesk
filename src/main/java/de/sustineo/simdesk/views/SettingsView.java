@@ -17,19 +17,20 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.UserService;
+import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
+
+import java.util.Objects;
 
 @Log
 @Route(value = "/settings", layout = MainLayout.class)
 @PageTitle("Settings")
-//@RolesAllowed({"ADMIN"})
-@AnonymousAllowed
+@RolesAllowed({"ADMIN"})
 public class SettingsView extends BaseView {
     private final UserService userService;
     private final NotificationService notificationService;
@@ -91,18 +92,7 @@ public class SettingsView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        Button saveButton = new Button("Save");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        saveButton.addClickListener(event -> {
-            notificationService.showInfoNotification("Save button clicked");
-        });
-
-        FlexLayout actionLayout = new FlexLayout(saveButton);
-        actionLayout.setWidthFull();
-        actionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        actionLayout.setAlignItems(Alignment.END);
-
-        layout.add(createUserRoleLayout(), actionLayout);
+        layout.add(createUserRoleLayout());
         return layout;
     }
 
@@ -122,7 +112,9 @@ public class SettingsView extends BaseView {
         editor.setBinder(binder);
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<UserRole>) event -> {
-            userService.updateUserRole(event.getItem());
+            UserRole userRole = event.getItem();
+            userService.updateUserRole(userRole);
+            notificationService.showSuccessNotification(String.format("%s updated successfully", userRole.getName()));
         });
 
         Grid.Column<UserRole> roleNameColumn = grid.addColumn(UserRole::getName)
@@ -134,11 +126,11 @@ public class SettingsView extends BaseView {
                 .setHeader("Description");
         Grid.Column<UserRole> discordRoleIdColumn = grid.addColumn(UserRole::getDiscordRoleId)
                 .setHeader("Discord Role ID")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
+                .setWidth("15rem ")
+                .setFlexGrow(0);
         Grid.Column<UserRole> updateColumn = grid.addComponentColumn(userRole -> {
                     Button updateButton = new Button("Update");
+                    updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
                     updateButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -153,17 +145,23 @@ public class SettingsView extends BaseView {
 
         TextField discordRoleIdField = new TextField();
         discordRoleIdField.setWidthFull();
+        discordRoleIdField.setClearButtonVisible(true);
         binder.forField(discordRoleIdField)
-                .withConverter(Long::valueOf, String::valueOf)
+                .withNullRepresentation("")
+                .withConverter(s -> s, s -> Objects.toString(s, ""))
+                .withValidator(discordId -> discordId == null || discordId.matches("[0-9]+"), "Discord Role ID is not a valid")
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
         discordRoleIdColumn.setEditorComponent(discordRoleIdField);
 
         Button saveButton = new Button("Save", e -> editor.save());
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+
         Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR);
-        HorizontalLayout actions = new HorizontalLayout(saveButton, cancelButton);
-        actions.setPadding(false);
-        updateColumn.setEditorComponent(actions);
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+
+        HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
+        editActions.setPadding(false);
+        updateColumn.setEditorComponent(editActions);
 
         layout.add(title, grid);
         return layout;

@@ -125,7 +125,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                     String accessToken = request.getAccessToken().getTokenValue();
 
                     // Get the roles of the user from the Discord bot installed in the guild
-                    Set<Long> memberRoleIds = discordService.get().getMemberRoleIds(accessToken);
+                    Set<String> memberRoleIds = discordService.get().getMemberRoleIds(accessToken);
 
                     // Map the guild roles to Spring Security authorities
                     Set<GrantedAuthority> authorities = userService.getAllRoles().stream()
