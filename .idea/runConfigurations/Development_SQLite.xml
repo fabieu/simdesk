@@ -3,7 +3,7 @@
     <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug, discord" />
     <envs>
       <env name="debug" value="false" />
-      <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="examples/acc-results" />
+      <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="development/results" />
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
