@@ -7,6 +7,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.utils.json.JsonUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
+import org.apache.commons.io.FileUtils;
 import org.apache.commons.io.monitor.FileAlterationListener;
 import org.apache.commons.io.monitor.FileAlterationListenerAdaptor;
 import org.apache.commons.io.monitor.FileAlterationMonitor;
@@ -29,7 +30,6 @@ import java.time.Duration;
 import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
-import java.util.stream.Stream;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
@@ -97,13 +97,12 @@ public class FileContentService {
     }
 
     @EventListener(ApplicationReadyEvent.class)
-    public void readAllSessionFiles() throws IOException {
+    public void readAllSessionFiles() {
         Set<Path> watchDirectories = FileContentConfiguration.WATCH_DIRECTORIES;
 
         for (Path watchDirectory : watchDirectories) {
-            try (Stream<Path> pathStream = Files.list(watchDirectory)) {
-                pathStream.forEach(this::handleSessionFile);
-            }
+            FileUtils.listFiles(watchDirectory.toFile(), new String[]{"json"}, true)
+                    .forEach(file -> handleSessionFile(file.toPath()));
         }
     }
 
