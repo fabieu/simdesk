@@ -2,7 +2,7 @@ spring:
   application:
     name: simdesk
   profiles:
-    active: production, acc-entrylist, acc-bop
+    active: acc-entrylist, acc-bop
   main:
     banner-mode: off
   flyway:
