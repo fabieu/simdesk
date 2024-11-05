@@ -15,6 +15,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -73,18 +74,21 @@ public class SettingsView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        Button saveButton = new Button("Save");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        saveButton.addClickListener(event -> {
-            notificationService.showInfoNotification("Save button clicked");
-        });
+        H3 title = new H3("Coming soon");
+        title.setWidthFull();
+        title.getStyle()
+                .setTextAlign(Style.TextAlign.CENTER)
+                .setColor("var(--lumo-secondary-text-color)");
+
+        Button saveButton = createSaveButton();
+        saveButton.setEnabled(false);
 
         FlexLayout actionLayout = new FlexLayout(saveButton);
         actionLayout.setWidthFull();
         actionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         actionLayout.setAlignItems(Alignment.END);
 
-        layout.add(actionLayout);
+        layout.add(title, actionLayout);
         return layout;
     }
 
@@ -113,8 +117,12 @@ public class SettingsView extends BaseView {
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<UserRole>) event -> {
             UserRole userRole = event.getItem();
-            userService.updateUserRole(userRole);
-            notificationService.showSuccessNotification(String.format("%s updated successfully", userRole.getName()));
+            try {
+                userService.updateUserRole(userRole);
+                notificationService.showSuccessNotification(String.format("%s updated successfully", userRole.getName()));
+            } catch (Exception e) {
+                notificationService.showErrorNotification(String.format("Failed to update %s - %s", userRole.getName(), e.getMessage()));
+            }
         });
 
         Grid.Column<UserRole> roleNameColumn = grid.addColumn(UserRole::getName)
@@ -153,8 +161,8 @@ public class SettingsView extends BaseView {
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
         discordRoleIdColumn.setEditorComponent(discordRoleIdField);
 
-        Button saveButton = new Button("Save", e -> editor.save());
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        Button saveButton = createSaveButton();
+        saveButton.addClickListener(e -> editor.save());
 
         Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
         cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
@@ -165,5 +173,11 @@ public class SettingsView extends BaseView {
 
         layout.add(title, grid);
         return layout;
+    }
+
+    private Button createSaveButton() {
+        Button saveButton = new Button("Save");
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        return saveButton;
     }
 }

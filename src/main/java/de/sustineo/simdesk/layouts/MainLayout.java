@@ -30,16 +30,14 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.views.ComponentUtils;
-import de.sustineo.simdesk.views.LoginView;
-import de.sustineo.simdesk.views.MainView;
-import de.sustineo.simdesk.views.UserProfileView;
+import de.sustineo.simdesk.views.*;
 import org.springframework.beans.factory.annotation.Value;
 
 import java.util.*;
@@ -220,6 +218,11 @@ public class MainLayout extends AppLayout {
 
             MenuItem profileMenuItem = userSubMenu.addItem("Profile");
             profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));
+
+            if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
+                MenuItem settingsMenuItem = userSubMenu.addItem("Settings");
+                settingsMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(SettingsView.class)));
+            }
 
             userSubMenu.add(ComponentUtils.createSpacer());
 

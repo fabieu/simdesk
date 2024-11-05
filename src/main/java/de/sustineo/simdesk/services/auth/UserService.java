@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.mapper.UserMapper;
 import de.sustineo.simdesk.entities.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.entities.mapper.UserRoleMapper;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
@@ -56,6 +57,7 @@ public class UserService {
         return userRoleMapper.findAll();
     }
 
+    @PreAuthorize("hasAuthority(T(de.sustineo.simdesk.entities.auth.UserRole).ADMIN)")
     public void updateUserRole(UserRole userRole) {
         userRoleMapper.update(userRole);
     }

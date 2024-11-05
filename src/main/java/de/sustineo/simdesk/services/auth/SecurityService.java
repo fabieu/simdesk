@@ -81,16 +81,16 @@ public class SecurityService {
                 .orElse(null);
     }
 
-    public boolean hasAnyRole(String... roles) {
+    public boolean hasAnyAuthority(String... authorities) {
         Optional<UserPrincipal> user = getAuthenticatedUser();
 
         if (user.isEmpty()) {
             return false;
         }
 
-        for (GrantedAuthority authority : user.get().getAuthorities()) {
-            for (String role : roles) {
-                if (authority.getAuthority().equals(role)) {
+        for (GrantedAuthority grantedAuthority : user.get().getAuthorities()) {
+            for (String authority : authorities) {
+                if (grantedAuthority.getAuthority().equals(authority)) {
                     return true;
                 }
             }
