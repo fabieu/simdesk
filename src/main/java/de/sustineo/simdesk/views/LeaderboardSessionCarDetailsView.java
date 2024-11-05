@@ -104,7 +104,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
         tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
-        if (securityService.hasAnyRole(UserRole.ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
             tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
         }
 

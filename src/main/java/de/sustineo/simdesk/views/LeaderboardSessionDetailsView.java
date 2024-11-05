@@ -105,7 +105,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
 
         layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
-        if (securityService.hasAnyRole(UserRole.ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
             StreamResource csvResource = new StreamResource(
                     String.format("session_table_%s.csv", session.getFileChecksum()),
                     () -> {
