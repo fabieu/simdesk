@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.5.3"
+        vaadinVersion = "24.5.4"
         flywayVersion = "10.21.0"
     }
     configurations.classpath {
@@ -82,8 +82,8 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.20.3'
     testImplementation 'org.testcontainers:postgresql:1.20.3'
 
-    compileOnly "org.projectlombok:lombok:1.18.34"
-    annotationProcessor "org.projectlombok:lombok:1.18.34"
+    compileOnly "org.projectlombok:lombok:1.18.36"
+    annotationProcessor "org.projectlombok:lombok:1.18.36"
 }
 
 tasks {
