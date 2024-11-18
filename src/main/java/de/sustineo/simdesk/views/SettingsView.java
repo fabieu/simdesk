@@ -52,7 +52,7 @@ public class SettingsView extends BaseView {
 
     private Component createFormLayout() {
         FlexLayout layout = new FlexLayout();
-        layout.addClassNames("container", "bg-light");
+        layout.addClassNames("container");
         layout.add(createTabSheet());
         return layout;
     }

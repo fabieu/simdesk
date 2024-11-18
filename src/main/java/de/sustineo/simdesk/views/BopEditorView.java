@@ -80,7 +80,7 @@ public class BopEditorView extends BaseView {
 
     private Component createFormLayout() {
         Div layout = new Div();
-        layout.addClassNames("container", "bg-light");
+        layout.addClassNames("container");
 
         layout.add(createFileUploadForm(), createEditingForm());
 

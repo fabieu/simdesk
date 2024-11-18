@@ -163,7 +163,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistContainer.add(createPopulateEntrylistLayout(), createEntrylistHeaderLayout(), createTabSheets(), createActionLayout());
 
         Div entrylistContainerWrapper = new Div(entrylistContainer);
-        entrylistContainerWrapper.addClassNames("container", "bg-light");
+        entrylistContainerWrapper.addClassNames("container");
 
         return entrylistContainerWrapper;
     }

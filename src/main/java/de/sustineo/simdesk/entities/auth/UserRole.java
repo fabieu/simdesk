@@ -7,6 +7,8 @@ import lombok.Data;
 public class UserRole {
     public static final String ADMIN = "ROLE_ADMIN";
     public static final String MANAGER = "ROLE_MANAGER";
+    public static final String HEAD_STEWARD = "ROLE_HEAD_STEWARD";
+    public static final String STEWARD = "ROLE_STEWARD";
 
     @NotNull
     private String name;
