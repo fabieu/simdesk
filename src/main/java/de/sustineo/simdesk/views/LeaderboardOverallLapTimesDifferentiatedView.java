@@ -78,7 +78,11 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
     private Component createSelectHeader(String carGroup, String trackId, TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassNames("header", "selection");
+        layout.addClassNames("header");
+        layout.setJustifyContentMode(JustifyContentMode.END);
+        layout.getStyle()
+                .setPaddingTop("0")
+                .setMarginBottom("0");
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());

@@ -68,23 +68,25 @@ public class SessionService {
 
     @Transactional
     public void handleSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
+        String fileName = fileMetadata.getFile().toString();
+
         // Ignore session without any laps
         if (accSession.getLaps().isEmpty()) {
-            log.fine(String.format("Ignoring session %s because it has no laps", fileMetadata.getFile()));
+            log.info(String.format("Ignoring session file %s because it has no laps", fileName));
             return;
         }
 
-        // Ignore session based on specific characters in server name
+        // Ignore session based on specific pattern in server name
         if (accSession.getServerName() != null && ignorePattern != null) {
             if (ignorePattern.matcher(accSession.getServerName()).find()) {
-                log.fine(String.format("Ignoring session %s because server name '%s' matches ignore pattern '%s'", fileMetadata.getFile(), accSession.getServerName(), ignorePattern));
+                log.info(String.format("Ignoring session file %s because server name '%s' matches ignore pattern '%s'", fileName, accSession.getServerName(), ignorePattern));
                 return;
             }
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileContent, fileMetadata);
         if (sessionExists(session.getFileChecksum())) {
-            log.fine(String.format("Ignoring session %s because it already exists", fileMetadata.getFile()));
+            log.info(String.format("Ignoring session file %s because it already exists", fileName));
             return;
         }
 
@@ -96,6 +98,6 @@ public class SessionService {
         lapService.handleLaps(session.getId(), accSession, fileMetadata);
         penaltyService.handlePenalties(session.getId(), accSession);
 
-        log.info(String.format("Successfully processed session file %s", fileMetadata.getFile()));
+        log.info(String.format("Successfully processed session file %s", fileName));
     }
 }

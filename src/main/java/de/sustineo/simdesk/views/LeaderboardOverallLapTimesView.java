@@ -69,7 +69,11 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
 
     private Component createSelectHeader(TimeRange timeRange) {
         HorizontalLayout layout = new HorizontalLayout();
-        layout.addClassNames("header", "selection");
+        layout.addClassNames("header");
+        layout.setJustifyContentMode(JustifyContentMode.END);
+        layout.getStyle()
+                .setPaddingTop("0")
+                .setMarginBottom("0");
 
         // Time range selection
         Select<TimeRange> timeRangeSelect = new Select<>();

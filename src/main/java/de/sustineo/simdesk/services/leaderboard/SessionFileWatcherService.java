@@ -2,9 +2,6 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.FileContentConfiguration;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.FileMetadata;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.utils.json.JsonUtils;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
@@ -17,36 +14,25 @@ import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
 
 import java.io.File;
-import java.io.IOException;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
-import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Duration;
-import java.util.List;
 import java.util.Set;
 import java.util.logging.Level;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
-public class FileContentService {
-    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
-
-    private final SessionService sessionService;
-    private final FileService fileService;
+public class SessionFileWatcherService {
+    private final SessionFileService sessionFileService;
     private final FileAlterationMonitor monitor;
 
     @Autowired
-    public FileContentService(SessionService sessionService,
-                              FileService fileService,
-                              @Value("${simdesk.results.scan-interval}") String scanInterval) {
-        this.sessionService = sessionService;
-        this.fileService = fileService;
+    public SessionFileWatcherService(SessionFileService sessionFileService,
+                                     @Value("${simdesk.results.scan-interval}") String scanInterval) {
+        this.sessionFileService = sessionFileService;
         this.monitor = new FileAlterationMonitor(Duration.parse(scanInterval).toMillis());
     }
 
@@ -61,13 +47,13 @@ public class FileContentService {
                     @Override
                     public void onFileCreate(File file) {
                         log.fine(String.format("Processing file create event; File affected: %s", file.getAbsolutePath()));
-                        handleSessionFile(file.toPath().toAbsolutePath());
+                        sessionFileService.handleSessionFileAsync(file.toPath().toAbsolutePath());
                     }
 
                     @Override
                     public void onFileChange(File file) {
                         log.fine(String.format("Processing file change event; File affected: %s", file.getAbsolutePath()));
-                        handleSessionFile(file.toPath().toAbsolutePath());
+                        sessionFileService.handleSessionFileAsync(file.toPath().toAbsolutePath());
                     }
 
                     @Override
@@ -102,42 +88,7 @@ public class FileContentService {
 
         for (Path watchDirectory : watchDirectories) {
             FileUtils.listFiles(watchDirectory.toFile(), new String[]{"json"}, true)
-                    .forEach(file -> handleSessionFile(file.toPath()));
+                    .forEach(file -> sessionFileService.handleSessionFileAsync(file.toPath()));
         }
-    }
-
-    @Async
-    public void handleSessionFile(Path file) {
-        try {
-            if (!Files.isRegularFile(file) || !FileService.isSessionFile(file)) {
-                log.warning(String.format("Ignoring file %s because it is not a valid session file", file));
-                return;
-            }
-
-            FileMetadata fileMetadata = new FileMetadata(file);
-            String fileContent = readFile(file);
-            AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
-
-            sessionService.handleSession(accSession, fileContent, fileMetadata);
-        } catch (Exception e) {
-            log.log(Level.SEVERE, String.format("Could not process session file %s", file), e);
-        }
-    }
-
-    private String readFile(Path file) throws IOException {
-        for (Charset charset : SUPPORTED_CHARSETS) {
-            try {
-                String fileContent = Files.readString(file, charset);
-                fileContent = fileService.removeBOM(fileContent);
-                fileContent = fileService.removeControlCharacters(fileContent);
-                log.fine(String.format("Successfully parsed %s with charset %s", file, charset));
-
-                return fileContent;
-            } catch (IOException e) {
-                log.fine(String.format("Unable to parse %s with charset %s", file, charset));
-            }
-        }
-
-        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", file, SUPPORTED_CHARSETS));
     }
 }

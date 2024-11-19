@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.utils.json;
 
+import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.core.type.TypeReference;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
@@ -45,5 +46,14 @@ public class JsonUtils {
     @SneakyThrows
     public static <T> T fromJson(InputStream inputStream, TypeReference<T> valueTypeRef) {
         return objectMapper.readValue(inputStream, valueTypeRef);
+    }
+
+    public static boolean isValid(String json) {
+        try {
+            objectMapper.readTree(json);
+        } catch (JacksonException e) {
+            return false;
+        }
+        return true;
     }
 }
