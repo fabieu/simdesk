@@ -9,11 +9,11 @@ import java.time.format.DateTimeFormatter;
 import java.time.temporal.TemporalAccessor;
 
 public class FormatUtils {
-    private static final String DRIVE_TIME_FORMAT = "HH:mm:ss";
     private static final String TIMING_FORMAT = "mm:ss.SSS";
     private static final String TIMING_FORMAT_LONG = "HH:mm:ss.SSS";
-    private static final String DATE_FORMAT = "dd.MM.yyyy";
-    private static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
+    public static final String DATE_FORMAT = "dd.MM.yyyy";
+    public static final String TIME_FORMAT = "HH:mm:ss";
+    public static final String DATETIME_FORMAT = "dd.MM.yyyy HH:mm:ss";
     private static final String DATETIME_FORMAT_SAFE = "yyyyMMdd_HHmmss";
     private static final DateTimeFormatter dateFormatter = DateTimeFormatter.ofPattern(DATE_FORMAT);
     private static final DateTimeFormatter dateTimeFormatter = DateTimeFormatter.ofPattern(DATETIME_FORMAT);
@@ -52,7 +52,7 @@ public class FormatUtils {
             return Entity.EMPTY;
         }
 
-        return DurationFormatUtils.formatDuration(millis, DRIVE_TIME_FORMAT, true);
+        return DurationFormatUtils.formatDuration(millis, TIME_FORMAT, true);
     }
 
     public static String formatDatetime(TemporalAccessor temporalAccessor) {
