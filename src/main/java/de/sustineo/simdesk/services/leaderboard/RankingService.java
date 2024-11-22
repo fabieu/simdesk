@@ -44,7 +44,7 @@ public class RankingService {
             return null;
         }
 
-        return rankingMapper.findValidLeaderboardLinesBySessionId(session.getId());
+        return rankingMapper.findLeaderboardLinesBySessionId(session.getId());
     }
 
     private void addRanking(List<DriverRanking> driverRankings) {
