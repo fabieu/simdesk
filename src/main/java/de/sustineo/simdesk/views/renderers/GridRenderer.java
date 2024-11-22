@@ -9,16 +9,17 @@ public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE_BALLAST = "ballastKg";
 
     static final String DRIVERS_TEMPLATE = """
-            <vaadin-horizontal-layout theme="spacing" style="align-items: center;">
+            <div style="display: flex; flex-wrap: wrap; gap: var(--lumo-space-s); align-items: center;">
                 ${item.drivers.map(driver => html`
-                <vaadin-horizontal-layout">
-                    <div>
+                    <div style="display: inline-block">
                         <span>${driver.fullName}</span>
-                        ${driver.prettyDriveTime ? html`<span theme="badge contrast pill" title="Driving time">${driver.prettyDriveTime}</span>` : ""}
+                        <span theme="badge contrast pill" title="Valid laps/Invalid laps - Driving Time">
+                            ${driver.validLapsCount || 0}/${driver.invalidLapsCount || 0}
+                            ${driver.driveTimeMillis ? `- ${driver.prettyDriveTime}` : ""}
+                        </span>
                     </div>
-                </vaadin-horizontal-layout>
                 `)}
-            </vaadin-horizontal-layout>
+            </div>
             """;
     static final String DRIVERS_TEMPLATE_DRIVERS = "drivers";
 
