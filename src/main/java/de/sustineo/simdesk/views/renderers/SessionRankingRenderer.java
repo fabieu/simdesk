@@ -26,9 +26,21 @@ public class SessionRankingRenderer extends GridRenderer {
 
         return LitRenderer.<SessionRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis()))
-                .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> getTimeColor(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis))
-                .withProperty(TIMING_TEMPLATE_FASTEST_LAP, sessionRanking -> sessionRanking.getBestLapTimeMillis() == bestLapTimeMillis);
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, sessionRanking -> {
+                    if (sessionRanking.getBestLapTimeMillis() > 0) {
+                        return FormatUtils.formatLapTime(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis);
+                    } else {
+                        return FormatUtils.formatLapTime(0L);
+                    }
+                })
+                .withProperty(TIMING_TEMPLATE_COLOR, sessionRanking -> {
+                    if (sessionRanking.getBestLapTimeMillis() > 0) {
+                        return getTimeColor(sessionRanking.getBestLapTimeMillis() - bestLapTimeMillis);
+                    } else {
+                        return getTimeColor(0L);
+                    }
+                })
+                .withProperty(TIMING_TEMPLATE_FASTEST_LAP, sessionRanking -> sessionRanking.getBestLapTimeMillis() != 0 && sessionRanking.getBestLapTimeMillis() == bestLapTimeMillis);
     }
 
     public static Renderer<SessionRanking> createTotalTimeRenderer(SessionRanking bestTotalTimeSessionRanking) {

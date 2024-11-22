@@ -38,7 +38,7 @@ vaadin-grid::part(ranking-podium-third) {
     background-color: rgba(167, 112, 68, 0.4);
 }
 
-vaadin-grid::part(ranking-dnf) {
+vaadin-grid::part(ranking-invalid) {
     background-color: var(--lumo-error-color-10pct);
 }
 

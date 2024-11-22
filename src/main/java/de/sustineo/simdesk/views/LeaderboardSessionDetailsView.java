@@ -28,7 +28,7 @@ import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
-import de.sustineo.simdesk.views.generators.SessionRankingDNFNameGenerator;
+import de.sustineo.simdesk.views.generators.SessionRankingPartNameGenerator;
 import de.sustineo.simdesk.views.generators.SessionRankingPodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.SessionRankingRenderer;
 import lombok.extern.java.Log;
@@ -39,6 +39,7 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
 @Log
@@ -130,10 +131,15 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
     }
 
     private Component createLeaderboardGrid(Session session) {
-        List<SessionRanking> validSessionRankings = rankingService.getSessionRankings(session);
+        List<SessionRanking> sessionRankings = rankingService.getSessionRankings(session).stream()
+                .filter(sessionRanking -> sessionRanking.getLapCount() > 0)
+                .collect(Collectors.toList());
 
-        SessionRanking bestTotalTimeSessionRanking = validSessionRankings.stream().findFirst().orElse(new SessionRanking());
-        SessionRanking bestLapTimeSessionRanking = validSessionRankings.stream()
+        SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream()
+                .findFirst()
+                .orElse(new SessionRanking());
+        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream()
+                .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
                 .min(new SessionRankingLapTimeComparator())
                 .orElse(new SessionRanking());
 
@@ -184,15 +190,15 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 .setSortable(true)
                 .setComparator(SessionRanking::getBestLapTimeMillis);
 
-        dataView = grid.setItems(validSessionRankings);
+        dataView = grid.setItems(sessionRankings);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
+        grid.setPartNameGenerator(new SessionRankingPartNameGenerator());
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
-        grid.setEmptyStateText("No valid laps in this session!");
+        grid.setEmptyStateText("No laps in this session!");
 
         SingleSelect<Grid<SessionRanking>, SessionRanking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
