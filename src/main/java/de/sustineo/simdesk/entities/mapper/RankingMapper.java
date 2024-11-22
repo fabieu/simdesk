@@ -104,8 +104,8 @@ public interface RankingMapper {
             @Result(property = "lapCount", column = "lap_count")
     })
     @Select("SELECT * FROM simdesk.leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
-    List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM leaderboard_line WHERE session_id = #{sessionId} AND lap_count > 0 AND best_lap_time_millis > 0 ORDER BY ranking")
+    List<SessionRanking> findValidLeaderboardLinesBySessionId(Integer sessionId);
 
     @ResultType(List.class)
     @Select("SELECT player_id FROM simdesk.leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")

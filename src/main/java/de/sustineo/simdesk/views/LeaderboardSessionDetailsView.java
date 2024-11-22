@@ -14,7 +14,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
@@ -131,25 +130,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
     }
 
     private Component createLeaderboardGrid(Session session) {
-        List<SessionRanking> sessionRankings = rankingService.getSessionRankings(session);
-        List<SessionRanking> validSessionRankings = sessionRankings.stream()
-                .filter(SessionRanking::isValid)
-                .toList();
-
-        if (validSessionRankings.isEmpty()) {
-            VerticalLayout layout = new VerticalLayout();
-
-            layout.setPadding(true);
-            layout.setWidthFull();
-            layout.setAlignItems(Alignment.CENTER);
-
-            H3 message = new H3("No valid laps in this session!");
-            message.getStyle()
-                    .setColor("var(--lumo-error-text-color)");
-
-            layout.add(message);
-            return layout;
-        }
+        List<SessionRanking> validSessionRankings = rankingService.getSessionRankings(session);
 
         SessionRanking bestTotalTimeSessionRanking = validSessionRankings.stream().findFirst().orElse(new SessionRanking());
         SessionRanking bestLapTimeSessionRanking = validSessionRankings.stream()
@@ -188,7 +169,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        if (SessionType.R.equals(bestTotalTimeSessionRanking.getSession().getSessionType())) {
+        if (SessionType.R.equals(session.getSessionType())) {
             grid.addColumn(SessionRankingRenderer.createTotalTimeRenderer(bestTotalTimeSessionRanking))
                     .setHeader("Total Time")
                     .setAutoWidth(true)
@@ -211,6 +192,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setPartNameGenerator(new SessionRankingDNFNameGenerator(bestTotalTimeSessionRanking));
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        grid.setEmptyStateText("No valid laps in this session!");
 
         SingleSelect<Grid<SessionRanking>, SessionRanking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {

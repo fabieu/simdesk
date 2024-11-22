@@ -48,8 +48,4 @@ public class SessionRanking {
     public String getCarModelName() {
         return Car.getCarNameById(carModelId);
     }
-
-    public boolean isValid() {
-        return bestLapTimeMillis > 0 && lapCount > 0;
-    }
 }
