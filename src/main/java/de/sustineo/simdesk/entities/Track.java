@@ -26,7 +26,7 @@ public class Track extends Entity {
         addTrack("silverstone", "Silverstone");
         addTrack("paul_ricard", "Paul Ricard");
         addTrack("misano", "Misano");
-        addTrack("spa", "Spa Franchorchamp");
+        addTrack("spa", "Spa Francorchamps");
         addTrack("nurburgring", "Nürburgring");
         addTrack("barcelona", "Barcelona");
         addTrack("hungaroring", "Hungaroring");
