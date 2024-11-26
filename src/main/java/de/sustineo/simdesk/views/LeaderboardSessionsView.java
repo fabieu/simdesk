@@ -213,7 +213,8 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
                 .setComparator(Session::getSessionDatetime);
         Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
                 .setHeader("Server Name")
-                .setSortable(true);
+                .setSortable(true)
+                .setTooltipGenerator(Session::getServerName);
         Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
                 .setHeader("Track Name")
                 .setAutoWidth(true)
