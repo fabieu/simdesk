@@ -15,6 +15,7 @@ import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
@@ -153,7 +154,13 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         Grid.Column<DriverRanking> serverNameColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getServerName())
                 .setHeader("Server Name")
                 .setSortable(true)
-                .setFlexGrow(2);
+                .setTooltipGenerator(driverRanking -> driverRanking.getSession().getServerName());
+        Grid.Column<DriverRanking> sessionDatetimeColumn = grid.addColumn(driverRanking -> FormatUtils.formatDatetime(driverRanking.getSession().getSessionDatetime()))
+                .setHeader("Session Time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(driverRanking -> driverRanking.getSession().getSessionDatetime());
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
         grid.setSizeFull();
