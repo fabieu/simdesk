@@ -828,9 +828,37 @@ public class EntrylistEditorView extends BaseView {
             }
         });
 
-        HorizontalLayout driverHeaderLayout = new HorizontalLayout(cloneDriverButton, removeDriverButton);
+
+        Button upButton = new Button(new Icon(VaadinIcon.ARROW_UP));
+        upButton.addClickListener(event -> {
+            int index = entry.getDrivers().indexOf(driver);
+            if (index > 0) {
+                Collections.swap(entry.getDrivers(), index, index - 1);
+                refreshEntrylistPreview();
+
+                entrylistEntryDriverSideListLayout.remove(entrylistDriverLayout);
+                entrylistEntryDriverSideListLayout.addComponentAtIndex(index - 1, createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
+            }
+        });
+
+        Button downButton = new Button(new Icon(VaadinIcon.ARROW_DOWN));
+        downButton.addClickListener(event -> {
+            int index = entry.getDrivers().indexOf(driver);
+            if (index < entry.getDrivers().size() - 1) {
+                Collections.swap(entry.getDrivers(), index, index + 1);
+                refreshEntrylistPreview();
+
+                entrylistEntryDriverSideListLayout.remove(entrylistDriverLayout);
+                entrylistEntryDriverSideListLayout.addComponentAtIndex(index + 1, createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
+            }
+        });
+        downButton.getStyle()
+                .setMarginRight("auto");
+
+        FlexLayout driverHeaderLayout = new FlexLayout(cloneDriverButton, upButton, downButton, removeDriverButton);
         driverHeaderLayout.setWidthFull();
-        driverHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        driverHeaderLayout.getStyle()
+                .set("gap", "var(--lumo-space-s)");
 
         entrylistDriverLayout.add(driverHeaderLayout, entrylistDriverFormLayout);
         return entrylistDriverLayout;
