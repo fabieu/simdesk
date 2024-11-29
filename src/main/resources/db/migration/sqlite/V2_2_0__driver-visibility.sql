@@ -1,0 +1,4 @@
+ALTER TABLE driver
+    DROP COLUMN locked;
+ALTER TABLE driver
+    ADD COLUMN visibility TEXT DEFAULT 'PUBLIC' NOT NULL;

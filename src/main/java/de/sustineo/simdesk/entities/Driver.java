@@ -12,11 +12,17 @@ import java.time.Instant;
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
 public class Driver extends Entity {
+    private static final String UNKNOWN_DRIVER = "Unknown Driver";
+    private static final String HIDDEN_FIRST_NAME = "Hidden";
+    private static final String HIDDEN_LAST_NAME = "Driver";
+    private static final String HIDDEN_SHORT_NAME = "HDR";
+    private static final String HIDDEN_FULL_NAME = HIDDEN_FIRST_NAME + " " + HIDDEN_LAST_NAME;
+
     private String playerId;
     private String firstName;
     private String lastName;
     private String shortName;
-    private boolean locked;
+    private Visibility visibility;
     private Integer validLapsCount;
     private Integer invalidLapsCount;
     private Long driveTimeMillis;
@@ -24,20 +30,50 @@ public class Driver extends Entity {
 
     public String getFullName() {
         if (firstName == null || lastName == null) {
-            return UNKNOWN;
+            return UNKNOWN_DRIVER;
+        }
+
+        if (visibility == Visibility.PRIVATE) {
+            return HIDDEN_FULL_NAME;
         }
 
         return String.join(" ", firstName, lastName);
     }
 
-    public String getEntireName() {
-        String driverFullName = getFullName();
-
-        if (shortName == null) {
-            return driverFullName;
-        } else {
-            return driverFullName + " (" + shortName + ")";
+    public String getFirstName() {
+        if (firstName == null) {
+            return UNKNOWN_DRIVER;
         }
+
+        if (visibility == Visibility.PRIVATE) {
+            return HIDDEN_FIRST_NAME;
+        }
+
+        return firstName;
+    }
+
+    public String getLastName() {
+        if (lastName == null) {
+            return UNKNOWN_DRIVER;
+        }
+
+        if (visibility == Visibility.PRIVATE) {
+            return HIDDEN_LAST_NAME;
+        }
+
+        return lastName;
+    }
+
+    public String getShortName() {
+        if (shortName == null) {
+            return UNKNOWN_DRIVER;
+        }
+
+        if (visibility == Visibility.PRIVATE) {
+            return HIDDEN_SHORT_NAME;
+        }
+
+        return shortName;
     }
 
     @SuppressWarnings("unused")
