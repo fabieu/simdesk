@@ -12,7 +12,7 @@ public class GridRenderer {
             <div style="display: flex; flex-wrap: wrap; gap: var(--lumo-space-s); align-items: center;">
                 ${item.drivers.map(driver => html`
                     <div style="display: inline-block">
-                        <span>${driver.fullName}</span>
+                        <span>${driver.fullNameCensored}</span>
                         <span theme="badge contrast pill" title="Valid laps/Invalid laps - Driving Time">
                             ${driver.validLapsCount || 0}/${driver.invalidLapsCount || 0}
                             ${driver.driveTimeMillis ? `- ${driver.prettyDriveTime}` : ""}
