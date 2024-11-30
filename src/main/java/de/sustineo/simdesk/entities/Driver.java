@@ -10,7 +10,6 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Driver extends Entity {
     private static final String UNKNOWN_DRIVER = "Unknown Driver";
     private static final String HIDDEN_FIRST_NAME = "Hidden";
@@ -33,55 +32,35 @@ public class Driver extends Entity {
             return UNKNOWN_DRIVER;
         }
 
+        return String.format("%s %s", firstName, lastName);
+    }
+
+    public String getFullNameCensored() {
         if (visibility == Visibility.PRIVATE) {
             return HIDDEN_FULL_NAME;
         }
 
-        return String.join(" ", firstName, lastName);
-    }
-
-    public String getFirstName() {
-        if (firstName == null) {
-            return UNKNOWN_DRIVER;
-        }
-
-        if (visibility == Visibility.PRIVATE) {
-            return HIDDEN_FIRST_NAME;
-        }
-
-        return firstName;
-    }
-
-    public String getLastName() {
-        if (lastName == null) {
-            return UNKNOWN_DRIVER;
-        }
-
-        if (visibility == Visibility.PRIVATE) {
-            return HIDDEN_LAST_NAME;
-        }
-
-        return lastName;
-    }
-
-    public String getShortName() {
-        if (shortName == null) {
-            return UNKNOWN_DRIVER;
-        }
-
-        if (visibility == Visibility.PRIVATE) {
-            return HIDDEN_SHORT_NAME;
-        }
-
-        return shortName;
+        return getFullName();
     }
 
     @SuppressWarnings("unused")
     public String getPrettyDriveTime() {
         return FormatUtils.formatDriveTime(driveTimeMillis);
     }
-    
-    public String toString() {
-        return getFullName();
+
+    /**
+     * The Grid editor needs to know what has changed in order to close the right thing.
+     * Make sure that equals and hashCode of <code>Driver</code> uses unique attributes.
+     */
+    @Override
+    public final boolean equals(Object o) {
+        if (!(o instanceof Driver driver)) return false;
+
+        return playerId.equals(driver.playerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return playerId.hashCode();
     }
 }

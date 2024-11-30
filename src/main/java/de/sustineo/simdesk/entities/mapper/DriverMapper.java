@@ -25,14 +25,9 @@ public interface DriverMapper {
             @Result(property = "invalidLapsCount", column = "invalid_lap_count"),
             @Result(property = "lastActivity", column = "last_activity")
     })
-    @Select("SELECT * FROM simdesk.driver")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM driver")
+    @Select("SELECT * FROM simdesk.driver ORDER BY last_activity DESC")
+    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM driver ORDER BY last_activity DESC")
     List<Driver> findAll();
-
-    @Select("SELECT COUNT(player_id) FROM simdesk.driver")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT COUNT(player_id) FROM driver")
-    @ResultType(long.class)
-    long count();
 
     @ResultMap("driverResultMap")
     @Select("SELECT * FROM simdesk.driver WHERE player_id = #{playerId}")
@@ -75,7 +70,7 @@ public interface DriverMapper {
               last_name = COALESCE(excluded.last_name, last_name),
               short_name = COALESCE(excluded.short_name, short_name),
               visibility = COALESCE(excluded.visibility, visibility),
-              last_activity = (SELECT CASE WHEN d.last_activity IS NULL OR d.last_activity < excluded.last_activity THEN excluded.last_activity ELSE d.last_activity END)
+              last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < excluded.last_activity THEN excluded.last_activity ELSE last_activity END)
             """)
     @Insert(databaseId = DatabaseVendor.SQLITE, value = """
             INSERT INTO driver (player_id, first_name, last_name, short_name, last_activity, visibility)
@@ -85,7 +80,19 @@ public interface DriverMapper {
               last_name = COALESCE(excluded.last_name, last_name),
               short_name = COALESCE(excluded.short_name, short_name),
               visibility = COALESCE(excluded.visibility, visibility),
-              last_activity = (SELECT CASE WHEN d.last_activity IS NULL OR d.last_activity < excluded.last_activity THEN excluded.last_activity ELSE d.last_activity END)
+              last_activity = (SELECT CASE WHEN last_activity IS NULL OR last_activity < excluded.last_activity THEN excluded.last_activity ELSE last_activity END)
             """)
     void upsert(Driver driver);
+
+    @Update("""
+            UPDATE simdesk.driver
+            SET visibility = COALESCE(#{visibility}, visibility)
+            WHERE player_id = #{playerId}
+            """)
+    @Update(databaseId = DatabaseVendor.SQLITE, value = """
+            UPDATE driver
+            SET visibility = COALESCE(#{visibility}, visibility)
+            WHERE player_id = #{playerId}
+            """)
+    void updateVisibility(Driver driver);
 }
