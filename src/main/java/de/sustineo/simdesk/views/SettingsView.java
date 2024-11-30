@@ -2,7 +2,6 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -10,7 +9,6 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -35,7 +33,6 @@ import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 
 import java.util.Comparator;
-import java.util.List;
 import java.util.Objects;
 
 @Log
@@ -100,12 +97,8 @@ public class SettingsView extends BaseView {
     }
 
     private Component createDriverVisibilityLayout() {
-        List<Driver> drivers = driverService.getAllDrivers();
-
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
-
-        H3 title = new H3("Driver Visibility");
 
         Grid<Driver> grid = new Grid<>(Driver.class, false);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -118,9 +111,9 @@ public class SettingsView extends BaseView {
             Driver driver = event.getItem();
             try {
                 driverService.updateDriverVisibility(driver);
-                notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getFullNameCensored()));
+                notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getFullName()));
             } catch (Exception e) {
-                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getFullNameCensored(), e.getMessage()));
+                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getFullName(), e.getMessage()));
             }
         });
 
@@ -143,8 +136,7 @@ public class SettingsView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Driver> updateColumn = grid.addComponentColumn(driver -> {
-                    Button updateButton = new Button("Update");
-                    updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+                    Button updateButton = createPrimaryButton("Update");
                     updateButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -164,13 +156,13 @@ public class SettingsView extends BaseView {
                 .bind(Driver::getVisibility, Driver::setVisibility);
         visibilityColumn.setEditorComponent(visibilityField);
 
-        Button saveButton = createSaveButton();
+        Button saveButton = createSuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
-        Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        Button cancelButton = createCancelIconButton();
+        cancelButton.addClickListener(e -> editor.cancel());
 
-        GridListDataView<Driver> dataView = grid.setItems(drivers);
+        GridListDataView<Driver> dataView = grid.setItems(driverService.getAllDrivers());
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(playerIdColumn).setComponent(GridFilter.createHeader(driverFilter::setPlayerId));
@@ -181,15 +173,13 @@ public class SettingsView extends BaseView {
         editActions.setPadding(false);
         updateColumn.setEditorComponent(editActions);
 
-        layout.add(title, grid);
+        layout.add(createTitle("Driver Visibility"), grid);
         return layout;
     }
 
     private Component createUserRoleLayout() {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
-
-        H3 title = new H3("User Roles");
 
         Grid<UserRole> grid = new Grid<>(UserRole.class, false);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -222,8 +212,7 @@ public class SettingsView extends BaseView {
                 .setWidth("15rem")
                 .setFlexGrow(0);
         Grid.Column<UserRole> updateColumn = grid.addComponentColumn(userRole -> {
-                    Button updateButton = new Button("Update");
-                    updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+                    Button updateButton = createPrimaryButton("Update");
                     updateButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -246,23 +235,21 @@ public class SettingsView extends BaseView {
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
         discordRoleIdColumn.setEditorComponent(discordRoleIdField);
 
-        Button saveButton = createSaveButton();
+        Button saveButton = createSuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
-        Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        Button cancelButton = createCancelIconButton();
+        cancelButton.addClickListener(e -> editor.cancel());
 
         HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
         editActions.setPadding(false);
         updateColumn.setEditorComponent(editActions);
 
-        layout.add(title, grid);
+        layout.add(createTitle("User Roles"), grid);
         return layout;
     }
 
-    private Button createSaveButton() {
-        Button saveButton = new Button("Save");
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        return saveButton;
+    private H3 createTitle(String title) {
+        return new H3(title);
     }
 }
