@@ -63,4 +63,9 @@ public class Driver extends Entity {
     public int hashCode() {
         return playerId.hashCode();
     }
+
+    @Override
+    public String toString() {
+        return getFullNameCensored();
+    }
 }
