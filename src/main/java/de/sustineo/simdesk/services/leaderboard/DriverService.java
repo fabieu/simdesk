@@ -6,6 +6,8 @@ import de.sustineo.simdesk.entities.mapper.DriverMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
+
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
 public class DriverService {
@@ -19,8 +21,12 @@ public class DriverService {
         driverMapper.upsert(driver);
     }
 
-    public long getDriverCount() {
-        return driverMapper.count();
+    public List<Driver> getAllDrivers() {
+        return driverMapper.findAll();
+    }
+
+    public void updateDriverVisibility(Driver driver) {
+        driverMapper.updateVisibility(driver);
     }
 }
 

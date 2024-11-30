@@ -5,6 +5,7 @@ import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
+import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -13,10 +14,10 @@ import org.springframework.stereotype.Service;
 public class DriverConverter extends BaseConverter {
     public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {
         return Driver.builder()
-                .playerId(accDriver.getPlayerId())
-                .firstName(accDriver.getFirstName())
-                .lastName(accDriver.getLastName())
-                .shortName(accDriver.getShortName())
+                .playerId(StringUtils.trim(accDriver.getPlayerId()))
+                .firstName(StringUtils.trim(accDriver.getFirstName()))
+                .lastName(StringUtils.trim(accDriver.getLastName()))
+                .shortName(StringUtils.trim(accDriver.getShortName()))
                 .lastActivity(fileMetadata.getModifiedDatetime())
                 .build();
     }

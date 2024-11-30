@@ -10,13 +10,18 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
 public class Driver extends Entity {
+    private static final String UNKNOWN_DRIVER = "Unknown Driver";
+    private static final String HIDDEN_FIRST_NAME = "Hidden";
+    private static final String HIDDEN_LAST_NAME = "Driver";
+    private static final String HIDDEN_SHORT_NAME = "HDR";
+    private static final String HIDDEN_FULL_NAME = HIDDEN_FIRST_NAME + " " + HIDDEN_LAST_NAME;
+
     private String playerId;
     private String firstName;
     private String lastName;
     private String shortName;
-    private boolean locked;
+    private Visibility visibility;
     private Integer validLapsCount;
     private Integer invalidLapsCount;
     private Long driveTimeMillis;
@@ -24,28 +29,43 @@ public class Driver extends Entity {
 
     public String getFullName() {
         if (firstName == null || lastName == null) {
-            return UNKNOWN;
+            return UNKNOWN_DRIVER;
         }
 
-        return String.join(" ", firstName, lastName);
+        return String.format("%s %s", firstName, lastName);
     }
 
-    public String getEntireName() {
-        String driverFullName = getFullName();
-
-        if (shortName == null) {
-            return driverFullName;
-        } else {
-            return driverFullName + " (" + shortName + ")";
+    public String getFullNameCensored() {
+        if (visibility == Visibility.PRIVATE) {
+            return HIDDEN_FULL_NAME;
         }
+
+        return getFullName();
     }
 
     @SuppressWarnings("unused")
     public String getPrettyDriveTime() {
         return FormatUtils.formatDriveTime(driveTimeMillis);
     }
-    
+
+    /**
+     * The Grid editor needs to know what has changed in order to close the right thing.
+     * Make sure that equals and hashCode of <code>Driver</code> uses unique attributes.
+     */
+    @Override
+    public final boolean equals(Object o) {
+        if (!(o instanceof Driver driver)) return false;
+
+        return playerId.equals(driver.playerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return playerId.hashCode();
+    }
+
+    @Override
     public String toString() {
-        return getFullName();
+        return getFullNameCensored();
     }
 }

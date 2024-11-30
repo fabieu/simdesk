@@ -4,6 +4,7 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.H2;
@@ -96,10 +97,27 @@ public abstract class BaseView extends VerticalLayout {
         return layout;
     }
 
+    protected Button createPrimaryButton(String label) {
+        Button button = new Button(label);
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        return button;
+    }
+
+    protected Button createSuccessButton(String label) {
+        Button button = new Button(label);
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        return button;
+    }
+
+    protected Button createCancelIconButton() {
+        Button button = new Button(VaadinIcon.CLOSE.create());
+        button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        return button;
+    }
+
     protected AbstractIcon<?> getDownloadIcon() {
         return new Icon(VaadinIcon.CLOUD_DOWNLOAD_O);
     }
-
 
     protected AbstractIcon<?> getUploadIcon() {
         return new Icon(VaadinIcon.CLOUD_UPLOAD_O);

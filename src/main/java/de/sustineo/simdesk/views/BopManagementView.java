@@ -2,7 +2,6 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
@@ -11,7 +10,6 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -270,7 +268,7 @@ public class BopManagementView extends BaseView {
                 .setSortable(true)
                 .setComparator(Bop::getUpdateDatetime);
         Grid.Column<Bop> editColumn = grid.addComponentColumn(bop -> {
-                    Button editButton = new Button("Edit");
+                    Button editButton = createPrimaryButton("Update");
                     editButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -279,7 +277,8 @@ public class BopManagementView extends BaseView {
                     });
                     return editButton;
                 })
-                .setWidth("150px")
+                .setTextAlign(ColumnTextAlign.END)
+                .setWidth("170px")
                 .setFlexGrow(0);
 
         IntegerField ballastKgField = new IntegerField();
@@ -306,9 +305,12 @@ public class BopManagementView extends BaseView {
                 .bind(Bop::getActive, Bop::setActive);
         activeColumn.setEditorComponent(activeField);
 
-        Button saveButton = new Button("Save", e -> editor.save());
-        Button cancelButton = new Button(VaadinIcon.CLOSE.create(), e -> editor.cancel());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_ERROR);
+        Button saveButton = createSuccessButton("Save");
+        saveButton.addClickListener(e -> editor.save());
+
+        Button cancelButton = createCancelIconButton();
+        cancelButton.addClickListener(e -> editor.cancel());
+
         HorizontalLayout actions = new HorizontalLayout(saveButton, cancelButton);
         actions.setPadding(false);
         editColumn.setEditorComponent(actions);

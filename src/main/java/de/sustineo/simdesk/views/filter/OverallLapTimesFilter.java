@@ -39,7 +39,7 @@ public class OverallLapTimesFilter extends GridFilter {
     public boolean test(GroupRanking groupRanking) {
         boolean matchesCarGroup = matches(groupRanking.getCarGroup().name(), carGroup);
         boolean matchesTrackName = matches(groupRanking.getTrackName(), trackName);
-        boolean matchesDriverName = matches(groupRanking.getDriver().getEntireName(), driverName);
+        boolean matchesDriverName = matches(groupRanking.getDriver().getFullNameCensored(), driverName);
         boolean matchesCarModelName = matches(groupRanking.getCarModelName(), carModelName);
 
         return matchesCarGroup && matchesTrackName && matchesDriverName && matchesCarModelName;
