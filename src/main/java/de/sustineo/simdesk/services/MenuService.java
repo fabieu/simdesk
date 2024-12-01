@@ -49,6 +49,10 @@ public class MenuService {
             items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
+        if (ProfileManager.isMapProfileEnabled()) {
+            items.add(MenuEntity.of(MenuEntityCategory.MAP, "Map", VaadinIcon.MAP_MARKER, MapView.class));
+        }
+
         return items;
     }
 

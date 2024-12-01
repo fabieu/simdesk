@@ -70,6 +70,7 @@
     "construct-style-sheets-polyfill": "3.1.0",
     "date-fns": "2.29.3",
     "flag-icons": "^7.2.3",
+    "leaflet": "1.9.4",
     "lit": "3.2.1"
   },
   "devDependencies": {
@@ -160,6 +161,7 @@
       "@vaadin/virtual-list": "24.5.5",
       "construct-style-sheets-polyfill": "3.1.0",
       "date-fns": "2.29.3",
+      "leaflet": "1.9.4",
       "lit": "3.2.1"
     },
     "devDependencies": {
@@ -252,7 +254,8 @@
     "@vaadin/vertical-layout": "$@vaadin/vertical-layout",
     "@vaadin/virtual-list": "$@vaadin/virtual-list",
     "@vaadin/popover": "$@vaadin/popover",
-    "flag-icons": "$flag-icons"
+    "flag-icons": "$flag-icons",
+    "leaflet": "$leaflet"
   },
   "type": "module"
 }

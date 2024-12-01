@@ -42,7 +42,7 @@ public class AccBop {
     @JsonIgnore
     public Track getTrack() {
         return entries.stream()
-                .map(entry -> new Track(entry.getTrackId(), entry.getTrackName()))
+                .map(entry -> Track.getTrackById(entry.getTrackId()))
                 .findFirst()
                 .orElse(null);
     }
