@@ -10,7 +10,6 @@ import java.util.List;
 public class OpenWeather {
     @JsonProperty("dt")
     private Instant timestamp;
-    private Double temp;
     private Integer pressure;
     private Integer humidity;
     @JsonProperty("dew_point")

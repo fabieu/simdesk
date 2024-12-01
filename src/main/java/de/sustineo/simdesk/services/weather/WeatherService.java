@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.weather;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -40,10 +41,6 @@ public class WeatherService {
         this.openweathermapApiKey = openweathermapApiKey;
     }
 
-    public Optional<OpenWeatherModel> getWeatherModel(Track track) {
-        return Optional.ofNullable(weatherModelsByTrack.get(track));
-    }
-
     private Optional<String> getMapUrlTemplate(String mapType) {
         if (isApiKeyMissing()) {
             return Optional.empty();
@@ -68,6 +65,42 @@ public class WeatherService {
         return openweathermapApiKey == null || openweathermapApiKey.isEmpty();
     }
 
+    public Optional<AccWeatherSettings> getAccWeatherSettings(Track track, int raceHours) {
+        OpenWeatherModel weatherModel = weatherModelsByTrack.get(track);
+        if (weatherModel == null) {
+            return Optional.empty();
+        }
+
+        // Set minium race length to one hour
+        if (raceHours <= 0) {
+            raceHours = 1;
+        }
+
+        double temperatureSum = 0.0;
+        double cloudsSum = 0.0;
+        double probabilityOfPrecipitationSum = 0.0;
+
+        for (int i = 0; i < raceHours; i++) {
+            temperatureSum += weatherModel.getHourly().get(i).getTemperature();
+            cloudsSum += weatherModel.getHourly().get(i).getClouds();
+            probabilityOfPrecipitationSum += weatherModel.getHourly().get(i).getProbabilityOfPrecipitation();
+        }
+
+        double averageTemperature = temperatureSum / raceHours;
+        double averageClouds = cloudsSum / raceHours;
+        double averageProbabilityOfPrecipitation = probabilityOfPrecipitationSum / raceHours;
+
+        AccWeatherSettings weatherSettings = AccWeatherSettings.builder()
+                .weatherModel(weatherModel)
+                .ambientTemperature((int) averageTemperature)
+                .cloudLevel(averageClouds / 100)
+                .rainLevel(averageProbabilityOfPrecipitation / 100)
+                .randomness(0)
+                .build();
+
+        return Optional.of(weatherSettings);
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     @Scheduled(cron = "0 0 * * * *")
     private void updateCurrentWeather() {
@@ -75,13 +108,13 @@ public class WeatherService {
             return;
         }
 
-        if (ProfileManager.isDebug()) {
-            log.info("Skipping weather update in debug mode");
-            return;
-        }
-
         // Fetch current weather data from OpenWeatherMap API
         for (Track track : Track.getAllSortedByName()) {
+            // Only fetch weather data for Kyalami Circuit in debug mode
+            if (ProfileManager.isDebug() && !track.getAccId().equals("kyalami")) {
+                continue;
+            }
+
             try {
                 String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, track.getLatitude(), track.getLongitude(), openweathermapApiKey);
                 log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), StringUtils.replace(url, openweathermapApiKey, "API_KEY")));

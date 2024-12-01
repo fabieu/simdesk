@@ -11,6 +11,8 @@ import java.time.Instant;
 public class OpenWeatherCurrent extends OpenWeather {
     private Instant sunrise;
     private Instant sunset;
+    @JsonProperty("temp")
+    private Double temperature;
     @JsonProperty("feels_like")
     private Double feelsLike;
     private OpenWeatherPrecipitation rain;
