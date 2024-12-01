@@ -175,12 +175,12 @@ public class BopEditorView extends BaseView {
         VerticalLayout verticalLayout = new VerticalLayout();
 
         trackComboBox.setItems(Track.getAllSortedByName());
-        trackComboBox.setItemLabelGenerator(Track::getTrackName);
+        trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setPlaceholder("Select track...");
         trackComboBox.setHelperText("Available filters: Track Name");
         trackComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getTrackId()));
+                currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getAccId()));
                 reloadComponents();
             }
         });
@@ -202,7 +202,7 @@ public class BopEditorView extends BaseView {
                 // Add entries and bop edit fields for newly selected cars
                 event.getValue().forEach(car -> {
                     if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getCarId()))) {
-                        AccBopEntry entry = new AccBopEntry(trackComboBox.getValue().getTrackId(), car.getCarId(), 0, 0);
+                        AccBopEntry entry = new AccBopEntry(trackComboBox.getValue().getAccId(), car.getCarId(), 0, 0);
                         currentBop.getEntries().add(entry);
                         currentCarComponents.put(entry.getCarId(), createBopEditField(entry));
                     }
