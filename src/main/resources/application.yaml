@@ -16,8 +16,10 @@ spring:
     deserialization:
       fail-on-unknown-properties: false
       read-unknown-enum-values-as-null: true
+      read-date-timestamps-as-nanoseconds: false
     serialization:
       fail-on-empty-beans: false
+      write-dates-as-timestamps: true
   servlet:
     multipart:
       max-file-size: 10MB
