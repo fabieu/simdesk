@@ -9,6 +9,7 @@ import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
+import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.VaadinUtils;
 import org.springframework.context.annotation.Profile;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
@@ -61,7 +62,9 @@ public class MapView extends BaseView {
         map.setMinZoom(MINIMUM_ZOOM_LEVEL);
 
         // Configure attribution control
-        LControlAttribution controlAttribution = new LControlAttribution(reg, new LControlAttributionOptions());
+        String lastUpdate = weatherService.getLastUpdate() != null ? FormatUtils.formatDatetime(weatherService.getLastUpdate()) : "Never";
+        String prefix = "Updated: %s | <a href=\"https://leafletjs.com\" target=\"_blank\">Leaflet</a>".formatted(lastUpdate);
+        LControlAttribution controlAttribution = new LControlAttribution(reg, new LControlAttributionOptions().withPrefix(prefix));
         map.addControl(controlAttribution);
 
         // Configure layer control

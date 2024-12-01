@@ -4,6 +4,7 @@ package de.sustineo.simdesk.services.weather;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
+import lombok.Getter;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.beans.factory.annotation.Value;
@@ -15,6 +16,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
 import org.springframework.web.client.RestTemplate;
 
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.Optional;
 import java.util.logging.Level;
@@ -27,8 +29,10 @@ public class WeatherService {
 
     private final RestTemplate restTemplate;
 
-    private final String openweathermapApiKey;
     private final HashMap<Track, OpenWeatherModel> weatherModelsByTrack = new HashMap<>();
+    private final String openweathermapApiKey;
+    @Getter
+    private Instant lastUpdate;
 
     public WeatherService(RestTemplate restTemplate,
                           @Value("${simdesk.openweathermap.api-key}") String openweathermapApiKey) {
@@ -71,6 +75,11 @@ public class WeatherService {
             return;
         }
 
+        if (ProfileManager.isDebug()) {
+            log.info("Skipping weather update in debug mode");
+            return;
+        }
+
         // Fetch current weather data from OpenWeatherMap API
         for (Track track : Track.getAllSortedByName()) {
             try {
@@ -83,5 +92,7 @@ public class WeatherService {
                 log.log(Level.SEVERE, "Failed to fetch weather data for track " + track.getName() + ": " + e.getMessage(), e);
             }
         }
+
+        lastUpdate = Instant.now();
     }
 }

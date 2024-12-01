@@ -12,6 +12,7 @@ public class ProfileManager {
     public static final String PROFILE_BOP = "acc-bop";
     public static final String PROFILE_MAP = "map";
     public static final String PROFILE_DISCORD = "discord";
+    public static final String PROFILE_DEBUG = "debug";
     private static Environment environment;
 
     public ProfileManager(Environment environment) {
@@ -44,5 +45,9 @@ public class ProfileManager {
 
     public static boolean isOAuth2ProfileEnabled() {
         return isDiscordProfileEnabled();
+    }
+
+    public static boolean isDebug() {
+        return isActive(PROFILE_DEBUG);
     }
 }
