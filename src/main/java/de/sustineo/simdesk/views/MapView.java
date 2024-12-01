@@ -6,6 +6,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
+import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
 import de.sustineo.simdesk.utils.VaadinUtils;
 import org.springframework.context.annotation.Profile;
@@ -21,6 +23,8 @@ import software.xdev.vaadin.maps.leaflet.map.LMap;
 import software.xdev.vaadin.maps.leaflet.map.LMapOptions;
 import software.xdev.vaadin.maps.leaflet.registry.LComponentManagementRegistry;
 import software.xdev.vaadin.maps.leaflet.registry.LDefaultComponentManagementRegistry;
+
+import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_MAP)
 @Route(value = "/map")
@@ -73,10 +77,33 @@ public class MapView extends BaseView {
         for (Track track : Track.getAllSortedByName()) {
             // Create a new marker for each track and add it to the map
             LMarker trackMarker = new LMarker(reg, new LLatLng(reg, track.getLatitude(), track.getLongitude()));
-            trackMarker.bindPopup(track.getName());
 
             if (!VaadinUtils.isMobileDevice()) {
                 trackMarker.bindTooltip(track.getName());
+            }
+
+            Optional<OpenWeatherModel> weatherModel = weatherService.getWeatherModel(track);
+            if (weatherModel.isPresent()) {
+                trackMarker.bindPopup("""
+                        <h4 style="color: var(--lumo-primary-text-color)">%s</h4>
+                        <b>Temperature:</b> %.0f°C <br>
+                        <b>Clouds:</b> %.0f%% <br>
+                        <b>Precipitation:</b> %.1f mm/h <br>
+                        """
+                        .formatted(
+                                track.getName(),
+                                weatherModel.get().getCurrent().getTemp(),
+                                weatherModel.get().getCurrent().getClouds(),
+                                Optional.ofNullable(weatherModel.get().getCurrent().getRain())
+                                        .map(OpenWeatherPrecipitation::getPrecipitation)
+                                        .orElse(0.0)
+                        )
+                );
+            } else {
+                trackMarker.bindPopup("""
+                        <h4 style="color: var(--lumo-primary-text-color)">%s</h4>
+                        """
+                        .formatted(track.getName()));
             }
 
             trackMarker.addTo(trackLayerGroup);
@@ -84,19 +111,20 @@ public class MapView extends BaseView {
         map.addLayer(trackLayerGroup);
         controlLayers.addOverlay(trackLayerGroup, "Race tracks");
 
-        // Add a layer for the current temperature
-        if (weatherService.isReady()) {
-            String apiKey = weatherService.getOpenweathermapApiKey();
-
-            LTileLayer temperatureLayer = new LTileLayer(reg, String.format("https://tile.openweathermap.org/map/temp_new/{z}/{x}/{y}.png?appid=%s", apiKey));
+        weatherService.getTemperatureMapUrlTemplate().ifPresent(temperatureMapUrlTemplate -> {
+            LTileLayer temperatureLayer = new LTileLayer(reg, temperatureMapUrlTemplate);
             controlLayers.addOverlay(temperatureLayer, "Temperature");
+        });
 
-            LTileLayer cloudsLayer = new LTileLayer(reg, String.format("https://tile.openweathermap.org/map/clouds_new/{z}/{x}/{y}.png?appid=%s", apiKey));
+        weatherService.getCloudsMapUrlTemplate().ifPresent(cloudsMapUrlTemplate -> {
+            LTileLayer cloudsLayer = new LTileLayer(reg, cloudsMapUrlTemplate);
             controlLayers.addOverlay(cloudsLayer, "Clouds");
+        });
 
-            LTileLayer precipitationLayer = new LTileLayer(reg, String.format("https://tile.openweathermap.org/map/precipitation_new/{z}/{x}/{y}.png?appid=%s", apiKey));
+        weatherService.getPrecipitationMapUrlTemplate().ifPresent(precipitationMapUrlTemplate -> {
+            LTileLayer precipitationLayer = new LTileLayer(reg, precipitationMapUrlTemplate);
             controlLayers.addOverlay(precipitationLayer, "Precipitation");
-        }
+        });
 
         // Set what part of the world should be shown
         map.setView(new LLatLng(reg, 20.558663, 9.412357), MINIMUM_ZOOM_LEVEL);
