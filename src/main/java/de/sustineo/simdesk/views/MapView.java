@@ -6,7 +6,8 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
+import de.sustineo.simdesk.entities.weather.OpenWeatherCurrent;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -85,21 +86,40 @@ public class MapView extends BaseView {
                 trackMarker.bindTooltip(track.getName());
             }
 
-            Optional<OpenWeatherModel> weatherModel = weatherService.getWeatherModel(track);
-            if (weatherModel.isPresent()) {
+            Optional<AccWeatherSettings> weatherSettings = weatherService.getAccWeatherSettings(track, 24);
+            if (weatherSettings.isPresent()) {
+                String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
+
+                OpenWeatherCurrent currentWeather = weatherSettings.get().getWeatherModel().getCurrent();
+                Double currentTemperature = currentWeather.getTemperature();
+                Double currentClouds = currentWeather.getClouds();
+                Double currentPrecipitation = Optional.ofNullable(currentWeather.getRain())
+                        .map(OpenWeatherPrecipitation::getPrecipitation)
+                        .orElse(0.0);
+
                 trackMarker.bindPopup("""
                         <h4 style="color: var(--lumo-primary-text-color)">%s</h4>
+                        %s
                         <b>Temperature:</b> %.0f°C <br>
                         <b>Clouds:</b> %.0f%% <br>
                         <b>Precipitation:</b> %.1f mm/h <br>
+                        %s
+                        <b>ACC Temperature:</b> %d°C <br>
+                        <b>ACC Cloud Level:</b> %.2f <br>
+                        <b>ACC Rain Level </b> %.2f <br>
+                        <b>ACC Randomness:</b> %d <br>
                         """
                         .formatted(
                                 track.getName(),
-                                weatherModel.get().getCurrent().getTemp(),
-                                weatherModel.get().getCurrent().getClouds(),
-                                Optional.ofNullable(weatherModel.get().getCurrent().getRain())
-                                        .map(OpenWeatherPrecipitation::getPrecipitation)
-                                        .orElse(0.0)
+                                spacerHtml,
+                                currentTemperature,
+                                currentClouds,
+                                currentPrecipitation,
+                                spacerHtml,
+                                weatherSettings.get().getAmbientTemperature(),
+                                weatherSettings.get().getCloudLevel(),
+                                weatherSettings.get().getRainLevel(),
+                                weatherSettings.get().getRandomness()
                         )
                 );
             } else {

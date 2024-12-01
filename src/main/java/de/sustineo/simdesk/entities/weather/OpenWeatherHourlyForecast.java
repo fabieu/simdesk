@@ -7,6 +7,8 @@ import lombok.EqualsAndHashCode;
 @Data
 @EqualsAndHashCode(callSuper = true)
 public class OpenWeatherHourlyForecast extends OpenWeather {
+    @JsonProperty("temp")
+    private Double temperature;
     @JsonProperty("feels_like")
     private Double feelsLike;
     @JsonProperty("pop")
