@@ -45,6 +45,7 @@ import java.time.Instant;
 import java.time.ZonedDateTime;
 import java.util.List;
 import java.util.Optional;
+import java.util.logging.Level;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -166,6 +167,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
                 notificationService.showSuccessNotification(String.format("%s - Session upload successfully", fileData.getFileName()));
             } catch (Exception e) {
+                log.log(Level.SEVERE, String.format("Could not upload session file %s", fileData.getFileName()), e);
                 notificationService.showErrorNotification(String.format("%s - Session upload failed", fileData.getFileName()));
             } finally {
                 boolean deleted = fileData.getFile().delete();
