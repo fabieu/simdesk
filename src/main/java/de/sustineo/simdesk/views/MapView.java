@@ -1,6 +1,9 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -26,6 +29,8 @@ import software.xdev.vaadin.maps.leaflet.map.LMapOptions;
 import software.xdev.vaadin.maps.leaflet.registry.LComponentManagementRegistry;
 import software.xdev.vaadin.maps.leaflet.registry.LDefaultComponentManagementRegistry;
 
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_MAP)
@@ -34,8 +39,14 @@ import java.util.Optional;
 @AnonymousAllowed
 public class MapView extends BaseView {
     private static final int MINIMUM_ZOOM_LEVEL = 3;
+    private static final int DEFAULT_RACE_HOURS = 24;
 
     private final WeatherService weatherService;
+
+    // Create the registry which is needed so that components can be reused and their methods invoked
+    // Note: You normally don't need to invoke any methods of the registry and just hand it over to the components
+    private final LComponentManagementRegistry registry = new LDefaultComponentManagementRegistry(this);
+    private final HashMap<Track, LMarker> trackMarkers = new HashMap<>();
 
     public MapView(WeatherService weatherService) {
         this.weatherService = weatherService;
@@ -45,17 +56,36 @@ public class MapView extends BaseView {
         setSpacing(false);
 
         add(createViewHeader());
+        add(createMapHeader());
         addAndExpand(createMap());
         add(createFooter());
+
+        updateWeatherMarkers(DEFAULT_RACE_HOURS);
+    }
+
+    private Component createMapHeader() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setPadding(true);
+        layout.setJustifyContentMode(JustifyContentMode.START);
+        layout.setAlignItems(Alignment.CENTER);
+
+        Span title = new Span("Race duration (hours):");
+
+        IntegerField raceHoursField = new IntegerField(event -> updateWeatherMarkers(event.getValue()));
+        raceHoursField.setValue(DEFAULT_RACE_HOURS);
+        raceHoursField.setMin(0);
+        raceHoursField.setMax(48);
+        raceHoursField.setStepButtonsVisible(true);
+        raceHoursField.setStep(1);
+
+        layout.add(title, raceHoursField);
+        return layout;
     }
 
     private Component createMap() {
-        // Create the registry which is needed so that components can be reused and their methods invoked
-        // Note: You normally don't need to invoke any methods of the registry and just hand it over to the components
-        final LComponentManagementRegistry reg = new LDefaultComponentManagementRegistry(this);
-
         // Create and add the MapContainer (which contains the map) to the UI
-        final MapContainer mapContainer = new MapContainer(reg, new LMapOptions().withAttributionControl(false));
+        final MapContainer mapContainer = new MapContainer(registry, new LMapOptions().withAttributionControl(false));
         mapContainer.setSizeFull();
 
         final LMap map = mapContainer.getlMap();
@@ -65,28 +95,62 @@ public class MapView extends BaseView {
         // Configure attribution control
         String lastUpdate = weatherService.getLastUpdate() != null ? FormatUtils.formatDatetime(weatherService.getLastUpdate()) : "Never";
         String prefix = "Updated: %s | <a href=\"https://leafletjs.com\" target=\"_blank\">Leaflet</a>".formatted(lastUpdate);
-        LControlAttribution controlAttribution = new LControlAttribution(reg, new LControlAttributionOptions().withPrefix(prefix));
+        LControlAttribution controlAttribution = new LControlAttribution(registry, new LControlAttributionOptions().withPrefix(prefix));
         map.addControl(controlAttribution);
 
         // Configure layer control
-        LControlLayers controlLayers = new LControlLayers(reg);
+        LControlLayers controlLayers = new LControlLayers(registry);
         map.addControl(controlLayers);
 
         // Add a (default) TileLayer so that we can see something on the map
-        LTileLayer defaultLayer = LTileLayer.createDefaultForOpenStreetMapTileServer(reg);
+        LTileLayer defaultLayer = LTileLayer.createDefaultForOpenStreetMapTileServer(registry);
         map.addLayer(defaultLayer);
 
         // Add a layer for all race track markers
-        LLayerGroup trackLayerGroup = new LLayerGroup(reg);
+        LLayerGroup trackLayerGroup = new LLayerGroup(registry);
         for (Track track : Track.getAllSortedByName()) {
             // Create a new marker for each track and add it to the map
-            LMarker trackMarker = new LMarker(reg, new LLatLng(reg, track.getLatitude(), track.getLongitude()));
+            LMarker trackMarker = new LMarker(registry, new LLatLng(registry, track.getLatitude(), track.getLongitude()));
 
             if (!VaadinUtils.isMobileDevice()) {
                 trackMarker.bindTooltip(track.getName());
             }
 
-            Optional<AccWeatherSettings> weatherSettings = weatherService.getAccWeatherSettings(track, 24);
+            trackMarker.bindPopup("<h4 style=\"color: var(--lumo-primary-text-color)\">%s</h4>".formatted(track.getName()));
+            trackMarker.addTo(trackLayerGroup);
+            trackMarkers.put(track, trackMarker);
+        }
+
+        map.addLayer(trackLayerGroup);
+        controlLayers.addOverlay(trackLayerGroup, "Race tracks");
+
+        weatherService.getTemperatureMapUrlTemplate().ifPresent(temperatureMapUrlTemplate -> {
+            LTileLayer temperatureLayer = new LTileLayer(registry, temperatureMapUrlTemplate);
+            controlLayers.addOverlay(temperatureLayer, "Temperature");
+        });
+
+        weatherService.getCloudsMapUrlTemplate().ifPresent(cloudsMapUrlTemplate -> {
+            LTileLayer cloudsLayer = new LTileLayer(registry, cloudsMapUrlTemplate);
+            controlLayers.addOverlay(cloudsLayer, "Clouds");
+        });
+
+        weatherService.getPrecipitationMapUrlTemplate().ifPresent(precipitationMapUrlTemplate -> {
+            LTileLayer precipitationLayer = new LTileLayer(registry, precipitationMapUrlTemplate);
+            controlLayers.addOverlay(precipitationLayer, "Precipitation");
+        });
+
+        // Set what part of the world should be shown
+        map.setView(new LLatLng(registry, 20.558663, 9.412357), MINIMUM_ZOOM_LEVEL);
+
+        return mapContainer;
+    }
+
+    public void updateWeatherMarkers(int raceHours) {
+        for (Map.Entry<Track, LMarker> entry : trackMarkers.entrySet()) {
+            Track track = entry.getKey();
+            LMarker trackMarker = entry.getValue();
+
+            Optional<AccWeatherSettings> weatherSettings = weatherService.getAccWeatherSettings(track, raceHours);
             if (weatherSettings.isPresent()) {
                 String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
 
@@ -97,17 +161,20 @@ public class MapView extends BaseView {
                         .map(OpenWeatherPrecipitation::getPrecipitation)
                         .orElse(0.0);
 
+                trackMarker.closePopup();
                 trackMarker.bindPopup("""
-                        <h4 style="color: var(--lumo-primary-text-color)">%s</h4>
+                        <h3 style="color: var(--lumo-primary-text-color)">%s</h3>
                         %s
+                        <h5 style="color: var(--lumo-primary-text-color)">Current weather</h5>
                         <b>Temperature:</b> %.0f°C <br>
                         <b>Clouds:</b> %.0f%% <br>
                         <b>Precipitation:</b> %.1f mm/h <br>
                         %s
-                        <b>ACC Temperature:</b> %d°C <br>
-                        <b>ACC Cloud Level:</b> %.2f <br>
-                        <b>ACC Rain Level </b> %.2f <br>
-                        <b>ACC Randomness:</b> %d <br>
+                        <h5 style="color: var(--lumo-primary-text-color)">ACC Weather Settings - %s hour(s)</h5>
+                        <b>Temperature:</b> %d°C <br>
+                        <b>Cloud Level:</b> %.2f <br>
+                        <b>Rain Level:</b> %.2f <br>
+                        <b>Randomness:</b> %d <br>
                         """
                         .formatted(
                                 track.getName(),
@@ -116,42 +183,14 @@ public class MapView extends BaseView {
                                 currentClouds,
                                 currentPrecipitation,
                                 spacerHtml,
+                                raceHours,
                                 weatherSettings.get().getAmbientTemperature(),
                                 weatherSettings.get().getCloudLevel(),
                                 weatherSettings.get().getRainLevel(),
                                 weatherSettings.get().getRandomness()
                         )
                 );
-            } else {
-                trackMarker.bindPopup("""
-                        <h4 style="color: var(--lumo-primary-text-color)">%s</h4>
-                        """
-                        .formatted(track.getName()));
             }
-
-            trackMarker.addTo(trackLayerGroup);
         }
-        map.addLayer(trackLayerGroup);
-        controlLayers.addOverlay(trackLayerGroup, "Race tracks");
-
-        weatherService.getTemperatureMapUrlTemplate().ifPresent(temperatureMapUrlTemplate -> {
-            LTileLayer temperatureLayer = new LTileLayer(reg, temperatureMapUrlTemplate);
-            controlLayers.addOverlay(temperatureLayer, "Temperature");
-        });
-
-        weatherService.getCloudsMapUrlTemplate().ifPresent(cloudsMapUrlTemplate -> {
-            LTileLayer cloudsLayer = new LTileLayer(reg, cloudsMapUrlTemplate);
-            controlLayers.addOverlay(cloudsLayer, "Clouds");
-        });
-
-        weatherService.getPrecipitationMapUrlTemplate().ifPresent(precipitationMapUrlTemplate -> {
-            LTileLayer precipitationLayer = new LTileLayer(reg, precipitationMapUrlTemplate);
-            controlLayers.addOverlay(precipitationLayer, "Precipitation");
-        });
-
-        // Set what part of the world should be shown
-        map.setView(new LLatLng(reg, 20.558663, 9.412357), MINIMUM_ZOOM_LEVEL);
-
-        return mapContainer;
     }
 }
