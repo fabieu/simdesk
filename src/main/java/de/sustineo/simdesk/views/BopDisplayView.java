@@ -75,7 +75,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         add(createFooter());
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
-        if (trackIdParameter.isPresent() && Track.isValid(trackIdParameter.get())) {
+        if (trackIdParameter.isPresent() && Track.existsInAcc(trackIdParameter.get())) {
             Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(this::scrollToComponent);
         }
     }
@@ -90,7 +90,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
         trackSelect.setWidthFull();
         trackSelect.setPlaceholder("Jump to track");
-        trackSelect.setItemLabelGenerator(Track::getTrackNameById);
+        trackSelect.setItemLabelGenerator(Track::getTrackNameByAccId);
         trackSelect.addValueChangeListener(event -> {
             String trackId = event.getValue();
             if (trackId != null) {
@@ -130,7 +130,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             );
 
             // Header
-            H2 trackTitle = new H2(Track.getTrackNameById(trackId));
+            H2 trackTitle = new H2(Track.getTrackNameByAccId(trackId));
             scrollTargets.put(trackId, trackTitle);
 
             Anchor downloadAnchor = new Anchor(bopResource, "");

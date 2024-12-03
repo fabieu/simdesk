@@ -174,7 +174,7 @@ public class BopEditorView extends BaseView {
     private Component createEditingForm() {
         VerticalLayout verticalLayout = new VerticalLayout();
 
-        trackComboBox.setItems(Track.getAllSortedByName());
+        trackComboBox.setItems(Track.getAllSortedByNameForAcc());
         trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setPlaceholder("Select track...");
         trackComboBox.setHelperText("Available filters: Track Name");

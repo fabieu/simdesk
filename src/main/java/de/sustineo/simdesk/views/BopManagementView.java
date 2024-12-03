@@ -132,7 +132,7 @@ public class BopManagementView extends BaseView {
             }
         });
 
-        trackComboBox.setItems(Track.getAllSortedByName());
+        trackComboBox.setItems(Track.getAllSortedByNameForAcc());
         trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setClearButtonVisible(true);
         trackComboBox.setPlaceholder("Select track");
@@ -151,7 +151,7 @@ public class BopManagementView extends BaseView {
 
         ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
         trackFilterComboxBox.setLabel("Track");
-        trackFilterComboxBox.setItems(Track.getAllSortedByName());
+        trackFilterComboxBox.setItems(Track.getAllSortedByNameForAcc());
         trackFilterComboxBox.setItemLabelGenerator(Track::getName);
         trackFilterComboxBox.setClearButtonVisible(true);
         trackFilterComboxBox.addValueChangeListener(e -> {
@@ -231,7 +231,7 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
         });
 
-        Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameById(bop.getTrackId()))
+        Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameByAccId(bop.getTrackId()))
                 .setHeader("Track")
                 .setSortable(true);
         Grid.Column<Bop> carNameColumn = grid.addColumn(bop -> Car.getCarNameById(bop.getCarId()))
