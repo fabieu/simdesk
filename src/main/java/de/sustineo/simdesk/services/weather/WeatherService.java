@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.weather;
 
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.Entity;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
@@ -117,7 +118,7 @@ public class WeatherService {
 
             try {
                 String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, track.getLatitude(), track.getLongitude(), openweathermapApiKey);
-                log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), StringUtils.replace(url, openweathermapApiKey, "API_KEY")));
+                log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), StringUtils.replace(url, openweathermapApiKey, Entity.HIDDEN)));
 
                 OpenWeatherModel weatherModel = restTemplate.getForObject(url, OpenWeatherModel.class);
                 weatherModelsByTrack.put(track, weatherModel);
