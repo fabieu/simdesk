@@ -102,6 +102,43 @@ public class WeatherService {
         return Optional.of(weatherSettings);
     }
 
+    /**
+     * This method calculates the percentage range based on the rain intensity in mm/h.
+     * The formula is defined piecewise to match the categories from the table.
+     *
+     * <pre>
+     * | Rain Classification     | Intensität (mm/h)    | Prozentbereich (%)     |
+     * |-------------------------|----------------------|------------------------|
+     * | No rain                 | < 0.5 mm/h           | 0 %                    |
+     * | Weak rain               | 0.5–2 mm/h           | 2–7 %                  |
+     * | Moderate rain           | 2–6 mm/h             | 7–20 %                 |
+     * | Heavy rain              | 6–10 mm/h            | 20–33 %                |
+     * | Very heavy rain         | 10–18 mm/h           | 33–60 %                |
+     * | Shower                  | 18–30 mm/h           | 60–100 %               |
+     * | Cloudburst              | > 30 mm/h            | > 100 %                |
+     * </pre>
+     *
+     * @param rainIntensity Rain intensity in mm/h
+     * @return Percentage value corresponding to the given intensity
+     */
+    protected double convertRainIntensityToPercentage(double rainIntensity) {
+        if (rainIntensity < 0.5) { // No rain (<0.5 mm/h)
+            return 0.0;
+        } else if (rainIntensity >= 0.5 && rainIntensity < 2) { // Weak rain (0.5–2 mm/h)
+            return ((2.0 / 1.5) * (rainIntensity - 0.5) + 2) / 100;
+        } else if (rainIntensity >= 2 && rainIntensity < 6) { // Moderate rain (2–6 mm/h)
+            return ((13.0 / 4.0) * (rainIntensity - 2) + 7) / 100;
+        } else if (rainIntensity >= 6 && rainIntensity < 10) { // Heavy rain (6–10 mm/h)
+            return ((13.0 / 4.0) * (rainIntensity - 6) + 20) / 100;
+        } else if (rainIntensity >= 10 && rainIntensity < 18) { // Very heavy rain (10–18 mm/h)
+            return ((27.0 / 8.0) * (rainIntensity - 10) + 33) / 100;
+        } else if (rainIntensity >= 18 && rainIntensity <= 30) { // Shower (18–30 mm/h)
+            return ((40.0 / 12.0) * (rainIntensity - 18) + 60) / 100;
+        } else { // Cloudburst (> 30 mm/h)
+            return 1.0;
+        }
+    }
+
     @EventListener(ApplicationReadyEvent.class)
     @Scheduled(cron = "0 0 * * * *")
     private void updateCurrentWeather() {
