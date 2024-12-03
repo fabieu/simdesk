@@ -8,7 +8,7 @@ import java.util.List;
 public enum CarGroup {
     GT3, GT2, GTC, GT4, TCX, UNKNOWN;
 
-    public static boolean isValid(String carGroup) {
+    public static boolean exists(String carGroup) {
         return carGroup != null && EnumUtils.isValidEnumIgnoreCase(CarGroup.class, carGroup);
     }
 

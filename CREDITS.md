@@ -95,3 +95,7 @@ and [Eclipse Public License 2.0](https://github.com/junit-team/junit5/blob/main/
 [Testcontainers Java](https://github.com/testcontainers/testcontainers-java)
 by [Testcontainers](https://www.testcontainers.org/)
 and [MIT License](https://github.com/testcontainers/testcontainers-java/blob/main/LICENSE)
+
+[vaadin-maps-leaflet-flow](https://github.com/xdev-software/vaadin-maps-leaflet-flow)
+by [XDEV Software](https://xdev.software/)
+and [Apache License 2.0](https://github.com/xdev-software/vaadin-maps-leaflet-flow/blob/develop/LICENSE)

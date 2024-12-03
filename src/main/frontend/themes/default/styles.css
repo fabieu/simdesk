@@ -16,6 +16,7 @@
 @import "assets/purecss/pure-min.css";
 @import "assets/purecss/grids-responsive-min.css";
 @import "assets/patterncss/pattern.min.css";
+@import "assets/leaflet/leaflet.css";
 
 @font-face {
     font-family: Roboto;
