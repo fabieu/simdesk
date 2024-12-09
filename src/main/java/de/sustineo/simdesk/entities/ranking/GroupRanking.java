@@ -25,6 +25,6 @@ public class GroupRanking extends Entity {
     }
 
     public String getTrackName() {
-        return Track.getTrackNameById(trackId);
+        return Track.getTrackNameByAccId(trackId);
     }
 }

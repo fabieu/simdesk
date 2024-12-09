@@ -52,7 +52,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
 
-        if (Track.isValid(trackId) && CarGroup.isValid(carGroup)) {
+        if (Track.existsInAcc(trackId) && CarGroup.exists(carGroup)) {
             if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
                 this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
             }
@@ -63,7 +63,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
             setSpacing(false);
             setPadding(false);
 
-            add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameById(trackId), carGroup.toUpperCase())));
+            add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
             add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
             add(createFooter());
