@@ -124,17 +124,17 @@ public class MapView extends BaseView {
         map.addLayer(trackLayerGroup);
         controlLayers.addOverlay(trackLayerGroup, "Race tracks");
 
-        weatherService.getTemperatureMapUrlTemplate().ifPresent(temperatureMapUrlTemplate -> {
+        weatherService.getOpenWeatherTemperatureMapUrlTemplate().ifPresent(temperatureMapUrlTemplate -> {
             LTileLayer temperatureLayer = new LTileLayer(registry, temperatureMapUrlTemplate);
             controlLayers.addOverlay(temperatureLayer, "Temperature");
         });
 
-        weatherService.getCloudsMapUrlTemplate().ifPresent(cloudsMapUrlTemplate -> {
+        weatherService.getOpenWeatherCloudsMapUrlTemplate().ifPresent(cloudsMapUrlTemplate -> {
             LTileLayer cloudsLayer = new LTileLayer(registry, cloudsMapUrlTemplate);
             controlLayers.addOverlay(cloudsLayer, "Clouds");
         });
 
-        weatherService.getPrecipitationMapUrlTemplate().ifPresent(precipitationMapUrlTemplate -> {
+        weatherService.getOpenWeatherPrecipitationMapUrlTemplate().ifPresent(precipitationMapUrlTemplate -> {
             LTileLayer precipitationLayer = new LTileLayer(registry, precipitationMapUrlTemplate);
             controlLayers.addOverlay(precipitationLayer, "Precipitation");
         });
