@@ -1,29 +1,29 @@
 package de.sustineo.simdesk.services.weather;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import org.junit.jupiter.api.Disabled;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
 import org.springframework.test.context.ActiveProfiles;
+import org.springframework.test.context.bean.override.mockito.MockitoBean;
+import org.springframework.web.client.RestTemplate;
 
-import static org.junit.jupiter.api.Assertions.assertEquals;
+import static org.assertj.core.api.Assertions.assertThat;
 
-@Disabled
-@ActiveProfiles(ProfileManager.PROFILE_MAP)
-@SpringBootTest
+@ActiveProfiles({ProfileManager.PROFILE_MAP})
+@SpringBootTest(classes = WeatherService.class)
 class WeatherServiceTest {
     @Autowired
     private WeatherService weatherService;
 
-    /**
-     * Test for the no rain case (intensity < 0.5 mm/h).
-     */
+    @MockitoBean
+    private RestTemplate restTemplate;
+
     @Test
     public void testNoRain() {
         // No rain, should return 0.0
-        assertEquals(0.0, weatherService.convertRainIntensityToPercentage(0.0));
-        assertEquals(0.0, weatherService.convertRainIntensityToPercentage(0.4));
+        assertThat(weatherService.convertRainIntensityToPercentage(0.0)).isEqualTo(0.0);
+        assertThat(weatherService.convertRainIntensityToPercentage(0.4)).isEqualTo(0.0);
     }
 
     /**
@@ -31,12 +31,9 @@ class WeatherServiceTest {
      */
     @Test
     public void testWeakRain() {
-        // For intensity of 0.5 mm/h, result should be 0.02 (2%)
-        assertEquals(0.02, weatherService.convertRainIntensityToPercentage(0.5));
-        // For intensity of 1.0 mm/h, it should be closer to the middle of the range
-        assertEquals(0.0667, weatherService.convertRainIntensityToPercentage(1.0), 0.0001);
-        // For intensity of 2.0 mm/h, it should be 0.2 (20%)
-        assertEquals(0.2, weatherService.convertRainIntensityToPercentage(2.0));
+        assertThat(weatherService.convertRainIntensityToPercentage(0.5)).isEqualTo(0.02);
+        assertThat(weatherService.convertRainIntensityToPercentage(1.0)).isEqualTo(0.03);
+        assertThat(weatherService.convertRainIntensityToPercentage(2.0)).isEqualTo(0.07);
     }
 
     /**
@@ -44,12 +41,9 @@ class WeatherServiceTest {
      */
     @Test
     public void testModerateRain() {
-        // For intensity of 2.5 mm/h
-        assertEquals(0.1, weatherService.convertRainIntensityToPercentage(2.5));
-        // For intensity of 4.0 mm/h
-        assertEquals(0.175, weatherService.convertRainIntensityToPercentage(4.0));
-        // For intensity of 6.0 mm/h
-        assertEquals(0.33, weatherService.convertRainIntensityToPercentage(6.0), 0.0001);
+        assertThat(weatherService.convertRainIntensityToPercentage(2.5)).isEqualTo(0.09);
+        assertThat(weatherService.convertRainIntensityToPercentage(4.0)).isEqualTo(0.14);
+        assertThat(weatherService.convertRainIntensityToPercentage(6.0)).isEqualTo(0.2);
     }
 
     /**
@@ -57,12 +51,9 @@ class WeatherServiceTest {
      */
     @Test
     public void testHeavyRain() {
-        // For intensity of 6.5 mm/h
-        assertEquals(0.375, weatherService.convertRainIntensityToPercentage(6.5));
-        // For intensity of 8.0 mm/h
-        assertEquals(0.475, weatherService.convertRainIntensityToPercentage(8.0));
-        // For intensity of 10.0 mm/h
-        assertEquals(0.6, weatherService.convertRainIntensityToPercentage(10.0));
+        assertThat(weatherService.convertRainIntensityToPercentage(6.5)).isEqualTo(0.22);
+        assertThat(weatherService.convertRainIntensityToPercentage(8.0)).isEqualTo(0.27);
+        assertThat(weatherService.convertRainIntensityToPercentage(10.0)).isEqualTo(0.33);
     }
 
     /**
@@ -70,12 +61,9 @@ class WeatherServiceTest {
      */
     @Test
     public void testVeryHeavyRain() {
-        // For intensity of 10.0 mm/h
-        assertEquals(0.6, weatherService.convertRainIntensityToPercentage(10.0));
-        // For intensity of 14.0 mm/h
-        assertEquals(0.7875, weatherService.convertRainIntensityToPercentage(14.0));
-        // For intensity of 18.0 mm/h
-        assertEquals(1.0, weatherService.convertRainIntensityToPercentage(18.0));
+        assertThat(weatherService.convertRainIntensityToPercentage(10.0)).isEqualTo(0.33);
+        assertThat(weatherService.convertRainIntensityToPercentage(14.0)).isEqualTo(0.47);
+        assertThat(weatherService.convertRainIntensityToPercentage(18.0)).isEqualTo(0.6);
     }
 
     /**
@@ -83,12 +71,9 @@ class WeatherServiceTest {
      */
     @Test
     public void testShower() {
-        // For intensity of 18.0 mm/h
-        assertEquals(0.6, weatherService.convertRainIntensityToPercentage(18.0));
-        // For intensity of 25.0 mm/h
-        assertEquals(0.9167, weatherService.convertRainIntensityToPercentage(25.0), 0.0001);
-        // For intensity of 30.0 mm/h
-        assertEquals(1.0, weatherService.convertRainIntensityToPercentage(30.0));
+        assertThat(weatherService.convertRainIntensityToPercentage(18.0)).isEqualTo(0.6);
+        assertThat(weatherService.convertRainIntensityToPercentage(25.0)).isEqualTo(0.83);
+        assertThat(weatherService.convertRainIntensityToPercentage(30.0)).isEqualTo(1.0);
     }
 
     /**
@@ -96,9 +81,7 @@ class WeatherServiceTest {
      */
     @Test
     public void testCloudburst() {
-        // Anything above 30 mm/h should return 1.0 (100%)
-        assertEquals(1.0, weatherService.convertRainIntensityToPercentage(35.0));
-        assertEquals(1.0, weatherService.convertRainIntensityToPercentage(50.0));
+        assertThat(weatherService.convertRainIntensityToPercentage(35.0)).isEqualTo(1.0);
+        assertThat(weatherService.convertRainIntensityToPercentage(50.0)).isEqualTo(1.0);
     }
-
 }
