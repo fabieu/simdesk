@@ -49,6 +49,10 @@ public class WeatherService {
         this.openweathermapApiKey = openweathermapApiKey;
     }
 
+    private boolean isApiKeyMissing() {
+        return openweathermapApiKey == null || openweathermapApiKey.isEmpty();
+    }
+
     private Optional<String> getOpenWeatherMapUrlTemplate(String mapType) {
         if (isApiKeyMissing()) {
             return Optional.empty();
@@ -69,10 +73,6 @@ public class WeatherService {
         return getOpenWeatherMapUrlTemplate("clouds_new");
     }
 
-    private boolean isApiKeyMissing() {
-        return openweathermapApiKey == null || openweathermapApiKey.isEmpty();
-    }
-
     public Optional<AccWeatherSettings> getAccWeatherSettings(Track track, int raceHours) {
         OpenWeatherModel weatherModel = weatherModelsByTrack.get(track);
         if (weatherModel == null) {
@@ -87,9 +87,9 @@ public class WeatherService {
         }
 
         double averageTemperature = calculateAverageTemperature(weatherModel, raceHours);
-        double cloudLevel = calculateCloudLevel(weatherModel, raceHours);
         double rainLevel = calculateRainLevel(weatherModel, raceHours);
-        int randomness = calculateRandomness(weatherModel, raceHours);
+        double cloudLevel = calculateCloudLevel(weatherModel, raceHours, rainLevel);
+        int randomness = calculateRandomness(weatherModel, raceHours, rainLevel);
 
         AccWeatherSettings weatherSettings = AccWeatherSettings.builder()
                 .weatherModel(weatherModel)
@@ -109,7 +109,7 @@ public class WeatherService {
      * @param raceHours    The number of race hours to calculate the average temperature for.
      * @return The average temperature over the specified number of race hours.
      */
-    private double calculateAverageTemperature(OpenWeatherModel weatherModel, int raceHours) {
+    protected double calculateAverageTemperature(OpenWeatherModel weatherModel, int raceHours) {
         int forecastHours = weatherModel.getHourly().size();
         double temperatureSum = 0.0;
 
@@ -131,21 +131,26 @@ public class WeatherService {
      * @param raceHours    The number of race hours to calculate the cloud level for.
      * @return The cloud level over the specified number of race hours.
      */
-    private double calculateCloudLevel(OpenWeatherModel weatherModel, int raceHours) {
+    protected double calculateCloudLevel(OpenWeatherModel weatherModel, int raceHours, double rainLevel) {
         int forecastHours = weatherModel.getHourly().size();
-        double cloudLevelMax = 0.0;
+        double cloudLevelSum = 0.0;
 
-        //TODO: Change algorithm to calculate the cloud level
+
         for (int i = 0; i < raceHours; i++) {
             if (i > forecastHours) {
                 break;
             }
 
-            double cloudLevel = weatherModel.getHourly().get(i).getClouds() / 100.0;
-            cloudLevelMax = Math.max(cloudLevelMax, cloudLevel);
+            cloudLevelSum += weatherModel.getHourly().get(i).getClouds();
         }
 
-        return cloudLevelMax;
+        double averageCloudLevel = (cloudLevelSum / raceHours) / 100.0;
+        if (rainLevel == 0.0) {
+            return averageCloudLevel;
+        }
+
+        //TODO: Change algorithm to calculate the cloud level with rain
+        return averageCloudLevel;
     }
 
     /**
@@ -155,7 +160,7 @@ public class WeatherService {
      * @param raceHours    The number of race hours to calculate the rain level for.
      * @return The rain level over the specified number of race hours.
      */
-    private double calculateRainLevel(OpenWeatherModel weatherModel, int raceHours) {
+    protected double calculateRainLevel(OpenWeatherModel weatherModel, int raceHours) {
         int forecastHours = weatherModel.getHourly().size();
         double rainIntensityMax = 0.0;
 
@@ -181,10 +186,10 @@ public class WeatherService {
      * @param raceHours    The number of race hours to calculate the randomness for.
      * @return The randomness over the specified number of race hours.
      */
-    private int calculateRandomness(OpenWeatherModel weatherModel, int raceHours) {
+    protected int calculateRandomness(OpenWeatherModel weatherModel, int raceHours, double rainLevel) {
         int forecastHours = weatherModel.getHourly().size();
 
-        List<Double> rainLevels = new ArrayList<>();
+        List<Double> rainProbabilities = new ArrayList<>();
         List<Double> cloudLevels = new ArrayList<>();
 
         for (int i = 0; i < raceHours; i++) {
@@ -192,19 +197,31 @@ public class WeatherService {
                 break;
             }
 
-            rainLevels.add(weatherModel.getHourly().get(i).getProbabilityOfPrecipitation());
-            cloudLevels.add(weatherModel.getHourly().get(i).getClouds() / 100);
+            double rainProbability = weatherModel.getHourly().get(i).getProbabilityOfPrecipitation();
+            rainProbabilities.add(rainProbability);
+
+            double cloudLevel = weatherModel.getHourly().get(i).getClouds() / 100.0;
+            cloudLevels.add(cloudLevel);
         }
 
-        final double rainModifier = 0.65;
-        final double cloudModifier = 0.35;
+        double rainModifier;
+        double cloudModifier;
+        if (rainLevel == 0.0) {
+            rainModifier = 0.0;
+            cloudModifier = 1.0; // Only consider cloud level if there is no rain
+        } else {
+            rainModifier = 0.7;
+            cloudModifier = 0.3;
+        }
 
-        double rainVariance = calculateVariance(rainLevels);
+        double rainVariance = calculateVariance(rainProbabilities);
         double cloudVariance = calculateVariance(cloudLevels);
         double combinedVariance = (rainModifier * rainVariance) + (cloudModifier * cloudVariance);
 
-        // Scale the variance to range [0, 4] and round to the nearest integer
-        return (int) Math.round(combinedVariance * 16);
+        // Scale the variance to range of [AccWeatherSettings.MIN_RANDOMNESS, AccWeatherSettings.MAX_RANDOMNESS] and round to the nearest integer
+        long randomness = Math.round(combinedVariance * 4 * AccWeatherSettings.MAX_RANDOMNESS);
+
+        return (int) randomness;
     }
 
     /**
@@ -301,7 +318,7 @@ public class WeatherService {
      * @param values List of values to calculate the variance for
      * @return The variance of the values
      */
-    private double calculateVariance(List<Double> values) {
+    protected double calculateVariance(List<Double> values) {
         // Calculate the mean of the values
         double mean = values.stream()
                 .mapToDouble(Double::doubleValue)

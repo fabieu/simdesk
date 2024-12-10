@@ -4,17 +4,28 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
+import org.springframework.core.env.Environment;
 import org.springframework.test.context.ActiveProfiles;
 import org.springframework.test.context.bean.override.mockito.MockitoBean;
 import org.springframework.web.client.RestTemplate;
 
+import java.util.ArrayList;
+import java.util.List;
+
 import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles({ProfileManager.PROFILE_MAP})
-@SpringBootTest(classes = WeatherService.class)
+@SpringBootTest(classes = {
+        WeatherService.class,
+        ProfileManager.class,
+        Environment.class
+})
 class WeatherServiceTest {
     @Autowired
     private WeatherService weatherService;
+
+    @Autowired
+    private ProfileManager profileManager;
 
     @MockitoBean
     private RestTemplate restTemplate;
@@ -83,5 +94,40 @@ class WeatherServiceTest {
     public void testCloudburst() {
         assertThat(weatherService.convertRainIntensityToPercentage(35.0)).isEqualTo(1.0);
         assertThat(weatherService.convertRainIntensityToPercentage(50.0)).isEqualTo(1.0);
+    }
+
+    @Test
+    public void calculateVarianceWithEmptyList() {
+        assertThat(weatherService.calculateVariance(new ArrayList<>())).isEqualTo(0.0);
+    }
+
+    @Test
+    public void calculateVarianceWithSingleValue() {
+        List<Double> values = List.of(1.0);
+        assertThat(weatherService.calculateVariance(values)).isEqualTo(0.0);
+    }
+
+    @Test
+    public void calculateVarianceWithMaximumVariancePair() {
+        List<Double> values = List.of(0.0, 1.0);
+        assertThat(weatherService.calculateVariance(values)).isEqualTo(0.25);
+    }
+
+    @Test
+    public void calculateVarianceWithMaximumVarianceList() {
+        List<Double> values = List.of(0.0, 1.0, 0.0, 1.0, 0.0, 1.0);
+        assertThat(weatherService.calculateVariance(values)).isEqualTo(0.25);
+    }
+
+    @Test
+    public void calculateVarianceWithIdenticalValues() {
+        List<Double> values = List.of(0.45, 0.45, 0.45);
+        assertThat(weatherService.calculateVariance(values)).isEqualTo(0.0);
+    }
+
+    @Test
+    public void calculateVarianceWithRandomValues() {
+        List<Double> values = List.of(0.1, 0.2, 0.3, 0.4, 0.5, 0.6, 0.7, 0.8, 0.9, 1.0);
+        assertThat(weatherService.calculateVariance(values)).isEqualTo(0.0825);
     }
 }
