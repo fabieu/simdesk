@@ -36,6 +36,6 @@ public class AccBopEntry {
 
     @JsonIgnore
     public String getTrackName() {
-        return Track.getTrackNameById(trackId);
+        return Track.getTrackNameByAccId(trackId);
     }
 }

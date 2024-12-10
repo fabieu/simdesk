@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Development SQLite" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, debug, discord" />
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, map, debug, discord" />
     <envs>
       <env name="debug" value="false" />
       <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="development/results" />
