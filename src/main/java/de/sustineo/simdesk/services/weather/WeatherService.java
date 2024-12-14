@@ -134,7 +134,7 @@ public class WeatherService {
     protected double calculateCloudLevel(OpenWeatherModel weatherModel, int raceHours, double rainLevel) {
         int forecastHours = weatherModel.getHourly().size();
         double cloudLevelSum = 0.0;
-
+        int rainCount = 0;
 
         for (int i = 0; i < raceHours; i++) {
             if (i > forecastHours) {
@@ -142,6 +142,16 @@ public class WeatherService {
             }
 
             cloudLevelSum += weatherModel.getHourly().get(i).getClouds();
+
+            boolean isRaining = Optional.ofNullable(weatherModel.getHourly().get(i))
+                    .map(OpenWeatherHourlyForecast::getRain)
+                    .map(OpenWeatherPrecipitation::getPrecipitation)
+                    .map(precipitation -> precipitation > 0.0)
+                    .orElse(false);
+
+            if (isRaining) {
+                rainCount++;
+            }
         }
 
         double averageCloudLevel = (cloudLevelSum / raceHours) / 100.0;
@@ -149,8 +159,8 @@ public class WeatherService {
             return averageCloudLevel;
         }
 
-        //TODO: Change algorithm to calculate the cloud level with rain
-        return averageCloudLevel;
+        double rainDurationPercentage = (double) rainCount / raceHours;
+        return rainDurationPercentage - rainLevel;
     }
 
     /**
@@ -265,6 +275,29 @@ public class WeatherService {
     }
 
     /**
+     * This method calculates the variance of a list of values.
+     * The variance of a list of numbers measures how far the values are spread out from their mean.
+     * By definition, variance is not inherently constrained to a particular range,
+     * but for values between 0 and 1, the variance will naturally fall between 0 and 0.25.
+     *
+     * @param values List of values to calculate the variance for
+     * @return The variance of the values
+     */
+    protected double calculateVariance(List<Double> values) {
+        // Calculate the mean of the values
+        double mean = values.stream()
+                .mapToDouble(Double::doubleValue)
+                .average()
+                .orElse(0.0);
+
+        // Calculate the variance of the values
+        return values.stream()
+                .mapToDouble(x -> Math.pow(x - mean, 2))
+                .average()
+                .orElse(0.0);
+    }
+
+    /**
      * Enforces the boundaries for the ambient temperature.
      * The temperature is constrained to the range [10, 40] degrees Celsius.
      *
@@ -307,29 +340,6 @@ public class WeatherService {
      */
     private int enforceAccRandomnessBoundaries(int randomness) {
         return Math.min(Math.max(randomness, AccWeatherSettings.MIN_RANDOMNESS), AccWeatherSettings.MAX_RANDOMNESS);
-    }
-
-    /**
-     * This method calculates the variance of a list of values.
-     * The variance of a list of numbers measures how far the values are spread out from their mean.
-     * By definition, variance is not inherently constrained to a particular range,
-     * but for values between 0 and 1, the variance will naturally fall between 0 and 0.25.
-     *
-     * @param values List of values to calculate the variance for
-     * @return The variance of the values
-     */
-    protected double calculateVariance(List<Double> values) {
-        // Calculate the mean of the values
-        double mean = values.stream()
-                .mapToDouble(Double::doubleValue)
-                .average()
-                .orElse(0.0);
-
-        // Calculate the variance of the values
-        return values.stream()
-                .mapToDouble(x -> Math.pow(x - mean, 2))
-                .average()
-                .orElse(0.0);
     }
 
     @EventListener(ApplicationReadyEvent.class)
