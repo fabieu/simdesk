@@ -107,8 +107,8 @@ public class BopManagementView extends BaseView {
         enableTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                enableAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been enabled", track.getTrackName()));
+                enableAllForTrack(track.getAccId());
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been enabled", track.getName()));
             }
         });
 
@@ -117,8 +117,8 @@ public class BopManagementView extends BaseView {
         disableTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                disableAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been disabled", track.getTrackName()));
+                disableAllForTrack(track.getAccId());
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been disabled", track.getName()));
             }
         });
 
@@ -127,13 +127,13 @@ public class BopManagementView extends BaseView {
         resetAllForTrackButton.addClickListener(e -> {
             Track track = trackComboBox.getValue();
             if (track != null) {
-                resetAllForTrack(track.getTrackId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been reset", track.getTrackName()));
+                resetAllForTrack(track.getAccId());
+                notificationService.showSuccessNotification(String.format("BOPs for track %s have been reset", track.getName()));
             }
         });
 
-        trackComboBox.setItems(Track.getAllSortedByName());
-        trackComboBox.setItemLabelGenerator(Track::getTrackName);
+        trackComboBox.setItems(Track.getAllSortedByNameForAcc());
+        trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setClearButtonVisible(true);
         trackComboBox.setPlaceholder("Select track");
         trackComboBox.addValueChangeListener(e -> {
@@ -151,13 +151,13 @@ public class BopManagementView extends BaseView {
 
         ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
         trackFilterComboxBox.setLabel("Track");
-        trackFilterComboxBox.setItems(Track.getAllSortedByName());
-        trackFilterComboxBox.setItemLabelGenerator(Track::getTrackName);
+        trackFilterComboxBox.setItems(Track.getAllSortedByNameForAcc());
+        trackFilterComboxBox.setItemLabelGenerator(Track::getName);
         trackFilterComboxBox.setClearButtonVisible(true);
         trackFilterComboxBox.addValueChangeListener(e -> {
             Track track = e.getValue();
             if (track != null) {
-                gridFilters.put(GRID_FILTER_TRACK, bop -> track.getTrackId().equals(bop.getTrackId()));
+                gridFilters.put(GRID_FILTER_TRACK, bop -> track.getAccId().equals(bop.getTrackId()));
             } else {
                 gridFilters.remove(GRID_FILTER_TRACK);
             }
@@ -231,7 +231,7 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
         });
 
-        Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameById(bop.getTrackId()))
+        Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameByAccId(bop.getTrackId()))
                 .setHeader("Track")
                 .setSortable(true);
         Grid.Column<Bop> carNameColumn = grid.addColumn(bop -> Car.getCarNameById(bop.getCarId()))

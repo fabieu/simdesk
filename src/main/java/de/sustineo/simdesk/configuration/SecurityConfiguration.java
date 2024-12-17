@@ -36,6 +36,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             "/public/**",
             "/assets/**",
             "/icons/**",
+            "/*.png" // Leaflet images
     };
     private static final String LOGIN_URL = "/login";
     private static final String LOGIN_SUCCESS_URL = "/";

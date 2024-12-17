@@ -24,6 +24,6 @@ public class Session extends Entity {
     private String fileContent;
 
     public String getTrackName() {
-        return Track.getTrackNameById(trackId);
+        return Track.getTrackNameByAccId(trackId);
     }
 }
