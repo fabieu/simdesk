@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.5.8"
+        vaadinVersion = "24.6.0"
         flywayVersion = "11.1.0"
     }
     configurations.classpath {
@@ -10,9 +10,9 @@ buildscript {
 
 plugins {
     id "java"
-    id "io.spring.dependency-management" version "1.1.6"
+    id "io.spring.dependency-management" version "1.1.7"
     id "org.flywaydb.flyway" version "${flywayVersion}"
-    id "org.springframework.boot" version "3.4.0"
+    id "org.springframework.boot" version "3.4.1"
     id 'com.vaadin' version "${vaadinVersion}"
 }
 
