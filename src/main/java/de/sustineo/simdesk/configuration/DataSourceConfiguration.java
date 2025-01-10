@@ -16,12 +16,16 @@ import org.springframework.boot.context.properties.ConfigurationProperties;
 import org.springframework.context.ApplicationContext;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.data.jpa.repository.config.EnableJpaRepositories;
 
 import javax.sql.DataSource;
 import java.util.Properties;
 
 @Configuration
+@EnableJpaRepositories(basePackages = "de.sustineo.simdesk.repositories")
 public class DataSourceConfiguration {
+    private static final String DEFAULT_SCHEMA_NAME = "simdesk";
+
     @Bean
     @ConfigurationProperties("simdesk.datasource")
     public DataSourceProperties dataSourceProperties() {
@@ -42,10 +46,15 @@ public class DataSourceConfiguration {
 
     @Bean
     @ConditionalOnProperty(name = "simdesk.datasource.vendor", havingValue = DatabaseVendor.POSTGRESQL)
-    public HikariDataSource dataSourcePostgreSQL() {
-        return dataSourceProperties().initializeDataSourceBuilder()
-                .type(HikariDataSource.class)
-                .build();
+    public HikariDataSource dataSourcePostgreSQL(DataSourceProperties dataSourceProperties) {
+        HikariConfig hikariConfig = new HikariConfig();
+        hikariConfig.setDriverClassName(dataSourceProperties.determineDriverClassName());
+        hikariConfig.setJdbcUrl(dataSourceProperties.determineUrl());
+        hikariConfig.setUsername(dataSourceProperties.determineUsername());
+        hikariConfig.setPassword(dataSourceProperties.determinePassword());
+        hikariConfig.setSchema(DEFAULT_SCHEMA_NAME);
+
+        return new HikariDataSource(hikariConfig);
     }
 
     @Bean
@@ -84,7 +93,7 @@ public class DataSourceConfiguration {
 
             if (DatabaseVendor.POSTGRESQL.equals(dataSourceVendor)) {
                 flywayConfiguration.locations("classpath:db/migration/" + DatabaseVendor.POSTGRESQL);
-                flywayConfiguration.defaultSchema("simdesk");
+                flywayConfiguration.defaultSchema(DEFAULT_SCHEMA_NAME);
                 flywayConfiguration.createSchemas(true);
             } else if (DatabaseVendor.SQLITE.equals(dataSourceVendor)) {
                 flywayConfiguration.locations("classpath:db/migration/" + DatabaseVendor.SQLITE);
