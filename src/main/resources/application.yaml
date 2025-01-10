@@ -26,17 +26,18 @@ spring:
       max-request-size: 10MB
 management:
   endpoints:
-    enabled-by-default: false
+    access:
+      default: none
     web:
       exposure:
         include: "info,health,prometheus"
   endpoint:
     health:
-      enabled: true
+      access: read_only
     info:
-      enabled: true
+      access: read_only
     prometheus:
-      enabled: true
+      access: read_only
 logging:
   level:
     root: INFO
@@ -94,6 +95,10 @@ logging:
     #org.springframework.cache: TRACE
     de.sustineo.simdesk: DEBUG
     de.sustineo.simdesk.entities.mapper: INFO
+management:
+  endpoints:
+    access:
+      default: unrestricted
 vaadin:
   productionMode: false
   heartbeatInterval: 60
