@@ -6,7 +6,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class Car extends Entity {
+public class Car extends Model {
     private static final HashMap<Integer, Car> carModels = new HashMap<>();
     private final Integer carId;
     private final String carName;

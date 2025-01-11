@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Lap extends Entity {
+public class Lap extends Model {
     private String id;
     private Integer sessionId;
     @CsvBindByName(column = "Driver")

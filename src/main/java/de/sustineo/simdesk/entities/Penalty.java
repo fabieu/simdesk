@@ -10,7 +10,7 @@ import java.util.Map;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Penalty extends Entity {
+public class Penalty extends Model {
     private static final int NO_LAP = 0;
     private static final String NO_PENALTY = "None";
     private static final String TIME_PENALTY = "TP";

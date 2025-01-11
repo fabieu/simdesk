@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class GroupRanking extends Entity {
+public class GroupRanking extends Model {
     private CarGroup carGroup;
     private String trackId;
     private Long lapTimeMillis;

@@ -1,31 +1,48 @@
 package de.sustineo.simdesk.entities;
 
 import de.sustineo.simdesk.utils.FormatUtils;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
 import java.time.Instant;
 
-@Getter
-@Setter
+@Entity
+@Table(name = "driver")
+@Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class Driver extends Entity {
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
+public class Driver extends Model {
     private static final String UNKNOWN_DRIVER = "Unknown Driver";
     private static final String HIDDEN_FIRST_NAME = "Hidden";
     private static final String HIDDEN_LAST_NAME = "Driver";
     private static final String HIDDEN_SHORT_NAME = "HDR";
     private static final String HIDDEN_FULL_NAME = HIDDEN_FIRST_NAME + " " + HIDDEN_LAST_NAME;
 
+    @Id
+    @Column(name = "player_id")
     private String playerId;
+    @Column(name = "first_name")
     private String firstName;
+    @Column(name = "last_name")
     private String lastName;
+    @Column(name = "short_name")
     private String shortName;
-    private Visibility visibility;
-    private Integer validLapsCount;
-    private Integer invalidLapsCount;
-    private Long driveTimeMillis;
+    @Column(name = "last_activity")
     private Instant lastActivity;
+    @CreationTimestamp
+    private Instant insertDatetime;
+    @Column(name = "visibility")
+    @Enumerated(EnumType.STRING)
+    private Visibility visibility;
+
+    @Transient
+    private Integer validLapsCount;
+    @Transient
+    private Integer invalidLapsCount;
+    @Transient
+    private Long driveTimeMillis;
 
     public String getFullName() {
         if (firstName == null || lastName == null) {

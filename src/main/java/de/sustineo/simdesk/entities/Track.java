@@ -11,7 +11,7 @@ import java.util.stream.Collectors;
 
 @Data
 @EqualsAndHashCode(callSuper = false)
-public class Track extends Entity {
+public class Track extends Model {
     private static final HashMap<String, Track> accTracks = new HashMap<>();
 
     private String accId;

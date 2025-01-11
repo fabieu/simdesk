@@ -9,7 +9,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class Session extends Entity {
+public class Session extends Model {
     private Integer id;
     private SessionType sessionType;
     private Integer raceWeekendIndex;

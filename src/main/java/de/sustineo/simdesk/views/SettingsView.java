@@ -34,6 +34,7 @@ import lombok.extern.java.Log;
 
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.logging.Level;
 
 @Log
 @Route(value = "/settings", layout = MainLayout.class)
@@ -113,7 +114,9 @@ public class SettingsView extends BaseView {
                 driverService.updateDriverVisibility(driver);
                 notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getFullName()));
             } catch (Exception e) {
-                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getFullName(), e.getMessage()));
+                String errorMessage = String.format("Failed to update %s - %s", driver.getFullName(), e.getMessage());
+                log.log(Level.SEVERE, errorMessage, e);
+                notificationService.showErrorNotification(errorMessage);
             }
         });
 
