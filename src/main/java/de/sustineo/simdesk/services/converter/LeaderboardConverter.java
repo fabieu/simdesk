@@ -21,7 +21,7 @@ public class LeaderboardConverter extends BaseConverter {
         this.driverConverter = driverConverter;
     }
 
-    public List<LeaderboardLine> convertToLeaderboardLines(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public List<LeaderboardLine> convertToLeaderboardLines(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<LeaderboardLine> leaderboardLines = new ArrayList<>();
         List<AccLeaderboardLine> accLeaderboardLines = accSession.getSessionResult().getLeaderboardLines();
 
@@ -33,7 +33,7 @@ public class LeaderboardConverter extends BaseConverter {
         return leaderboardLines;
     }
 
-    private LeaderboardLine convertToLeaderboardLine(Integer index, Integer sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
+    private LeaderboardLine convertToLeaderboardLine(Integer index, Long sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
         return LeaderboardLine.builder()
                 .sessionId(sessionId)
                 .ranking(index + 1)

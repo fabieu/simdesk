@@ -14,7 +14,7 @@ import java.util.List;
 @NoArgsConstructor
 public class LeaderboardLine {
     private Integer id;
-    private Integer sessionId;
+    private Long sessionId;
     private Integer ranking;
     private AccCupCategory cupCategory;
     private Integer carId;

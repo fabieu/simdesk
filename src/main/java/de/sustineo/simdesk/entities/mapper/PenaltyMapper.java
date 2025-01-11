@@ -27,7 +27,7 @@ public interface PenaltyMapper {
     })
     @Select("SELECT * FROM simdesk.penalty WHERE session_id = #{sessionId} AND car_id = #{carId} ORDER BY id")
     @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM penalty WHERE session_id = #{sessionId} AND car_id = #{carId} ORDER BY id")
-    List<Penalty> findBySessionAndCarId(int sessionId, int carId);
+    List<Penalty> findBySessionAndCarId(Long sessionId, int carId);
 
     @Insert("""
             INSERT INTO simdesk.penalty (session_id, car_id, reason, penalty, penalty_value, violation_lap, cleared_lap, post_race)

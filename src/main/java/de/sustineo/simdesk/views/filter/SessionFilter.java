@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.Track;
 
 public class SessionFilter extends GridFilter {
     private final GridListDataView<Session> dataView;
@@ -32,7 +33,7 @@ public class SessionFilter extends GridFilter {
 
     public boolean test(Session session) {
         boolean matchesServerName = matches(session.getServerName(), serverName);
-        boolean matchesTrackName = matches(session.getTrackName(), trackName);
+        boolean matchesTrackName = matches(Track.getTrackNameByAccId(session.getTrackId()), trackName);
         boolean matchesSessionDescription = matches(session.getSessionType().getDescription(), sessionDescription);
 
         return matchesServerName && matchesTrackName && matchesSessionDescription;

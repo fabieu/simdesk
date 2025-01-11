@@ -26,14 +26,14 @@ public class LapConverter extends BaseConverter {
         this.driverConverter = driverConverter;
     }
 
-    public List<Lap> convertToLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public List<Lap> convertToLaps(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
         return accSession.getLaps().stream()
                 .map(accLap -> convertToLap(sessionId, accLap, accSession, fileMetadata))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private Lap convertToLap(Integer sessionId, AccLap accLap, AccSession accSession, FileMetadata fileMetadata) {
+    private Lap convertToLap(Long sessionId, AccLap accLap, AccSession accSession, FileMetadata fileMetadata) {
         Optional<AccCar> accCar = accSession.getCarById(accLap.getCarId());
         if (accCar.isEmpty()) {
             log.severe(String.format("Car not found with id %s", accLap.getCarId()));

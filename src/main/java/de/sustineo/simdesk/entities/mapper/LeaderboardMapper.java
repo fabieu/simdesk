@@ -32,5 +32,5 @@ public interface LeaderboardMapper {
             INSERT INTO leaderboard_driver (session_id, car_id, player_id, drive_time_millis)
             VALUES (#{sessionId}, #{carId}, #{playerId}, #{driveTimeMillis})
             """)
-    void insertLeaderboardDriver(Integer sessionId, Integer carId, String playerId, Long driveTimeMillis);
+    void insertLeaderboardDriver(Long sessionId, Integer carId, String playerId, Long driveTimeMillis);
 }

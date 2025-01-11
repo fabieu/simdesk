@@ -15,7 +15,7 @@ import java.util.stream.Stream;
 @Log
 @Service
 public class PenaltyConverter {
-    public List<Penalty> convertToPenalty(Integer sessionId, AccSession accSession) {
+    public List<Penalty> convertToPenalty(Long sessionId, AccSession accSession) {
         List<Penalty> penalties = accSession.getPenalties().stream()
                 .map(accPenalty -> convertToPenalty(sessionId, accPenalty, false))
                 .toList();
@@ -27,7 +27,7 @@ public class PenaltyConverter {
         return Stream.concat(penalties.stream(), postRacePenalties.stream()).toList();
     }
 
-    public Penalty convertToPenalty(Integer sessionId, AccPenalty accPenalty, boolean postRace) {
+    public Penalty convertToPenalty(Long sessionId, AccPenalty accPenalty, boolean postRace) {
         return Penalty.builder()
                 .sessionId(sessionId)
                 .carId(accPenalty.getCarId())

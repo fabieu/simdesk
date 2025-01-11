@@ -13,5 +13,5 @@ public interface LapRepository extends JpaRepository<Lap, Long> {
             where l.sessionId = :sessionId and l.driver.playerId in :playerIds
             order by l.id asc
             """)
-    List<Lap> findBySessionAndPlayerIdsOrderByIdAsc(@Param("sessionId") Integer sessionId, @Param("playerIds") List<String> playerIds);
+    List<Lap> findBySessionAndPlayerIdsOrderByIdAsc(@Param("sessionId") Long sessionId, @Param("playerIds") List<String> playerIds);
 }

@@ -87,7 +87,7 @@ public class RankingService {
                 .toList();
     }
 
-    public List<String> getPlayerIdsBySessionAndCarId(Integer sessionId, Integer carId) {
+    public List<String> getPlayerIdsBySessionAndCarId(Long sessionId, Integer carId) {
         return rankingMapper.findDriversBySessionAndCarId(sessionId, carId);
     }
 }

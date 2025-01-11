@@ -12,7 +12,7 @@ import lombok.*;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class Lap extends Model {
     @Id
@@ -21,7 +21,7 @@ public class Lap extends Model {
     private Long id;
 
     @Column(name = "session_id")
-    private Integer sessionId;
+    private Long sessionId;
 
     @OneToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "player_id")

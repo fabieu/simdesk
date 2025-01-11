@@ -5,6 +5,7 @@ import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.entities.mapper.SessionMapper;
+import de.sustineo.simdesk.repositories.SessionRepository;
 import de.sustineo.simdesk.services.converter.SessionConverter;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import lombok.extern.java.Log;
@@ -22,6 +23,7 @@ import java.util.regex.Pattern;
 @Service
 public class SessionService {
     private final SessionConverter sessionConverter;
+    private final SessionRepository sessionRepository;
     private final SessionMapper sessionMapper;
     private final LapService lapService;
     private final LeaderboardService leaderboardService;
@@ -30,11 +32,13 @@ public class SessionService {
 
     @Autowired
     public SessionService(SessionConverter sessionConverter,
+                          SessionRepository sessionRepository,
                           SessionMapper sessionMapper,
                           LapService lapService,
                           LeaderboardService leaderboardService,
                           PenaltyService penaltyService) {
         this.sessionConverter = sessionConverter;
+        this.sessionRepository = sessionRepository;
         this.sessionMapper = sessionMapper;
         this.lapService = lapService;
         this.leaderboardService = leaderboardService;
@@ -51,19 +55,15 @@ public class SessionService {
     }
 
     public List<Session> getAllSessions(TimeRange timeRange) {
-        return sessionMapper.findAllByTimeRange(timeRange.start(), timeRange.end());
+        return sessionRepository.findBySessionDatetimeBetween(timeRange.start(), timeRange.end());
     }
 
     public Session getSession(String fileChecksum) {
-        return sessionMapper.findByFileChecksum(fileChecksum);
+        return sessionRepository.findByFileChecksum(fileChecksum);
     }
 
     public boolean sessionExists(String fileChecksum) {
         return getSession(fileChecksum) != null;
-    }
-
-    public long getSessionCount() {
-        return sessionMapper.count();
     }
 
     @Transactional
@@ -91,7 +91,7 @@ public class SessionService {
         }
 
         // Insert session first to get the id (auto increment)
-        sessionMapper.insert(session);
+        sessionRepository.save(session);
 
         // Actual processing of the session results
         leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);

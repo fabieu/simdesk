@@ -22,10 +22,7 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.Lap;
-import de.sustineo.simdesk.entities.Penalty;
-import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -124,7 +121,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), Track.getTrackNameByAccId(session.getTrackId()), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 

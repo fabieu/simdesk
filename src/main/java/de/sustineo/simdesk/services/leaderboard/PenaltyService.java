@@ -24,12 +24,12 @@ public class PenaltyService {
         this.penaltyMapper = penaltyMapper;
     }
 
-    public void handlePenalties(Integer sessionId, AccSession accSession) {
+    public void handlePenalties(Long sessionId, AccSession accSession) {
         List<Penalty> penalties = penaltyConverter.convertToPenalty(sessionId, accSession);
         penalties.forEach(this::insertPenaltyAsync);
     }
 
-    public List<Penalty> findBySessionAndCarId(int sessionId, int carId) {
+    public List<Penalty> findBySessionAndCarId(Long sessionId, int carId) {
         return penaltyMapper.findBySessionAndCarId(sessionId, carId);
     }
 

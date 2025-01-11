@@ -26,13 +26,13 @@ public class LeaderboardService {
         this.leaderboardMapper = leaderboardMapper;
     }
 
-    public void handleLeaderboard(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public void handleLeaderboard(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<LeaderboardLine> leaderboardLines = leaderboardConverter.convertToLeaderboardLines(sessionId, accSession, fileMetadata);
         leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLineAsync(sessionId, leaderboardLine));
     }
 
     @Async
-    protected void insertLeaderboardLineAsync(Integer sessionId, LeaderboardLine leaderboardLine) {
+    protected void insertLeaderboardLineAsync(Long sessionId, LeaderboardLine leaderboardLine) {
         for (Driver driver : leaderboardLine.getDrivers()) {
             driverService.upsertDriver(driver);
             leaderboardMapper.insertLeaderboardDriver(sessionId, leaderboardLine.getCarId(), driver.getPlayerId(), driver.getDriveTimeMillis());

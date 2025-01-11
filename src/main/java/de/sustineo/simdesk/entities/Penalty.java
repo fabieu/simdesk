@@ -30,7 +30,7 @@ public class Penalty extends Model {
     );
 
     private String id;
-    private Integer sessionId;
+    private Long sessionId;
     private Integer carId;
     private String reason;
     private String penalty;

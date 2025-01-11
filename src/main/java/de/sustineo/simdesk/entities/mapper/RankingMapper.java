@@ -105,10 +105,10 @@ public interface RankingMapper {
     })
     @Select("SELECT * FROM simdesk.leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
     @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
-    List<SessionRanking> findLeaderboardLinesBySessionId(Integer sessionId);
+    List<SessionRanking> findLeaderboardLinesBySessionId(Long sessionId);
 
     @ResultType(List.class)
     @Select("SELECT player_id FROM simdesk.leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")
     @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT player_id FROM leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")
-    List<String> findDriversBySessionAndCarId(Integer sessionId, Integer carId);
+    List<String> findDriversBySessionAndCarId(Long sessionId, Integer carId);
 }

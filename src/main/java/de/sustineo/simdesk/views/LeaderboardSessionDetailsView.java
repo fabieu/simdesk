@@ -21,6 +21,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.entities.comparator.SessionRankingLapTimeComparator;
 import de.sustineo.simdesk.entities.ranking.SessionRanking;
@@ -95,7 +96,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), Track.getTrackNameByAccId(session.getTrackId()), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 

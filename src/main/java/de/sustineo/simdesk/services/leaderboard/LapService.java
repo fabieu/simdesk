@@ -30,7 +30,7 @@ public class LapService {
         this.lapRepository = lapRepository;
     }
 
-    public void handleLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public void handleLaps(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
         for (Lap lap : laps) {
             driverService.upsertDriver(lap.getDriver());
@@ -38,7 +38,7 @@ public class LapService {
         }
     }
 
-    public List<Lap> getLapsBySessionAndDrivers(Integer sessionId, List<String> playerIds) {
+    public List<Lap> getLapsBySessionAndDrivers(Long sessionId, List<String> playerIds) {
         return lapRepository.findBySessionAndPlayerIdsOrderByIdAsc(sessionId, playerIds);
     }
 }
