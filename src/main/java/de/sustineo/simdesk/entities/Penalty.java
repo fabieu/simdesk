@@ -38,8 +38,9 @@ public class Penalty extends Model {
     @Column(name = "id")
     private String id;
 
-    @Column(name = "session_id")
-    private Long sessionId;
+    @OneToOne
+    @JoinColumn(name = "session_id", referencedColumnName = "id")
+    private Session session;
 
     @Column(name = "car_id")
     private Integer carId;

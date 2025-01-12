@@ -2,23 +2,23 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
-import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
 import de.sustineo.simdesk.entities.comparator.GroupRankingComparator;
 import de.sustineo.simdesk.entities.mapper.RankingMapper;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
-import de.sustineo.simdesk.entities.ranking.SessionRanking;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.HashMap;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
+@Transactional
 public class RankingService {
     private final RankingMapper rankingMapper;
 
@@ -37,14 +37,6 @@ public class RankingService {
         addRanking(driverRankings);
 
         return driverRankings;
-    }
-
-    public List<SessionRanking> getSessionRankings(Session session) {
-        if (session == null) {
-            return null;
-        }
-
-        return rankingMapper.findLeaderboardLinesBySessionId(session.getId());
     }
 
     private void addRanking(List<DriverRanking> driverRankings) {
@@ -85,9 +77,5 @@ public class RankingService {
         return fastestLapsByDriverAndCarModel.values().stream()
                 .sorted(new DriverRankingComparator())
                 .toList();
-    }
-
-    public List<String> getPlayerIdsBySessionAndCarId(Long sessionId, Integer carId) {
-        return rankingMapper.findDriversBySessionAndCarId(sessionId, carId);
     }
 }

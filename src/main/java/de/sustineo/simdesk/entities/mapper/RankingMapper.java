@@ -5,7 +5,6 @@ import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
-import de.sustineo.simdesk.entities.ranking.SessionRanking;
 import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -86,29 +85,4 @@ public interface RankingMapper {
                                lap.lap_time_millis = fastest_laps.lap_time_millis
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant startTime, Instant endTime);
-
-    @Results(id = "leaderboardResultMap", value = {
-            @Result(property = "session", column = "session_id", one = @One(select = "de.sustineo.simdesk.entities.mapper.SessionMapper.findById")),
-            @Result(property = "ranking", column = "ranking"),
-            @Result(property = "carId", column = "car_id"),
-            @Result(property = "carGroup", column = "car_group"),
-            @Result(property = "carModelId", column = "car_model_id"),
-            @Result(property = "ballastKg", column = "ballast_kg"),
-            @Result(property = "raceNumber", column = "race_number"),
-            @Result(property = "drivers", column = "{sessionId=session_id, carId=car_id}", many = @Many(select = "de.sustineo.simdesk.entities.mapper.DriverMapper.findDriversBySessionAndCarId")),
-            @Result(property = "bestLapTimeMillis", column = "best_lap_time_millis"),
-            @Result(property = "bestSplit1Millis", column = "best_split1_millis"),
-            @Result(property = "bestSplit2Millis", column = "best_split2_millis"),
-            @Result(property = "bestSplit3Millis", column = "best_split3_millis"),
-            @Result(property = "totalTimeMillis", column = "total_time_millis"),
-            @Result(property = "lapCount", column = "lap_count")
-    })
-    @Select("SELECT * FROM simdesk.leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM leaderboard_line WHERE session_id = #{sessionId} ORDER BY ranking")
-    List<SessionRanking> findLeaderboardLinesBySessionId(Long sessionId);
-
-    @ResultType(List.class)
-    @Select("SELECT player_id FROM simdesk.leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT player_id FROM leaderboard_driver WHERE car_id = #{carId} AND session_id = #{sessionId}")
-    List<String> findDriversBySessionAndCarId(Long sessionId, Integer carId);
 }

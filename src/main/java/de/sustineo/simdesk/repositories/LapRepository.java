@@ -10,7 +10,7 @@ import java.util.List;
 public interface LapRepository extends JpaRepository<Lap, Long> {
     @Query(value = """
             select l from Lap l
-            where l.sessionId = :sessionId and l.driver.playerId in :playerIds
+            where l.session.id = :sessionId and l.driver.playerId in :playerIds
             order by l.id asc
             """)
     List<Lap> findBySessionAndPlayerIdsOrderByIdAsc(@Param("sessionId") Long sessionId, @Param("playerIds") List<String> playerIds);

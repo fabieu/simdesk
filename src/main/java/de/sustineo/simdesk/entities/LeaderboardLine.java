@@ -1,6 +1,12 @@
 package de.sustineo.simdesk.entities;
 
+import com.opencsv.bean.CsvBindAndSplitByName;
+import com.opencsv.bean.CsvBindByName;
+import com.opencsv.bean.CsvCustomBindByName;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccCupCategory;
+import de.sustineo.simdesk.services.converter.csv.CarModelConverter;
+import de.sustineo.simdesk.services.converter.csv.LapTimeConverter;
+import de.sustineo.simdesk.services.converter.csv.TotalTimeConverter;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -20,9 +26,11 @@ public class LeaderboardLine {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "session_id")
-    private Long sessionId;
+    @OneToOne
+    @JoinColumn(name = "session_id", referencedColumnName = "id")
+    private Session session;
 
+    @CsvBindByName(column = "Position")
     @Column(name = "ranking")
     private Integer ranking;
 
@@ -33,19 +41,30 @@ public class LeaderboardLine {
     @Column(name = "car_id")
     private Integer carId;
 
+    @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
     @Column(name = "car_model_id")
     private Integer carModelId;
 
     @Column(name = "ballast_kg")
     private Integer ballastKg;
 
+    @CsvBindByName(column = "Car Number")
     @Column(name = "race_number")
     private Integer raceNumber;
 
+    //TODO: Fix join tables for drivers
+    @CsvBindAndSplitByName(column = "Drivers", elementType = Driver.class, writeDelimiter = ",")
     @OneToMany
-    @JoinColumn(name = "player_id")
+    @JoinTable(name = "leaderboard_driver",
+            joinColumns = {
+                    @JoinColumn(name = "session_id", referencedColumnName = "id"),
+                    @JoinColumn(name = "car_id", referencedColumnName = "car_id")
+            },
+            inverseJoinColumns = @JoinColumn(name = "player_id")
+    )
     private List<Driver> drivers;
 
+    @CsvCustomBindByName(column = "Fastest lap", converter = LapTimeConverter.class)
     @Column(name = "best_lap_time_millis")
     private Long bestLapTimeMillis;
 
@@ -58,9 +77,11 @@ public class LeaderboardLine {
     @Column(name = "best_split3_millis")
     private Long bestSplit3Millis;
 
+    @CsvCustomBindByName(column = "Total time", converter = TotalTimeConverter.class)
     @Column(name = "total_time_millis")
     private Long totalTimeMillis;
 
+    @CsvBindByName(column = "Laps")
     @Column(name = "lap_count")
     private Integer lapCount;
 

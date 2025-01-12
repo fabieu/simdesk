@@ -19,8 +19,9 @@ public class LeaderboardDriver {
     @JoinColumn(name = "player_id")
     private Driver driver;
 
-    @Column(name = "session_id")
-    private Long sessionId;
+    @OneToOne
+    @JoinColumn(name = "session_id", referencedColumnName = "id")
+    private Session session;
 
     @Column(name = "car_id")
     private Integer carId;

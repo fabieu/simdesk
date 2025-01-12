@@ -1,10 +1,7 @@
 package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.FileMetadata;
-import de.sustineo.simdesk.entities.LeaderboardDriver;
-import de.sustineo.simdesk.entities.LeaderboardLine;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
 import org.springframework.context.annotation.Profile;
@@ -22,9 +19,9 @@ public class LeaderboardConverter extends BaseConverter {
         this.driverConverter = driverConverter;
     }
 
-    public LeaderboardLine convertToLeaderboardLine(Integer index, Long sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
+    public LeaderboardLine convertToLeaderboardLine(Integer index, Session session, AccLeaderboardLine accLeaderboardLine) {
         return LeaderboardLine.builder()
-                .sessionId(sessionId)
+                .session(session)
                 .ranking(index + 1)
                 .cupCategory(accLeaderboardLine.getCar().getCupCategory())
                 .carId(accLeaderboardLine.getCar().getCarId())
@@ -40,22 +37,22 @@ public class LeaderboardConverter extends BaseConverter {
                 .build();
     }
 
-    public List<LeaderboardDriver> convertToLeaderboardDrivers(Long sessionId, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
+    public List<LeaderboardDriver> convertToLeaderboardDrivers(Session session, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
         List<LeaderboardDriver> leaderboardDrivers = new ArrayList<>();
 
         for (AccDriver accDriver : accLeaderboardLine.getCar().getDrivers()) {
             Driver driver = driverConverter.convertToDriver(accDriver, fileMetadata, accLeaderboardLine);
-            LeaderboardDriver leaderboardDriver = convertToLeaderboardDriver(sessionId, accLeaderboardLine.getCar().getCarId(), driver);
+            LeaderboardDriver leaderboardDriver = convertToLeaderboardDriver(session, accLeaderboardLine.getCar().getCarId(), driver);
             leaderboardDrivers.add(leaderboardDriver);
         }
 
         return leaderboardDrivers;
     }
 
-    private LeaderboardDriver convertToLeaderboardDriver(Long sessionId, Integer carId, Driver driver) {
+    private LeaderboardDriver convertToLeaderboardDriver(Session session, Integer carId, Driver driver) {
         return LeaderboardDriver.builder()
                 .driver(driver)
-                .sessionId(sessionId)
+                .session(session)
                 .carId(carId)
                 .driveTimeMillis(driver.getDriveTimeMillis())
                 .build();

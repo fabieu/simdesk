@@ -4,6 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.LeaderboardDriver;
 import de.sustineo.simdesk.entities.LeaderboardLine;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.repositories.LeaderboardDriverRepository;
@@ -34,18 +35,36 @@ public class LeaderboardService {
     }
 
     @Transactional
-    public void processLeaderboardLines(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public void processLeaderboardLines(Session session, AccSession accSession, FileMetadata fileMetadata) {
         List<AccLeaderboardLine> accLeaderboardLines = accSession.getSessionResult().getLeaderboardLines();
 
         for (int i = 0; i < accLeaderboardLines.size(); i++) {
             AccLeaderboardLine accLeaderboardLine = accLeaderboardLines.get(i);
 
-            LeaderboardLine leaderboardLine = leaderboardConverter.convertToLeaderboardLine(i, sessionId, accLeaderboardLine, fileMetadata);
+            LeaderboardLine leaderboardLine = leaderboardConverter.convertToLeaderboardLine(i, session, accLeaderboardLine);
             leaderboardLineRepository.save(leaderboardLine);
 
-            List<LeaderboardDriver> leaderboardDrivers = leaderboardConverter.convertToLeaderboardDrivers(sessionId, accLeaderboardLine, fileMetadata);
+            List<LeaderboardDriver> leaderboardDrivers = leaderboardConverter.convertToLeaderboardDrivers(session, accLeaderboardLine, fileMetadata);
             leaderboardDrivers.forEach(leaderboardDriver -> driverService.upsertDriver(leaderboardDriver.getDriver()));
             leaderboardDriverRepository.saveAll(leaderboardDrivers);
         }
+    }
+
+    @Transactional
+    public List<String> getPlayerIdsBySessionAndCarId(Long sessionId, Integer carId) {
+        List<LeaderboardDriver> leaderboardDrivers = leaderboardDriverRepository.findBySessionIdAndCarId(sessionId, carId);
+
+        return leaderboardDrivers.stream()
+                .map(leaderboardDriver -> leaderboardDriver.getDriver().getPlayerId())
+                .toList();
+    }
+
+    @Transactional
+    public List<LeaderboardLine> getLeaderboardLinesBySessionId(Session session) {
+        if (session == null) {
+            return null;
+        }
+
+        return leaderboardLineRepository.findBySessionIdOrderByRanking(session.getId());
     }
 }

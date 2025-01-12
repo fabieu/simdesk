@@ -20,8 +20,9 @@ public class Lap extends Model {
     @Column(name = "id")
     private Long id;
 
-    @Column(name = "session_id")
-    private Long sessionId;
+    @OneToOne
+    @JoinColumn(name = "session_id", referencedColumnName = "id")
+    private Session session;
 
     @CsvBindByName(column = "Driver")
     @OneToOne

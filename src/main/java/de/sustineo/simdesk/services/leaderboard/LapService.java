@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.repositories.LapRepository;
 import de.sustineo.simdesk.services.converter.LapConverter;
@@ -17,6 +18,7 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
+@Transactional
 public class LapService {
     private final LapConverter lapConverter;
     private final LapRepository lapRepository;
@@ -28,9 +30,8 @@ public class LapService {
         this.lapRepository = lapRepository;
     }
 
-    @Transactional
-    public void processLaps(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
-        List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
+    public void processLaps(Session session, AccSession accSession, FileMetadata fileMetadata) {
+        List<Lap> laps = lapConverter.convertToLaps(session, accSession, fileMetadata);
         lapRepository.saveAll(laps);
     }
 

@@ -14,6 +14,7 @@ import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 import java.util.Set;
@@ -22,6 +23,7 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Service
+@Transactional
 public class BopService {
     private final BopRepository bopRepository;
 

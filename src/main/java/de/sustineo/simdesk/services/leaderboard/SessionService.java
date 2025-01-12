@@ -20,6 +20,7 @@ import java.util.regex.Pattern;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
+@Transactional
 public class SessionService {
     private final SessionConverter sessionConverter;
     private final SessionRepository sessionRepository;
@@ -62,7 +63,6 @@ public class SessionService {
         return getSessionByFileChecksum(fileChecksum) != null;
     }
 
-    @Transactional
     public void handleSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
         String fileName = fileMetadata.getFile().toString();
 
@@ -90,9 +90,9 @@ public class SessionService {
         sessionRepository.save(session);
 
         // Actual processing of the session results
-        leaderboardService.processLeaderboardLines(session.getId(), accSession, fileMetadata);
-        lapService.processLaps(session.getId(), accSession, fileMetadata);
-        penaltyService.processPenalties(session.getId(), accSession);
+        leaderboardService.processLeaderboardLines(session, accSession, fileMetadata);
+        lapService.processLaps(session, accSession, fileMetadata);
+        penaltyService.processPenalties(session, accSession);
 
         log.info(String.format("Successfully processed session file %s", fileName));
     }

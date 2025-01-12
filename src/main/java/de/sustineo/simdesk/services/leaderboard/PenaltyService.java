@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Penalty;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.repositories.PenaltyRepository;
 import de.sustineo.simdesk.services.converter.PenaltyConverter;
@@ -15,6 +16,7 @@ import java.util.List;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Log
 @Service
+@Transactional
 public class PenaltyService {
     private final PenaltyConverter penaltyConverter;
     private final PenaltyRepository penaltyRepository;
@@ -25,9 +27,8 @@ public class PenaltyService {
         this.penaltyRepository = penaltyRepository;
     }
 
-    @Transactional
-    public void processPenalties(Long sessionId, AccSession accSession) {
-        List<Penalty> penalties = penaltyConverter.convertToPenalty(sessionId, accSession);
+    public void processPenalties(Session session, AccSession accSession) {
+        List<Penalty> penalties = penaltyConverter.convertToPenalty(session, accSession);
         penaltyRepository.saveAll(penalties);
     }
 

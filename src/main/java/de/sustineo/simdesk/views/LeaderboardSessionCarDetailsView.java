@@ -25,10 +25,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.services.leaderboard.LapService;
-import de.sustineo.simdesk.services.leaderboard.PenaltyService;
-import de.sustineo.simdesk.services.leaderboard.RankingService;
-import de.sustineo.simdesk.services.leaderboard.SessionService;
+import de.sustineo.simdesk.services.leaderboard.*;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.generators.InvalidLapPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LapRenderer;
@@ -54,6 +51,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
     private final LapService lapService;
     private final PenaltyService penaltyService;
     private final RankingService rankingService;
+    private final LeaderboardService leaderboardService;
     private final SecurityService securityService;
 
     private List<Lap> laps = new ArrayList<>();
@@ -63,11 +61,13 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                                             LapService lapService,
                                             PenaltyService penaltyService,
                                             RankingService rankingService,
+                                            LeaderboardService leaderboardService,
                                             SecurityService securityService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.penaltyService = penaltyService;
         this.rankingService = rankingService;
+        this.leaderboardService = leaderboardService;
         this.securityService = securityService;
     }
 
@@ -83,7 +83,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
             throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
         }
 
-        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
+        List<String> playerIds = leaderboardService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
         if (playerIds == null || playerIds.isEmpty()) {
             throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
         }
