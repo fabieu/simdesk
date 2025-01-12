@@ -3,50 +3,48 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPermission;
 import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.entities.mapper.UserMapper;
-import de.sustineo.simdesk.entities.mapper.UserPermissionMapper;
-import de.sustineo.simdesk.entities.mapper.UserRoleMapper;
+import de.sustineo.simdesk.repositories.UserPermissionRepository;
+import de.sustineo.simdesk.repositories.UserRepository;
+import de.sustineo.simdesk.repositories.UserRoleRepository;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
 
 @Service
 public class UserService {
-    private final UserMapper userMapper;
-    private final UserPermissionMapper userPermissionMapper;
-    private final UserRoleMapper userRoleMapper;
+    private final UserRepository userRepository;
+    private final UserPermissionRepository userPermissionRepository;
+    private final UserRoleRepository userRoleRepository;
 
-    public UserService(UserMapper userMapper,
-                       UserPermissionMapper userPermissionMapper,
-                       UserRoleMapper userRoleMapper) {
-        this.userMapper = userMapper;
-        this.userPermissionMapper = userPermissionMapper;
-        this.userRoleMapper = userRoleMapper;
+    public UserService(UserRepository userRepository,
+                       UserPermissionRepository userPermissionRepository,
+                       UserRoleRepository userRoleRepository) {
+        this.userRepository = userRepository;
+        this.userPermissionRepository = userPermissionRepository;
+        this.userRoleRepository = userRoleRepository;
     }
 
     public User findByUsername(String username) {
-        return userMapper.findByUsername(username);
+        return userRepository.findByUsername(username);
     }
 
-    public void insertSystemUser(String username, String password, Long userId) {
+    public void updateSystemUser(Long userId, String username, String password) {
         User user = User.builder()
                 .userId(userId)
                 .username(username)
                 .password(password)
-                .updateDatetime(Instant.now())
                 .build();
 
-        userMapper.insertSystemUser(user);
+        userRepository.save(user);
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Long userId) {
-        List<UserPermission> userPermissions = userPermissionMapper.findByUserId(userId);
+        List<UserPermission> userPermissions = userPermissionRepository.findByUserId(userId);
 
         return userPermissions.stream()
                 .map(userPermission -> new SimpleGrantedAuthority(userPermission.getRoleName()))
@@ -54,11 +52,11 @@ public class UserService {
     }
 
     public List<UserRole> getAllRoles() {
-        return userRoleMapper.findAll();
+        return userRoleRepository.findAll();
     }
 
     @PreAuthorize("hasAuthority(T(de.sustineo.simdesk.entities.auth.UserRole).ADMIN)")
     public void updateUserRole(UserRole userRole) {
-        userRoleMapper.update(userRole);
+        userRoleRepository.update(userRole);
     }
 }
