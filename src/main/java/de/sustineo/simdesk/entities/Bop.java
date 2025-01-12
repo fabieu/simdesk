@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities;
 
-import jakarta.persistence.Entity;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.UpdateTimestamp;
@@ -19,17 +18,23 @@ public class Bop {
     @Id
     @Column(name = "track_id")
     private String trackId;
+
     @Id
     @Column(name = "car_id")
     private Integer carId;
+
     @Column(name = "restrictor")
     private Integer restrictor;
+
     @Column(name = "ballast_kg")
     private Integer ballastKg;
+
     @Column(name = "username")
     private String username;
+
     @Column(name = "active")
     private Boolean active;
+
     @UpdateTimestamp
     @Column(name = "update_datetime")
     private Instant updateDatetime;

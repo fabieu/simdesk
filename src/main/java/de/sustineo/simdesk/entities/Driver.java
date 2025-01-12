@@ -37,10 +37,11 @@ public class Driver extends Model {
     private Instant lastActivity;
 
     @CreationTimestamp
+    @Column(name = "insert_datetime")
     private Instant insertDatetime;
 
-    @Column(name = "visibility")
     @Enumerated(EnumType.STRING)
+    @Column(name = "visibility")
     private Visibility visibility;
 
     @Transient

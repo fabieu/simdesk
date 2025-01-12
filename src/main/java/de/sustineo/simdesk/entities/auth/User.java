@@ -29,7 +29,7 @@ public class User {
     @Column(name = "password")
     private String password;
 
-    @Column(name = "insert_datetime")
     @UpdateTimestamp
+    @Column(name = "insert_datetime")
     private Instant insertDatetime;
 }

@@ -17,6 +17,7 @@ import java.util.List;
 public class LeaderboardLine {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "session_id")
@@ -25,8 +26,8 @@ public class LeaderboardLine {
     @Column(name = "ranking")
     private Integer ranking;
 
-    @Column(name = "cup_category")
     @Enumerated(EnumType.STRING)
+    @Column(name = "cup_category")
     private AccCupCategory cupCategory;
 
     @Column(name = "car_id")
@@ -63,7 +64,7 @@ public class LeaderboardLine {
     @Column(name = "lap_count")
     private Integer lapCount;
 
-    @Column(name = "insert_datetime")
     @CreationTimestamp
+    @Column(name = "insert_datetime")
     private Instant insertDatetime;
 }

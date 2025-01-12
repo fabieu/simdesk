@@ -12,7 +12,6 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Service
-@Transactional
 public class DriverService {
     private final DriverRepository driverRepository;
 
@@ -24,6 +23,7 @@ public class DriverService {
         return driverRepository.findAll();
     }
 
+    @Transactional
     public void upsertDriver(Driver driver) {
         Driver existingDriver = driverRepository.findByPlayerId(driver.getPlayerId());
         if (existingDriver == null) {
@@ -57,6 +57,7 @@ public class DriverService {
     }
 
 
+    @Transactional
     public void updateDriverVisibility(Driver driver) {
         driverRepository.updateVisibility(driver);
     }

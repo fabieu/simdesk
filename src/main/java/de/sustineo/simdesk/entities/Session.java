@@ -16,6 +16,7 @@ import java.time.Instant;
 public class Session extends Model {
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private Long id;
 
     @Column(name = "session_type")

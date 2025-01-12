@@ -22,7 +22,7 @@ public class UserPermission {
     @Column(name = "role_name")
     private String roleName;
 
-    @Column(name = "insert_datetime")
     @CreationTimestamp
+    @Column(name = "insert_datetime")
     private Instant insertDatetime;
 }

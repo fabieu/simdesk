@@ -35,6 +35,7 @@ public class Penalty extends Model {
 
     @Id
     @GeneratedValue(strategy = GenerationType.IDENTITY)
+    @Column(name = "id")
     private String id;
 
     @Column(name = "session_id")
@@ -61,8 +62,8 @@ public class Penalty extends Model {
     @Column(name = "post_race")
     private Boolean postRace;
 
-    @Column(name = "insert_datetime")
     @CreationTimestamp
+    @Column(name = "insert_datetime")
     private Instant insertDatetime;
 
     public boolean isValid() {

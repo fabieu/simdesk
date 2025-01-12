@@ -23,32 +23,34 @@ public class Lap extends Model {
     @Column(name = "session_id")
     private Long sessionId;
 
+    @CsvBindByName(column = "Driver")
     @OneToOne
     @JoinColumn(name = "driver_id", referencedColumnName = "player_id")
-    @CsvBindByName(column = "Driver")
     private Driver driver;
 
-    @Column(name = "car_model_id")
     @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
+    @Column(name = "car_model_id")
     private Integer carModelId;
 
-    @Column(name = "lap_time_millis")
     @CsvCustomBindByName(column = "Lap time", converter = LapTimeConverter.class)
+    @Column(name = "lap_time_millis")
     private Long lapTimeMillis;
 
-    @Column(name = "split1_millis")
+
     @CsvCustomBindByName(column = "Split 1 time", converter = LapTimeConverter.class)
+    @Column(name = "split1_millis")
     private Long split1Millis;
 
-    @Column(name = "split2_millis")
+
     @CsvCustomBindByName(column = "Split 2 time", converter = LapTimeConverter.class)
+    @Column(name = "split2_millis")
     private Long split2Millis;
 
-    @Column(name = "split3_millis")
     @CsvCustomBindByName(column = "Split 3 time", converter = LapTimeConverter.class)
+    @Column(name = "split3_millis")
     private Long split3Millis;
 
-    @Column(name = "valid")
     @CsvBindByName(column = "Valid")
+    @Column(name = "valid")
     private boolean valid;
 }
