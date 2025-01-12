@@ -23,24 +23,32 @@ public class Driver extends Model {
     @Id
     @Column(name = "player_id")
     private String playerId;
+
     @Column(name = "first_name")
     private String firstName;
+
     @Column(name = "last_name")
     private String lastName;
+
     @Column(name = "short_name")
     private String shortName;
+
     @Column(name = "last_activity")
     private Instant lastActivity;
+
     @CreationTimestamp
     private Instant insertDatetime;
+
     @Column(name = "visibility")
     @Enumerated(EnumType.STRING)
     private Visibility visibility;
 
     @Transient
     private Integer validLapsCount;
+
     @Transient
     private Integer invalidLapsCount;
+
     @Transient
     private Long driveTimeMillis;
 

@@ -22,7 +22,7 @@ public class DriverConverter extends BaseConverter {
                 .build();
     }
 
-    public Driver convertToLeaderboardDriver(AccDriver accDriver, FileMetadata fileMetadata, AccLeaderboardLine accLeaderboardLine) {
+    public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata, AccLeaderboardLine accLeaderboardLine) {
         Driver driver = convertToDriver(accDriver, fileMetadata);
 
         if (accLeaderboardLine.getDriverTotalTimes().isEmpty()) {

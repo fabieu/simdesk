@@ -70,7 +70,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
         try {
-            Session session = sessionService.getSession(fileChecksum);
+            Session session = sessionService.getSessionByFileChecksum(fileChecksum);
             if (session == null) {
                 throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }

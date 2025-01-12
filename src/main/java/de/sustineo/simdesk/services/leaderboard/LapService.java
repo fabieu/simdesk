@@ -10,6 +10,7 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -17,25 +18,20 @@ import java.util.List;
 @Log
 @Service
 public class LapService {
-    private final DriverService driverService;
     private final LapConverter lapConverter;
     private final LapRepository lapRepository;
 
     @Autowired
-    public LapService(DriverService driverService,
-                      LapConverter lapConverter,
+    public LapService(LapConverter lapConverter,
                       LapRepository lapRepository) {
-        this.driverService = driverService;
         this.lapConverter = lapConverter;
         this.lapRepository = lapRepository;
     }
 
-    public void handleLaps(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    @Transactional
+    public void processLaps(Long sessionId, AccSession accSession, FileMetadata fileMetadata) {
         List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
-        for (Lap lap : laps) {
-            driverService.upsertDriver(lap.getDriver());
-            lapRepository.save(lap);
-        }
+        lapRepository.saveAll(laps);
     }
 
     public List<Lap> getLapsBySessionAndDrivers(Long sessionId, List<String> playerIds) {

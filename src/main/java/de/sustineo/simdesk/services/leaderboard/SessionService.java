@@ -4,7 +4,6 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.entities.mapper.SessionMapper;
 import de.sustineo.simdesk.repositories.SessionRepository;
 import de.sustineo.simdesk.services.converter.SessionConverter;
 import de.sustineo.simdesk.views.enums.TimeRange;
@@ -24,7 +23,6 @@ import java.util.regex.Pattern;
 public class SessionService {
     private final SessionConverter sessionConverter;
     private final SessionRepository sessionRepository;
-    private final SessionMapper sessionMapper;
     private final LapService lapService;
     private final LeaderboardService leaderboardService;
     private final PenaltyService penaltyService;
@@ -33,13 +31,11 @@ public class SessionService {
     @Autowired
     public SessionService(SessionConverter sessionConverter,
                           SessionRepository sessionRepository,
-                          SessionMapper sessionMapper,
                           LapService lapService,
                           LeaderboardService leaderboardService,
                           PenaltyService penaltyService) {
         this.sessionConverter = sessionConverter;
         this.sessionRepository = sessionRepository;
-        this.sessionMapper = sessionMapper;
         this.lapService = lapService;
         this.leaderboardService = leaderboardService;
         this.penaltyService = penaltyService;
@@ -54,16 +50,16 @@ public class SessionService {
         this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
-    public List<Session> getAllSessions(TimeRange timeRange) {
-        return sessionRepository.findBySessionDatetimeBetween(timeRange.start(), timeRange.end());
+    public List<Session> getAllSessionsByTimeRange(TimeRange timeRange) {
+        return sessionRepository.findBySessionDatetimeBetweenOrderBySessionDatetimeDesc(timeRange.start(), timeRange.end());
     }
 
-    public Session getSession(String fileChecksum) {
+    public Session getSessionByFileChecksum(String fileChecksum) {
         return sessionRepository.findByFileChecksum(fileChecksum);
     }
 
     public boolean sessionExists(String fileChecksum) {
-        return getSession(fileChecksum) != null;
+        return getSessionByFileChecksum(fileChecksum) != null;
     }
 
     @Transactional
@@ -94,9 +90,9 @@ public class SessionService {
         sessionRepository.save(session);
 
         // Actual processing of the session results
-        leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
-        lapService.handleLaps(session.getId(), accSession, fileMetadata);
-        penaltyService.handlePenalties(session.getId(), accSession);
+        leaderboardService.processLeaderboardLines(session.getId(), accSession, fileMetadata);
+        lapService.processLaps(session.getId(), accSession, fileMetadata);
+        penaltyService.processPenalties(session.getId(), accSession);
 
         log.info(String.format("Successfully processed session file %s", fileName));
     }

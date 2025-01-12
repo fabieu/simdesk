@@ -1,20 +1,24 @@
 package de.sustineo.simdesk.entities;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
+import jakarta.persistence.*;
 import lombok.*;
+import org.hibernate.annotations.CreationTimestamp;
 
+import java.time.Instant;
 import java.util.Map;
 
+@Entity
+@Table(name = "penalty")
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
+@AllArgsConstructor(access = AccessLevel.PROTECTED)
 @EqualsAndHashCode(callSuper = false)
 public class Penalty extends Model {
     private static final int NO_LAP = 0;
     private static final String NO_PENALTY = "None";
     private static final String TIME_PENALTY = "TP";
-
 
     private static final Map<String, String> PENALTY_MAP = Map.of(
             NO_PENALTY, PLACEHOLDER,
@@ -29,15 +33,37 @@ public class Penalty extends Model {
             "PitSpeeding", "Speeding in pits"
     );
 
+    @Id
+    @GeneratedValue(strategy = GenerationType.IDENTITY)
     private String id;
+
+    @Column(name = "session_id")
     private Long sessionId;
+
+    @Column(name = "car_id")
     private Integer carId;
+
+    @Column(name = "reason")
     private String reason;
+
+    @Column(name = "penalty")
     private String penalty;
+
+    @Column(name = "penalty_value")
     private Integer penaltyValue;
+
+    @Column(name = "violation_lap")
     private Integer violationLap;
+
+    @Column(name = "cleared_lap")
     private Integer clearedLap;
+
+    @Column(name = "post_race")
     private Boolean postRace;
+
+    @Column(name = "insert_datetime")
+    @CreationTimestamp
+    private Instant insertDatetime;
 
     public boolean isValid() {
         return !NO_PENALTY.equals(penalty);
