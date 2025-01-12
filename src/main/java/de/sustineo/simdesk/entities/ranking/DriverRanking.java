@@ -1,6 +1,9 @@
 package de.sustineo.simdesk.entities.ranking;
 
-import de.sustineo.simdesk.entities.*;
+import de.sustineo.simdesk.entities.CarGroup;
+import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.Model;
+import de.sustineo.simdesk.entities.Session;
 import lombok.*;
 
 @Data
@@ -19,8 +22,4 @@ public class DriverRanking extends Model {
     private Driver driver;
     private Integer carModelId;
     private Session session;
-
-    public String getCarModelName() {
-        return Car.getCarNameById(carModelId);
-    }
 }

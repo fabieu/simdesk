@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccCar;
@@ -48,6 +49,7 @@ public class LapConverter extends BaseConverter {
 
         return Lap.builder()
                 .sessionId(sessionId)
+                .carGroup(Car.getCarGroupById(accCar.get().getCarModel()))
                 .carModelId(accCar.get().getCarModel())
                 .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))

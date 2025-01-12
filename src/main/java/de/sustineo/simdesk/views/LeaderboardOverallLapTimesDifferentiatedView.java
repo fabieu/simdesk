@@ -11,6 +11,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
@@ -141,7 +142,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(DriverRanking::getSplit3Millis);
-        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(DriverRanking::getCarModelName)
+        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> Car.getCarNameById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

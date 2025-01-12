@@ -28,6 +28,10 @@ public class Lap extends Model {
     @JoinColumn(name = "driver_id", referencedColumnName = "player_id")
     private Driver driver;
 
+    @Enumerated(EnumType.STRING)
+    @Column(name = "car_group")
+    private CarGroup carGroup;
+
     @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
     @Column(name = "car_model_id")
     private Integer carModelId;
@@ -36,11 +40,9 @@ public class Lap extends Model {
     @Column(name = "lap_time_millis")
     private Long lapTimeMillis;
 
-
     @CsvCustomBindByName(column = "Split 1 time", converter = LapTimeConverter.class)
     @Column(name = "split1_millis")
     private Long split1Millis;
-
 
     @CsvCustomBindByName(column = "Split 2 time", converter = LapTimeConverter.class)
     @Column(name = "split2_millis")
