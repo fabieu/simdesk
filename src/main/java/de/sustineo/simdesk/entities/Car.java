@@ -8,9 +8,9 @@ import java.util.stream.Collectors;
 @Data
 public class Car extends Model {
     private static final HashMap<Integer, Car> carModels = new HashMap<>();
-    private final Integer carId;
-    private final String carName;
-    private final CarGroup carGroup;
+    private final Integer modelId;
+    private final String name;
+    private final CarGroup group;
 
     static {
         addCarModel(0, "Porsche 991 GT3 R", CarGroup.GT3);
@@ -69,14 +69,14 @@ public class Car extends Model {
         addCarModel(86, "Porsche 935", CarGroup.GT2);
     }
 
-    public Car(Integer carId, String carName, CarGroup carGroup) {
-        this.carId = carId;
-        this.carName = carName;
-        this.carGroup = carGroup;
+    public Car(Integer modelId, String name, CarGroup group) {
+        this.modelId = modelId;
+        this.name = name;
+        this.group = group;
     }
 
-    public Car(Integer carId, String carName) {
-        this(carId, carName, CarGroup.UNKNOWN);
+    public Car(Integer modelId, String name) {
+        this(modelId, name, CarGroup.UNKNOWN);
     }
 
     @Override
@@ -84,45 +84,45 @@ public class Car extends Model {
         if (this == o) return true;
         if (o == null || getClass() != o.getClass()) return false;
         Car car = (Car) o;
-        return Objects.equals(carId, car.carId);
+        return Objects.equals(modelId, car.modelId);
     }
 
     @Override
     public int hashCode() {
-        return Objects.hash(carId);
+        return Objects.hash(modelId);
     }
 
-    private static void addCarModel(int carId, String carName, CarGroup carGroup) {
-        carModels.put(carId, new Car(carId, carName, carGroup));
+    private static void addCarModel(int modelId, String carName, CarGroup group) {
+        carModels.put(modelId, new Car(modelId, carName, group));
     }
 
-    public static Car getCarById(Integer carId) {
-        return carModels.get(carId);
+    public static Car getCarById(Integer carModelId) {
+        return carModels.get(carModelId);
     }
 
-    public static String getCarNameById(Integer carId) {
-        return Optional.ofNullable(carModels.get(carId))
-                .map(Car::getCarName)
+    public static String getNameById(Integer modelId) {
+        return Optional.ofNullable(carModels.get(modelId))
+                .map(Car::getName)
                 .orElse(UNKNOWN);
     }
 
-    public static Integer getCarIdByName(String carName) {
+    public static Integer getModelIdByName(String name) {
         return carModels.values().stream()
-                .filter(car -> car.getCarName().equals(carName))
-                .map(Car::getCarId)
+                .filter(car -> car.getName().equals(name))
+                .map(Car::getModelId)
                 .findFirst()
                 .orElse(null);
     }
 
-    public static CarGroup getCarGroupById(Integer carId) {
-        return Optional.ofNullable(carModels.get(carId))
-                .map(Car::getCarGroup)
+    public static CarGroup getGroupById(Integer modelId) {
+        return Optional.ofNullable(carModels.get(modelId))
+                .map(Car::getGroup)
                 .orElse(CarGroup.UNKNOWN);
     }
 
     public static List<Car> getAllSortedByName() {
         return carModels.values().stream()
-                .sorted(Comparator.comparing(Car::getCarName))
+                .sorted(Comparator.comparing(Car::getName))
                 .collect(Collectors.toList());
     }
 }

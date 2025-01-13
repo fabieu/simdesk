@@ -1,13 +1,14 @@
 package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.*;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
+import de.sustineo.simdesk.entities.FileMetadata;
+import de.sustineo.simdesk.entities.LeaderboardDriver;
+import de.sustineo.simdesk.entities.LeaderboardLine;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-import java.util.ArrayList;
 import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -38,23 +39,8 @@ public class LeaderboardConverter extends BaseConverter {
     }
 
     public List<LeaderboardDriver> convertToLeaderboardDrivers(Session session, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
-        List<LeaderboardDriver> leaderboardDrivers = new ArrayList<>();
-
-        for (AccDriver accDriver : accLeaderboardLine.getCar().getDrivers()) {
-            Driver driver = driverConverter.convertToDriver(accDriver, fileMetadata, accLeaderboardLine);
-            LeaderboardDriver leaderboardDriver = convertToLeaderboardDriver(session, accLeaderboardLine.getCar().getCarId(), driver);
-            leaderboardDrivers.add(leaderboardDriver);
-        }
-
-        return leaderboardDrivers;
-    }
-
-    private LeaderboardDriver convertToLeaderboardDriver(Session session, Integer carId, Driver driver) {
-        return LeaderboardDriver.builder()
-                .driver(driver)
-                .session(session)
-                .carId(carId)
-                .driveTimeMillis(driver.getDriveTimeMillis())
-                .build();
+        return accLeaderboardLine.getCar().getDrivers().stream()
+                .map(accDriver -> driverConverter.convertToLeaderboardDriver(accDriver, session, accLeaderboardLine, fileMetadata))
+                .toList();
     }
 }

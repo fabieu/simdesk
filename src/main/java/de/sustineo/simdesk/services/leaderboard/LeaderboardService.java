@@ -65,6 +65,7 @@ public class LeaderboardService {
             return null;
         }
 
+        // TODO: Fix performance issue (n+1 queries)
         return leaderboardLineRepository.findBySessionIdOrderByRanking(session.getId());
     }
 }

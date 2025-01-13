@@ -90,6 +90,8 @@ spring:
   config:
     activate:
       on-profile: "development"
+  jpa:
+    show-sql: true
 logging:
   level:
     #org.springframework.cache: TRACE

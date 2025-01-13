@@ -10,12 +10,12 @@ public class GridRenderer {
 
     static final String DRIVERS_TEMPLATE = """
             <div style="display: flex; flex-wrap: wrap; gap: var(--lumo-space-s); align-items: center;">
-                ${item.drivers.map(driver => html`
+                ${item.drivers.map(leaderboardDriver => html`
                     <div style="display: inline-block">
-                        <span>${driver.fullNameCensored}</span>
+                        <span>${leaderboardDriver.driver.fullNameCensored}</span>
                         <span theme="badge contrast pill" title="Valid laps/Invalid laps - Driving Time">
-                            ${driver.validLapsCount || 0}/${driver.invalidLapsCount || 0}
-                            ${driver.driveTimeMillis ? `- ${driver.prettyDriveTime}` : ""}
+                            ${leaderboardDriver.validLapsCount || 0}/${leaderboardDriver.invalidLapsCount || 0}
+                            ${leaderboardDriver.driveTimeMillis ? `- ${leaderboardDriver.prettyDriveTime}` : ""}
                         </span>
                     </div>
                 `)}

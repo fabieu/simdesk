@@ -3,6 +3,8 @@ package de.sustineo.simdesk.services.converter;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
+import de.sustineo.simdesk.entities.LeaderboardDriver;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLeaderboardLine;
 import org.apache.commons.lang3.StringUtils;
@@ -22,22 +24,22 @@ public class DriverConverter extends BaseConverter {
                 .build();
     }
 
-    public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata, AccLeaderboardLine accLeaderboardLine) {
+    public LeaderboardDriver convertToLeaderboardDriver(AccDriver accDriver, Session session, AccLeaderboardLine accLeaderboardLine, FileMetadata fileMetadata) {
         Driver driver = convertToDriver(accDriver, fileMetadata);
 
-        if (accLeaderboardLine.getDriverTotalTimes().isEmpty()) {
-            return driver;
+        LeaderboardDriver leaderboardDriver = LeaderboardDriver.builder()
+                .driver(driver)
+                .session(session)
+                .carId(accLeaderboardLine.getCar().getCarId())
+                .build();
+
+        if (!accLeaderboardLine.getDriverTotalTimes().isEmpty()) {
+            int driverIndex = accLeaderboardLine.getCar().getDrivers().indexOf(accDriver);
+            if (driverIndex != -1) {
+                leaderboardDriver.setDriveTimeMillis(accLeaderboardLine.getDriverTotalTimes().get(driverIndex));
+            }
         }
 
-        int driverIndex = getDriverIndex(accDriver, accLeaderboardLine);
-        if (driverIndex != -1) {
-            driver.setDriveTimeMillis(accLeaderboardLine.getDriverTotalTimes().get(driverIndex));
-        }
-
-        return driver;
-    }
-
-    private Integer getDriverIndex(AccDriver accDriver, AccLeaderboardLine accLeaderboardLine) {
-        return accLeaderboardLine.getCar().getDrivers().indexOf(accDriver);
+        return leaderboardDriver;
     }
 }

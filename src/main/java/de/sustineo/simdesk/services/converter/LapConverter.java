@@ -1,10 +1,7 @@
 package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.FileMetadata;
-import de.sustineo.simdesk.entities.Lap;
-import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccCar;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLap;
@@ -48,11 +45,13 @@ public class LapConverter extends BaseConverter {
             return null;
         }
 
+        Driver driver = driverConverter.convertToDriver(accDriver.get(), fileMetadata);
+
         return Lap.builder()
                 .session(session)
-                .carGroup(Car.getCarGroupById(accCar.get().getCarModel()))
+                .carGroup(Car.getGroupById(accCar.get().getCarModel()))
                 .carModelId(accCar.get().getCarModel())
-                .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
+                .driver(driver)
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))
                 .split1Millis(fixBadTiming(accLap.getSplits().get(0)))
                 .split2Millis(fixBadTiming(accLap.getSplits().get(1)))

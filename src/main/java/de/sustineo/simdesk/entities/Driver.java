@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities;
 
-import de.sustineo.simdesk.utils.FormatUtils;
 import jakarta.persistence.*;
 import lombok.*;
 import org.hibernate.annotations.CreationTimestamp;
@@ -44,15 +43,6 @@ public class Driver extends Model {
     @Column(name = "visibility")
     private Visibility visibility;
 
-    @Transient
-    private Integer validLapsCount;
-
-    @Transient
-    private Integer invalidLapsCount;
-
-    @Transient
-    private Long driveTimeMillis;
-
     public String getFullName() {
         if (firstName == null || lastName == null) {
             return UNKNOWN_DRIVER;
@@ -67,11 +57,6 @@ public class Driver extends Model {
         }
 
         return getFullName();
-    }
-
-    @SuppressWarnings("unused")
-    public String getPrettyDriveTime() {
-        return FormatUtils.formatDriveTime(driveTimeMillis);
     }
 
     /**

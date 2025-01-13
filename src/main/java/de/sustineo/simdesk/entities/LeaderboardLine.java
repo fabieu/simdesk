@@ -26,7 +26,7 @@ public class LeaderboardLine {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     private Session session;
 
@@ -52,17 +52,13 @@ public class LeaderboardLine {
     @Column(name = "race_number")
     private Integer raceNumber;
 
-    //TODO: Fix join tables for drivers
     @CsvBindAndSplitByName(column = "Drivers", elementType = Driver.class, writeDelimiter = ",")
     @OneToMany
-    @JoinTable(name = "leaderboard_driver",
-            joinColumns = {
-                    @JoinColumn(name = "session_id", referencedColumnName = "id"),
-                    @JoinColumn(name = "car_id", referencedColumnName = "car_id")
-            },
-            inverseJoinColumns = @JoinColumn(name = "player_id")
-    )
-    private List<Driver> drivers;
+    @JoinColumns({
+            @JoinColumn(name = "session_id", referencedColumnName = "session_id"),
+            @JoinColumn(name = "car_id", referencedColumnName = "car_id")
+    })
+    private List<LeaderboardDriver> drivers;
 
     @CsvCustomBindByName(column = "Fastest lap", converter = LapTimeConverter.class)
     @Column(name = "best_lap_time_millis")

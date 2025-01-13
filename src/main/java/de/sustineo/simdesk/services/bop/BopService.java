@@ -34,7 +34,7 @@ public class BopService {
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeBopTable() {
         Set<Pair<String, Integer>> availableTrackCarPairs = Track.getAllSortedByNameForAcc().stream()
-                .flatMap(track -> Car.getAllSortedByName().stream().map(car -> Pair.of(track.getAccId(), car.getCarId())))
+                .flatMap(track -> Car.getAllSortedByName().stream().map(car -> Pair.of(track.getAccId(), car.getModelId())))
                 .collect(Collectors.toSet());
 
         Set<Pair<String, Integer>> currentTrackCarPairs = bopRepository.findAll().stream()

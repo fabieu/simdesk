@@ -142,12 +142,12 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFrozen(true);
-        grid.addColumn(lap -> Car.getCarGroupById(lap.getCarModelId()))
+        grid.addColumn(lap -> Car.getGroupById(lap.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(lap -> Car.getCarNameById(lap.getCarModelId()))
+        grid.addColumn(lap -> Car.getNameById(lap.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

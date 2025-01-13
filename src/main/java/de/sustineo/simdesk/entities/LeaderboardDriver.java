@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.entities;
 
+import de.sustineo.simdesk.utils.FormatUtils;
 import jakarta.persistence.*;
 import lombok.*;
 
@@ -15,11 +16,11 @@ public class LeaderboardDriver {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "player_id")
     private Driver driver;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     private Session session;
 
@@ -28,4 +29,15 @@ public class LeaderboardDriver {
 
     @Column(name = "drive_time_millis")
     private Long driveTimeMillis;
+
+    @Transient
+    private Integer validLapsCount;
+
+    @Transient
+    private Integer invalidLapsCount;
+
+    @SuppressWarnings("unused")
+    public String getPrettyDriveTime() {
+        return FormatUtils.formatDriveTime(driveTimeMillis);
+    }
 }

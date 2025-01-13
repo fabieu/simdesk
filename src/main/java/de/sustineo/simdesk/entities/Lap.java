@@ -20,12 +20,12 @@ public class Lap extends Model {
     @Column(name = "id")
     private Long id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     private Session session;
 
     @CsvBindByName(column = "Driver")
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "driver_id", referencedColumnName = "player_id")
     private Driver driver;
 

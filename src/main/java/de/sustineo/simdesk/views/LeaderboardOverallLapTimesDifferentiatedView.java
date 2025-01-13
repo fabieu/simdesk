@@ -142,7 +142,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(DriverRanking::getSplit3Millis);
-        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> Car.getCarNameById(driverRanking.getCarModelId()))
+        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> Car.getNameById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

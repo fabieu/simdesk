@@ -38,7 +38,7 @@ public class Penalty extends Model {
     @Column(name = "id")
     private String id;
 
-    @OneToOne
+    @OneToOne(fetch = FetchType.LAZY)
     @JoinColumn(name = "session_id", referencedColumnName = "id")
     private Session session;
 

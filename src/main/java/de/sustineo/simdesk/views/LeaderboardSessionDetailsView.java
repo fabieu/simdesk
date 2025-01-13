@@ -31,6 +31,7 @@ import de.sustineo.simdesk.views.generators.LeaderboardLinePodiumPartNameGenerat
 import de.sustineo.simdesk.views.renderers.LeaderboardLineRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -60,6 +61,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         this.securityService = securityService;
     }
 
+    @Transactional
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
@@ -155,12 +157,12 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(LeaderboardLine::getRaceNumber);
-        grid.addColumn(leaderboardLine -> Car.getCarGroupById(leaderboardLine.getCarId()))
+        grid.addColumn(leaderboardLine -> Car.getGroupById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(leaderboardLine -> Car.getCarNameById(leaderboardLine.getCarId()))
+        grid.addColumn(leaderboardLine -> Car.getNameById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

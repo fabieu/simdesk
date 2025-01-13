@@ -19,7 +19,7 @@ public class BopEditField extends CustomField<AccBopEntry> {
 
     public BopEditField(AccBopEntry entry) {
         Integer carId = entry.getCarId();
-        String carName = Car.getCarNameById(carId);
+        String carName = Car.getNameById(carId);
         setLabel(String.format("%s (ID: %s)", carName, carId));
 
         ballastField.setSuffixComponent(new Span("kg"));

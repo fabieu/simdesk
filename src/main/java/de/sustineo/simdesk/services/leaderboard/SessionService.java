@@ -90,8 +90,8 @@ public class SessionService {
         sessionRepository.save(session);
 
         // Actual processing of the session results
-        leaderboardService.processLeaderboardLines(session, accSession, fileMetadata);
         lapService.processLaps(session, accSession, fileMetadata);
+        leaderboardService.processLeaderboardLines(session, accSession, fileMetadata);
         penaltyService.processPenalties(session, accSession);
 
         log.info(String.format("Successfully processed session file %s", fileName));

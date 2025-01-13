@@ -21,7 +21,7 @@ public class GroupRanking extends Model {
     }
 
     public String getCarModelName() {
-        return Car.getCarNameById(carModelId);
+        return Car.getNameById(carModelId);
     }
 
     public String getTrackName() {
