@@ -19,20 +19,19 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.entities.comparator.SessionRankingLapTimeComparator;
-import de.sustineo.simdesk.entities.ranking.SessionRanking;
+import de.sustineo.simdesk.entities.comparator.LeaderboardLineLapTimeComparator;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
-import de.sustineo.simdesk.views.generators.SessionRankingPartNameGenerator;
-import de.sustineo.simdesk.views.generators.SessionRankingPodiumPartNameGenerator;
-import de.sustineo.simdesk.views.renderers.SessionRankingRenderer;
+import de.sustineo.simdesk.views.generators.LeaderboardLinePartNameGenerator;
+import de.sustineo.simdesk.views.generators.LeaderboardLinePodiumPartNameGenerator;
+import de.sustineo.simdesk.views.renderers.LeaderboardLineRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
@@ -48,20 +47,21 @@ import java.util.stream.Stream;
 @PageTitle("Leaderboard - Session Details")
 @AnonymousAllowed
 public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnterObserver {
-    private final RankingService rankingService;
     private final SessionService sessionService;
+    private final LeaderboardService leaderboardService;
     private final SecurityService securityService;
 
-    private GridListDataView<SessionRanking> dataView;
+    private GridListDataView<LeaderboardLine> dataView;
 
-    public LeaderboardSessionDetailsView(RankingService rankingService,
-                                         SessionService sessionService,
+    public LeaderboardSessionDetailsView(SessionService sessionService,
+                                         LeaderboardService leaderboardService,
                                          SecurityService securityService) {
-        this.rankingService = rankingService;
         this.sessionService = sessionService;
+        this.leaderboardService = leaderboardService;
         this.securityService = securityService;
     }
 
+    @Transactional
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
@@ -69,7 +69,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
         try {
-            Session session = sessionService.getSession(fileChecksum);
+            Session session = sessionService.getSessionByFileChecksum(fileChecksum);
             if (session == null) {
                 throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }
@@ -95,7 +95,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), Track.getTrackNameByAccId(session.getTrackId()), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 
@@ -131,84 +131,84 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
     }
 
     private Component createLeaderboardGrid(Session session) {
-        List<SessionRanking> sessionRankings = rankingService.getSessionRankings(session).stream()
-                .filter(sessionRanking -> sessionRanking.getLapCount() > 0)
+        List<LeaderboardLine> leaderboardLines = leaderboardService.getLeaderboardLinesBySessionId(session).stream()
+                .filter(leaderboardLine -> leaderboardLine.getLapCount() > 0)
                 .collect(Collectors.toList());
 
-        SessionRanking bestTotalTimeSessionRanking = sessionRankings.stream()
+        LeaderboardLine bestTotalTime = leaderboardLines.stream()
                 .findFirst()
-                .orElse(new SessionRanking());
-        SessionRanking bestLapTimeSessionRanking = sessionRankings.stream()
+                .orElse(new LeaderboardLine());
+        LeaderboardLine bestLapTime = leaderboardLines.stream()
                 .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
-                .min(new SessionRankingLapTimeComparator())
-                .orElse(new SessionRanking());
+                .min(new LeaderboardLineLapTimeComparator())
+                .orElse(new LeaderboardLine());
 
-        Grid<SessionRanking> grid = new Grid<>(SessionRanking.class, false);
-        grid.addColumn(SessionRanking::getRanking)
+        Grid<LeaderboardLine> grid = new Grid<>(LeaderboardLine.class, false);
+        grid.addColumn(LeaderboardLine::getRanking)
                 .setHeader("#")
                 .setWidth(GRID_RANKING_WIDTH)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
-                .setPartNameGenerator(new SessionRankingPodiumPartNameGenerator());
-        grid.addColumn(SessionRankingRenderer.createRaceNumberRenderer())
+                .setPartNameGenerator(new LeaderboardLinePodiumPartNameGenerator());
+        grid.addColumn(LeaderboardLineRenderer.createRaceNumberRenderer())
                 .setHeader("Race Number")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(SessionRanking::getRaceNumber);
-        grid.addColumn(SessionRanking::getCarGroup)
+                .setComparator(LeaderboardLine::getRaceNumber);
+        grid.addColumn(leaderboardLine -> Car.getGroupById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(SessionRanking::getCarModelName)
+        grid.addColumn(leaderboardLine -> Car.getNameById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(SessionRankingRenderer.createDriversRenderer())
+        grid.addColumn(LeaderboardLineRenderer.createDriversRenderer())
                 .setHeader("Drivers")
                 .setSortable(true);
-        grid.addColumn(SessionRanking::getLapCount)
+        grid.addColumn(LeaderboardLine::getLapCount)
                 .setHeader("Laps")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
         if (SessionType.R.equals(session.getSessionType())) {
-            grid.addColumn(SessionRankingRenderer.createTotalTimeRenderer(bestTotalTimeSessionRanking))
+            grid.addColumn(LeaderboardLineRenderer.createTotalTimeRenderer(bestTotalTime))
                     .setHeader("Total Time")
                     .setAutoWidth(true)
                     .setFlexGrow(0)
                     .setSortable(true)
-                    .setComparator(SessionRanking::getTotalTimeMillis);
+                    .setComparator(LeaderboardLine::getTotalTimeMillis);
         }
-        grid.addColumn(SessionRankingRenderer.createLapTimeRenderer(bestLapTimeSessionRanking))
+        grid.addColumn(LeaderboardLineRenderer.createLapTimeRenderer(bestLapTime))
                 .setHeader("Fastest Lap")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(SessionRanking::getBestLapTimeMillis);
+                .setComparator(LeaderboardLine::getBestLapTimeMillis);
 
-        dataView = grid.setItems(sessionRankings);
+        dataView = grid.setItems(leaderboardLines);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setPartNameGenerator(new SessionRankingPartNameGenerator());
+        grid.setPartNameGenerator(new LeaderboardLinePartNameGenerator());
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         grid.setEmptyStateText("No laps in this session!");
 
-        SingleSelect<Grid<SessionRanking>, SessionRanking> singleSelect = grid.asSingleSelect();
+        SingleSelect<Grid<LeaderboardLine>, LeaderboardLine> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
-            SessionRanking selectedSessionRanking = e.getValue();
+            LeaderboardLine selectedLeaderboardLine = e.getValue();
 
-            if (selectedSessionRanking != null) {
+            if (selectedLeaderboardLine != null) {
                 getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionCarDetailsView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum()),
-                                new RouteParam(ROUTE_PARAMETER_CAR_ID, selectedSessionRanking.getCarId().toString())
+                                new RouteParam(ROUTE_PARAMETER_CAR_ID, selectedLeaderboardLine.getCarId().toString())
                         )
                 ));
             }
@@ -222,13 +222,12 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
             return null;
         }
 
-        Stream<SessionRanking> sessionRows = dataView.getItems();
+        Stream<LeaderboardLine> sessionRows = dataView.getItems();
 
         try (StringWriter writer = new StringWriter()) {
-            StatefulBeanToCsv<SessionRanking> sbc = new StatefulBeanToCsvBuilder<SessionRanking>(writer)
+            StatefulBeanToCsv<LeaderboardLine> sbc = new StatefulBeanToCsvBuilder<LeaderboardLine>(writer)
                     .withSeparator(';')
                     .build();
-
             sbc.write(sessionRows);
 
             return writer.toString();

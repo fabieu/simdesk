@@ -12,7 +12,7 @@ public class BopCarGroupPartNameGenerator extends CarGroupPartNameGenerator impl
             return null;
         }
 
-        CarGroup carGroup = Car.getCarGroupById(bop.getCarId());
+        CarGroup carGroup = Car.getGroupById(bop.getCarId());
         return getCarGroupPartName(carGroup);
     }
 }

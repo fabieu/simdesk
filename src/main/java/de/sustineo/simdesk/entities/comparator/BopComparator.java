@@ -12,8 +12,8 @@ public class BopComparator implements Comparator<Bop> {
 
     public BopComparator() {
         comparatorList.add(Comparator.comparing(Bop::getTrackId));
-        comparatorList.add(Comparator.comparing(bop -> Car.getCarGroupById(bop.getCarId())));
-        comparatorList.add(Comparator.comparing(bop -> Car.getCarNameById(bop.getCarId())));
+        comparatorList.add(Comparator.comparing(bop -> Car.getGroupById(bop.getCarId())));
+        comparatorList.add(Comparator.comparing(bop -> Car.getNameById(bop.getCarId())));
     }
 
     @Override

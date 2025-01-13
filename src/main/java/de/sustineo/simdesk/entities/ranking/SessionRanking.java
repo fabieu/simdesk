@@ -46,6 +46,6 @@ public class SessionRanking {
     private Integer lapCount;
 
     public String getCarModelName() {
-        return Car.getCarNameById(carModelId);
+        return Car.getNameById(carModelId);
     }
 }

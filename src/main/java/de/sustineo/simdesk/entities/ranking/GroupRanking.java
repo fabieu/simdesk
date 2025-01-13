@@ -9,7 +9,7 @@ import lombok.*;
 @AllArgsConstructor
 @NoArgsConstructor
 @EqualsAndHashCode(callSuper = false)
-public class GroupRanking extends Entity {
+public class GroupRanking extends Model {
     private CarGroup carGroup;
     private String trackId;
     private Long lapTimeMillis;
@@ -21,7 +21,7 @@ public class GroupRanking extends Entity {
     }
 
     public String getCarModelName() {
-        return Car.getCarNameById(carModelId);
+        return Car.getNameById(carModelId);
     }
 
     public String getTrackName() {

@@ -49,7 +49,7 @@ public class SecurityService {
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), SecurityConfiguration.USER_ID_ADMIN);
+        userService.updateSystemUser(SecurityConfiguration.USER_ID_ADMIN, adminUsername, passwordEncoder.encode(adminPassword));
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {

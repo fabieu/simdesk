@@ -185,10 +185,10 @@ public class BopEditorView extends BaseView {
             }
         });
 
-        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getCarName().toLowerCase().contains(filterString.toLowerCase()) || car.getCarGroup().name().equalsIgnoreCase(filterString);
+        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getName().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
         carsComboBox.setItems(carFilter, Car.getAllSortedByName());
-        carsComboBox.setItemLabelGenerator(Car::getCarName);
-        carsComboBox.setClassNameGenerator(car -> car.getCarGroup().name());
+        carsComboBox.setItemLabelGenerator(Car::getName);
+        carsComboBox.setClassNameGenerator(car -> car.getGroup().name());
         carsComboBox.setPlaceholder("Select cars...");
         carsComboBox.setHelperText(String.format("Available filters: Car Name, Car Group (%s)", String.join(", ", CarGroup.getValidNames())));
         carsComboBox.addValueChangeListener(event -> {
@@ -201,8 +201,8 @@ public class BopEditorView extends BaseView {
 
                 // Add entries and bop edit fields for newly selected cars
                 event.getValue().forEach(car -> {
-                    if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getCarId()))) {
-                        AccBopEntry entry = new AccBopEntry(trackComboBox.getValue().getAccId(), car.getCarId(), 0, 0);
+                    if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getModelId()))) {
+                        AccBopEntry entry = new AccBopEntry(trackComboBox.getValue().getAccId(), car.getModelId(), 0, 0);
                         currentBop.getEntries().add(entry);
                         currentCarComponents.put(entry.getCarId(), createBopEditField(entry));
                     }

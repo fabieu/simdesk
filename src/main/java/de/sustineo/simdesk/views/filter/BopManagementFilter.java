@@ -40,7 +40,7 @@ public class BopManagementFilter extends GridFilter {
 
     private boolean test(Bop bop) {
         boolean matchesTrackName = matches(Track.getTrackNameByAccId(bop.getTrackId()), trackName);
-        boolean matchesCarName = matches(Car.getCarNameById(bop.getCarId()), carName);
+        boolean matchesCarName = matches(Car.getNameById(bop.getCarId()), carName);
         boolean matchesActive = matches(String.valueOf(bop.getActive()), active);
         boolean matchesUsername = matches(bop.getUsername(), username);
 

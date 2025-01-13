@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
+import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 
 public class OverallLapTimesDifferentiatedFilter extends GridFilter {
@@ -38,7 +39,7 @@ public class OverallLapTimesDifferentiatedFilter extends GridFilter {
 
     public boolean test(DriverRanking driverRanking) {
         boolean matchesDriverFullName = matches(driverRanking.getDriver().getFullNameCensored(), driverName);
-        boolean matchesCarModelName = matches(driverRanking.getCarModelName(), carModelName);
+        boolean matchesCarModelName = matches(Car.getNameById(driverRanking.getCarModelId()), carModelName);
         boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
         boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);
 

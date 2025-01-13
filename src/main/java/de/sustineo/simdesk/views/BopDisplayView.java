@@ -168,7 +168,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             grid.setSelectionMode(Grid.SelectionMode.NONE);
             grid.setPartNameGenerator(new BopCarGroupPartNameGenerator());
 
-            grid.addColumn(bop -> Car.getCarNameById(bop.getCarId()))
+            grid.addColumn(bop -> Car.getNameById(bop.getCarId()))
                     .setHeader("Car")
                     .setSortable(true);
             grid.addColumn(BopRenderer.createRestrictorRenderer())

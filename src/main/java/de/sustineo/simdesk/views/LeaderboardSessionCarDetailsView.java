@@ -22,16 +22,10 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.Lap;
-import de.sustineo.simdesk.entities.Penalty;
-import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.services.leaderboard.LapService;
-import de.sustineo.simdesk.services.leaderboard.PenaltyService;
-import de.sustineo.simdesk.services.leaderboard.RankingService;
-import de.sustineo.simdesk.services.leaderboard.SessionService;
+import de.sustineo.simdesk.services.leaderboard.*;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.generators.InvalidLapPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LapRenderer;
@@ -57,6 +51,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
     private final LapService lapService;
     private final PenaltyService penaltyService;
     private final RankingService rankingService;
+    private final LeaderboardService leaderboardService;
     private final SecurityService securityService;
 
     private List<Lap> laps = new ArrayList<>();
@@ -66,11 +61,13 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                                             LapService lapService,
                                             PenaltyService penaltyService,
                                             RankingService rankingService,
+                                            LeaderboardService leaderboardService,
                                             SecurityService securityService) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.penaltyService = penaltyService;
         this.rankingService = rankingService;
+        this.leaderboardService = leaderboardService;
         this.securityService = securityService;
     }
 
@@ -81,12 +78,12 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
         int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());
 
-        Session session = sessionService.getSession(fileChecksum);
+        Session session = sessionService.getSessionByFileChecksum(fileChecksum);
         if (session == null) {
             throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
         }
 
-        List<String> playerIds = rankingService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
+        List<String> playerIds = leaderboardService.getPlayerIdsBySessionAndCarId(session.getId(), carId);
         if (playerIds == null || playerIds.isEmpty()) {
             throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
         }
@@ -124,7 +121,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         layout.setAlignItems(Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), Track.getTrackNameByAccId(session.getTrackId()), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 
@@ -145,12 +142,12 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFrozen(true);
-        grid.addColumn(lap -> Car.getCarGroupById(lap.getCarModelId()))
+        grid.addColumn(lap -> Car.getGroupById(lap.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(lap -> Car.getCarNameById(lap.getCarModelId()))
+        grid.addColumn(lap -> Car.getNameById(lap.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

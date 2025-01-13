@@ -23,6 +23,7 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -200,7 +201,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     }
 
     private Grid<Session> createSessionGrid(TimeRange timeRange) {
-        List<Session> sessions = sessionService.getAllSessions(timeRange);
+        List<Session> sessions = sessionService.getAllSessionsByTimeRange(timeRange);
 
         Grid<Session> grid = new Grid<>(Session.class, false);
         Grid.Column<Session> weatherColumn = grid.addComponentColumn(this::getWeatherIcon)
@@ -217,7 +218,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
                 .setHeader("Server Name")
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackNameColumn = grid.addColumn(session -> Track.getTrackNameByAccId(session.getTrackId()))
                 .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
