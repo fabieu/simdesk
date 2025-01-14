@@ -2,13 +2,14 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Penalty;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.entities.mapper.PenaltyMapper;
+import de.sustineo.simdesk.mapper.PenaltyMapper;
 import de.sustineo.simdesk.services.converter.PenaltyConverter;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -24,17 +25,18 @@ public class PenaltyService {
         this.penaltyMapper = penaltyMapper;
     }
 
-    public void handlePenalties(Integer sessionId, AccSession accSession) {
-        List<Penalty> penalties = penaltyConverter.convertToPenalty(sessionId, accSession);
-        penalties.forEach(this::insertPenaltyAsync);
+    @Transactional
+    public void processPenalties(Session session, AccSession accSession) {
+        List<Penalty> penalties = penaltyConverter.convertToPenalty(session, accSession);
+        penalties.forEach(this::insertPenalty);
     }
 
-    public List<Penalty> findBySessionAndCarId(int sessionId, int carId) {
-        return penaltyMapper.findBySessionAndCarId(sessionId, carId);
-    }
-
-    @Async
-    protected void insertPenaltyAsync(Penalty penalty) {
+    @Transactional
+    protected void insertPenalty(Penalty penalty) {
         penaltyMapper.insert(penalty);
+    }
+
+    public List<Penalty> findBySessionIdAndCarId(int sessionId, int carId) {
+        return penaltyMapper.findBySessionIdAndCarId(sessionId, carId);
     }
 }

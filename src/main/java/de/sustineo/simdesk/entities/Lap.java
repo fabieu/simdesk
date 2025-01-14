@@ -9,14 +9,12 @@ import lombok.*;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class Lap extends Entity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Lap {
     private String id;
     private Integer sessionId;
     @CsvBindByName(column = "Driver")
     private Driver driver;
-    @Deprecated
     private CarGroup carGroup;
     @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
     private Integer carModelId;

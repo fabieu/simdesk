@@ -3,7 +3,7 @@ package de.sustineo.simdesk.entities;
 import lombok.Getter;
 
 @Getter
-public enum SortingModeEntrylist {
+public enum EntrylistSortingMode {
     NONE("None"),
     GRID_POSITION("Grid Position"),
     CAR_NUMBER("Car Number"),
@@ -11,7 +11,7 @@ public enum SortingModeEntrylist {
 
     private final String label;
 
-    SortingModeEntrylist(String label) {
+    EntrylistSortingMode(String label) {
         this.label = label;
     }
 }

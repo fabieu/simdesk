@@ -7,9 +7,8 @@ import java.time.Instant;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class Session extends Entity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Session {
     private Integer id;
     private SessionType sessionType;
     private Integer raceWeekendIndex;

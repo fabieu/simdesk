@@ -3,14 +3,15 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.entities.mapper.LapMapper;
+import de.sustineo.simdesk.mapper.LapMapper;
 import de.sustineo.simdesk.services.converter.LapConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -29,22 +30,19 @@ public class LapService {
         this.lapConverter = lapConverter;
     }
 
-    public void handleLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
-        List<Lap> laps = lapConverter.convertToLaps(sessionId, accSession, fileMetadata);
-        laps.forEach(this::insertLapAsync);
+    @Transactional
+    public void processLaps(Session session, AccSession accSession, FileMetadata fileMetadata) {
+        List<Lap> laps = lapConverter.convertToLaps(session, accSession, fileMetadata);
+        laps.forEach(this::insertLap);
     }
 
-    @Async
-    public void insertLapAsync(Lap lap) {
+    @Transactional
+    public void insertLap(Lap lap) {
         driverService.upsertDriver(lap.getDriver());
         lapMapper.insert(lap);
     }
 
     public List<Lap> getLapsBySessionAndDrivers(int sessionId, List<String> playerIds) {
         return lapMapper.findBySessionAndDrivers(sessionId, playerIds);
-    }
-
-    public long getLapCount() {
-        return lapMapper.count();
     }
 }

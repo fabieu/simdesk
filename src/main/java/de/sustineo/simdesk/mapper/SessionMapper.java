@@ -1,8 +1,7 @@
-package de.sustineo.simdesk.entities.mapper;
+package de.sustineo.simdesk.mapper;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.database.DatabaseVendor;
 import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
@@ -30,13 +29,6 @@ public interface SessionMapper {
     })
     @Select("""
             SELECT *
-            FROM simdesk.session
-            WHERE session_datetime >= #{startTime}
-              AND session_datetime <= #{endTime}
-            ORDER BY session_datetime DESC
-            """)
-    @Select(databaseId = DatabaseVendor.SQLITE, value = """
-            SELECT *
             FROM session
             WHERE session_datetime >= #{startTime}
               AND session_datetime <= #{endTime}
@@ -44,28 +36,11 @@ public interface SessionMapper {
             """)
     List<Session> findAllByTimeRange(Instant startTime, Instant endTime);
 
-    @ResultType(long.class)
-    @Select("SELECT COUNT(id) FROM simdesk.session")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT COUNT(id) FROM session")
-    long count();
-
-    @SuppressWarnings("unused")
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM simdesk.session WHERE id = #{id} LIMIT 1")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM session WHERE id = #{id} LIMIT 1")
-    Session findById(Integer id);
-
-
-    @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM simdesk.session WHERE file_checksum = #{fileChecksum} LIMIT 1")
-    @Select(databaseId = DatabaseVendor.SQLITE, value = "SELECT * FROM session WHERE file_checksum = #{fileChecksum} LIMIT 1")
+    @Select("SELECT * FROM session WHERE file_checksum = #{fileChecksum} LIMIT 1")
     Session findByFileChecksum(String fileChecksum);
 
     @Insert("""
-            INSERT INTO simdesk.session (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_content)
-            VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileContent})
-            """)
-    @Insert(databaseId = DatabaseVendor.SQLITE, value = """
             INSERT INTO session (session_type, race_weekend_index, server_name, track_id, wet_session, car_count, session_datetime, file_checksum, file_name, file_content)
             VALUES (#{sessionType}, #{raceWeekendIndex}, #{serverName}, #{trackId}, #{wetSession}, #{carCount}, #{sessionDatetime}, #{fileChecksum}, #{fileName}, #{fileContent})
             """)

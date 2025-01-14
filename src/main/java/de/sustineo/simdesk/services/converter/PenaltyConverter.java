@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Penalty;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccPenalty;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import lombok.extern.java.Log;
@@ -15,21 +16,21 @@ import java.util.stream.Stream;
 @Log
 @Service
 public class PenaltyConverter {
-    public List<Penalty> convertToPenalty(Integer sessionId, AccSession accSession) {
+    public List<Penalty> convertToPenalty(Session session, AccSession accSession) {
         List<Penalty> penalties = accSession.getPenalties().stream()
-                .map(accPenalty -> convertToPenalty(sessionId, accPenalty, false))
+                .map(accPenalty -> convertToPenalty(session, accPenalty, false))
                 .toList();
 
         List<Penalty> postRacePenalties = accSession.getPostRacePenalties().stream()
-                .map(accPenalty -> convertToPenalty(sessionId, accPenalty, true))
+                .map(accPenalty -> convertToPenalty(session, accPenalty, true))
                 .toList();
 
         return Stream.concat(penalties.stream(), postRacePenalties.stream()).toList();
     }
 
-    public Penalty convertToPenalty(Integer sessionId, AccPenalty accPenalty, boolean postRace) {
+    public Penalty convertToPenalty(Session session, AccPenalty accPenalty, boolean postRace) {
         return Penalty.builder()
-                .sessionId(sessionId)
+                .sessionId(session.getId())
                 .carId(accPenalty.getCarId())
                 .reason(accPenalty.getReason())
                 .penalty(accPenalty.getPenalty())

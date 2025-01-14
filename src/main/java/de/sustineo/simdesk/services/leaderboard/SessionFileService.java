@@ -6,7 +6,6 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.utils.json.JsonUtils;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
@@ -33,8 +32,7 @@ public class SessionFileService {
         this.sessionService = sessionService;
     }
 
-    @Async
-    public void handleSessionFileAsync(@Nonnull Path path) {
+    public void handleSessionFile(@Nonnull Path path) {
         try {
             handleSessionFile(path, null);
         } catch (Exception e) {

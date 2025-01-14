@@ -84,7 +84,7 @@ public class EntrylistEditorView extends BaseView {
 
     private final Upload entrylistUpload = new Upload();
     private final Anchor downloadAnchor = new Anchor();
-    private final Select<SortingModeEntrylist> sortingModeSelect = new Select<>();
+    private final Select<EntrylistSortingMode> sortingModeSelect = new Select<>();
     private final Select<SortingDirection> sortdirectionSelect = new Select<>();
     private final TextArea entrylistPreview = new TextArea();
     private final VerticalLayout entrylistLayout = new VerticalLayout();
@@ -118,7 +118,7 @@ public class EntrylistEditorView extends BaseView {
         this.entrylistPreview.setReadOnly(true);
 
         WebStorage.getItem(webStorageType, WEB_STORAGE_KEY_SORTING_MODE, (value) ->
-                this.sortingModeSelect.setValue(EnumUtils.getEnum(SortingModeEntrylist.class, value, SortingModeEntrylist.NONE))
+                this.sortingModeSelect.setValue(EnumUtils.getEnum(EntrylistSortingMode.class, value, EntrylistSortingMode.NONE))
         );
 
         WebStorage.getItem(webStorageType, WEB_STORAGE_KEY_SORTING_DIRECTION, (value) ->
@@ -308,8 +308,8 @@ public class EntrylistEditorView extends BaseView {
 
     private Component createEntrylistHeaderLayout() {
         this.sortingModeSelect.setLabel("Sort mode");
-        this.sortingModeSelect.setItems(SortingModeEntrylist.values());
-        this.sortingModeSelect.setItemLabelGenerator(SortingModeEntrylist::getLabel);
+        this.sortingModeSelect.setItems(EntrylistSortingMode.values());
+        this.sortingModeSelect.setItemLabelGenerator(EntrylistSortingMode::getLabel);
         this.sortingModeSelect.addValueChangeListener(event -> {
             WebStorage.setItem(webStorageType, WEB_STORAGE_KEY_SORTING_MODE, event.getValue().name());
             refreshEntrylistEntriesFromMap();
@@ -513,7 +513,7 @@ public class EntrylistEditorView extends BaseView {
                 entry.setRaceNumber(event.getValue());
             }
 
-            if (SortingModeEntrylist.CAR_NUMBER.equals(getSortingMode())) {
+            if (EntrylistSortingMode.CAR_NUMBER.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -552,15 +552,15 @@ public class EntrylistEditorView extends BaseView {
         });
 
         ComboBox<Car> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getCarName().toLowerCase().contains(filterString.toLowerCase()) || car.getCarGroup().name().equalsIgnoreCase(filterString);
+        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getName().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
         forcedCarModelComboBox.setItems(carFilter, Car.getAllSortedByName());
-        forcedCarModelComboBox.setItemLabelGenerator(Car::getCarName);
-        forcedCarModelComboBox.setClassNameGenerator(car -> car.getCarGroup().name());
+        forcedCarModelComboBox.setItemLabelGenerator(Car::getName);
+        forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
         forcedCarModelComboBox.setValue(Car.getCarById(entry.getForcedCarModel()));
         forcedCarModelComboBox.addValueChangeListener(event -> {
             Integer carId = Optional.of(event)
                     .map(ComboBox.ValueChangeEvent::getValue)
-                    .map(Car::getCarId)
+                    .map(Car::getModelId)
                     .orElse(AccEntrylistEntry.DEFAULT_FORCED_CAR_MODEL);
 
             entry.setForcedCarModel(carId);
@@ -605,7 +605,7 @@ public class EntrylistEditorView extends BaseView {
                 entry.setDefaultGridPosition(event.getValue());
             }
 
-            if (SortingModeEntrylist.GRID_POSITION.equals(getSortingMode())) {
+            if (EntrylistSortingMode.GRID_POSITION.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -621,7 +621,7 @@ public class EntrylistEditorView extends BaseView {
             // Override background color for server admins
             setBackGroundColorForServerAdmins(entrylistEntryLayout, isServerAdminCheckbox.getValue());
 
-            if (SortingModeEntrylist.ADMIN.equals(getSortingMode())) {
+            if (EntrylistSortingMode.ADMIN.equals(getSortingMode())) {
                 refreshEntrylistEntriesFromMap();
                 scrollToComponent(entrylistEntryLayout);
             } else {
@@ -1073,7 +1073,7 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private SortingModeEntrylist getSortingMode() {
+    private EntrylistSortingMode getSortingMode() {
         return sortingModeSelect.getValue();
     }
 

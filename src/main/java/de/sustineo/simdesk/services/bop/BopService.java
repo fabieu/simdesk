@@ -5,7 +5,7 @@ import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
-import de.sustineo.simdesk.entities.mapper.BopMapper;
+import de.sustineo.simdesk.mapper.BopMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -33,7 +33,7 @@ public class BopService {
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeBopTable() {
         Set<Pair<String, Integer>> availableTrackCarPairs = Track.getAllSortedByNameForAcc().stream()
-                .flatMap(track -> Car.getAllSortedByName().stream().map(car -> Pair.of(track.getAccId(), car.getCarId())))
+                .flatMap(track -> Car.getAllSortedByName().stream().map(car -> Pair.of(track.getAccId(), car.getModelId())))
                 .collect(Collectors.toSet());
 
         Set<Pair<String, Integer>> currentTrackCarPairs = bopMapper.findAll().stream()

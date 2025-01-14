@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.utils;
 
-import de.sustineo.simdesk.entities.Entity;
 import de.sustineo.simdesk.views.BrowserTimeZone;
+import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
 import java.time.Duration;
@@ -21,7 +21,7 @@ public class FormatUtils {
 
     public static String formatLapTime(Long millis) {
         if (millis == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         if (millis > Duration.ofHours(1).toMillis()) {
@@ -35,7 +35,7 @@ public class FormatUtils {
 
     public static String formatTotalTime(Long millis) {
         if (millis == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         if (millis > Duration.ofHours(1).toMillis()) {
@@ -43,13 +43,13 @@ public class FormatUtils {
         } else if (millis >= 0) {
             return DurationFormatUtils.formatDuration(millis, TIMING_FORMAT, true);
         } else {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
     }
 
     public static String formatDriveTime(Long millis) {
         if (millis == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         return DurationFormatUtils.formatDuration(millis, TIME_FORMAT, true);
@@ -57,7 +57,7 @@ public class FormatUtils {
 
     public static String formatDatetime(TemporalAccessor temporalAccessor) {
         if (temporalAccessor == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         return dateTimeFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);
@@ -65,7 +65,7 @@ public class FormatUtils {
 
     public static String formatDatetimeSafe(TemporalAccessor intemporalAccessor) {
         if (intemporalAccessor == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         return dateTimeFormatterSafe.withZone(BrowserTimeZone.get()).format(intemporalAccessor);
@@ -73,7 +73,7 @@ public class FormatUtils {
 
     public static String formatDate(TemporalAccessor temporalAccessor) {
         if (temporalAccessor == null) {
-            return Entity.EMPTY;
+            return StringUtils.EMPTY;
         }
 
         return dateFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);

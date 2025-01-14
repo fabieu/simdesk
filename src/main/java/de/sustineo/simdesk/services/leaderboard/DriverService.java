@@ -2,7 +2,7 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.mapper.DriverMapper;
+import de.sustineo.simdesk.mapper.DriverMapper;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -27,6 +27,10 @@ public class DriverService {
 
     public void updateDriverVisibility(Driver driver) {
         driverMapper.updateVisibility(driver);
+    }
+
+    public List<String> getPlayerIdsBySessionIdAndCarId(Integer id, int carId) {
+        return driverMapper.findPlayerIdsBySessionIdAndCarId(id, carId);
     }
 }
 

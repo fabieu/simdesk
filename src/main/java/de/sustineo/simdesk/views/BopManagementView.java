@@ -172,7 +172,7 @@ public class BopManagementView extends BaseView {
         carGroupFilterComboBox.addValueChangeListener(e -> {
             CarGroup carGroup = e.getValue();
             if (carGroup != null) {
-                gridFilters.put(GRID_FILTER_CAR_GROUP, bop -> carGroup.equals(Car.getCarGroupById(bop.getCarId())));
+                gridFilters.put(GRID_FILTER_CAR_GROUP, bop -> carGroup.equals(Car.getGroupById(bop.getCarId())));
             } else {
                 gridFilters.remove(GRID_FILTER_CAR_GROUP);
             }
@@ -234,7 +234,7 @@ public class BopManagementView extends BaseView {
         Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameByAccId(bop.getTrackId()))
                 .setHeader("Track")
                 .setSortable(true);
-        Grid.Column<Bop> carNameColumn = grid.addColumn(bop -> Car.getCarNameById(bop.getCarId()))
+        Grid.Column<Bop> carNameColumn = grid.addColumn(bop -> Car.getNameById(bop.getCarId()))
                 .setHeader("Car")
                 .setSortable(true);
         Grid.Column<Bop> restrictorColumn = grid.addColumn(BopRenderer.createRestrictorRenderer())

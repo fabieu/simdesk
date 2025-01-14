@@ -11,8 +11,11 @@ import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.Car;
+import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
@@ -99,12 +102,12 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<GroupRanking> trackNameColumn = grid.addColumn(GroupRanking::getTrackName)
+        Grid.Column<GroupRanking> trackNameColumn = grid.addColumn(groupRanking -> Track.getTrackNameByAccId(groupRanking.getTrackId()))
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<GroupRanking> lapTimeColumn = grid.addColumn(GroupRanking::getLapTime)
+        Grid.Column<GroupRanking> lapTimeColumn = grid.addColumn(groupRanking -> FormatUtils.formatLapTime(groupRanking.getLapTimeMillis()))
                 .setHeader("Lap Time")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -112,7 +115,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullNameCensored())
                 .setHeader("Driver")
                 .setSortable(true);
-        Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(GroupRanking::getCarModelName)
+        Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(groupRanking -> Car.getNameById(groupRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setSortable(true);
 

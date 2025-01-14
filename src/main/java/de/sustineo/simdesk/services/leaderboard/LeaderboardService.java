@@ -4,12 +4,13 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.LeaderboardLine;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.entities.mapper.LeaderboardMapper;
+import de.sustineo.simdesk.mapper.LeaderboardMapper;
 import de.sustineo.simdesk.services.converter.LeaderboardConverter;
 import org.springframework.context.annotation.Profile;
-import org.springframework.scheduling.annotation.Async;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
@@ -26,18 +27,23 @@ public class LeaderboardService {
         this.leaderboardMapper = leaderboardMapper;
     }
 
-    public void handleLeaderboard(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
-        List<LeaderboardLine> leaderboardLines = leaderboardConverter.convertToLeaderboardLines(sessionId, accSession, fileMetadata);
-        leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLineAsync(sessionId, leaderboardLine));
+    @Transactional
+    public void processLeaderboardLines(Session session, AccSession accSession, FileMetadata fileMetadata) {
+        List<LeaderboardLine> leaderboardLines = leaderboardConverter.convertToLeaderboardLines(session, accSession, fileMetadata);
+        leaderboardLines.forEach(leaderboardLine -> insertLeaderboardLine(session.getId(), leaderboardLine));
     }
 
-    @Async
-    protected void insertLeaderboardLineAsync(Integer sessionId, LeaderboardLine leaderboardLine) {
+    @Transactional
+    protected void insertLeaderboardLine(Integer sessionId, LeaderboardLine leaderboardLine) {
         for (Driver driver : leaderboardLine.getDrivers()) {
             driverService.upsertDriver(driver);
             leaderboardMapper.insertLeaderboardDriver(sessionId, leaderboardLine.getCarId(), driver.getPlayerId(), driver.getDriveTimeMillis());
         }
 
         leaderboardMapper.insertLeaderboardLine(leaderboardLine);
+    }
+
+    public List<LeaderboardLine> getLeaderboardLinesBySessionId(Integer sessionId) {
+        return leaderboardMapper.findBySessionIdOrderByRanking(sessionId);
     }
 }
