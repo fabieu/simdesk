@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.entities;
 
 import lombok.Data;
-import lombok.EqualsAndHashCode;
 
 import java.util.Comparator;
 import java.util.HashMap;
@@ -10,8 +9,7 @@ import java.util.Optional;
 import java.util.stream.Collectors;
 
 @Data
-@EqualsAndHashCode(callSuper = false)
-public class Track extends Entity {
+public class Track {
     private static final HashMap<String, Track> accTracks = new HashMap<>();
 
     private String accId;
@@ -73,7 +71,7 @@ public class Track extends Entity {
     public static String getTrackNameByAccId(String accId) {
         return Optional.ofNullable(getByAccId(accId))
                 .map(Track::getName)
-                .orElse(UNKNOWN);
+                .orElse(Constants.UNKNOWN);
     }
 
     public static List<Track> getAllSortedByNameForAcc() {

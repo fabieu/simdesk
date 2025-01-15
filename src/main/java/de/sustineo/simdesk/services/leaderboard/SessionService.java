@@ -4,7 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.entities.mapper.SessionMapper;
+import de.sustineo.simdesk.mapper.SessionMapper;
 import de.sustineo.simdesk.services.converter.SessionConverter;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import lombok.extern.java.Log;
@@ -50,20 +50,12 @@ public class SessionService {
         this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
-    public List<Session> getAllSessions(TimeRange timeRange) {
+    public List<Session> getAllSessionsByTimeRange(TimeRange timeRange) {
         return sessionMapper.findAllByTimeRange(timeRange.start(), timeRange.end());
     }
 
-    public Session getSession(String fileChecksum) {
+    public Session getSessionByFileChecksum(String fileChecksum) {
         return sessionMapper.findByFileChecksum(fileChecksum);
-    }
-
-    public boolean sessionExists(String fileChecksum) {
-        return getSession(fileChecksum) != null;
-    }
-
-    public long getSessionCount() {
-        return sessionMapper.count();
     }
 
     @Transactional
@@ -85,7 +77,8 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileContent, fileMetadata);
-        if (sessionExists(session.getFileChecksum())) {
+        Session existingSession = getSessionByFileChecksum(session.getFileChecksum());
+        if (existingSession != null) {
             log.info(String.format("Ignoring session file %s because it already exists", fileName));
             return;
         }
@@ -94,9 +87,9 @@ public class SessionService {
         sessionMapper.insert(session);
 
         // Actual processing of the session results
-        leaderboardService.handleLeaderboard(session.getId(), accSession, fileMetadata);
-        lapService.handleLaps(session.getId(), accSession, fileMetadata);
-        penaltyService.handlePenalties(session.getId(), accSession);
+        leaderboardService.processLeaderboardLines(session, accSession, fileMetadata);
+        lapService.processLaps(session, accSession, fileMetadata);
+        penaltyService.processPenalties(session, accSession);
 
         log.info(String.format("Successfully processed session file %s", fileName));
     }

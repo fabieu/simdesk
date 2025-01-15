@@ -8,16 +8,15 @@ import java.util.Map;
 @Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-@EqualsAndHashCode(callSuper = false)
-public class Penalty extends Entity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Penalty {
     private static final int NO_LAP = 0;
     private static final String NO_PENALTY = "None";
     private static final String TIME_PENALTY = "TP";
 
 
     private static final Map<String, String> PENALTY_MAP = Map.of(
-            NO_PENALTY, PLACEHOLDER,
+            NO_PENALTY, Constants.PLACEHOLDER,
             "DriveThrough", "DT",
             "Disqualified", "DSQ",
             "PostRaceTime", TIME_PENALTY,
@@ -63,7 +62,7 @@ public class Penalty extends Entity {
 
     @JsonIgnore
     public String getPenaltyAbbreviation() {
-        String abbreviation = PENALTY_MAP.getOrDefault(penalty, UNKNOWN);
+        String abbreviation = PENALTY_MAP.getOrDefault(penalty, Constants.UNKNOWN);
 
         if (TIME_PENALTY.equals(abbreviation) && penaltyValue != null) {
             return String.format("%s (%ss)", abbreviation, penaltyValue);
@@ -74,6 +73,6 @@ public class Penalty extends Entity {
 
     @JsonIgnore
     public String getReasonDescription() {
-        return REASON_MAP.getOrDefault(reason, UNKNOWN);
+        return REASON_MAP.getOrDefault(reason, Constants.UNKNOWN);
     }
 }

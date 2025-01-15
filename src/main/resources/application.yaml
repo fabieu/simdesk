@@ -24,19 +24,23 @@ spring:
     multipart:
       max-file-size: 10MB
       max-request-size: 10MB
+server:
+  forward-headers-strategy: framework
+  shutdown: graceful
 management:
   endpoints:
-    enabled-by-default: false
     web:
       exposure:
         include: "info,health,prometheus"
+    access:
+      default: none
   endpoint:
     health:
-      enabled: true
+      access: read_only
     info:
-      enabled: true
+      access: read_only
     prometheus:
-      enabled: true
+      access: read_only
 logging:
   level:
     root: INFO
@@ -50,6 +54,9 @@ vaadin:
     - /api/**
     - /swagger-ui/**
     - /openapi/**
+mybatis:
+  configuration:
+    lazy-loading-enabled: true
 simdesk:
   datasource:
     vendor: ${SIMDESK_DB_TYPE:sqlite}
@@ -80,10 +87,6 @@ springdoc:
     path: /openapi
   paths-to-match:
     - /api/**
-server:
-  forward-headers-strategy: framework
-  shutdown: graceful
-
 ---
 spring:
   config:
@@ -93,11 +96,15 @@ logging:
   level:
     #org.springframework.cache: TRACE
     de.sustineo.simdesk: DEBUG
-    de.sustineo.simdesk.entities.mapper: INFO
+    de.sustineo.simdesk.mapper: INFO
 vaadin:
   productionMode: false
   heartbeatInterval: 60
   closeIdleSessions: false
+management:
+  endpoints:
+    access:
+      default: read_only
 
 ---
 spring:

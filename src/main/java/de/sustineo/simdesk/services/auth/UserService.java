@@ -3,15 +3,14 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPermission;
 import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.entities.mapper.UserMapper;
-import de.sustineo.simdesk.entities.mapper.UserPermissionMapper;
-import de.sustineo.simdesk.entities.mapper.UserRoleMapper;
+import de.sustineo.simdesk.mapper.UserMapper;
+import de.sustineo.simdesk.mapper.UserPermissionMapper;
+import de.sustineo.simdesk.mapper.UserRoleMapper;
 import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
 
-import java.time.Instant;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -39,7 +38,6 @@ public class UserService {
                 .userId(userId)
                 .username(username)
                 .password(password)
-                .updateDatetime(Instant.now())
                 .build();
 
         userMapper.insertSystemUser(user);

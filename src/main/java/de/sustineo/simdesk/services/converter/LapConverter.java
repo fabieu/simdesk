@@ -1,9 +1,7 @@
 package de.sustineo.simdesk.services.converter;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
-import de.sustineo.simdesk.entities.FileMetadata;
-import de.sustineo.simdesk.entities.Lap;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccCar;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccLap;
@@ -27,14 +25,14 @@ public class LapConverter extends BaseConverter {
         this.driverConverter = driverConverter;
     }
 
-    public List<Lap> convertToLaps(Integer sessionId, AccSession accSession, FileMetadata fileMetadata) {
+    public List<Lap> convertToLaps(Session session, AccSession accSession, FileMetadata fileMetadata) {
         return accSession.getLaps().stream()
-                .map(accLap -> convertToLap(sessionId, accLap, accSession, fileMetadata))
+                .map(accLap -> convertToLap(session, accLap, accSession, fileMetadata))
                 .filter(Objects::nonNull)
                 .collect(Collectors.toList());
     }
 
-    private Lap convertToLap(Integer sessionId, AccLap accLap, AccSession accSession, FileMetadata fileMetadata) {
+    private Lap convertToLap(Session session, AccLap accLap, AccSession accSession, FileMetadata fileMetadata) {
         Optional<AccCar> accCar = accSession.getCarById(accLap.getCarId());
         if (accCar.isEmpty()) {
             log.severe(String.format("Car not found with id %s", accLap.getCarId()));
@@ -47,11 +45,13 @@ public class LapConverter extends BaseConverter {
             return null;
         }
 
+        Driver driver = driverConverter.convertToDriver(accDriver.orElseThrow(), fileMetadata);
+
         return Lap.builder()
-                .sessionId(sessionId)
-                .carGroup(Car.getCarGroupById(accCar.get().getCarModel()))
+                .sessionId(session.getId())
+                .carGroup(Car.getGroupById(accCar.get().getCarModel()))
                 .carModelId(accCar.get().getCarModel())
-                .driver(driverConverter.convertToDriver(accDriver.get(), fileMetadata))
+                .driver(driver)
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))
                 .split1Millis(fixBadTiming(accLap.getSplits().get(0)))
                 .split2Millis(fixBadTiming(accLap.getSplits().get(1)))

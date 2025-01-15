@@ -200,7 +200,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     }
 
     private Grid<Session> createSessionGrid(TimeRange timeRange) {
-        List<Session> sessions = sessionService.getAllSessions(timeRange);
+        List<Session> sessions = sessionService.getAllSessionsByTimeRange(timeRange);
 
         Grid<Session> grid = new Grid<>(Session.class, false);
         Grid.Column<Session> weatherColumn = grid.addComponentColumn(this::getWeatherIcon)

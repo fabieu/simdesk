@@ -6,11 +6,11 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Data
-public class Car extends Entity {
+public class Car {
     private static final HashMap<Integer, Car> carModels = new HashMap<>();
-    private final Integer carId;
-    private final String carName;
-    private final CarGroup carGroup;
+    private final Integer modelId;
+    private final String name;
+    private final CarGroup group;
 
     static {
         addCarModel(0, "Porsche 991 GT3 R", CarGroup.GT3);
@@ -69,27 +69,14 @@ public class Car extends Entity {
         addCarModel(86, "Porsche 935", CarGroup.GT2);
     }
 
-    public Car(Integer carId, String carName, CarGroup carGroup) {
-        this.carId = carId;
-        this.carName = carName;
-        this.carGroup = carGroup;
+    public Car(Integer modelId, String name, CarGroup group) {
+        this.modelId = modelId;
+        this.name = name;
+        this.group = group;
     }
 
-    public Car(Integer carId, String carName) {
-        this(carId, carName, CarGroup.UNKNOWN);
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        Car car = (Car) o;
-        return Objects.equals(carId, car.carId);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(carId);
+    public Car(Integer modelId, String name) {
+        this(modelId, name, CarGroup.UNKNOWN);
     }
 
     private static void addCarModel(int carId, String carName, CarGroup carGroup) {
@@ -100,29 +87,42 @@ public class Car extends Entity {
         return carModels.get(carId);
     }
 
-    public static String getCarNameById(Integer carId) {
+    public static String getNameById(Integer carId) {
         return Optional.ofNullable(carModels.get(carId))
-                .map(Car::getCarName)
-                .orElse(UNKNOWN);
+                .map(Car::getName)
+                .orElse(Constants.UNKNOWN);
     }
 
-    public static Integer getCarIdByName(String carName) {
+    public static Integer getModelIdByName(String carName) {
         return carModels.values().stream()
-                .filter(car -> car.getCarName().equals(carName))
-                .map(Car::getCarId)
+                .filter(car -> car.getName().equals(carName))
+                .map(Car::getModelId)
                 .findFirst()
                 .orElse(null);
     }
 
-    public static CarGroup getCarGroupById(Integer carId) {
+    public static CarGroup getGroupById(Integer carId) {
         return Optional.ofNullable(carModels.get(carId))
-                .map(Car::getCarGroup)
+                .map(Car::getGroup)
                 .orElse(CarGroup.UNKNOWN);
     }
 
     public static List<Car> getAllSortedByName() {
         return carModels.values().stream()
-                .sorted(Comparator.comparing(Car::getCarName))
+                .sorted(Comparator.comparing(Car::getName))
                 .collect(Collectors.toList());
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        Car car = (Car) o;
+        return Objects.equals(modelId, car.modelId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(modelId);
     }
 }

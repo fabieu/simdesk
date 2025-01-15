@@ -5,12 +5,11 @@ import lombok.*;
 
 import java.time.Instant;
 
-@Getter
-@Setter
+@Data
 @Builder
 @NoArgsConstructor
-@AllArgsConstructor
-public class Driver extends Entity {
+@AllArgsConstructor(access = AccessLevel.PRIVATE)
+public class Driver {
     private static final String UNKNOWN_DRIVER = "Unknown Driver";
     private static final String HIDDEN_FIRST_NAME = "Hidden";
     private static final String HIDDEN_LAST_NAME = "Driver";

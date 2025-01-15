@@ -31,7 +31,7 @@ public class AccBopEntry {
 
     @JsonIgnore
     public String getCarName() {
-        return Car.getCarNameById(carId);
+        return Car.getNameById(carId);
     }
 
     @JsonIgnore

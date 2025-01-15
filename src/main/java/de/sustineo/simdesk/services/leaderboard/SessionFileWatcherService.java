@@ -47,13 +47,13 @@ public class SessionFileWatcherService {
                     @Override
                     public void onFileCreate(File file) {
                         log.fine(String.format("Processing file create event; File affected: %s", file.getAbsolutePath()));
-                        sessionFileService.handleSessionFileAsync(file.toPath().toAbsolutePath());
+                        sessionFileService.handleSessionFile(file.toPath().toAbsolutePath());
                     }
 
                     @Override
                     public void onFileChange(File file) {
                         log.fine(String.format("Processing file change event; File affected: %s", file.getAbsolutePath()));
-                        sessionFileService.handleSessionFileAsync(file.toPath().toAbsolutePath());
+                        sessionFileService.handleSessionFile(file.toPath().toAbsolutePath());
                     }
 
                     @Override
@@ -88,7 +88,7 @@ public class SessionFileWatcherService {
 
         for (Path watchDirectory : watchDirectories) {
             FileUtils.listFiles(watchDirectory.toFile(), new String[]{"json"}, true)
-                    .forEach(file -> sessionFileService.handleSessionFileAsync(file.toPath()));
+                    .forEach(file -> sessionFileService.handleSessionFile(file.toPath()));
         }
     }
 }
