@@ -21,24 +21,31 @@ public interface RankingMapper {
     @Results(id = "groupRankingResultMap", value = {
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "carModelId", column = "car_model_id"),
+            @Result(property = "lapTimeMillis", column = "lap_time_millis"),
             @Result(property = "driver.playerId", column = "player_id"),
             @Result(property = "driver.firstName", column = "first_name"),
             @Result(property = "driver.lastName", column = "last_name"),
             @Result(property = "driver.shortName", column = "short_name"),
             @Result(property = "driver.visibility", column = "visibility"),
             @Result(property = "trackId", column = "track_id"),
-            @Result(property = "lapTimeMillis", column = "lap_time_millis"),
     })
     @Select("""
-            SELECT lap.car_group, lap.car_model_id, lap.driver_id, session.track_id, driver.*, MIN(lap.lap_time_millis) AS lap_time_millis
+            SELECT lap.car_group, lap.car_model_id, lap.lap_time_millis AS lap_time_millis, driver.*, session.track_id
             FROM lap
-            LEFT JOIN session ON lap.session_id = session.id
-            LEFT JOIN driver ON lap.driver_id = driver.player_id
-            WHERE valid IS TRUE
-                AND session.session_datetime >= #{startTime}
-                AND session.session_datetime <= #{endTime}
-            GROUP BY lap.car_group, lap.car_model_id, session.track_id, lap.driver_id
-            ORDER BY MIN(lap.lap_time_millis)
+                     INNER JOIN (SELECT lap.driver_id, lap.car_group, lap.car_model_id, session.track_id, MIN(lap.lap_time_millis) AS lap_time_millis
+                                 FROM lap
+                                    LEFT JOIN session ON lap.session_id = session.id
+                                 WHERE valid IS TRUE
+                                    AND session.session_datetime >= #{startTime}
+                                    AND session.session_datetime <= #{endTime}
+                                 GROUP BY lap.car_group, lap.car_model_id, session.track_id, lap.driver_id) fastest_laps
+                                ON lap.car_group = fastest_laps.car_group
+                                    AND lap.car_model_id = fastest_laps.car_model_id
+                                    AND lap.driver_id = fastest_laps.driver_id
+                                    AND lap.lap_time_millis = fastest_laps.lap_time_millis
+                     LEFT JOIN driver ON lap.driver_id = driver.player_id
+                     LEFT JOIN session ON lap.session_id = session.id
+            ORDER BY lap_time_millis;
             """)
     List<GroupRanking> findAllTimeFastestLaps(Instant startTime, Instant endTime);
 
