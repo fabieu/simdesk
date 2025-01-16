@@ -47,7 +47,7 @@ public class UserService {
         List<UserPermission> userPermissions = userPermissionMapper.findByUserId(userId);
 
         return userPermissions.stream()
-                .map(userPermission -> new SimpleGrantedAuthority(userPermission.getRoleName()))
+                .map(userPermission -> new SimpleGrantedAuthority(userPermission.getRole().name()))
                 .collect(Collectors.toSet());
     }
 
@@ -55,7 +55,7 @@ public class UserService {
         return userRoleMapper.findAll();
     }
 
-    @PreAuthorize("hasAuthority(T(de.sustineo.simdesk.entities.auth.UserRole).ADMIN)")
+    @PreAuthorize("hasAuthority(T(de.sustineo.simdesk.entities.auth.UserRoleEnum).ROLE_ADMIN)")
     public void updateUserRole(UserRole userRole) {
         userRoleMapper.update(userRole);
     }

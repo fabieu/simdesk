@@ -7,6 +7,6 @@ import java.time.Instant;
 @Data
 public class UserPermission {
     private Long userId;
-    private String roleName;
+    private UserRoleEnum role;
     private Instant insertDatetime;
 }

@@ -23,7 +23,7 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.SessionFileService;
@@ -118,7 +118,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
             updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
 
-        if (securityService.hasAnyAuthority(UserRole.ADMIN, UserRole.MANAGER)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_MANAGER)) {
             Button uploadSessionButton = new Button("Upload sessions");
             uploadSessionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             uploadSessionButton.addClickListener(event -> createUploadSessionDialog().open());

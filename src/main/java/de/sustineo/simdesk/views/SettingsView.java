@@ -72,6 +72,7 @@ public class SettingsView extends BaseView {
         tabSheet.setSizeFull();
 
         tabSheet.add("General", createGeneralTab());
+        tabSheet.add("API Keys", createApiKeysTab());
 
         if (ProfileManager.isDiscordProfileEnabled()) {
             tabSheet.add("Discord", createDiscordTab());
@@ -85,6 +86,14 @@ public class SettingsView extends BaseView {
         layout.setSizeFull();
 
         layout.add(createDriverVisibilityLayout());
+        return layout;
+    }
+
+    private Component createApiKeysTab() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+
+        layout.add(createApiKeyLayout());
         return layout;
     }
 
@@ -174,6 +183,14 @@ public class SettingsView extends BaseView {
         updateColumn.setEditorComponent(editActions);
 
         layout.add(createTitle("Driver Visibility"), grid);
+        return layout;
+    }
+
+    private Component createApiKeyLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+
+        layout.add(createTitle("API Keys"));
         return layout;
     }
 

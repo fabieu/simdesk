@@ -2,6 +2,7 @@ package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
@@ -23,6 +24,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -47,11 +49,14 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     public static final Long USER_ID_ADMIN = 10000L;
 
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final Optional<DiscordService> discordService;
     private final UserService userService;
 
-    public SecurityConfiguration(Optional<DiscordService> discordService,
+    public SecurityConfiguration(ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                 Optional<DiscordService> discordService,
                                  UserService userService) {
+        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
         this.discordService = discordService;
         this.userService = userService;
     }
@@ -76,7 +81,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                         .loginPage(LOGIN_URL).permitAll()
                         .loginProcessingUrl(LOGIN_URL)
                         .defaultSuccessUrl(LOGIN_SUCCESS_URL)
-                );
+                ).addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
 
         if (ProfileManager.isOAuth2ProfileEnabled()) {
             http
@@ -132,7 +137,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                     Set<GrantedAuthority> authorities = userService.getAllRoles().stream()
                             .filter(userRole -> userRole.getDiscordRoleId() != null)
                             .filter(userRole -> memberRoleIds.contains(userRole.getDiscordRoleId()))
-                            .map(userRole -> new SimpleGrantedAuthority(userRole.getName()))
+                            .map(userRole -> new SimpleGrantedAuthority(userRole.getName().name()))
                             .collect(Collectors.toSet());
 
                     Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());

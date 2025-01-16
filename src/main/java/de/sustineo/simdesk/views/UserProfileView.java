@@ -5,12 +5,15 @@ import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.avatar.Avatar;
 import com.vaadin.flow.component.avatar.AvatarVariant;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import jakarta.annotation.security.PermitAll;
+import org.springframework.security.core.GrantedAuthority;
 
 import java.util.Optional;
 
@@ -41,44 +44,59 @@ public class UserProfileView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.CENTER);
 
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+
         /* Avatar */
         Avatar avatar = new Avatar();
         avatar.addThemeVariants(AvatarVariant.LUMO_XLARGE);
         layout.add(avatar);
 
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
         user.ifPresent(userPrincipal -> avatar.setName(userPrincipal.getUsername()));
 
         Optional<String> avatarImageUrl = securityService.getAvatarUrl();
         avatarImageUrl.ifPresent(avatar::setImage);
 
         /* Name */
-        layout.add(createNameLayout());
+        user.ifPresent(userPrincipal -> layout.add(createNameLayout(userPrincipal)));
+
+        /* Roles */
+        user.ifPresent(userPrincipal -> layout.add(createRolesLayout(userPrincipal)));
 
         return layout;
     }
 
-    private Component createNameLayout() {
+    private Component createNameLayout(UserPrincipal userPrincipal) {
         VerticalLayout nameLayout = new VerticalLayout();
         nameLayout.setAlignItems(Alignment.CENTER);
         nameLayout.setPadding(false);
         nameLayout.setSpacing(false);
 
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
-        Optional<String> detailedName = user
+        Optional<String> detailedName = Optional.of(userPrincipal)
                 .map(UserPrincipal::getAttributes)
                 .map(attributes -> attributes.get("global_name"))
                 .map(String.class::cast);
 
         if (detailedName.isPresent()) {
             H3 detailedNameHeader = new H3(detailedName.get());
-            Text usernameHeader = new Text(user.get().getUsername());
+            Text usernameHeader = new Text(userPrincipal.getUsername());
             nameLayout.add(detailedNameHeader, usernameHeader);
-        } else if (user.isPresent()) {
-            H3 usernameHeader = new H3(user.get().getUsername());
+        } else {
+            H3 usernameHeader = new H3(userPrincipal.getUsername());
             nameLayout.add(usernameHeader);
         }
 
         return nameLayout;
+    }
+
+    private Component createRolesLayout(UserPrincipal userPrincipal) {
+        HorizontalLayout rolesLayout = new HorizontalLayout();
+
+        for (GrantedAuthority role : userPrincipal.getAuthorities()) {
+            Span roleSpan = new Span(role.getAuthority());
+            roleSpan.getElement().getThemeList().add("badge");
+            rolesLayout.add(roleSpan);
+        }
+
+        return rolesLayout;
     }
 }

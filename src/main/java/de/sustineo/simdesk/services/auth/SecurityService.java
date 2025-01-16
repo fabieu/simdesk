@@ -3,14 +3,15 @@ package de.sustineo.simdesk.services.auth;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.server.VaadinServletRequest;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
+import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
 import org.springframework.security.core.Authentication;
 import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
@@ -53,9 +54,8 @@ public class SecurityService {
     }
 
     public Optional<UserPrincipal> getAuthenticatedUser() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Object principal = Optional.ofNullable(context)
-                .map(SecurityContext::getAuthentication)
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        Object principal = Optional.ofNullable(authentication)
                 .map(Authentication::getPrincipal)
                 .orElse(null);
 
@@ -70,6 +70,20 @@ public class SecurityService {
         return Optional.empty(); // Anonymous or no authentication
     }
 
+    public Optional<ApiKey> getAuthenticatedApiKey() {
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        if (authentication == null || authentication.getDetails() == null) {
+            return Optional.empty();
+        }
+
+        Object authenticationDetails = authentication.getDetails();
+        if (authenticationDetails instanceof ApiKey) {
+            return Optional.of((ApiKey) authenticationDetails);
+        }
+
+        return Optional.empty();
+    }
+
     /**
      * Get the username of the currently authenticated user
      *
@@ -81,16 +95,23 @@ public class SecurityService {
                 .orElse(null);
     }
 
-    public boolean hasAnyAuthority(String... authorities) {
+    public boolean hasAnyAuthority(UserRoleEnum... roles) {
         Optional<UserPrincipal> user = getAuthenticatedUser();
+        Optional<ApiKey> apiKey = getAuthenticatedApiKey();
 
-        if (user.isEmpty()) {
-            return false;
+        if (user.isPresent()) {
+            for (GrantedAuthority grantedAuthority : user.get().getAuthorities()) {
+                for (UserRoleEnum role : roles) {
+                    if (grantedAuthority.getAuthority().equals(role.name())) {
+                        return true;
+                    }
+                }
+            }
         }
 
-        for (GrantedAuthority grantedAuthority : user.get().getAuthorities()) {
-            for (String authority : authorities) {
-                if (grantedAuthority.getAuthority().equals(authority)) {
+        if (apiKey.isPresent()) {
+            for (UserRoleEnum role : roles) {
+                if (apiKey.get().getRoles().contains(role)) {
                     return true;
                 }
             }
