@@ -33,14 +33,12 @@ public class UserService {
         return userMapper.findByUsername(username);
     }
 
-    public void insertSystemUser(String username, String password, Long userId) {
-        User user = User.builder()
-                .userId(userId)
-                .username(username)
-                .password(password)
-                .build();
+    public void insertSystemUser(Integer userId, String username, String password) {
+        userMapper.insertSystemUser(userId, username, password);
+    }
 
-        userMapper.insertSystemUser(user);
+    public void insertDiscordUser(String discordUserId) {
+        userMapper.insertDiscordUser(discordUserId);
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Long userId) {

@@ -22,5 +22,11 @@ public interface UserMapper {
             ON CONFLICT(user_id)
             DO UPDATE SET username = #{username}, password = #{password}
             """)
-    void insertSystemUser(User user);
+    void insertSystemUser(Integer userId, String username, String password);
+
+    @Insert("""
+            INSERT INTO "user" (username) VALUES (#{discordUserId})
+            ON CONFLICT(username) DO NOTHING
+            """)
+    void insertDiscordUser(String discordUserId);
 }

@@ -47,7 +47,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     public static final String AUTH_PROVIDER_DISCORD = "discord";
     public static final String AUTH_PROVIDER_DATABASE = "database";
 
-    public static final Long USER_ID_ADMIN = 10000L;
+    public static final int USER_ID_ADMIN = 1;
 
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final Optional<DiscordService> discordService;
@@ -124,7 +124,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
         return (request -> {
             // Delegate to the default implementation for loading a user
-            OAuth2User user = delegate.loadUser(request);
+            OAuth2User oAuthUser = delegate.loadUser(request);
 
             if (AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
                 try {
@@ -140,17 +140,19 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                             .map(userRole -> new SimpleGrantedAuthority(userRole.getName().name()))
                             .collect(Collectors.toSet());
 
-                    Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());
+                    Map<String, Object> attributes = new LinkedHashMap<>(oAuthUser.getAttributes());
                     attributes.put(ATTRIBUTE_AUTH_PROVIDER, AUTH_PROVIDER_DISCORD);
+
+                    userService.insertDiscordUser((String) attributes.get("id"));
 
                     return new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
                 } catch (Exception e) {
-                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", user.getName(), e.getMessage()));
+                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", oAuthUser.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));
                 }
             }
 
-            return user;
+            return oAuthUser;
         });
     }
 }
