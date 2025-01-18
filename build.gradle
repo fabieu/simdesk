@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        vaadinVersion = "24.6.1"
-        flywayVersion = "11.1.1"
+        vaadinVersion = "24.6.2"
+        flywayVersion = "11.2.0"
     }
     configurations.classpath {
         exclude group: 'com.vaadin', module: 'hilla-engine-core'
@@ -56,8 +56,8 @@ dependencies {
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4"
-    runtimeOnly "org.postgresql:postgresql:42.7.4"
-    runtimeOnly "org.xerial:sqlite-jdbc:3.47.2.0"
+    runtimeOnly "org.postgresql:postgresql:42.7.5"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.48.0.0"
     implementation "org.flywaydb:flyway-core:${flywayVersion}"
     implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
 
@@ -71,10 +71,10 @@ dependencies {
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.2.7"
-    implementation 'com.opencsv:opencsv:5.9'
+    implementation 'com.opencsv:opencsv:5.10'
 
     // OpenAPI documentation
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.1'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.3'
     implementation 'org.webjars:webjars-locator-lite:1.0.1'
 
     // Development
