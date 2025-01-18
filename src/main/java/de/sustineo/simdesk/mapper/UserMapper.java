@@ -9,7 +9,7 @@ import org.springframework.stereotype.Component;
 @Mapper
 public interface UserMapper {
     @Results(id = "userResultMap", value = {
-            @Result(id = true, property = "userId", column = "user_id"),
+            @Result(id = true, property = "id", column = "user_id"),
             @Result(property = "username", column = "username"),
             @Result(property = "password", column = "password"),
             @Result(property = "type", column = "type"),

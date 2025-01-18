@@ -129,14 +129,11 @@ public class SecurityService {
 
     public Optional<String> getAvatarUrl() {
         Optional<UserPrincipal> user = getAuthenticatedUser();
-
         if (user.isEmpty()) {
             return Optional.empty();
         }
 
         Map<String, Object> userAttributes = user.get().getAttributes();
-
-        // Discord avatar
         String avatarId = (String) userAttributes.get("avatar");
         String userId = (String) userAttributes.get("id");
 

@@ -30,11 +30,11 @@ public class DatabaseUserDetailsService implements UserDetailsService {
 
         // Set custom attributes for the user
         LinkedHashMap<String, Object> attributes = new LinkedHashMap<>();
-        attributes.put("id", String.valueOf(user.getUserId()));
+        attributes.put("id", String.valueOf(user.getId()));
         attributes.put(SecurityConfiguration.ATTRIBUTE_AUTH_PROVIDER, SecurityConfiguration.AUTH_PROVIDER_DATABASE);
 
         // Set authorities for the user
-        Set<? extends GrantedAuthority> authorities = userService.getAuthoritiesByUserId(user.getUserId());
+        Set<? extends GrantedAuthority> authorities = userService.getAuthoritiesByUserId(user.getId());
 
         return new UserPrincipal(user, attributes, authorities);
     }

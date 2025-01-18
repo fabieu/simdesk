@@ -6,7 +6,9 @@ import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
+import java.util.List;
 import java.util.Optional;
+import java.util.UUID;
 
 @Service
 public class ApiKeyService {
@@ -16,27 +18,36 @@ public class ApiKeyService {
         this.apiKeyMapper = apiKeyMapper;
     }
 
-    @Cacheable("apiKey")
-    public Optional<ApiKey> getValid(String apiKeyString) {
+    public List<ApiKey> getByUserId(Integer userId) {
+        return apiKeyMapper.findByUserId(userId);
+    }
+
+    @Cacheable(cacheNames = "activeApiKeys")
+    public Optional<ApiKey> getActiveByApiKey(String apiKeyString) {
         if (apiKeyString == null) {
             return Optional.empty();
         }
 
-        ApiKey apiKey = apiKeyMapper.findByApiKey(apiKeyString);
-        if (apiKey != null && Boolean.TRUE.equals(apiKey.getActive())) {
-            return Optional.of(apiKey);
-        }
+        ApiKey apiKey = apiKeyMapper.findActiveByApiKey(apiKeyString);
 
-        return Optional.empty();
+        return Optional.ofNullable(apiKey);
     }
 
-    @CacheEvict("apiKey")
+    public void create(Integer userId, String name) {
+        apiKeyMapper.insert(userId, generateApiKey(), name);
+    }
+
+    @CacheEvict(cacheNames = "activeApiKeys", key = "#apiKey.apiKey")
     public void deleteApiKey(ApiKey apiKey) {
         apiKeyMapper.deleteById(apiKey);
     }
 
-    @CacheEvict("apiKey")
+    @CacheEvict(cacheNames = "activeApiKeys", key = "#apiKey.apiKey")
     public void updateStatus(ApiKey apiKey) {
         apiKeyMapper.updateStatus(apiKey);
+    }
+
+    private String generateApiKey() {
+        return UUID.randomUUID().toString();
     }
 }

@@ -18,15 +18,15 @@ public interface UserPermissionMapper {
             @Result(property = "insertDatetime", column = "insert_datetime"),
     })
     @Select("SELECT * FROM user_permission WHERE user_id = #{userId}")
-    List<UserPermission> findByUserId(Long userId);
+    List<UserPermission> findByUserId(Integer userId);
 
     /**
-     * Find roles by user ID. Used by {@link de.sustineo.simdesk.mapper.UserApiKeyMapper#findByApiKey(String)}.
+     * Find roles by user ID. Used by {@link de.sustineo.simdesk.mapper.UserApiKeyMapper#findActiveByApiKey(String)}.
      *
      * @param userId User ID
      * @return List of roles
      */
     @SuppressWarnings("unused")
     @Select("SELECT role FROM user_permission WHERE user_id = #{userId}")
-    List<String> findRolesByUserId(Long userId);
+    List<String> findRolesByUserId(Integer userId);
 }

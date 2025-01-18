@@ -42,7 +42,7 @@ public class UserService {
         userMapper.insertDiscordUser(discordUserId, UserType.DISCORD);
     }
 
-    public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Long userId) {
+    public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Integer userId) {
         List<UserPermission> userPermissions = userPermissionMapper.findByUserId(userId);
 
         return userPermissions.stream()

@@ -11,7 +11,7 @@ import lombok.experimental.SuperBuilder;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User {
-    private Long userId;
+    private Integer id;
     private String username;
     private String password;
     private UserType type;

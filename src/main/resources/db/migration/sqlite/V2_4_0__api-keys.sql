@@ -14,7 +14,6 @@ ALTER TABLE user_permission
 
 /* Recreate user table */
 DROP TABLE IF EXISTS "user";
-
 CREATE TABLE IF NOT EXISTS "user"
 (
     user_id         INTEGER PRIMARY KEY,

@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities.auth;
 
-import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import lombok.Data;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
@@ -8,7 +7,6 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
-import java.util.Optional;
 
 @Data
 public class UserPrincipal implements UserDetails {
@@ -44,27 +42,5 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
-    }
-
-    public boolean isDiscordUser() {
-        return determineAuthProvider(SecurityConfiguration.AUTH_PROVIDER_DISCORD);
-    }
-
-    public boolean isDatabaseUser() {
-        return determineAuthProvider(SecurityConfiguration.AUTH_PROVIDER_DATABASE);
-    }
-
-    private boolean determineAuthProvider(String authProvider) {
-        return attributes != null && authProvider.equals(attributes.get(SecurityConfiguration.ATTRIBUTE_AUTH_PROVIDER));
-    }
-
-    public Optional<Long> getUserId() {
-        String attributeName = "id";
-
-        if (attributes == null || !attributes.containsKey(attributeName)) {
-            return Optional.empty();
-        }
-
-        return Optional.of(Long.parseLong((String) attributes.get(attributeName)));
     }
 }

@@ -123,10 +123,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
         return (request -> {
+            String userNameAttributeName = request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
+
             // Delegate to the default implementation for loading a user
             OAuth2User oAuthUser = delegate.loadUser(request);
 
-            if (AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
+            if (discordService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
                 try {
                     String accessToken = request.getAccessToken().getTokenValue();
 
@@ -143,9 +145,9 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                     Map<String, Object> attributes = new LinkedHashMap<>(oAuthUser.getAttributes());
                     attributes.put(ATTRIBUTE_AUTH_PROVIDER, AUTH_PROVIDER_DISCORD);
 
-                    userService.insertDiscordUser((String) attributes.get("id"));
+                    oAuthUser = new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), userNameAttributeName);
 
-                    return new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
+                    userService.insertDiscordUser(oAuthUser.getName());
                 } catch (Exception e) {
                     log.severe(String.format("Failed to load roles for user: %s, reason: %s", oAuthUser.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));

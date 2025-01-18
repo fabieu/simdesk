@@ -37,7 +37,7 @@ public class ApiKeyAuthenticationFilter implements Filter {
         HttpServletResponse response = (HttpServletResponse) resp;
 
         String apiKeyFromRequest = extractApiKeyFromRequest(request);
-        Optional<ApiKey> apiKey = apiKeyService.getValid(apiKeyFromRequest);
+        Optional<ApiKey> apiKey = apiKeyService.getActiveByApiKey(apiKeyFromRequest);
 
         if (apiKey.isPresent()) {
             List<GrantedAuthority> grantedAuthorities = AuthorityUtils.NO_AUTHORITIES;
