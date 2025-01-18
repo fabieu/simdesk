@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPermission;
 import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserType;
 import de.sustineo.simdesk.mapper.UserMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.mapper.UserRoleMapper;
@@ -34,11 +35,11 @@ public class UserService {
     }
 
     public void insertSystemUser(Integer userId, String username, String password) {
-        userMapper.insertSystemUser(userId, username, password);
+        userMapper.insertSystemUser(userId, username, password, UserType.SYSTEM);
     }
 
     public void insertDiscordUser(String discordUserId) {
-        userMapper.insertDiscordUser(discordUserId);
+        userMapper.insertDiscordUser(discordUserId, UserType.DISCORD);
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Long userId) {
