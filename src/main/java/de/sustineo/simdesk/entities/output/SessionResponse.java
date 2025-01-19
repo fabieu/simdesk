@@ -7,7 +7,7 @@ import lombok.Data;
 import java.time.Instant;
 
 @Data
-public class SessionOutput {
+public class SessionResponse {
     private Integer id;
     private Instant sessionDatetime;
     private SessionType sessionType;
@@ -18,7 +18,7 @@ public class SessionOutput {
     private String fileName;
     private String fileChecksum;
 
-    public SessionOutput(Session session) {
+    public SessionResponse(Session session) {
         this.id = session.getId();
         this.sessionDatetime = session.getSessionDatetime();
         this.sessionType = session.getSessionType();

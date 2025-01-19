@@ -1,21 +1,20 @@
 <component name="ProjectRunConfigurationManager">
-  <configuration default="false" name="Development PostgreSQL" type="SpringBootApplicationConfigurationType"
-                 factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, map, debug, discord"/>
+  <configuration default="false" name="Development PostgreSQL" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, map, debug, discord" />
     <envs>
       <env name="debug" value="false" />
-      <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="development/results"/>
+      <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="development/results" />
       <env name="SIMDESK_COMMUNITY_NAME" value="Sustineo" />
-      <env name="SIMDESK_DB_PASSWORD" value="development"/>
-      <env name="SIMDESK_DB_TYPE" value="postgres"/>
-      <env name="SIMDESK_DB_URL" value="jdbc:postgresql://localhost:5432/simdesk"/>
-      <env name="SIMDESK_DB_USERNAME" value="postgres"/>
+      <env name="SIMDESK_DB_PASSWORD" value="development" />
+      <env name="SIMDESK_DB_TYPE" value="postgres" />
+      <env name="SIMDESK_DB_URL" value="jdbc:postgresql://localhost:5432/simdesk" />
+      <env name="SIMDESK_DB_USERNAME" value="postgres" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
       <env name="SIMDESK_THEME" value="default" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
-    <module name="simdesk.main" />
+    <module name="SimDesk.main" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.simdesk.SimDeskApplication" />
     <extension name="net.ashald.envfile">

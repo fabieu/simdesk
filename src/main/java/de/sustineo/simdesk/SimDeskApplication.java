@@ -5,17 +5,15 @@ import org.springframework.boot.autoconfigure.SpringBootApplication;
 import org.springframework.cache.annotation.EnableCaching;
 import org.springframework.scheduling.annotation.EnableScheduling;
 import org.springframework.transaction.annotation.EnableTransactionManagement;
-import org.springframework.web.servlet.config.annotation.EnableWebMvc;
 
 import java.time.ZoneOffset;
 import java.util.Locale;
 import java.util.TimeZone;
 
-@SpringBootApplication
-@EnableWebMvc
 @EnableTransactionManagement
 @EnableCaching
 @EnableScheduling
+@SpringBootApplication
 public class SimDeskApplication {
     public static void main(String[] args) {
         TimeZone.setDefault(TimeZone.getTimeZone(ZoneOffset.UTC));

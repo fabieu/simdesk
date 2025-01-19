@@ -38,6 +38,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             "/public/**",
             "/assets/**",
             "/icons/**",
+            "/swagger-ui/**",
+            "/openapi/**",
             "/*.png" // Leaflet images
     };
     private static final String LOGIN_URL = "/login";
