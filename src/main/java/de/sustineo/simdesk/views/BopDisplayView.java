@@ -26,7 +26,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
-import de.sustineo.simdesk.utils.json.JsonUtils;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.generators.BopCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.generators.InactiveBopPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.BopRenderer;
@@ -48,6 +48,7 @@ import java.util.stream.Collectors;
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final BopService bopService;
     private final NotificationService notificationService;
+    private final JsonClient jsonClient;
 
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
@@ -55,9 +56,12 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final Select<String> trackSelect = new Select<>();
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
 
-    public BopDisplayView(BopService bopService, NotificationService notificationService) {
+    public BopDisplayView(BopService bopService,
+                          NotificationService notificationService,
+                          JsonClient jsonClient) {
         this.bopService = bopService;
         this.notificationService = notificationService;
+        this.jsonClient = jsonClient;
 
         setSizeFull();
         setPadding(false);
@@ -124,7 +128,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
                         List<AccBopEntry> accBopEntries = entry.getValue().stream()
                                 .map(bopService::convertToAccBopEntry)
                                 .toList();
-                        String json = JsonUtils.toJson(new AccBop(accBopEntries));
+                        String json = jsonClient.toJson(new AccBop(accBopEntries));
                         return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
                     }
             );

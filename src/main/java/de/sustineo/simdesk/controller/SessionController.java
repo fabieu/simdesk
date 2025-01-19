@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.controller;
 
-import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.output.SessionOutput;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
 import org.springframework.http.ResponseEntity;
@@ -24,7 +24,11 @@ public class SessionController {
 
     @Operation(summary = "Get all sessions")
     @GetMapping("/sessions")
-    public ResponseEntity<List<Session>> getSessions() {
-        return ResponseEntity.of(Optional.ofNullable(sessionService.getAll()));
+    public ResponseEntity<List<SessionOutput>> getSessions() {
+        List<SessionOutput> sessionOutputs = sessionService.getAll().stream()
+                .map(SessionOutput::new)
+                .toList();
+
+        return ResponseEntity.of(Optional.of(sessionOutputs));
     }
 }

@@ -29,7 +29,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
-import de.sustineo.simdesk.utils.json.JsonUtils;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.fields.BopEditField;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import jakarta.validation.ConstraintViolationException;
@@ -53,6 +53,7 @@ import java.util.Set;
 public class BopEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
+    private final JsonClient jsonClient;
 
     private final FormLayout settingsLayout = new FormLayout();
     private final FormLayout carsLayout = new FormLayout();
@@ -63,9 +64,11 @@ public class BopEditorView extends BaseView {
     private AccBop currentBop = new AccBop();
 
     public BopEditorView(ValidationService validationService,
-                         NotificationService notificationService) {
+                         NotificationService notificationService,
+                         JsonClient jsonClient) {
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.jsonClient = jsonClient;
 
         setSizeFull();
         setPadding(false);
@@ -108,7 +111,7 @@ public class BopEditorView extends BaseView {
             InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
 
             try {
-                currentBop = JsonUtils.fromJson(fileData, AccBop.class);
+                currentBop = jsonClient.fromJson(fileData, AccBop.class);
                 validationService.validate(currentBop);
 
                 if (currentBop.isMultiTrack()) {
@@ -271,7 +274,7 @@ public class BopEditorView extends BaseView {
     private StreamResource downloadBop() {
         return new StreamResource(
                 "bop.json",
-                () -> new ByteArrayInputStream(JsonUtils.toJson(currentBop).getBytes(StandardCharsets.UTF_8))
+                () -> new ByteArrayInputStream(jsonClient.toJson(currentBop).getBytes(StandardCharsets.UTF_8))
         );
     }
 
@@ -284,7 +287,7 @@ public class BopEditorView extends BaseView {
     }
 
     private void reloadComponents() {
-        previewTextArea.setValue(JsonUtils.toJsonPretty(currentBop));
+        previewTextArea.setValue(jsonClient.toJsonPretty(currentBop));
         carsLayout.removeAll();
         carsLayout.add(currentCarComponents.values());
     }
