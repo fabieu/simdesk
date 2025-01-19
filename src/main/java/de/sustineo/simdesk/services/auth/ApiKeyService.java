@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.auth;
 
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.mapper.UserApiKeyMapper;
+import de.sustineo.simdesk.mapper.UserPermissionMapper;
 import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
@@ -13,9 +14,12 @@ import java.util.UUID;
 @Service
 public class ApiKeyService {
     private final UserApiKeyMapper apiKeyMapper;
+    private final UserPermissionMapper userPermissionMapper;
 
-    public ApiKeyService(UserApiKeyMapper apiKeyMapper) {
+    public ApiKeyService(UserApiKeyMapper apiKeyMapper,
+                         UserPermissionMapper userPermissionMapper) {
         this.apiKeyMapper = apiKeyMapper;
+        this.userPermissionMapper = userPermissionMapper;
     }
 
     public List<ApiKey> getByUserId(Integer userId) {
@@ -29,8 +33,13 @@ public class ApiKeyService {
         }
 
         ApiKey apiKey = apiKeyMapper.findActiveByApiKey(apiKeyString);
+        if (apiKey == null) {
+            return Optional.empty();
+        }
 
-        return Optional.ofNullable(apiKey);
+        apiKey.setRoles(userPermissionMapper.findRolesByUserId(apiKey.getUserId()));
+
+        return Optional.of(apiKey);
     }
 
     public void create(Integer userId, String name) {

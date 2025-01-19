@@ -26,9 +26,10 @@ public interface UserMapper {
             """)
     void insertSystemUser(Integer userId, String username, String password, UserType type);
 
+    @Options(useGeneratedKeys = true, keyColumn = "user_id", keyProperty = "id")
     @Insert("""
-            INSERT INTO "user" (username, type) VALUES (#{discordUserId}, #{type})
+            INSERT INTO "user" (username, type) VALUES (#{username}, #{type})
             ON CONFLICT(username) DO NOTHING
             """)
-    void insertDiscordUser(String discordUserId, UserType type);
+    void insertDiscordUser(User user);
 }

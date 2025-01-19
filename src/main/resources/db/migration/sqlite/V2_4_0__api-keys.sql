@@ -12,6 +12,9 @@ CREATE TABLE IF NOT EXISTS user_api_key
 ALTER TABLE user_permission
     RENAME role_name TO role;
 
+ALTER TABLE user_permission
+    DROP COLUMN insert_datetime;
+
 /* Recreate user table */
 DROP TABLE IF EXISTS "user";
 CREATE TABLE IF NOT EXISTS "user"

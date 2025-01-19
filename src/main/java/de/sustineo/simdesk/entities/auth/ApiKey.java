@@ -7,9 +7,9 @@ import java.util.List;
 @Data
 public class ApiKey {
     private Integer id;
+    private Integer userId;
     private String apiKey;
     private String name;
     private Boolean active;
-    private User user;
-    private List<UserRoleEnum> roles;
+    private transient List<UserRoleEnum> roles;
 }

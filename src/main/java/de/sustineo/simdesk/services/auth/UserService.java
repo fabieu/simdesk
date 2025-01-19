@@ -1,9 +1,6 @@
 package de.sustineo.simdesk.services.auth;
 
-import de.sustineo.simdesk.entities.auth.User;
-import de.sustineo.simdesk.entities.auth.UserPermission;
-import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.entities.auth.UserType;
+import de.sustineo.simdesk.entities.auth.*;
 import de.sustineo.simdesk.mapper.UserMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.mapper.UserRoleMapper;
@@ -11,7 +8,9 @@ import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
 import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
 
+import java.util.Collection;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -38,8 +37,30 @@ public class UserService {
         userMapper.insertSystemUser(userId, username, password, UserType.SYSTEM);
     }
 
-    public void insertDiscordUser(String discordUserId) {
-        userMapper.insertDiscordUser(discordUserId, UserType.DISCORD);
+    @Transactional
+    public void insertDiscordUser(String discordUserId, Collection<? extends GrantedAuthority> authorities) {
+        User user = userMapper.findByUsername(discordUserId);
+
+        // If the user does not exist, create a new user and insert it into the database
+        if (user == null) {
+            user = User.builder()
+                    .username(discordUserId)
+                    .type(UserType.DISCORD)
+                    .build();
+
+            userMapper.insertDiscordUser(user);
+        }
+
+        // Refresh the roles of the user
+        userPermissionMapper.deleteAllByUserId(user.getId());
+        for (GrantedAuthority authority : authorities) {
+            UserPermission userPermission = UserPermission.builder()
+                    .userId(user.getId())
+                    .role(UserRoleEnum.valueOf(authority.getAuthority()))
+                    .build();
+
+            userPermissionMapper.insert(userPermission);
+        }
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Integer userId) {

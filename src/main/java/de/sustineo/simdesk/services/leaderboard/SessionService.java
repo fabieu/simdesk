@@ -50,6 +50,10 @@ public class SessionService {
         this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
+    public List<Session> getAll() {
+        return sessionMapper.findAll();
+    }
+
     public List<Session> getAllSessionsByTimeRange(TimeRange timeRange) {
         return sessionMapper.findAllByTimeRange(timeRange.start(), timeRange.end());
     }

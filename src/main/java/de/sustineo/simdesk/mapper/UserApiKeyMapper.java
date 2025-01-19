@@ -11,31 +11,16 @@ import java.util.List;
 public interface UserApiKeyMapper {
     @Results(id = "apiKeyResultMap", value = {
             @Result(id = true, property = "id", column = "api_key_id"),
+            @Result(property = "userId", column = "user_id"),
             @Result(property = "apiKey", column = "api_key"),
             @Result(property = "name", column = "name"),
             @Result(property = "active", column = "active"),
     })
-    @Select("""
-            SELECT api_key_id, api_key, name, active FROM user_api_key
-            WHERE user_id = #{userId}
-            """)
+    @Select("SELECT * FROM user_api_key WHERE user_id = #{userId}")
     List<ApiKey> findByUserId(Integer userId);
 
-    @Results(id = "apiKeyDetailedResultMap", value = {
-            @Result(id = true, property = "id", column = "api_key_id"),
-            @Result(property = "apiKey", column = "api_key"),
-            @Result(property = "name", column = "name"),
-            @Result(property = "active", column = "active"),
-            @Result(property = "user.id", column = "user_id"),
-            @Result(property = "user.username", column = "username"),
-            @Result(property = "user.password", column = "password"),
-            @Result(property = "roles", column = "user_id", many = @Many(select = " de.sustineo.simdesk.mapper.UserPermissionMapper.findRolesByUserId")),
-    })
-    @Select("""
-            SELECT * FROM user_api_key
-            LEFT JOIN "user" ON user_api_key.user_id = "user".user_id
-            WHERE api_key = #{apiKey} AND active = TRUE
-            """)
+    @ResultMap("apiKeyResultMap")
+    @Select("SELECT * FROM user_api_key WHERE api_key = #{apiKey} AND active = TRUE")
     ApiKey findActiveByApiKey(String apiKey);
 
     @Insert("""

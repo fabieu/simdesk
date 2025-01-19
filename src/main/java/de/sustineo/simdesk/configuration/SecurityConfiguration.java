@@ -147,7 +147,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
                     oAuthUser = new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), userNameAttributeName);
 
-                    userService.insertDiscordUser(oAuthUser.getName());
+                    userService.insertDiscordUser(oAuthUser.getName(), oAuthUser.getAuthorities());
                 } catch (Exception e) {
                     log.severe(String.format("Failed to load roles for user: %s, reason: %s", oAuthUser.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));

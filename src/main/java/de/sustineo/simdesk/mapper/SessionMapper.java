@@ -27,6 +27,10 @@ public interface SessionMapper {
             @Result(property = "fileDirectory", column = "file_directory"),
             @Result(property = "fileContent", column = "file_content"),
     })
+    @Select("SELECT * FROM session ORDER BY session_datetime DESC")
+    List<Session> findAll();
+
+    @ResultMap("sessionResultMap")
     @Select("""
             SELECT *
             FROM session

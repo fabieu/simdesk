@@ -25,7 +25,7 @@ public final class ApiKeyAuthenticationToken extends AbstractAuthenticationToken
 
     @Override
     public Object getPrincipal() {
-        return apiKey.getUser().getUsername();
+        return null;
     }
 }
 
