@@ -25,12 +25,12 @@ public class RankingService {
     }
 
     public List<GroupRanking> getAllTimeGroupRanking(TimeRange timeRange) {
-        List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps(timeRange.start(), timeRange.end());
+        List<GroupRanking> groupRankings = rankingMapper.findAllTimeFastestLaps(timeRange.from(), timeRange.to());
         return getRankingsByCarGroupAndTrackId(groupRankings);
     }
 
     public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId, TimeRange timeRange) {
-        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.start(), timeRange.end());
+        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.from(), timeRange.to());
         driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);
         addRanking(driverRankings);
 

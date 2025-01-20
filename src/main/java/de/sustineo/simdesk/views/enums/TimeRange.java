@@ -21,7 +21,7 @@ public enum TimeRange {
         this.description = description;
     }
 
-    public Instant start() {
+    public Instant from() {
         return switch (this) {
             case ALL_TIME -> Instant.EPOCH;
             case LAST_YEAR -> Instant.now().minus(365, ChronoUnit.DAYS);
@@ -33,7 +33,7 @@ public enum TimeRange {
         };
     }
 
-    public Instant end() {
+    public Instant to() {
         return switch (this) {
             case YEAR_2024 -> Instant.parse("2024-12-31T23:59:59Z");
             case YEAR_2023 -> Instant.parse("2023-12-31T23:59:59Z");

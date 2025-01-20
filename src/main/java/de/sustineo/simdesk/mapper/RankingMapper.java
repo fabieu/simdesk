@@ -36,8 +36,8 @@ public interface RankingMapper {
                                  FROM lap
                                     LEFT JOIN session ON lap.session_id = session.id
                                  WHERE valid IS TRUE
-                                    AND session.session_datetime >= #{startTime}
-                                    AND session.session_datetime <= #{endTime}
+                                    AND session.session_datetime >= #{from}
+                                    AND session.session_datetime <= #{to}
                                  GROUP BY lap.car_group, lap.car_model_id, session.track_id, lap.driver_id) fastest_laps
                                 ON lap.car_group = fastest_laps.car_group
                                     AND lap.car_model_id = fastest_laps.car_model_id
@@ -47,7 +47,7 @@ public interface RankingMapper {
                      LEFT JOIN session ON lap.session_id = session.id
             ORDER BY lap_time_millis;
             """)
-    List<GroupRanking> findAllTimeFastestLaps(Instant startTime, Instant endTime);
+    List<GroupRanking> findAllTimeFastestLaps(Instant from, Instant to);
 
     @Results(id = "driverRankingResultMap", value = {
             @Result(property = "carModelId", column = "car_model_id"),
@@ -73,8 +73,8 @@ public interface RankingMapper {
                 WHERE valid IS TRUE
                   AND lap.car_group = #{carGroup}
                   AND session.track_id = #{trackId}
-                  AND session.session_datetime >= #{startTime}
-                  AND session.session_datetime <= #{endTime}
+                  AND session.session_datetime >= #{from}
+                  AND session.session_datetime <= #{to}
                 GROUP BY lap.driver_id, lap.car_model_id, lap.car_group, session.track_id
             ) fastest_laps ON lap.driver_id = fastest_laps.driver_id
                           AND lap.car_model_id = fastest_laps.car_model_id
@@ -82,5 +82,5 @@ public interface RankingMapper {
             LEFT JOIN driver ON lap.driver_id = driver.player_id
             LEFT JOIN session ON lap.session_id = session.id
             """)
-    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant startTime, Instant endTime);
+    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to);
 }

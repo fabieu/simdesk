@@ -10,7 +10,6 @@ public class ServiceResponse<T> {
     private final HttpStatus status;
     private final Integer statusCode;
     private T data;
-    private Throwable exception;
 
     public ServiceResponse(HttpStatus status) {
         this.status = status;
