@@ -26,7 +26,7 @@ public class UserProfileView extends BaseView {
     public UserProfileView(SecurityService securityService) {
         this.securityService = securityService;
 
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
         if (user.isEmpty()) {
             add(new Text("No user found"));
             return;
@@ -44,7 +44,7 @@ public class UserProfileView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.CENTER);
 
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
 
         /* Avatar */
         Avatar avatar = new Avatar();

@@ -79,11 +79,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatchers(PUBLIC_PATHS)).permitAll()
                 )
+                .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .formLogin(formLogin -> formLogin
                         .loginPage(LOGIN_URL).permitAll()
                         .loginProcessingUrl(LOGIN_URL)
                         .defaultSuccessUrl(LOGIN_SUCCESS_URL)
-                ).addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class);
+                );
 
         if (ProfileManager.isOAuth2ProfileEnabled()) {
             http

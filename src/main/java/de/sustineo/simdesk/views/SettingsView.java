@@ -209,7 +209,7 @@ public class SettingsView extends BaseView {
 
         layout.add(createTitle("API Keys"));
 
-        Optional<UserPrincipal> userPrincipal = securityService.getAuthenticatedUser();
+        Optional<UserPrincipal> userPrincipal = securityService.getAuthenticatedUserPrincipal();
         if (userPrincipal.isPresent()) {
             User user = userService.findByUsername(userPrincipal.get().getUsername());
             if (user != null) {
