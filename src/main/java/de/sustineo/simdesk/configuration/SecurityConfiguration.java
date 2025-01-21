@@ -24,7 +24,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.Http403ForbiddenEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -80,6 +82,9 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                         .requestMatchers(antMatchers(PUBLIC_PATHS)).permitAll()
                 )
                 .addFilterBefore(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .defaultAuthenticationEntryPointFor(new Http403ForbiddenEntryPoint(), new AntPathRequestMatcher("/api/**"))
+                )
                 .formLogin(formLogin -> formLogin
                         .loginPage(LOGIN_URL).permitAll()
                         .loginProcessingUrl(LOGIN_URL)

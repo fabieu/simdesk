@@ -17,7 +17,7 @@ import java.util.List;
 import java.util.Objects;
 
 @RestController
-@RequestMapping("/api/v1")
+@RequestMapping(value = "/api/v1", produces = "application/json")
 @PreAuthorize("hasAnyRole('ADMIN')")
 public class SessionController {
     private final SessionService sessionService;
