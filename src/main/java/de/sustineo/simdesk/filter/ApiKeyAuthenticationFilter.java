@@ -3,7 +3,8 @@ package de.sustineo.simdesk.filter;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.entities.auth.ApiKeyAuthenticationToken;
 import de.sustineo.simdesk.services.auth.ApiKeyService;
-import jakarta.servlet.*;
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.extern.java.Log;
@@ -15,7 +16,9 @@ import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
+import org.springframework.web.filter.OncePerRequestFilter;
 
+import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.List;
 import java.util.Optional;
@@ -23,7 +26,7 @@ import java.util.Optional;
 @Order(1)
 @Component
 @Log
-public class ApiKeyAuthenticationFilter implements Filter {
+public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private final ApiKeyService apiKeyService;
 
     @Autowired
@@ -32,27 +35,26 @@ public class ApiKeyAuthenticationFilter implements Filter {
     }
 
     @Override
-    public void doFilter(ServletRequest req, ServletResponse resp, FilterChain chain) throws IOException, ServletException {
-        HttpServletRequest request = (HttpServletRequest) req;
-        HttpServletResponse response = (HttpServletResponse) resp;
-
+    protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
         String apiKeyFromRequest = extractApiKeyFromRequest(request);
-        Optional<ApiKey> apiKey = apiKeyService.getActiveByApiKey(apiKeyFromRequest);
+        if (apiKeyFromRequest != null) {
+            Optional<ApiKey> apiKey = apiKeyService.getActiveByApiKey(apiKeyFromRequest);
 
-        if (apiKey.isPresent()) {
-            List<GrantedAuthority> grantedAuthorities = AuthorityUtils.NO_AUTHORITIES;
-            if (apiKey.get().getRoles() != null) {
-                List<String> roles = apiKey.get().getRoles().stream()
-                        .map(Enum::name)
-                        .toList();
-                grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
+            if (apiKey.isPresent()) {
+                List<GrantedAuthority> grantedAuthorities = AuthorityUtils.NO_AUTHORITIES;
+                if (apiKey.get().getRoles() != null) {
+                    List<String> roles = apiKey.get().getRoles().stream()
+                            .map(Enum::name)
+                            .toList();
+                    grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
+                }
+
+                ApiKeyAuthenticationToken apiToken = new ApiKeyAuthenticationToken(apiKey.get(), grantedAuthorities);
+                SecurityContextHolder.getContext().setAuthentication(apiToken);
             }
-
-            ApiKeyAuthenticationToken apiToken = new ApiKeyAuthenticationToken(apiKey.get(), grantedAuthorities);
-            SecurityContextHolder.getContext().setAuthentication(apiToken);
         }
 
-        chain.doFilter(request, response);
+        filterChain.doFilter(request, response);
     }
 
     /**

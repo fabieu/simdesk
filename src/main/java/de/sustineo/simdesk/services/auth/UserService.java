@@ -20,13 +20,16 @@ public class UserService {
     private final UserMapper userMapper;
     private final UserPermissionMapper userPermissionMapper;
     private final UserRoleMapper userRoleMapper;
+    private final ApiKeyService apiKeyService;
 
     public UserService(UserMapper userMapper,
                        UserPermissionMapper userPermissionMapper,
-                       UserRoleMapper userRoleMapper) {
+                       UserRoleMapper userRoleMapper,
+                       ApiKeyService apiKeyService) {
         this.userMapper = userMapper;
         this.userPermissionMapper = userPermissionMapper;
         this.userRoleMapper = userRoleMapper;
+        this.apiKeyService = apiKeyService;
     }
 
     public User findByUsername(String username) {
@@ -61,6 +64,8 @@ public class UserService {
 
             userPermissionMapper.insert(userPermission);
         }
+
+        apiKeyService.removeActiveApiKeysFromCache(user.getId());
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Integer userId) {
