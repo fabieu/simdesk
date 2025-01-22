@@ -1,6 +1,8 @@
 package de.sustineo.simdesk.services.auth;
 
-import de.sustineo.simdesk.entities.auth.*;
+import de.sustineo.simdesk.entities.auth.User;
+import de.sustineo.simdesk.entities.auth.UserPermission;
+import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.mapper.UserMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.mapper.UserRoleMapper;
@@ -37,7 +39,8 @@ public class UserService {
     }
 
     public void insertSystemUser(Integer userId, String username, String password) {
-        userMapper.insertSystemUser(userId, username, password, UserType.SYSTEM);
+        User user = User.ofSystem(userId, username, password);
+        userMapper.insertSystemUser(user);
     }
 
     @Transactional
@@ -46,22 +49,14 @@ public class UserService {
 
         // If the user does not exist, create a new user and insert it into the database
         if (user == null) {
-            user = User.builder()
-                    .username(discordUserId)
-                    .type(UserType.DISCORD)
-                    .build();
-
+            user = User.ofDiscord(discordUserId);
             userMapper.insertDiscordUser(user);
         }
 
         // Refresh the roles of the user
         userPermissionMapper.deleteAllByUserId(user.getId());
         for (GrantedAuthority authority : authorities) {
-            UserPermission userPermission = UserPermission.builder()
-                    .userId(user.getId())
-                    .role(UserRoleEnum.valueOf(authority.getAuthority()))
-                    .build();
-
+            UserPermission userPermission = UserPermission.of(user.getId(), authority.getAuthority());
             userPermissionMapper.insert(userPermission);
         }
 

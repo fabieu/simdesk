@@ -1,13 +1,9 @@
 package de.sustineo.simdesk.entities.auth;
 
-import lombok.AccessLevel;
-import lombok.AllArgsConstructor;
-import lombok.Data;
-import lombok.NoArgsConstructor;
-import lombok.experimental.SuperBuilder;
+import lombok.*;
 
 @Data
-@SuperBuilder
+@Builder(access = AccessLevel.PRIVATE)
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class User {
@@ -15,4 +11,20 @@ public class User {
     private String username;
     private String password;
     private UserType type;
+
+    public static User ofSystem(Integer id, String username, String password) {
+        return User.builder()
+                .type(UserType.SYSTEM)
+                .id(id)
+                .username(username)
+                .password(password)
+                .build();
+    }
+
+    public static User ofDiscord(String discordUserId) {
+        return User.builder()
+                .type(UserType.DISCORD)
+                .username(discordUserId)
+                .build();
+    }
 }

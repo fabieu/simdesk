@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.mapper;
 
 import de.sustineo.simdesk.entities.auth.User;
-import de.sustineo.simdesk.entities.auth.UserType;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -20,11 +19,11 @@ public interface UserMapper {
     User findByUsername(String username);
 
     @Insert("""
-            INSERT INTO "user" (user_id, username, password, type) VALUES (#{userId}, #{username}, #{password}, #{type})
+            INSERT INTO "user" (user_id, username, password, type) VALUES (#{id}, #{username}, #{password}, #{type})
             ON CONFLICT(user_id)
             DO UPDATE SET username = #{username}, password = #{password}
             """)
-    void insertSystemUser(Integer userId, String username, String password, UserType type);
+    void insertSystemUser(User user);
 
     @Options(useGeneratedKeys = true, keyColumn = "user_id", keyProperty = "id")
     @Insert("""
