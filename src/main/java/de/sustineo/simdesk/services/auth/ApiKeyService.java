@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.mapper.UserApiKeyMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
+import org.apache.commons.lang3.RandomStringUtils;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -10,7 +11,6 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 import java.util.Optional;
-import java.util.UUID;
 
 @Service
 public class ApiKeyService {
@@ -71,6 +71,6 @@ public class ApiKeyService {
     }
 
     private String generateApiKey() {
-        return UUID.randomUUID().toString();
+        return RandomStringUtils.secureStrong().next(32, true, true);
     }
 }
