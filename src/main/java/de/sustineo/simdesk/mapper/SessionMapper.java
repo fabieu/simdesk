@@ -41,7 +41,7 @@ public interface SessionMapper {
     List<Session> findAllByTimeRange(Instant startTime, Instant endTime);
 
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM session WHERE file_checksum = #{fileChecksum} LIMIT 1")
+    @Select("SELECT * FROM session WHERE file_checksum = #{fileChecksum}")
     Session findByFileChecksum(String fileChecksum);
 
     @Insert("""
@@ -50,4 +50,8 @@ public interface SessionMapper {
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Session session);
+
+    @ResultMap("sessionResultMap")
+    @Select("SELECT * FROM session WHERE id = #{id}")
+    Session findById(Integer id);
 }

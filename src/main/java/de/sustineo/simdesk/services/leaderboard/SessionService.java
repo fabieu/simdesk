@@ -59,8 +59,12 @@ public class SessionService {
         return sessionMapper.findAllByTimeRange(from, to);
     }
 
-    public Session getSessionByFileChecksum(String fileChecksum) {
+    public Session getByFileChecksum(String fileChecksum) {
         return sessionMapper.findByFileChecksum(fileChecksum);
+    }
+
+    public Session getById(Integer id) {
+        return sessionMapper.findById(id);
     }
 
     @Transactional
@@ -82,7 +86,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileContent, fileMetadata);
-        Session existingSession = getSessionByFileChecksum(session.getFileChecksum());
+        Session existingSession = getByFileChecksum(session.getFileChecksum());
         if (existingSession != null) {
             log.info(String.format("Ignoring session file %s because it already exists", fileName));
             return;

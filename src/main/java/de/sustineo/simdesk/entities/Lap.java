@@ -11,7 +11,7 @@ import lombok.*;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Lap {
-    private String id;
+    private Integer id;
     private Integer sessionId;
     @CsvBindByName(column = "Driver")
     private Driver driver;

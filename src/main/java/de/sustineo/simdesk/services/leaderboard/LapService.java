@@ -42,7 +42,11 @@ public class LapService {
         lapMapper.insert(lap);
     }
 
-    public List<Lap> getLapsBySessionAndDrivers(int sessionId, List<String> playerIds) {
-        return lapMapper.findBySessionAndDrivers(sessionId, playerIds);
+    public List<Lap> getBySessionIdAndPlayerIds(int sessionId, List<String> playerIds) {
+        return lapMapper.findBySessionIdAndPlayerIds(sessionId, playerIds);
+    }
+
+    public List<Lap> getBySessionId(Integer sessionId) {
+        return lapMapper.findBySessionId(sessionId);
     }
 }
