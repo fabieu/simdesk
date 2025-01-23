@@ -10,7 +10,7 @@ CREATE TABLE simdesk.user
     insert_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
-CREATE TABLE user_permission
+CREATE TABLE simdesk.user_permission
 (
     user_id INTEGER,
     role    TEXT,
@@ -19,7 +19,7 @@ CREATE TABLE user_permission
     FOREIGN KEY (role) REFERENCES simdesk.user_role (name)
 );
 
-CREATE TABLE IF NOT EXISTS user_api_key
+CREATE TABLE IF NOT EXISTS simdesk.user_api_key
 (
     api_key_id        SERIAL PRIMARY KEY,
     user_id           INTEGER   NOT NULL,

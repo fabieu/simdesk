@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.auth.UserType;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.userdetails.UserDetails;
 import org.springframework.security.core.userdetails.UserDetailsService;
@@ -22,7 +23,7 @@ public class DatabaseUserDetailsService implements UserDetailsService {
 
     @Override
     public UserDetails loadUserByUsername(String username) throws UsernameNotFoundException {
-        User user = userService.findByUsername(username);
+        User user = userService.findByUsernameAndType(username, UserType.SYSTEM);
 
         if (user == null) {
             throw new UsernameNotFoundException(username);

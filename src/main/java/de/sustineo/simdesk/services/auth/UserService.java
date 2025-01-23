@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPermission;
 import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserType;
 import de.sustineo.simdesk.mapper.UserMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.mapper.UserRoleMapper;
@@ -32,6 +33,10 @@ public class UserService {
         this.userPermissionMapper = userPermissionMapper;
         this.userRoleMapper = userRoleMapper;
         this.apiKeyService = apiKeyService;
+    }
+
+    public User findByUsernameAndType(String username, UserType userType) {
+        return userMapper.findByUsernameAndType(username, userType);
     }
 
     public User findByUsername(String username) {

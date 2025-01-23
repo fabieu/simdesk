@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.mapper;
 
 import de.sustineo.simdesk.entities.auth.User;
+import de.sustineo.simdesk.entities.auth.UserType;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
@@ -17,6 +18,12 @@ public interface UserMapper {
             SELECT * FROM "user" WHERE username = #{username}
             """)
     User findByUsername(String username);
+
+    @ResultMap("userResultMap")
+    @Select("""
+            SELECT * FROM "user" WHERE username = #{username} AND type = #{type}
+            """)
+    User findByUsernameAndType(String username, UserType userType);
 
     @Insert("""
             INSERT INTO "user" (user_id, username, password, type) VALUES (#{id}, #{username}, #{password}, #{type})
