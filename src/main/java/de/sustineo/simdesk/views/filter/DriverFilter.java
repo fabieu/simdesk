@@ -33,7 +33,7 @@ public class DriverFilter extends GridFilter {
     public boolean test(Driver driver) {
         boolean matchesServerName = matches(driver.getPlayerId(), playerId);
         boolean matchesTrackName = matches(driver.getFullName(), fullName);
-        boolean matchesVisibility = matches(driver.getVisibility().name(), visibility);
+        boolean matchesVisibility = matches(driver.getVisibility() != null ? driver.getVisibility().name() : null, visibility);
 
         return matchesServerName && matchesTrackName && matchesVisibility;
     }

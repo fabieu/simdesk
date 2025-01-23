@@ -23,7 +23,7 @@ public interface UserMapper {
     @Select("""
             SELECT * FROM "user" WHERE username = #{username} AND type = #{type}
             """)
-    User findByUsernameAndType(String username, UserType userType);
+    User findByUsernameAndType(String username, UserType type);
 
     @Insert("""
             INSERT INTO "user" (user_id, username, password, type) VALUES (#{id}, #{username}, #{password}, #{type})
