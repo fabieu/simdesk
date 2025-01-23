@@ -14,6 +14,7 @@ import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
+import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
 
@@ -50,12 +51,20 @@ public class SessionService {
         this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
-    public List<Session> getAllSessionsByTimeRange(TimeRange timeRange) {
-        return sessionMapper.findAllByTimeRange(timeRange.start(), timeRange.end());
+    public List<Session> getAllByTimeRange(TimeRange timeRange) {
+        return getAllByTimeRange(timeRange.from(), timeRange.to());
     }
 
-    public Session getSessionByFileChecksum(String fileChecksum) {
+    public List<Session> getAllByTimeRange(Instant from, Instant to) {
+        return sessionMapper.findAllByTimeRange(from, to);
+    }
+
+    public Session getByFileChecksum(String fileChecksum) {
         return sessionMapper.findByFileChecksum(fileChecksum);
+    }
+
+    public Session getById(Integer id) {
+        return sessionMapper.findById(id);
     }
 
     @Transactional
@@ -77,7 +86,7 @@ public class SessionService {
         }
 
         Session session = sessionConverter.convertToSession(accSession, fileContent, fileMetadata);
-        Session existingSession = getSessionByFileChecksum(session.getFileChecksum());
+        Session existingSession = getByFileChecksum(session.getFileChecksum());
         if (existingSession != null) {
             log.info(String.format("Ignoring session file %s because it already exists", fileName));
             return;

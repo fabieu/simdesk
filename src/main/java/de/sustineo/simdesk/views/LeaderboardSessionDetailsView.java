@@ -23,7 +23,7 @@ import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
-import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.LeaderboardLineLapTimeComparator;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
@@ -70,7 +70,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
         try {
-            Session session = sessionService.getSessionByFileChecksum(fileChecksum);
+            Session session = sessionService.getByFileChecksum(fileChecksum);
             if (session == null) {
                 throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
             }
@@ -106,7 +106,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
 
         layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
-        if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
             StreamResource csvResource = new StreamResource(
                     String.format("session_table_%s.csv", session.getFileChecksum()),
                     () -> {

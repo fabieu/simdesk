@@ -1,10 +1,8 @@
 package de.sustineo.simdesk.mapper;
 
 import de.sustineo.simdesk.entities.auth.UserPermission;
-import org.apache.ibatis.annotations.Mapper;
-import org.apache.ibatis.annotations.Result;
-import org.apache.ibatis.annotations.Results;
-import org.apache.ibatis.annotations.Select;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
+import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
@@ -14,9 +12,21 @@ import java.util.List;
 public interface UserPermissionMapper {
     @Results(id = "userPermissionResultMap", value = {
             @Result(property = "userId", column = "user_id"),
-            @Result(property = "roleName", column = "role_name"),
+            @Result(property = "role", column = "role"),
             @Result(property = "insertDatetime", column = "insert_datetime"),
     })
     @Select("SELECT * FROM user_permission WHERE user_id = #{userId}")
-    List<UserPermission> findByUserId(Long userId);
+    List<UserPermission> findByUserId(Integer userId);
+
+    @Select("SELECT role FROM user_permission WHERE user_id = #{userId}")
+    List<UserRoleEnum> findRolesByUserId(Integer userId);
+
+    @Insert("""
+            INSERT INTO user_permission (user_id, role)
+            VALUES (#{userId}, #{role})
+            """)
+    void insert(UserPermission userPermission);
+
+    @Delete("DELETE FROM user_permission WHERE user_id = #{userId}")
+    void deleteAllByUserId(Integer userId);
 }

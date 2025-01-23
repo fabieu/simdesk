@@ -1,22 +1,22 @@
 package de.sustineo.simdesk.services.auth;
 
-import com.vaadin.flow.component.UI;
-import com.vaadin.flow.server.VaadinServletRequest;
+import com.vaadin.flow.spring.security.AuthenticationContext;
 import de.sustineo.simdesk.configuration.SecurityConfiguration;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.event.EventListener;
+import org.springframework.security.authentication.AnonymousAuthenticationToken;
 import org.springframework.security.core.Authentication;
-import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.context.SecurityContext;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
-import org.springframework.security.web.authentication.logout.SecurityContextLogoutHandler;
 import org.springframework.stereotype.Service;
 
+import java.util.Arrays;
 import java.util.Map;
 import java.util.Optional;
 import java.util.UUID;
@@ -24,11 +24,11 @@ import java.util.UUID;
 @Log
 @Service
 public class SecurityService {
-    private static final String LOGOUT_SUCCESS_URL = "/";
     public static final String DISCORD_CDN_AVATARS_URL = "https://cdn.discordapp.com/avatars";
 
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
+    private final transient AuthenticationContext authenticationContext;
 
     @Value("${simdesk.auth.admin.username}")
     private String adminUsername;
@@ -36,9 +36,11 @@ public class SecurityService {
     private String adminPassword;
 
     public SecurityService(UserService userService,
-                           PasswordEncoder passwordEncoder) {
+                           PasswordEncoder passwordEncoder,
+                           AuthenticationContext authenticationContext) {
         this.userService = userService;
         this.passwordEncoder = passwordEncoder;
+        this.authenticationContext = authenticationContext;
     }
 
     @EventListener(ApplicationReadyEvent.class)
@@ -49,13 +51,17 @@ public class SecurityService {
             log.info(String.format("Please change the password via environment variable SIMDESK_ADMIN_PASSWORD \n\n Generated random admin password: %s \n", adminPassword));
         }
 
-        userService.insertSystemUser(adminUsername, passwordEncoder.encode(adminPassword), SecurityConfiguration.USER_ID_ADMIN);
+        userService.insertSystemUser(SecurityConfiguration.USER_ID_ADMIN, adminUsername, passwordEncoder.encode(adminPassword));
     }
 
-    public Optional<UserPrincipal> getAuthenticatedUser() {
-        SecurityContext context = SecurityContextHolder.getContext();
-        Object principal = Optional.ofNullable(context)
+    private static Optional<Authentication> getAuthentication() {
+        return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
+                .filter(auth -> !(auth instanceof AnonymousAuthenticationToken));
+    }
+
+    public Optional<UserPrincipal> getAuthenticatedUserPrincipal() {
+        Object principal = getAuthentication()
                 .map(Authentication::getPrincipal)
                 .orElse(null);
 
@@ -67,55 +73,32 @@ public class SecurityService {
             return Optional.of(new UserPrincipal((DefaultOAuth2User) principal));
         }
 
-        return Optional.empty(); // Anonymous or no authentication
+        return Optional.empty();
     }
 
-    /**
-     * Get the username of the currently authenticated user
-     *
-     * @return the username or null if not authenticated
-     */
-    public String getAuthenticatedUsername() {
-        return getAuthenticatedUser()
-                .map(UserPrincipal::getUsername)
-                .orElse(null);
+    public Optional<String> getPrincipalName() {
+        return authenticationContext.getPrincipalName();
     }
 
-    public boolean hasAnyAuthority(String... authorities) {
-        Optional<UserPrincipal> user = getAuthenticatedUser();
+    public boolean hasAnyAuthority(UserRoleEnum... userRoles) {
+        String[] authorities = Arrays.stream(userRoles)
+                .map(UserRoleEnum::name)
+                .toArray(String[]::new);
 
-        if (user.isEmpty()) {
-            return false;
-        }
-
-        for (GrantedAuthority grantedAuthority : user.get().getAuthorities()) {
-            for (String authority : authorities) {
-                if (grantedAuthority.getAuthority().equals(authority)) {
-                    return true;
-                }
-            }
-        }
-
-        return false;
+        return authenticationContext.hasAnyAuthority(authorities);
     }
 
     public void logout() {
-        UI.getCurrent().getPage().setLocation(LOGOUT_SUCCESS_URL);
-        SecurityContextLogoutHandler logoutHandler = new SecurityContextLogoutHandler();
-        logoutHandler.logout(VaadinServletRequest.getCurrent().getHttpServletRequest(), null, null);
+        authenticationContext.logout();
     }
 
-
     public Optional<String> getAvatarUrl() {
-        Optional<UserPrincipal> user = getAuthenticatedUser();
-
-        if (user.isEmpty()) {
+        Optional<UserPrincipal> userPrincipal = getAuthenticatedUserPrincipal();
+        if (userPrincipal.isEmpty()) {
             return Optional.empty();
         }
 
-        Map<String, Object> userAttributes = user.get().getAttributes();
-
-        // Discord avatar
+        Map<String, Object> userAttributes = userPrincipal.get().getAttributes();
         String avatarId = (String) userAttributes.get("avatar");
         String userId = (String) userAttributes.get("id");
 

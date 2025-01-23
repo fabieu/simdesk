@@ -226,7 +226,7 @@ public class BopManagementView extends BaseView {
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<Bop>) event -> {
             Bop bop = event.getItem();
-            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUsername(securityService.getPrincipalName().orElseThrow());
             bop.setUpdateDatetime(Instant.now());
             bopService.update(bop);
         });
@@ -337,7 +337,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(true);
-            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUsername(securityService.getPrincipalName().orElseThrow());
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -356,7 +356,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(false);
-            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUsername(securityService.getPrincipalName().orElseThrow());
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -376,7 +376,7 @@ public class BopManagementView extends BaseView {
 
             bop.setRestrictor(0);
             bop.setBallastKg(0);
-            bop.setUsername(securityService.getAuthenticatedUsername());
+            bop.setUsername(securityService.getPrincipalName().orElseThrow());
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);

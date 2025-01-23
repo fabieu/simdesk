@@ -2,12 +2,14 @@ package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.builders.WebSecurity;
@@ -23,6 +25,9 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.authentication.HttpStatusEntryPoint;
+import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
+import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -36,6 +41,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
             "/public/**",
             "/assets/**",
             "/icons/**",
+            "/swagger-ui/**",
+            "/openapi/**",
             "/*.png" // Leaflet images
     };
     private static final String LOGIN_URL = "/login";
@@ -45,13 +52,16 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     public static final String AUTH_PROVIDER_DISCORD = "discord";
     public static final String AUTH_PROVIDER_DATABASE = "database";
 
-    public static final Long USER_ID_ADMIN = 10000L;
+    public static final int USER_ID_ADMIN = 1;
 
+    private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final Optional<DiscordService> discordService;
     private final UserService userService;
 
-    public SecurityConfiguration(Optional<DiscordService> discordService,
+    public SecurityConfiguration(ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
+                                 Optional<DiscordService> discordService,
                                  UserService userService) {
+        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
         this.discordService = discordService;
         this.userService = userService;
     }
@@ -71,6 +81,10 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         http
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(antMatchers(PUBLIC_PATHS)).permitAll()
+                )
+                .addFilterAfter(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
+                .exceptionHandling(exceptionHandling -> exceptionHandling
+                        .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage(LOGIN_URL).permitAll()
@@ -118,10 +132,12 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
         return (request -> {
-            // Delegate to the default implementation for loading a user
-            OAuth2User user = delegate.loadUser(request);
+            String userNameAttributeName = request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
-            if (AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId()) && discordService.isPresent()) {
+            // Delegate to the default implementation for loading a user
+            OAuth2User oAuthUser = delegate.loadUser(request);
+
+            if (discordService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
                 try {
                     String accessToken = request.getAccessToken().getTokenValue();
 
@@ -132,20 +148,22 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                     Set<GrantedAuthority> authorities = userService.getAllRoles().stream()
                             .filter(userRole -> userRole.getDiscordRoleId() != null)
                             .filter(userRole -> memberRoleIds.contains(userRole.getDiscordRoleId()))
-                            .map(userRole -> new SimpleGrantedAuthority(userRole.getName()))
+                            .map(userRole -> new SimpleGrantedAuthority(userRole.getName().name()))
                             .collect(Collectors.toSet());
 
-                    Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());
+                    Map<String, Object> attributes = new LinkedHashMap<>(oAuthUser.getAttributes());
                     attributes.put(ATTRIBUTE_AUTH_PROVIDER, AUTH_PROVIDER_DISCORD);
 
-                    return new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName());
+                    oAuthUser = new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), userNameAttributeName);
+
+                    userService.insertDiscordUser(oAuthUser.getName(), oAuthUser.getAuthorities());
                 } catch (Exception e) {
-                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", user.getName(), e.getMessage()));
+                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", oAuthUser.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));
                 }
             }
 
-            return user;
+            return oAuthUser;
         });
     }
 }

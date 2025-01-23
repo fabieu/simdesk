@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.HeaderRow;
@@ -9,6 +10,7 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
 import com.vaadin.flow.component.html.H3;
+import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -21,9 +23,14 @@ import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.Visibility;
+import de.sustineo.simdesk.entities.auth.ApiKey;
+import de.sustineo.simdesk.entities.auth.User;
+import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.auth.UserRole;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.NotificationService;
+import de.sustineo.simdesk.services.auth.ApiKeyService;
+import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -32,8 +39,10 @@ import de.sustineo.simdesk.views.filter.GridFilter;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 
+import javax.annotation.Nonnull;
 import java.util.Comparator;
 import java.util.Objects;
+import java.util.Optional;
 
 @Log
 @Route(value = "/settings", layout = MainLayout.class)
@@ -43,13 +52,21 @@ public class SettingsView extends BaseView {
     private final UserService userService;
     private final NotificationService notificationService;
     private final DriverService driverService;
+    private final ApiKeyService apiKeyService;
+    private final SecurityService securityService;
+
+    private final Grid<ApiKey> grid = new Grid<>(ApiKey.class, false);
 
     public SettingsView(NotificationService notificationService,
                         UserService userService,
-                        DriverService driverService) {
+                        DriverService driverService,
+                        ApiKeyService apiKeyService,
+                        SecurityService securityService) {
         this.notificationService = notificationService;
         this.userService = userService;
         this.driverService = driverService;
+        this.apiKeyService = apiKeyService;
+        this.securityService = securityService;
 
         setSizeFull();
         setPadding(false);
@@ -72,6 +89,7 @@ public class SettingsView extends BaseView {
         tabSheet.setSizeFull();
 
         tabSheet.add("General", createGeneralTab());
+        tabSheet.add("API Keys", createApiKeysTab());
 
         if (ProfileManager.isDiscordProfileEnabled()) {
             tabSheet.add("Discord", createDiscordTab());
@@ -85,6 +103,14 @@ public class SettingsView extends BaseView {
         layout.setSizeFull();
 
         layout.add(createDriverVisibilityLayout());
+        return layout;
+    }
+
+    private Component createApiKeysTab() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSizeFull();
+
+        layout.add(createApiKeysLayout());
         return layout;
     }
 
@@ -174,6 +200,94 @@ public class SettingsView extends BaseView {
         updateColumn.setEditorComponent(editActions);
 
         layout.add(createTitle("Driver Visibility"), grid);
+        return layout;
+    }
+
+    private Component createApiKeysLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+
+        layout.add(createTitle("API Keys"));
+
+        Optional<UserPrincipal> userPrincipal = securityService.getAuthenticatedUserPrincipal();
+        if (userPrincipal.isPresent()) {
+            User user = userService.findByUsername(userPrincipal.get().getUsername());
+            if (user != null) {
+                layout.add(createApiKeyCreationLayout(user), createApiKeyGrid(user));
+            }
+        }
+
+        return layout;
+    }
+
+    private void refreshApiKeyGrid(@Nonnull User user) {
+        grid.setItems(apiKeyService.getByUserId(user.getId()));
+        grid.getDataProvider().refreshAll();
+    }
+
+    private Component createApiKeyCreationLayout(@Nonnull User user) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setPadding(false);
+
+        TextField nameField = new TextField();
+        nameField.setWidth("15rem");
+        nameField.setPlaceholder("API key name");
+        nameField.setClearButtonVisible(true);
+
+        Button createButton = createPrimaryButton("Generate");
+        createButton.addClickListener(e -> {
+            if (nameField.getValue() == null || nameField.getValue().isEmpty()) {
+                notificationService.showErrorNotification("API key name is mandatory");
+                return;
+            }
+
+            apiKeyService.create(user.getId(), nameField.getValue());
+            refreshApiKeyGrid(user);
+        });
+
+        layout.add(nameField, createButton);
+        return layout;
+    }
+
+    private Component createApiKeyGrid(@Nonnull User user) {
+        grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setEmptyStateText("No API keys configured");
+        grid.setAllRowsVisible(true);
+
+        refreshApiKeyGrid(user);
+
+        Grid.Column<ApiKey> apiKeyColumn = grid.addColumn(ApiKey::getApiKey)
+                .setHeader("Key")
+                .setTooltipGenerator(ApiKey::getApiKey);
+        Grid.Column<ApiKey> nameColumn = grid.addColumn(ApiKey::getName)
+                .setHeader("Name")
+                .setTooltipGenerator(ApiKey::getName);
+        Grid.Column<ApiKey> activeColumn = grid.addColumn(apiKey -> Boolean.TRUE.equals(apiKey.getActive()) ? "Active" : "Inactive")
+                .setHeader("Status")
+                .setAutoWidth(true)
+                .setFlexGrow(0);
+        Grid.Column<ApiKey> actionColumn = grid.addComponentColumn(apiKey -> createApiKeyActionComponent(apiKey, user))
+                .setHeader("Actions")
+                .setTextAlign(ColumnTextAlign.END)
+                .setWidth("170px")
+                .setFlexGrow(0);
+
+        return grid;
+    }
+
+    private Component createApiKeyActionComponent(@Nonnull ApiKey apiKey, @Nonnull User user) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setJustifyContentMode(JustifyContentMode.END);
+
+        Button deleteButton = new Button(VaadinIcon.CLOSE.create());
+        deleteButton.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
+        deleteButton.addClickListener(e -> {
+            apiKeyService.deleteApiKey(apiKey);
+            refreshApiKeyGrid(user);
+        });
+
+        layout.add(deleteButton);
         return layout;
     }
 

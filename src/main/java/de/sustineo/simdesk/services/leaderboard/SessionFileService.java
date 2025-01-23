@@ -3,7 +3,7 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.utils.json.JsonUtils;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -27,9 +27,12 @@ public class SessionFileService {
     private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
 
     private final SessionService sessionService;
+    private final JsonClient jsonClient;
 
-    public SessionFileService(SessionService sessionService) {
+    public SessionFileService(SessionService sessionService,
+                              JsonClient jsonClient) {
         this.sessionService = sessionService;
+        this.jsonClient = jsonClient;
     }
 
     public void handleSessionFile(@Nonnull Path path) {
@@ -53,7 +56,7 @@ public class SessionFileService {
         }
 
         String fileContent = readFile(path);
-        if (!JsonUtils.isValid(fileContent)) {
+        if (!jsonClient.isValid(fileContent)) {
             String errorMessage = String.format("File %s is not a valid JSON file", path.getFileName());
             log.warning(errorMessage);
             throw new IllegalArgumentException(errorMessage);
@@ -65,7 +68,7 @@ public class SessionFileService {
             fileMetadata.setModifiedDatetime(sessionDatetimeOverride);
         }
 
-        AccSession accSession = JsonUtils.fromJson(fileContent, AccSession.class);
+        AccSession accSession = jsonClient.fromJson(fileContent, AccSession.class);
 
         sessionService.handleSession(accSession, fileContent, fileMetadata);
     }

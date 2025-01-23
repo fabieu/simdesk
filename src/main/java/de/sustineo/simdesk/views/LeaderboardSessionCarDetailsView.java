@@ -26,7 +26,7 @@ import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -81,7 +81,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
         int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());
 
-        Session session = sessionService.getSessionByFileChecksum(fileChecksum);
+        Session session = sessionService.getByFileChecksum(fileChecksum);
         if (session == null) {
             throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
         }
@@ -91,7 +91,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
             throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
         }
 
-        laps = lapService.getLapsBySessionAndDrivers(session.getId(), playerIds);
+        laps = lapService.getBySessionIdAndPlayerIds(session.getId(), playerIds);
         penalties = penaltyService.findBySessionIdAndCarId(session.getId(), carId).stream()
                 .filter(Penalty::isValid)
                 .collect(Collectors.toList());
@@ -104,7 +104,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
         tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
         tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
-        if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
             tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
         }
 

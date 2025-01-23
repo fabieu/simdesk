@@ -19,7 +19,9 @@ spring:
       read-date-timestamps-as-nanoseconds: false
     serialization:
       fail-on-empty-beans: false
-      write-dates-as-timestamps: true
+      write-dates-as-timestamps: false
+    mapper:
+      propagate-transient-marker: true
   servlet:
     multipart:
       max-file-size: 10MB
@@ -129,7 +131,7 @@ spring:
             authorizationUri: https://discordapp.com/api/oauth2/authorize
             tokenUri: https://discordapp.com/api/oauth2/token
             userInfoUri: https://discordapp.com/api/users/@me
-            user-name-attribute: username
+            user-name-attribute: id
 simdesk:
   auth:
     discord:

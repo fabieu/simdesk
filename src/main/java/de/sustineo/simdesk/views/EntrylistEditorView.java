@@ -48,7 +48,7 @@ import de.sustineo.simdesk.entities.validation.ValidationRule;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
-import de.sustineo.simdesk.utils.json.JsonUtils;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -78,6 +78,7 @@ public class EntrylistEditorView extends BaseView {
     private final EntrylistService entrylistService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
+    private final JsonClient jsonClient;
 
     private AccEntrylist entrylist;
     private EntrylistMetadata entrylistMetadata;
@@ -109,10 +110,12 @@ public class EntrylistEditorView extends BaseView {
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                ValidationService validationService,
-                               NotificationService notificationService) {
+                               NotificationService notificationService,
+                               JsonClient jsonClient) {
         this.entrylistService = entrylistService;
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.jsonClient = jsonClient;
 
         this.entrylistPreview.setWidthFull();
         this.entrylistPreview.setReadOnly(true);
@@ -222,7 +225,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            AccEntrylist entrylist = JsonUtils.fromJson(fileData, AccEntrylist.class);
+            AccEntrylist entrylist = jsonClient.fromJson(fileData, AccEntrylist.class);
             EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
                     .fileName(event.getFileName())
                     .type(event.getMIMEType())
@@ -301,7 +304,7 @@ public class EntrylistEditorView extends BaseView {
                         return new ByteArrayInputStream(new byte[0]);
                     }
 
-                    return new ByteArrayInputStream(JsonUtils.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
+                    return new ByteArrayInputStream(jsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
                 }
         );
     }
@@ -398,7 +401,7 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        entrylistPreview.setValue(JsonUtils.toJsonPretty(entrylist));
+        entrylistPreview.setValue(jsonClient.toJsonPretty(entrylist));
     }
 
     private void addEntrylistEntry(AccEntrylistEntry entry) {
@@ -994,7 +997,7 @@ public class EntrylistEditorView extends BaseView {
         resultsUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            AccSession session = JsonUtils.fromJson(fileData, AccSession.class);
+            AccSession session = jsonClient.fromJson(fileData, AccSession.class);
 
             // Validate results file against syntax and semantic rules
             validationService.validate(session);
@@ -1050,7 +1053,7 @@ public class EntrylistEditorView extends BaseView {
         defaultCustomCarUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
 
-            CustomCar[] customCars = JsonUtils.fromJson(fileData, CustomCar[].class);
+            CustomCar[] customCars = jsonClient.fromJson(fileData, CustomCar[].class);
 
             // Validate results file against syntax and semantic rules
             for (CustomCar customCar : customCars) {
@@ -1174,7 +1177,7 @@ public class EntrylistEditorView extends BaseView {
             dialogLayout.add(errorMessage);
 
             for (Object reference : errorReferences) {
-                Span referenceSpan = new Span(JsonUtils.toJsonPretty(reference));
+                Span referenceSpan = new Span(jsonClient.toJsonPretty(reference));
                 referenceSpan.setWhiteSpace(HasText.WhiteSpace.PRE_LINE);
 
                 dialogLayout.add(new Div(referenceSpan));

@@ -30,7 +30,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
-import de.sustineo.simdesk.entities.auth.UserRole;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
@@ -202,7 +202,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addUserMenu(MenuBar menuBar) {
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
 
         Avatar avatar = new Avatar();
         avatar.setTooltipEnabled(true);
@@ -219,7 +219,7 @@ public class MainLayout extends AppLayout {
             MenuItem profileMenuItem = userSubMenu.addItem("Profile");
             profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));
 
-            if (securityService.hasAnyAuthority(UserRole.ADMIN)) {
+            if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
                 MenuItem settingsMenuItem = userSubMenu.addItem("Settings");
                 settingsMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(SettingsView.class)));
             }

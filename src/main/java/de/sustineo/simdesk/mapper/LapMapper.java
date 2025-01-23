@@ -37,7 +37,15 @@ public interface LapMapper {
             ORDER BY id ASC;
             </script>
             """)
-    List<Lap> findBySessionAndDrivers(int sessionId, List<String> playerIds);
+    List<Lap> findBySessionIdAndPlayerIds(int sessionId, List<String> playerIds);
+
+    @ResultMap("lapResultMap")
+    @Select("""
+            SELECT lap.*, driver.* FROM lap
+            LEFT JOIN driver ON lap.driver_id = driver.player_id
+            WHERE session_id = #{sessionId}
+            """)
+    List<Lap> findBySessionId(Integer sessionId);
 
     @Insert("""
             INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)

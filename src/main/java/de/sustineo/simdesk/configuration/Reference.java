@@ -6,4 +6,5 @@ public class Reference {
     public static final String GITHUB = "https://github.com/fabieu/simdesk";
     public static final String GITHUB_DISCUSSIONS = GITHUB + "/discussions";
     public static final String GITHUB_RELEASES = GITHUB + "/releases";
+    public static final String GITHUB_LICENSE = GITHUB + "/blob/main/LICENSE";
 }
