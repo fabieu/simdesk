@@ -39,8 +39,8 @@ public interface LeaderboardMapper {
     void insertLeaderboardLine(LeaderboardLine leaderboardLines);
 
     @Insert("""
-            INSERT INTO leaderboard_driver (session_id, car_id, player_id, drive_time_millis)
-            VALUES (#{sessionId}, #{carId}, #{playerId}, #{driveTimeMillis})
+            INSERT INTO leaderboard_driver (session_id, car_id, driver_id, drive_time_millis)
+            VALUES (#{sessionId}, #{carId}, #{driverId}, #{driveTimeMillis})
             """)
-    void insertLeaderboardDriver(Integer sessionId, Integer carId, String playerId, Long driveTimeMillis);
+    void insertLeaderboardDriver(Integer sessionId, Integer carId, String driverId, Long driveTimeMillis);
 }

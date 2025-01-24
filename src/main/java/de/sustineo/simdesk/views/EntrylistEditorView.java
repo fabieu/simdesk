@@ -763,10 +763,10 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistPreview();
         });
 
-        TextField playerIdField = new TextField("Steam ID");
-        playerIdField.setRequired(true);
-        playerIdField.setValue(Objects.requireNonNullElse(driver.getPlayerId(), ""));
-        playerIdField.addValueChangeListener(event -> {
+        TextField driverIdField = new TextField("Steam ID");
+        driverIdField.setRequired(true);
+        driverIdField.setValue(Objects.requireNonNullElse(driver.getPlayerId(), ""));
+        driverIdField.addValueChangeListener(event -> {
             if (event.getValue() != null || !event.getValue().isEmpty()) {
                 driver.setPlayerId(event.getValue());
             }
@@ -795,7 +795,7 @@ public class EntrylistEditorView extends BaseView {
         nationalyComboBox.setOverlayWidth("225px");
 
         FormLayout entrylistDriverFormLayout = new FormLayout();
-        entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, playerIdField, driverCategoryComboBox, nationalyComboBox);
+        entrylistDriverFormLayout.add(firstNameField, lastNameField, shortNameField, driverIdField, driverCategoryComboBox, nationalyComboBox);
         entrylistDriverFormLayout.setResponsiveSteps(
                 // Use one column by default
                 new FormLayout.ResponsiveStep("0", 1),

@@ -6,7 +6,7 @@ import de.sustineo.simdesk.entities.Driver;
 public class DriverFilter extends GridFilter {
     private final GridListDataView<Driver> dataView;
 
-    private String playerId;
+    private String driverId;
     private String fullName;
     private String visibility;
 
@@ -15,8 +15,8 @@ public class DriverFilter extends GridFilter {
         this.dataView.addFilter(this::test);
     }
 
-    public void setPlayerId(String playerId) {
-        this.playerId = playerId;
+    public void setDriverId(String driverId) {
+        this.driverId = driverId;
         this.dataView.refreshAll();
     }
 
@@ -31,9 +31,9 @@ public class DriverFilter extends GridFilter {
     }
 
     public boolean test(Driver driver) {
-        boolean matchesServerName = matches(driver.getPlayerId(), playerId);
+        boolean matchesServerName = matches(driver.getId(), driverId);
         boolean matchesTrackName = matches(driver.getFullName(), fullName);
-        boolean matchesVisibility = matches(driver.getVisibility() != null ? driver.getVisibility().name() : null, visibility);
+        boolean matchesVisibility = matches(driver.getVisibility().name(), visibility);
 
         return matchesServerName && matchesTrackName && matchesVisibility;
     }

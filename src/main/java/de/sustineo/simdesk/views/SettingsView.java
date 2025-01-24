@@ -143,7 +143,7 @@ public class SettingsView extends BaseView {
             }
         });
 
-        Grid.Column<Driver> playerIdColumn = grid.addColumn(Driver::getPlayerId)
+        Grid.Column<Driver> driverIdColumn = grid.addColumn(Driver::getId)
                 .setHeader("Steam ID")
                 .setAutoWidth(true)
                 .setFlexGrow(0);
@@ -191,7 +191,7 @@ public class SettingsView extends BaseView {
         GridListDataView<Driver> dataView = grid.setItems(driverService.getAllDrivers());
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(playerIdColumn).setComponent(GridFilter.createHeader(driverFilter::setPlayerId));
+        headerRow.getCell(driverIdColumn).setComponent(GridFilter.createHeader(driverFilter::setDriverId));
         headerRow.getCell(fullNameColumn).setComponent(GridFilter.createHeader(driverFilter::setFullName));
         headerRow.getCell(visibilityColumn).setComponent(GridFilter.createHeader(driverFilter::setVisibility));
 

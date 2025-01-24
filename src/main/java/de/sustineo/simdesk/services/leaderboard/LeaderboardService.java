@@ -37,7 +37,7 @@ public class LeaderboardService {
     protected void insertLeaderboardLine(Integer sessionId, LeaderboardLine leaderboardLine) {
         for (Driver driver : leaderboardLine.getDrivers()) {
             driverService.upsertDriver(driver);
-            leaderboardMapper.insertLeaderboardDriver(sessionId, leaderboardLine.getCarId(), driver.getPlayerId(), driver.getDriveTimeMillis());
+            leaderboardMapper.insertLeaderboardDriver(sessionId, leaderboardLine.getCarId(), driver.getId(), driver.getDriveTimeMillis());
         }
 
         leaderboardMapper.insertLeaderboardLine(leaderboardLine);
