@@ -16,7 +16,7 @@ public class Driver {
     private static final String HIDDEN_SHORT_NAME = "HDR";
     private static final String HIDDEN_FULL_NAME = HIDDEN_FIRST_NAME + " " + HIDDEN_LAST_NAME;
 
-    private String playerId;
+    private String id;
     private String firstName;
     private String lastName;
     private String shortName;
@@ -55,12 +55,12 @@ public class Driver {
     public final boolean equals(Object o) {
         if (!(o instanceof Driver driver)) return false;
 
-        return playerId.equals(driver.playerId);
+        return id.equals(driver.id);
     }
 
     @Override
     public int hashCode() {
-        return playerId.hashCode();
+        return id.hashCode();
     }
 
     @Override

@@ -29,8 +29,8 @@ public class DriverService {
         driverMapper.updateVisibility(driver);
     }
 
-    public List<String> getPlayerIdsBySessionIdAndCarId(Integer id, int carId) {
-        return driverMapper.findPlayerIdsBySessionIdAndCarId(id, carId);
+    public List<String> getDriverIdsBySessionIdAndCarId(Integer id, Integer carId) {
+        return driverMapper.findDriverIdsBySessionIdAndCarId(id, carId);
     }
 }
 

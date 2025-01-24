@@ -59,6 +59,11 @@ public class SessionService {
         return sessionMapper.findAllByTimeRange(from, to);
     }
 
+
+    public List<Session> getAllByTimeRangeAndDriverId(Instant from, Instant to, String driverId) {
+        return sessionMapper.findAllByTimeRangeAndDriverId(from, to, driverId);
+    }
+
     public Session getByFileChecksum(String fileChecksum) {
         return sessionMapper.findByFileChecksum(fileChecksum);
     }

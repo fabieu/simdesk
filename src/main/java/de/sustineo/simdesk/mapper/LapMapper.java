@@ -12,7 +12,7 @@ public interface LapMapper {
     @Results(id = "lapResultMap", value = {
             @Result(id = true, property = "id", column = "id"),
             @Result(property = "sessionId", column = "session_id"),
-            @Result(property = "driver.playerId", column = "player_id"),
+            @Result(property = "driver.id", column = "driver_id"),
             @Result(property = "driver.firstName", column = "first_name"),
             @Result(property = "driver.lastName", column = "last_name"),
             @Result(property = "driver.shortName", column = "short_name"),
@@ -27,29 +27,29 @@ public interface LapMapper {
     })
     @Select("""
             <script>
-            SELECT lap.*, driver.* FROM lap
-                LEFT JOIN driver ON lap.driver_id = driver.player_id
-            WHERE session_id = #{sessionId} AND driver_id IN
-                <foreach item="item" index="index" collection="playerIds"
+            SELECT lap.*, driver.first_name, driver.last_name, driver.short_name, driver.visibility FROM lap
+            LEFT JOIN driver ON lap.driver_id = driver.driver_id
+            WHERE lap.session_id = #{sessionId} AND lap.driver_id IN
+                <foreach item="item" index="index" collection="driverIds"
                     open="(" separator="," close=")">
                       #{item}
                 </foreach>
             ORDER BY id ASC;
             </script>
             """)
-    List<Lap> findBySessionIdAndPlayerIds(int sessionId, List<String> playerIds);
+    List<Lap> findBySessionIdAndDriverIds(int sessionId, List<String> driverIds);
 
     @ResultMap("lapResultMap")
     @Select("""
-            SELECT lap.*, driver.* FROM lap
-            LEFT JOIN driver ON lap.driver_id = driver.player_id
+            SELECT lap.*, driver.first_name, driver.last_name, driver.short_name, driver.visibility FROM lap
+            LEFT JOIN driver ON lap.driver_id = driver.driver_id
             WHERE session_id = #{sessionId}
             """)
     List<Lap> findBySessionId(Integer sessionId);
 
     @Insert("""
             INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)
-            VALUES (#{sessionId}, #{driver.playerId}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})
+            VALUES (#{sessionId}, #{driver.id}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Lap lap);

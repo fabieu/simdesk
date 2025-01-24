@@ -14,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class DriverConverter extends BaseConverter {
     public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {
         return Driver.builder()
-                .playerId(StringUtils.trim(accDriver.getPlayerId()))
+                .id(StringUtils.trim(accDriver.getPlayerId()))
                 .firstName(StringUtils.trim(accDriver.getFirstName()))
                 .lastName(StringUtils.trim(accDriver.getLastName()))
                 .shortName(StringUtils.trim(accDriver.getShortName()))

@@ -54,4 +54,15 @@ public interface SessionMapper {
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM session WHERE id = #{id}")
     Session findById(Integer id);
+
+    @ResultMap("sessionResultMap")
+    @Select("""
+            SELECT *
+            FROM session
+            WHERE session_datetime >= #{from}
+              AND session_datetime <= #{to}
+              AND id IN (SELECT DISTINCT session_id FROM leaderboard_driver WHERE driver_id = #{driverId})
+            ORDER BY session_datetime DESC
+            """)
+    List<Session> findAllByTimeRangeAndDriverId(Instant from, Instant to, String driverId);
 }

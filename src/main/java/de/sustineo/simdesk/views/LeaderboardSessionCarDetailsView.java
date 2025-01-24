@@ -86,12 +86,12 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
             throw new NotFoundException("Session with file checksum " + fileChecksum + " does not exist.");
         }
 
-        List<String> playerIds = driverService.getPlayerIdsBySessionIdAndCarId(session.getId(), carId);
-        if (playerIds == null || playerIds.isEmpty()) {
+        List<String> driverIds = driverService.getDriverIdsBySessionIdAndCarId(session.getId(), carId);
+        if (driverIds == null || driverIds.isEmpty()) {
             throw new NotFoundException("No car found in session with file checksum " + fileChecksum + " and car id " + carId);
         }
 
-        laps = lapService.getBySessionIdAndPlayerIds(session.getId(), playerIds);
+        laps = lapService.getBySessionIdAndDriverIds(session.getId(), driverIds);
         penalties = penaltyService.findBySessionIdAndCarId(session.getId(), carId).stream()
                 .filter(Penalty::isValid)
                 .collect(Collectors.toList());

@@ -31,7 +31,7 @@ public class RankingService {
 
     public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId, TimeRange timeRange) {
         List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.from(), timeRange.to());
-        driverRankings = getRankingByPlayerIdAndCarModel(driverRankings);
+        driverRankings = getRankingByDriverIdAndCarModel(driverRankings);
         addRanking(driverRankings);
 
         return driverRankings;
@@ -60,11 +60,11 @@ public class RankingService {
                 .toList();
     }
 
-    private List<DriverRanking> getRankingByPlayerIdAndCarModel(List<DriverRanking> driverRankings) {
+    private List<DriverRanking> getRankingByDriverIdAndCarModel(List<DriverRanking> driverRankings) {
         HashMap<Pair<String, Integer>, DriverRanking> fastestLapsByDriverAndCarModel = new HashMap<>();
 
         for (DriverRanking driverRanking : driverRankings) {
-            Pair<String, Integer> key = Pair.of(driverRanking.getDriver().getPlayerId(), driverRanking.getCarModelId());
+            Pair<String, Integer> key = Pair.of(driverRanking.getDriver().getId(), driverRanking.getCarModelId());
             DriverRanking value = fastestLapsByDriverAndCarModel.get(key);
 
             if (value == null || value.getLapTimeMillis() >= driverRanking.getLapTimeMillis()) {
