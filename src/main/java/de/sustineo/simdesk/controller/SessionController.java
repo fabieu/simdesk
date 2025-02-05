@@ -39,31 +39,34 @@ public class SessionController {
         Instant to = Objects.requireNonNullElse(toParam, Instant.now());
 
         List<SessionResponse> sessionResponse = sessionService.getAllByTimeRange(from, to).stream()
-                .map(SessionResponse::new)
+                .map(session -> createSessionResponse(session, withLaps))
                 .toList();
-
-        if (withLaps) {
-            sessionResponse.forEach(session -> session.setLaps(lapService.getBySessionId(session.getId())));
-        }
 
         return new ServiceResponse<>(HttpStatus.OK, sessionResponse).toResponseEntity();
     }
 
-    @Operation(summary = "Get session by id")
-    @GetMapping(path = "/sessions/{id}")
-    public ResponseEntity<ServiceResponse<SessionResponse>> getSession(@PathVariable Integer id,
+    @Operation(summary = "Get session by file checksum")
+    @GetMapping(path = "/sessions/{fileChecksum}")
+    public ResponseEntity<ServiceResponse<SessionResponse>> getSession(@PathVariable String fileChecksum,
                                                                        @RequestParam(name = "withLaps", required = false) boolean withLaps) {
-        Session session = sessionService.getById(id);
+        Session session = sessionService.getByFileChecksum(fileChecksum);
         if (session == null) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND);
         }
 
+        SessionResponse sessionResponse = createSessionResponse(session, withLaps);
+
+        return new ServiceResponse<>(HttpStatus.OK, sessionResponse).toResponseEntity();
+    }
+
+    private SessionResponse createSessionResponse(Session session, boolean withLaps) {
         SessionResponse sessionResponse = new SessionResponse(session);
+
         if (withLaps) {
-            List<Lap> laps = lapService.getBySessionId(id);
+            List<Lap> laps = lapService.getBySessionId(session.getId());
             sessionResponse.setLaps(laps);
         }
 
-        return new ServiceResponse<>(HttpStatus.OK, sessionResponse).toResponseEntity();
+        return sessionResponse;
     }
 }

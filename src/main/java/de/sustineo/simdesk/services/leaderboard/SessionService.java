@@ -68,10 +68,6 @@ public class SessionService {
         return sessionMapper.findByFileChecksum(fileChecksum);
     }
 
-    public Session getById(Integer id) {
-        return sessionMapper.findById(id);
-    }
-
     @Transactional
     public void handleSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
         String fileName = fileMetadata.getFile().toString();

@@ -52,10 +52,6 @@ public interface SessionMapper {
     void insert(Session session);
 
     @ResultMap("sessionResultMap")
-    @Select("SELECT * FROM session WHERE id = #{id}")
-    Session findById(Integer id);
-
-    @ResultMap("sessionResultMap")
     @Select("""
             SELECT *
             FROM session
