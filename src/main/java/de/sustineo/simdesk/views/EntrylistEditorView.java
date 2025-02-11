@@ -441,11 +441,6 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        if (!SessionType.Q.equals(accSession.getSessionType())) {
-            notificationService.showWarningNotification("Results import failed - Only qualifying results are currently supported");
-            return;
-        }
-
         entrylistService.updateFromResults(entrylist, accSession, gridStartPosition);
         refreshEntrylistEditor();
 
