@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        vaadinVersion = "24.6.4"
-        flywayVersion = "11.3.1"
+        vaadinVersion = "24.6.5"
+        flywayVersion = "11.3.2"
     }
     configurations.classpath {
         exclude group: 'com.vaadin', module: 'hilla-engine-core'
@@ -52,7 +52,7 @@ dependencies {
         exclude group: "com.vaadin", module: "hilla"
         exclude group: "com.vaadin", module: "hilla-dev"
     }
-    implementation "software.xdev:vaadin-maps-leaflet-flow:4.5.0"
+    implementation "software.xdev:vaadin-maps-leaflet-flow:4.6.0"
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4"
