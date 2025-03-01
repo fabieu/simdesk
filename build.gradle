@@ -1,7 +1,7 @@
 buildscript {
     ext {
         vaadinVersion = "24.6.5"
-        flywayVersion = "11.3.3"
+        flywayVersion = "11.3.4"
     }
     configurations.classpath {
         exclude group: 'com.vaadin', module: 'hilla-engine-core'
