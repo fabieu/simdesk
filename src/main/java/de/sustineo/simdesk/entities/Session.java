@@ -21,6 +21,7 @@ public class Session {
     private String fileName;
     private String fileDirectory;
     private String fileContent;
+    private Instant insertDatetime;
 
     public String getTrackName() {
         return Track.getTrackNameByAccId(trackId);
