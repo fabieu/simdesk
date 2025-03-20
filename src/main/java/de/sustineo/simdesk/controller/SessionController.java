@@ -15,7 +15,6 @@ import org.springframework.web.server.ResponseStatusException;
 
 import java.time.Instant;
 import java.util.List;
-import java.util.Objects;
 
 @RestController
 @RequestMapping(value = "/api/v1", produces = "application/json")
@@ -34,11 +33,42 @@ public class SessionController {
     @GetMapping(path = "/sessions")
     public ResponseEntity<ServiceResponse<List<SessionResponse>>> getSessions(@RequestParam(name = "withLaps", required = false) boolean withLaps,
                                                                               @RequestParam(name = "from", required = false) Instant fromParam,
-                                                                              @RequestParam(name = "to", required = false) Instant toParam) {
-        Instant from = Objects.requireNonNullElse(fromParam, Instant.EPOCH);
-        Instant to = Objects.requireNonNullElse(toParam, Instant.now());
+                                                                              @RequestParam(name = "to", required = false) Instant toParam,
+                                                                              @RequestParam(name = "insertFrom", required = false) Instant insertFromParam,
+                                                                              @RequestParam(name = "insertTo", required = false) Instant insertToParam) {
+        // Prevent both from and to and insertFrom and insertTo being set
+        if ((fromParam != null || toParam != null) && (insertFromParam != null || insertToParam != null)) {
+            throw new ResponseStatusException(HttpStatus.BAD_REQUEST);
+        }
 
-        List<SessionResponse> sessionResponse = sessionService.getAllByTimeRange(from, to).stream()
+        // Set default time range values
+        Instant from = Instant.EPOCH;
+        Instant to = Instant.now();
+
+        List<Session> sessions;
+        if (insertFromParam != null || insertToParam != null) {
+            if (insertFromParam != null) {
+                from = insertFromParam;
+            }
+
+            if (insertToParam != null) {
+                to = insertToParam;
+            }
+
+            sessions = sessionService.getAllByInsertTimeRange(from, to);
+        } else {
+            if (toParam != null) {
+                to = toParam;
+            }
+
+            if (fromParam != null) {
+                from = fromParam;
+            }
+
+            sessions = sessionService.getAllBySessionTimeRange(from, to);
+        }
+
+        List<SessionResponse> sessionResponse = sessions.stream()
                 .map(session -> createSessionResponse(session, withLaps))
                 .toList();
 

@@ -51,14 +51,17 @@ public class SessionService {
         this.ignorePattern = Pattern.compile(ignorePattern);
     }
 
-    public List<Session> getAllByTimeRange(TimeRange timeRange) {
-        return getAllByTimeRange(timeRange.from(), timeRange.to());
+    public List<Session> getAllBySessionTimeRange(TimeRange timeRange) {
+        return getAllBySessionTimeRange(timeRange.from(), timeRange.to());
     }
 
-    public List<Session> getAllByTimeRange(Instant from, Instant to) {
-        return sessionMapper.findAllByTimeRange(from, to);
+    public List<Session> getAllBySessionTimeRange(Instant from, Instant to) {
+        return sessionMapper.findAllBySessionTimeRange(from, to);
     }
 
+    public List<Session> getAllByInsertTimeRange(Instant from, Instant to) {
+        return sessionMapper.findAllByInsertTimeRange(from, to);
+    }
 
     public List<Session> getAllByTimeRangeAndDriverId(Instant from, Instant to, String driverId) {
         return sessionMapper.findAllByTimeRangeAndDriverId(from, to, driverId);

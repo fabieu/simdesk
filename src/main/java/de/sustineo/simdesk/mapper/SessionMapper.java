@@ -26,6 +26,7 @@ public interface SessionMapper {
             @Result(property = "fileName", column = "file_name"),
             @Result(property = "fileDirectory", column = "file_directory"),
             @Result(property = "fileContent", column = "file_content"),
+            @Result(property = "insertDatetime", column = "insert_datetime"),
     })
     @Select("SELECT * FROM session ORDER BY session_datetime DESC")
     List<Session> findAll();
@@ -38,7 +39,17 @@ public interface SessionMapper {
               AND session_datetime <= #{endTime}
             ORDER BY session_datetime DESC
             """)
-    List<Session> findAllByTimeRange(Instant startTime, Instant endTime);
+    List<Session> findAllBySessionTimeRange(Instant startTime, Instant endTime);
+
+    @ResultMap("sessionResultMap")
+    @Select("""
+            SELECT *
+            FROM session
+            WHERE insert_datetime >= #{startTime}
+              AND insert_datetime <= #{endTime}
+            ORDER BY insert_datetime DESC
+            """)
+    List<Session> findAllByInsertTimeRange(Instant startTime, Instant endTime);
 
     @ResultMap("sessionResultMap")
     @Select("SELECT * FROM session WHERE file_checksum = #{fileChecksum}")
