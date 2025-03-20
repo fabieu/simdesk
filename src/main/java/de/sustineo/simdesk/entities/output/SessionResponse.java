@@ -19,6 +19,7 @@ public class SessionResponse {
     private Integer carCount;
     private String fileName;
     private String fileChecksum;
+    private Instant insertDatetime;
     private List<LapResponse> laps;
 
     public SessionResponse(Session session) {
@@ -31,6 +32,7 @@ public class SessionResponse {
         this.carCount = session.getCarCount();
         this.fileName = session.getFileName();
         this.fileChecksum = session.getFileChecksum();
+        this.insertDatetime = session.getInsertDatetime();
     }
 
     public void setLaps(List<Lap> laps) {
