@@ -30,8 +30,6 @@ CREATE TABLE IF NOT EXISTS driver
     insert_datetime TIMESTAMP NOT NULL DEFAULT ((UNIXEPOCH('subsec') * 1000))
 );
 
-CREATE INDEX ix_lap_driver_id ON lap (driver_id);
-
 CREATE TABLE IF NOT EXISTS lap
 (
     id              INTEGER PRIMARY KEY,
@@ -49,6 +47,7 @@ CREATE TABLE IF NOT EXISTS lap
     FOREIGN KEY (driver_id) REFERENCES driver (driver_id)
 );
 
+CREATE INDEX ix_lap_driver_id ON lap (driver_id);
 CREATE INDEX ix_lap_session_id_driver_id ON lap (session_id, driver_id);
 CREATE INDEX ix_lap_fastest_laps ON lap (car_model_id, driver_id, lap_time_millis);
 
