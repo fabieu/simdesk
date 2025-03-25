@@ -1,10 +1,12 @@
 package de.sustineo.simdesk.controller;
 
+import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
 import de.sustineo.simdesk.entities.output.SessionResponse;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import io.swagger.v3.oas.annotations.Operation;
+import org.springframework.context.annotation.Profile;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.security.access.prepost.PreAuthorize;
@@ -14,6 +16,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
+@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @RestController
 @RequestMapping(value = "/api/v1", produces = "application/json")
 @PreAuthorize("hasAnyRole('ADMIN')")
