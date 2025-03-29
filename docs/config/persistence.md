@@ -93,6 +93,7 @@ services:
   app:
     image: ghcr.io/fabieu/simdesk:latest
     environment:
+      SIMDESK_DB_TYPE: postgres
       SIMDESK_DB_URL: jdbc:postgresql://database:5432/simdesk
       SIMDESK_DB_USERNAME: postgres
       SIMDESK_DB_PASSWORD: development
