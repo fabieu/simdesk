@@ -23,7 +23,8 @@ import java.util.stream.Collectors;
 @Service
 public class EntrylistService {
     public void updateFromResults(AccEntrylist entrylist, AccSession accSession, Optional<Integer> gridStartPosition) {
-        Map<Integer, AccEntrylistEntry> entrylistEntryMap = entrylist.getEntries().stream()
+        Map<Integer, AccEntrylistEntry> entrylistEntriesByRaceNumber = entrylist.getEntries().stream()
+                .filter(accEntrylistEntry -> accEntrylistEntry.getRaceNumber() != null)
                 .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
 
         List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
@@ -41,7 +42,7 @@ public class EntrylistService {
             }
 
             // Skip entries without matching entrylist entry
-            AccEntrylistEntry entrylistEntry = entrylistEntryMap.get(leaderboardLine.getCar().getRaceNumber());
+            AccEntrylistEntry entrylistEntry = entrylistEntriesByRaceNumber.get(leaderboardLine.getCar().getRaceNumber());
             if (entrylistEntry == null) {
                 continue;
             }
