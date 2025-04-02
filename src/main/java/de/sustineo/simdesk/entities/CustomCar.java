@@ -5,7 +5,7 @@ import lombok.Data;
 
 @Data
 public class CustomCar {
-    private Integer carId;
+    @NotNull
     private Integer carNumber;
     @NotNull
     private String customCar;
