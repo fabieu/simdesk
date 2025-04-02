@@ -51,4 +51,10 @@ public class DriverRankingRenderer extends GridRenderer {
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit3Millis() - fastestTimeMillis))
                 .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSplit3Millis() - fastestTimeMillis));
     }
+
+    public static Renderer<DriverRanking> createDriverRenderer() {
+        return LitRenderer.<DriverRanking>of(DRIVER_REFERENCE_TEMPLATE)
+                .withProperty(DRIVER_REFERENCE_TEMPLATE_DRIVER, DriverRanking::getDriver)
+                .withFunction(DRIVER_REFERENCE_TEMPLATE_CLICK_HANDLER, driverRanking -> redirectToDriverProfile(driverRanking.getDriver()));
+    }
 }

@@ -112,7 +112,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
-        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getFullName())
+        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRankingRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setAutoWidth(true)
                 .setFlexGrow(1)

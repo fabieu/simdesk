@@ -26,4 +26,9 @@ public class LapRenderer extends GridRenderer {
                 .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSplit3Millis()));
     }
 
+    public static Renderer<Lap> createDriverRenderer() {
+        return LitRenderer.<Lap>of(DRIVER_REFERENCE_TEMPLATE)
+                .withProperty(DRIVER_REFERENCE_TEMPLATE_DRIVER, Lap::getDriver)
+                .withFunction(DRIVER_REFERENCE_TEMPLATE_CLICK_HANDLER, lap -> redirectToDriverProfile(lap.getDriver()));
+    }
 }

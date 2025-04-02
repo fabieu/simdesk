@@ -156,7 +156,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Lap::getLapTimeMillis);
-        grid.addColumn(lap -> lap.getDriver().getFullName())
+        grid.addColumn(LapRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setSortable(true);
         grid.addColumn(LapRenderer.createLapTimeRenderer())
