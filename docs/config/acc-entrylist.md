@@ -24,12 +24,12 @@ The custom car definitions will be used to override the `customCar` and `overrid
   {
     "carNumber": 1,
     "customCar": "SIMDESK_1.json",
-    "overrideCarModelForCustomCar": false // optional
+    "overrideCarModelForCustomCar": false
   },
   {
     "carNumber": 2,
     "customCar": "SIMDESK_2.json",
-    "overrideCarModelForCustomCar": true // optional
+    "overrideCarModelForCustomCar": true
   }
 ]
 ```
