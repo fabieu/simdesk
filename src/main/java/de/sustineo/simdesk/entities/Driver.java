@@ -31,15 +31,11 @@ public class Driver {
             return UNKNOWN_DRIVER;
         }
 
-        return String.format("%s %s", firstName, lastName);
-    }
-
-    public String getFullNameCensored() {
         if (visibility == Visibility.PRIVATE) {
             return HIDDEN_FULL_NAME;
         }
 
-        return getFullName();
+        return String.format("%s %s", firstName, lastName);
     }
 
     @SuppressWarnings("unused")
@@ -65,6 +61,6 @@ public class Driver {
 
     @Override
     public String toString() {
-        return getFullNameCensored();
+        return getFullName();
     }
 }

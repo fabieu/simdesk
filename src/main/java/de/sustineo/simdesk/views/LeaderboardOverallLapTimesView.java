@@ -112,7 +112,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setPartNameGenerator(ranking -> "font-weight-bold");
-        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullNameCensored())
+        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullName())
                 .setHeader("Driver")
                 .setSortable(true);
         Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(groupRanking -> Car.getNameById(groupRanking.getCarModelId()))
