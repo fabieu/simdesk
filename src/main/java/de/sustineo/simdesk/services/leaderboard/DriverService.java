@@ -32,5 +32,9 @@ public class DriverService {
     public List<String> getDriverIdsBySessionIdAndCarId(Integer id, Integer carId) {
         return driverMapper.findDriverIdsBySessionIdAndCarId(id, carId);
     }
+
+    public Driver getDriverById(String driverId) {
+        return driverMapper.findById(driverId);
+    }
 }
 

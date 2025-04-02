@@ -35,6 +35,7 @@ public abstract class BaseView extends VerticalLayout {
     protected static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     protected static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     protected static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
+    protected static final String ROUTE_PARAMETER_DRIVER_ID = "driverId";
 
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";
