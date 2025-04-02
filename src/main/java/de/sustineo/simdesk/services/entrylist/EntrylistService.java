@@ -29,10 +29,12 @@ public class EntrylistService {
 
         List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
         for (int i = 0; i < leaderboardLines.size(); i++) {
-            int gridPosition = i + 1;
+            int gridPosition;
 
             if (gridStartPosition.isPresent()) {
-                gridPosition += gridStartPosition.get();
+                gridPosition = i + gridStartPosition.get();
+            } else {
+                gridPosition = i + 1;
             }
 
             AccLeaderboardLine leaderboardLine = leaderboardLines.get(i);
@@ -52,10 +54,6 @@ public class EntrylistService {
     }
 
     public void updateFromCustomCars(AccEntrylist entrylist, CustomCar[] customCars) {
-        Map<Integer, CustomCar> customCarByCarIdMap = Arrays.stream(customCars)
-                .filter(customCar -> customCar.getCarId() != null)
-                .collect(Collectors.toMap(CustomCar::getCarId, Function.identity(), (customCar1, customCar2) -> customCar1));
-
         Map<Integer, CustomCar> customCarByCarNumberMap = Arrays.stream(customCars)
                 .filter(customCar -> customCar.getCarNumber() != null)
                 .collect(Collectors.toMap(CustomCar::getCarNumber, Function.identity(), (customCar1, customCar2) -> customCar1));
@@ -65,19 +63,12 @@ public class EntrylistService {
                 continue;
             }
 
-            CustomCar customCarByCarId = customCarByCarIdMap.get(entrylistEntry.getForcedCarModel());
-            CustomCar customCarByCarNumber = customCarByCarNumberMap.get(entrylistEntry.getRaceNumber());
-
-            CustomCar customCar;
-            if (customCarByCarNumber != null) {
-                entrylistEntry.setCustomCar(customCarByCarNumber.getCustomCar());
-                customCar = customCarByCarNumber;
-            } else if (customCarByCarId != null) {
-                entrylistEntry.setCustomCar(customCarByCarId.getCustomCar());
-                customCar = customCarByCarId;
-            } else {
+            CustomCar customCar = customCarByCarNumberMap.get(entrylistEntry.getRaceNumber());
+            if (customCar == null) {
                 continue;
             }
+
+            entrylistEntry.setCustomCar(customCar.getCustomCar());
 
             if (Boolean.TRUE.equals(customCar.getOverrideCarModelForCustomCar())) {
                 entrylistEntry.setOverrideCarModelForCustomCar(1);

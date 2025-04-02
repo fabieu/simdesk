@@ -326,18 +326,18 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistEntriesFromMap();
         });
 
-        Button reverseGridButton = new Button("Reverse grid positions", new Icon(VaadinIcon.REFRESH));
-        reverseGridButton.addClickListener(event -> reverseEntrylistEntries());
-
         Button importResultsButton = new Button("Import results", getUploadIcon());
         importResultsButton.addClickListener(event -> resultsUploadDialog.open());
 
         Button loadDefaultCustomCarsButton = new Button("Load custom cars", new Icon(VaadinIcon.CAR));
         loadDefaultCustomCarsButton.addClickListener(event -> customCarsUploadDialog.open());
-        loadDefaultCustomCarsButton.getStyle()
+
+        Button reverseGridButton = new Button("Reverse grid positions", new Icon(VaadinIcon.REFRESH));
+        reverseGridButton.addClickListener(event -> reverseEntrylistEntries());
+        reverseGridButton.getStyle()
                 .setMarginRight("auto");
 
-        FlexLayout entrylistHeaderLayout = new FlexLayout(reverseGridButton, importResultsButton, loadDefaultCustomCarsButton, sortingModeSelect, sortdirectionSelect);
+        FlexLayout entrylistHeaderLayout = new FlexLayout(importResultsButton, loadDefaultCustomCarsButton, reverseGridButton, sortingModeSelect, sortdirectionSelect);
         entrylistHeaderLayout.setWidthFull();
         entrylistHeaderLayout.setAlignItems(Alignment.END);
         entrylistHeaderLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
