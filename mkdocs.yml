@@ -18,6 +18,7 @@ nav:
           - Leaderboard: config/acc-leaderboard.md
           - Entrylist: config/acc-entrylist.md
           - Balance of Performance: config/acc-bop.md
+          - Map: config/map.md
   - Contributing: contributing.md
   - Credits: credits.md
 

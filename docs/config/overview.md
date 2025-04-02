@@ -10,6 +10,7 @@ options.
 - [Leaderboard](acc-leaderboard.md)
 - [Entrylist](acc-entrylist.md)
 - [Balance of Performance](acc-bop.md)
+- [Map](map.md)
 
 ## Basic configuration
 
