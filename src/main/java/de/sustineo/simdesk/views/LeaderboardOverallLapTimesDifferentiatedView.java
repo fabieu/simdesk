@@ -64,6 +64,8 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
             setSpacing(false);
             setPadding(false);
 
+            removeAll();
+
             add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
             add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);

@@ -68,6 +68,8 @@ public class ErrorView extends BaseView implements BeforeEnterObserver {
 
         log.warning(String.format("ErrorView: %s: %s", httpStatus, errorMessage));
 
+        removeAll();
+
         add(createStatusCode(httpStatus));
         add(createErrorMessage(errorMessage));
         add(createSupportLink());

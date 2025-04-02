@@ -38,6 +38,8 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
             setSpacing(false);
             setPadding(false);
 
+            removeAll();
+
             add(createViewHeader(driver.getFullName()));
             addAndExpand(createDriverLayout(driver));
             add(createFooter());

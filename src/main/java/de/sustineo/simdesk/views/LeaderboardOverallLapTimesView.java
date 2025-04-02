@@ -60,6 +60,8 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         setPadding(false);
         setSpacing(false);
 
+        removeAll();
+
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
         addAndExpand(rankingGrid);

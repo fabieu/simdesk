@@ -73,6 +73,8 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         routeParameters = beforeEnterEvent.getRouteParameters();
         queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
 
+        removeAll();
+
         add(createViewHeader());
         add(createTrackSelectionLayout());
         addAndExpand(createBopGrid());
