@@ -9,6 +9,37 @@ Enable the leaderboard feature by adding `acc-entrylist` to `SPRING_PROFILES_ACT
 
 ## Entrylist Editor
 
+### Import results
+
+The Entrylist Editor allows you to update the grid positions based on result files from previous sessions. You can
+optionally define a grid start position, which will be used as the starting point for the actual grid positions.
+The car number (`raceNumber`) will be used to match the results with the entrylist entries, so make sure that the car
+numbers are identical.
+
+## Load custom cars
+Specify custom car definitions using an external file, ensuring they follow the required format (detailed below). 
+The custom car definitions will be used to override the `customCar` and `overrideCarModelForCustomCar` properties in the entrylist file.
+```json
+[
+  {
+    "carNumber": 1,
+    "customCar": "SIMDESK_1.json",
+    "overrideCarModelForCustomCar": false // optional
+  },
+  {
+    "carNumber": 2,
+    "customCar": "SIMDESK_2.json",
+    "overrideCarModelForCustomCar": true // optional
+  }
+]
+```
+
+
+### Reverse grid positions
+
+When grid positions are defined, you can choose to reverse the grid positions. This is useful for reverse grid
+scenarios.
+
 ### Validation Rules
 
 The following validation rules are available and can be toggled on or off:
