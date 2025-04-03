@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Div;
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -72,14 +74,15 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
     }
 
     private Component createDriverLayout(Driver driver) {
-        List<Lap> laps = lapService.getByDriverId(driver.getId());
-        List<Session> sessions = sessionService.getAllByDriverId(driver.getId());
+        List<Lap> lapsByDriver = lapService.getByDriverId(driver.getId());
+        List<Session> sessionsByDriver = sessionService.getAllByDriverId(driver.getId());
 
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
-        layout.add(createBadgeLayout(driver, laps));
-        layout.add(createFavoriteCarLayout(laps));
-        layout.add(createFavoriteTrackLayout(laps, sessions));
+        layout.add(createBadgeLayout(driver, lapsByDriver));
+        layout.add(createLatestRacesLayout(sessionsByDriver));
+        layout.add(createFavoriteCarLayout(lapsByDriver));
+        layout.add(createFavoriteTrackLayout(lapsByDriver, sessionsByDriver));
 
         return layout;
     }
@@ -101,6 +104,67 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
         invalidLapCountBadge.getElement().getThemeList().add("badge error");
 
         layout.add(lastSeenBadge, validLapCountBadge, invalidLapCountBadge);
+        return layout;
+    }
+
+    private Component createLatestRacesLayout(List<Session> sessions) {
+        List<Session> raceSessions = sessions.stream()
+                .filter(session -> SessionType.R.equals(session.getSessionType()))
+                .limit(10)
+                .toList();
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+
+        H3 header = new H3("Latest Races");
+
+        Grid<Session> grid = new Grid<>(Session.class, false);
+        grid.addComponentColumn(this::getWeatherIcon)
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.CENTER);
+        grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
+                .setHeader("Session Time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(Session::getSessionDatetime);
+        grid.addColumn(Session::getServerName)
+                .setHeader("Server Name")
+                .setSortable(true)
+                .setTooltipGenerator(Session::getServerName);
+        grid.addColumn(Session::getTrackName)
+                .setHeader("Track Name")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(Session::getCarCount)
+                .setHeader("Cars")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+
+        grid.setItems(raceSessions);
+        grid.setAllRowsVisible(true);
+        grid.setMultiSort(true, true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();
+        singleSelect.addValueChangeListener(e -> {
+            Session selectedSession = e.getValue();
+
+            if (selectedSession != null) {
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
+                        new RouteParameters(
+                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
+                        )
+                ));
+            }
+        });
+
+        layout.add(header, grid);
+
         return layout;
     }
 
