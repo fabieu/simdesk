@@ -47,6 +47,10 @@ public interface LapMapper {
             """)
     List<Lap> findBySessionId(Integer sessionId);
 
+    @ResultMap("lapResultMap")
+    @Select("Select * from lap where driver_id = #{driverId}")
+    List<Lap> findByDriverId(String driverId);
+
     @Insert("""
             INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)
             VALUES (#{sessionId}, #{driver.id}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})

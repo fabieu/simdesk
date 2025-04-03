@@ -53,4 +53,8 @@ public class LapService {
     public List<Lap> getBySessionId(Integer sessionId) {
         return lapMapper.findBySessionId(sessionId);
     }
+
+    public List<Lap> getByDriverId(String driverId) {
+        return lapMapper.findByDriverId(driverId);
+    }
 }
