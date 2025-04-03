@@ -1,5 +1,13 @@
 package de.sustineo.simdesk.views.renderers;
 
+import com.vaadin.flow.component.UI;
+import com.vaadin.flow.router.RouteParam;
+import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.router.RouterLink;
+import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.views.BaseView;
+import de.sustineo.simdesk.views.LeaderboardDriverView;
+
 public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE = """
                 #${item.raceNumber}
@@ -8,11 +16,22 @@ public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE_NUMBER = "raceNumber";
     static final String RACE_NUMBER_TEMPLATE_BALLAST = "ballastKg";
 
+    static final String DRIVER_REFERENCE_TEMPLATE = """
+            <vaadin-button
+            title="Show profile"
+            @click="${clickHandler}"
+            theme="tertiary-inline small link">
+            ${item.driver.fullName}
+            </vaadin-button>
+            """;
+    static final String DRIVER_REFERENCE_TEMPLATE_DRIVER = "driver";
+    static final String DRIVER_REFERENCE_TEMPLATE_CLICK_HANDLER = "clickHandler";
+
     static final String DRIVERS_TEMPLATE = """
             <div style="display: flex; flex-wrap: wrap; gap: var(--lumo-space-s); align-items: center;">
                 ${item.drivers.map(driver => html`
                     <div style="display: inline-block">
-                        <span>${driver.fullNameCensored}</span>
+                        <span>${driver.fullName}</span>
                         <span theme="badge contrast pill" title="Valid laps/Invalid laps - Driving Time">
                             ${driver.validLapsCount || 0}/${driver.invalidLapsCount || 0}
                             ${driver.driveTimeMillis ? `- ${driver.prettyDriveTime}` : ""}
@@ -76,5 +95,16 @@ public class GridRenderer {
         } else {
             return "--lumo-error-text-color";
         }
+    }
+
+    public static void redirectToDriverProfile(Driver driver) {
+        if (driver == null || driver.getId() == null) {
+            return;
+        }
+
+        RouterLink link = new RouterLink(LeaderboardDriverView.class, new RouteParameters(
+                new RouteParam(BaseView.ROUTE_PARAMETER_DRIVER_ID, driver.getId())
+        ));
+        UI.getCurrent().getPage().open(link.getHref());
     }
 }

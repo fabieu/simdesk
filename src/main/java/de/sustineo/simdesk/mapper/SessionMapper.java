@@ -72,4 +72,13 @@ public interface SessionMapper {
             ORDER BY session_datetime DESC
             """)
     List<Session> findAllByTimeRangeAndDriverId(Instant from, Instant to, String driverId);
+
+    @ResultMap("sessionResultMap")
+    @Select("""
+            SELECT *
+            FROM session
+            WHERE id IN (SELECT DISTINCT session_id FROM leaderboard_driver WHERE driver_id = #{driverId})
+            ORDER BY session_datetime DESC
+            """)
+    List<Session> findAllByDriverId(String driverId);
 }

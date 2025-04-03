@@ -38,7 +38,7 @@ public class OverallLapTimesDifferentiatedFilter extends GridFilter {
     }
 
     public boolean test(DriverRanking driverRanking) {
-        boolean matchesDriverFullName = matches(driverRanking.getDriver().getFullNameCensored(), driverName);
+        boolean matchesDriverFullName = matches(driverRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(Car.getNameById(driverRanking.getCarModelId()), carModelName);
         boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
         boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);

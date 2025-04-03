@@ -27,6 +27,11 @@ public interface DriverMapper {
     @Select("SELECT * FROM driver ORDER BY last_activity DESC")
     List<Driver> findAll();
 
+
+    @ResultMap("driverResultMap")
+    @Select("SELECT * FROM driver WHERE driver_id = #{driverId}")
+    Driver findById(String driverId);
+
     @SuppressWarnings("unused")
     @ResultMap("driverResultMap")
     @Select("""

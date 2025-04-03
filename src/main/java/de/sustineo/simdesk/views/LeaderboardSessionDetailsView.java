@@ -79,6 +79,8 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
             setSpacing(false);
             setPadding(false);
 
+            removeAll();
+
             add(createViewHeader());
             add(createSessionInformation(session));
             addAndExpand(createLeaderboardGrid(session));

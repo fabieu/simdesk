@@ -64,6 +64,8 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
             setSpacing(false);
             setPadding(false);
 
+            removeAll();
+
             add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
             add(createSelectHeader(carGroup, trackId, this.timeRange));
             addAndExpand(this.rankingGrid);
@@ -112,7 +114,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setPartNameGenerator(new DriverRankingPodiumPartNameGenerator());
-        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(driverRanking -> driverRanking.getDriver().getFullNameCensored())
+        Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRankingRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setAutoWidth(true)
                 .setFlexGrow(1)

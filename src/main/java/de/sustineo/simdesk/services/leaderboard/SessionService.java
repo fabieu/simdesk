@@ -71,6 +71,10 @@ public class SessionService {
         return sessionMapper.findByFileChecksum(fileChecksum);
     }
 
+    public List<Session> getAllByDriverId(String driverId) {
+        return sessionMapper.findAllByDriverId(driverId);
+    }
+
     @Transactional
     public void handleSession(AccSession accSession, String fileContent, FileMetadata fileMetadata) {
         String fileName = fileMetadata.getFile().toString();

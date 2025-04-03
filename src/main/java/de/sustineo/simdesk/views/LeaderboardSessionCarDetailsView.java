@@ -96,23 +96,15 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .filter(Penalty::isValid)
                 .collect(Collectors.toList());
 
-        add(createViewHeader());
-        add(createSessionInformation(session));
-
-        TabSheet tabSheet = new TabSheet();
-        tabSheet.setSizeFull();
-        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
-        tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
-        tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
-            tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
-        }
-
         setSizeFull();
         setPadding(false);
         setSpacing(false);
 
-        addAndExpand(tabSheet);
+        removeAll();
+
+        add(createViewHeader());
+        add(createSessionInformation(session));
+        addAndExpand(createTabSheet(fileChecksum, carId));
         add(createFooter());
     }
 
@@ -136,6 +128,21 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         return layout;
     }
 
+    private Component createTabSheet(String fileChecksum, int carId) {
+        TabSheet tabSheet = new TabSheet();
+        tabSheet.setSizeFull();
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
+
+        tabSheet.add(createTab("Laps", laps.size()), createLapsGrid());
+        tabSheet.add(createTab("Penalties", penalties.size()), createPenaltyGrid());
+
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+            tabSheet.add(createTab("Statistics"), createStatisticsLayout(fileChecksum, carId));
+        }
+
+        return tabSheet;
+    }
+
     private Component createLapsGrid() {
         Grid<Lap> grid = new Grid<>(Lap.class, false);
         grid.addColumn(LitRenderer.of("${index + 1}"))
@@ -156,7 +163,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Lap::getLapTimeMillis);
-        grid.addColumn(lap -> lap.getDriver().getFullNameCensored())
+        grid.addColumn(LapRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setSortable(true);
         grid.addColumn(LapRenderer.createLapTimeRenderer())

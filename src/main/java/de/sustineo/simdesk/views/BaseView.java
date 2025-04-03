@@ -29,12 +29,13 @@ import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
 public abstract class BaseView extends VerticalLayout {
-    protected static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
-    protected static final String QUERY_PARAMETER_TRACK_ID = "track";
-    protected static final String ROUTE_PARAMETER_CAR_ID = "carId";
-    protected static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
-    protected static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
-    protected static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
+    public static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
+    public static final String QUERY_PARAMETER_TRACK_ID = "track";
+    public static final String ROUTE_PARAMETER_CAR_ID = "carId";
+    public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
+    public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
+    public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
+    public static final String ROUTE_PARAMETER_DRIVER_ID = "driverId";
 
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";

@@ -20,6 +20,7 @@ import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
+import de.sustineo.simdesk.views.renderers.GroupRankingRenderer;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
@@ -58,6 +59,8 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         setSizeFull();
         setPadding(false);
         setSpacing(false);
+
+        removeAll();
 
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
@@ -112,7 +115,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setPartNameGenerator(ranking -> "font-weight-bold");
-        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(groupRanking -> groupRanking.getDriver().getFullNameCensored())
+        Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(GroupRankingRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setSortable(true);
         Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(groupRanking -> Car.getNameById(groupRanking.getCarModelId()))
