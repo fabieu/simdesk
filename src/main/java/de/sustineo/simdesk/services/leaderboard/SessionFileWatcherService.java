@@ -42,7 +42,10 @@ public class SessionFileWatcherService {
 
         try {
             for (Path path : watchDirectories) {
-                FileAlterationObserver observer = new FileAlterationObserver(path.toFile());
+                FileAlterationObserver observer = FileAlterationObserver.builder()
+                        .setFile(path.toFile())
+                        .get();
+
                 FileAlterationListener listener = new FileAlterationListenerAdaptor() {
                     @Override
                     public void onFileCreate(File file) {
