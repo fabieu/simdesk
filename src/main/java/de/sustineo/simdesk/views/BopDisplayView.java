@@ -151,7 +151,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             shareButton.addClickListener(event -> {
                         Page page = UI.getCurrent().getPage();
                         page.fetchCurrentURL(url -> {
-                            String shareUrl = UriComponentsBuilder.fromHttpUrl(url.toString())
+                            String shareUrl = UriComponentsBuilder.fromUriString(url.toString())
                                     .replaceQueryParam(QUERY_PARAMETER_TRACK_ID, entry.getKey())
                                     .toUriString();
                             page.executeJs(String.format("navigator.clipboard.writeText('%s')", shareUrl));
