@@ -88,6 +88,10 @@ tasks {
     bootJar {
         archiveFileName.set("${project.name}.jar")
     }
+
+    compileJava {
+        options.deprecation = true
+    }
 }
 
 springBoot {
