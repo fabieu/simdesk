@@ -12,9 +12,9 @@ public class LapResponse {
     private CarGroup carGroup;
     private Integer carModelId;
     private Long lapTimeMillis;
-    private Long split1Millis;
-    private Long split2Millis;
-    private Long split3Millis;
+    private Long sector1Millis;
+    private Long sector2Millis;
+    private Long sector3Millis;
     private boolean valid;
 
     public LapResponse(Lap lap) {
@@ -24,9 +24,9 @@ public class LapResponse {
         this.carGroup = lap.getCarGroup();
         this.carModelId = lap.getCarModelId();
         this.lapTimeMillis = lap.getLapTimeMillis();
-        this.split1Millis = lap.getSplit1Millis();
-        this.split2Millis = lap.getSplit2Millis();
-        this.split3Millis = lap.getSplit3Millis();
+        this.sector1Millis = lap.getSector1Millis();
+        this.sector2Millis = lap.getSector2Millis();
+        this.sector3Millis = lap.getSector3Millis();
         this.valid = lap.isValid();
     }
 }

@@ -44,9 +44,9 @@ public class LeaderboardConverter extends BaseConverter {
                 .raceNumber(accLeaderboardLine.getCar().getRaceNumber())
                 .drivers(accLeaderboardLine.getCar().getDrivers().stream().map(driver -> driverConverter.convertToLeaderboardDriver(driver, fileMetadata, accLeaderboardLine)).toList())
                 .bestLapTimeMillis(fixBadTiming(accLeaderboardLine.getTiming().getBestLap()))
-                .bestSplit1Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(0)))
-                .bestSplit2Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(1)))
-                .bestSplit3Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(2)))
+                .bestSector1Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(0)))
+                .bestSector2Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(1)))
+                .bestSector3Millis(fixBadTiming(accLeaderboardLine.getTiming().getBestSplits().get(2)))
                 .totalTimeMillis(fixBadTiming(accLeaderboardLine.getTiming().getTotalTime()))
                 .lapCount(accLeaderboardLine.getTiming().getLapCount())
                 .build();

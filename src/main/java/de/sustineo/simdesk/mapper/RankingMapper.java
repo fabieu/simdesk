@@ -52,9 +52,9 @@ public interface RankingMapper {
     @Results(id = "driverRankingResultMap", value = {
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
-            @Result(property = "split1Millis", column = "split1_millis"),
-            @Result(property = "split2Millis", column = "split2_millis"),
-            @Result(property = "split3Millis", column = "split3_millis"),
+            @Result(property = "sector1Millis", column = "sector1_millis"),
+            @Result(property = "sector2Millis", column = "sector2_millis"),
+            @Result(property = "sector3Millis", column = "sector3_millis"),
             @Result(property = "driver.id", column = "driver_id"),
             @Result(property = "driver.firstName", column = "first_name"),
             @Result(property = "driver.lastName", column = "last_name"),

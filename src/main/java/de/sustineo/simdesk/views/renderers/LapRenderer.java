@@ -11,19 +11,19 @@ public class LapRenderer extends GridRenderer {
                 .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getLapTimeMillis()));
     }
 
-    public static Renderer<Lap> createSplit1Renderer() {
+    public static Renderer<Lap> createSector1Renderer() {
         return LitRenderer.<Lap>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSplit1Millis()));
+                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSector1Millis()));
     }
 
-    public static Renderer<Lap> createSplit2Renderer() {
+    public static Renderer<Lap> createSector2Renderer() {
         return LitRenderer.<Lap>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSplit2Millis()));
+                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSector2Millis()));
     }
 
-    public static Renderer<Lap> createSplit3Renderer() {
+    public static Renderer<Lap> createSector3Renderer() {
         return LitRenderer.<Lap>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSplit3Millis()));
+                .withProperty(TIMING_TEMPLATE_TIME, lap -> FormatUtils.formatLapTime(lap.getSector3Millis()));
     }
 
     public static Renderer<Lap> createDriverRenderer() {

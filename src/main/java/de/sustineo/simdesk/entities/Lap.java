@@ -20,12 +20,12 @@ public class Lap {
     private Integer carModelId;
     @CsvCustomBindByName(column = "Lap time", converter = LapTimeConverter.class)
     private Long lapTimeMillis;
-    @CsvCustomBindByName(column = "Split 1 time", converter = LapTimeConverter.class)
-    private Long split1Millis;
-    @CsvCustomBindByName(column = "Split 2 time", converter = LapTimeConverter.class)
-    private Long split2Millis;
-    @CsvCustomBindByName(column = "Split 3 time", converter = LapTimeConverter.class)
-    private Long split3Millis;
+    @CsvCustomBindByName(column = "Sector 1 time", converter = LapTimeConverter.class)
+    private Long sector1Millis;
+    @CsvCustomBindByName(column = "Sector 2 time", converter = LapTimeConverter.class)
+    private Long sector2Millis;
+    @CsvCustomBindByName(column = "Sector 3 time", converter = LapTimeConverter.class)
+    private Long sector3Millis;
     @CsvBindByName(column = "Valid")
     private boolean valid;
 }

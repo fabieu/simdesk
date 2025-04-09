@@ -19,37 +19,37 @@ public class DriverRankingRenderer extends GridRenderer {
                 .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getLapTimeMillis() - fastestTimeMillis));
     }
 
-    public static Renderer<DriverRanking> createSplit1Renderer(DriverRanking topDriverRanking) {
+    public static Renderer<DriverRanking> createSector1Renderer(DriverRanking topDriverRanking) {
         long fastestTimeMillis = Optional.ofNullable(topDriverRanking)
-                .map(DriverRanking::getSplit1Millis)
+                .map(DriverRanking::getSector1Millis)
                 .orElse(0L);
 
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit1Millis()))
-                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit1Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSplit1Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector1Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector1Millis() - fastestTimeMillis))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector1Millis() - fastestTimeMillis));
     }
 
-    public static Renderer<DriverRanking> createSplit2Renderer(DriverRanking topDriverRanking) {
+    public static Renderer<DriverRanking> createSector2Renderer(DriverRanking topDriverRanking) {
         long fastestTimeMillis = Optional.ofNullable(topDriverRanking)
-                .map(DriverRanking::getSplit2Millis)
+                .map(DriverRanking::getSector2Millis)
                 .orElse(0L);
 
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit2Millis()))
-                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit2Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSplit2Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector2Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector2Millis() - fastestTimeMillis))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector2Millis() - fastestTimeMillis));
     }
 
-    public static Renderer<DriverRanking> createSplit3Renderer(DriverRanking topDriverRanking) {
+    public static Renderer<DriverRanking> createSector3Renderer(DriverRanking topDriverRanking) {
         long fastestTimeMillis = Optional.ofNullable(topDriverRanking)
-                .map(DriverRanking::getSplit3Millis)
+                .map(DriverRanking::getSector3Millis)
                 .orElse(0L);
 
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
-                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit3Millis()))
-                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSplit3Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSplit3Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector3Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector3Millis() - fastestTimeMillis))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector3Millis() - fastestTimeMillis));
     }
 
     public static Renderer<DriverRanking> createDriverRenderer() {

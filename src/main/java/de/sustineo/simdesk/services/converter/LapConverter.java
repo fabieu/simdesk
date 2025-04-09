@@ -53,9 +53,9 @@ public class LapConverter extends BaseConverter {
                 .carModelId(accCar.get().getCarModel())
                 .driver(driver)
                 .lapTimeMillis(fixBadTiming(accLap.getLapTimeMillis()))
-                .split1Millis(fixBadTiming(accLap.getSplits().get(0)))
-                .split2Millis(fixBadTiming(accLap.getSplits().get(1)))
-                .split3Millis(fixBadTiming(accLap.getSplits().get(2)))
+                .sector1Millis(fixBadTiming(accLap.getSplits().get(0)))
+                .sector2Millis(fixBadTiming(accLap.getSplits().get(1)))
+                .sector3Millis(fixBadTiming(accLap.getSplits().get(2)))
                 .valid(accLap.getValid())
                 .build();
     }
