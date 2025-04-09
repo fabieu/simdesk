@@ -127,19 +127,19 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setSortable(true)
                 .setComparator(DriverRanking::getLapTimeMillis);
         Grid.Column<DriverRanking> split1Column = grid.addColumn(DriverRankingRenderer.createSplit1Renderer(topDriverRanking))
-                .setHeader("Split 1")
+                .setHeader("Sector 1")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(DriverRanking::getSplit1Millis);
         Grid.Column<DriverRanking> split2Column = grid.addColumn(DriverRankingRenderer.createSplit2Renderer(topDriverRanking))
-                .setHeader("Split 2")
+                .setHeader("Sector 2")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(DriverRanking::getSplit2Millis);
         Grid.Column<DriverRanking> split3Column = grid.addColumn(DriverRankingRenderer.createSplit3Renderer(topDriverRanking))
-                .setHeader("Split 3")
+                .setHeader("Sector 3")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)

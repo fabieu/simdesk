@@ -174,19 +174,19 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setSortable(true)
                 .setComparator(Lap::getLapTimeMillis);
         grid.addColumn(LapRenderer.createSplit1Renderer())
-                .setHeader("Split 1")
+                .setHeader("Sector 1")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Lap::getSplit1Millis);
         grid.addColumn(LapRenderer.createSplit2Renderer())
-                .setHeader("Split 2")
+                .setHeader("Sector 2")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Lap::getSplit2Millis);
         grid.addColumn(LapRenderer.createSplit3Renderer())
-                .setHeader("Split 3")
+                .setHeader("Sector 3")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
