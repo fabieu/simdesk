@@ -30,22 +30,28 @@ public interface RankingMapper {
             @Result(property = "trackId", column = "track_id"),
     })
     @Select("""
-            SELECT lap.car_group, lap.car_model_id, lap.lap_time_millis AS lap_time_millis, driver.*, session.track_id
+            SELECT lap.car_group, lap.car_model_id, lap.lap_time_millis, driver.*, session.track_id
             FROM lap
-                     INNER JOIN (SELECT lap.driver_id, lap.car_group, lap.car_model_id, session.track_id, MIN(lap.lap_time_millis) AS lap_time_millis
-                                 FROM lap
-                                    LEFT JOIN session ON lap.session_id = session.id
-                                 WHERE valid IS TRUE
-                                    AND session.session_datetime >= #{from}
-                                    AND session.session_datetime <= #{to}
-                                 GROUP BY lap.car_group, lap.car_model_id, session.track_id, lap.driver_id) fastest_laps
-                                ON lap.car_group = fastest_laps.car_group
-                                    AND lap.car_model_id = fastest_laps.car_model_id
-                                    AND lap.driver_id = fastest_laps.driver_id
-                                    AND lap.lap_time_millis = fastest_laps.lap_time_millis
-                     LEFT JOIN driver ON lap.driver_id = driver.driver_id
-                     LEFT JOIN session ON lap.session_id = session.id
-            ORDER BY lap_time_millis;
+                    INNER JOIN session ON lap.session_id = session.id
+                    INNER JOIN driver ON lap.driver_id = driver.driver_id
+                    INNER JOIN (
+                    SELECT lap.car_model_id, lap.driver_id, session.track_id, lap.car_group, MIN(lap.lap_time_millis) AS min_lap_time_millis
+                        FROM lap
+                            INNER JOIN session ON lap.session_id = session.id
+                        WHERE lap.valid IS TRUE
+                          AND session.session_datetime >= #{from}
+                          AND session.session_datetime <= #{to}
+                        GROUP BY session.track_id, lap.car_group
+                    ) fastest_laps
+                    ON lap.car_model_id = fastest_laps.car_model_id
+                       AND lap.driver_id = fastest_laps.driver_id
+                       AND session.track_id = fastest_laps.track_id
+                       AND lap.car_group = fastest_laps.car_group
+                       AND lap.lap_time_millis = fastest_laps.min_lap_time_millis
+                    WHERE lap.valid IS TRUE
+                      AND session.session_datetime >= #{from}
+                      AND session.session_datetime <= #{to}
+            ORDER BY lap.car_group, session.track_id;
             """)
     List<GroupRanking> findAllTimeFastestLaps(Instant from, Instant to);
 
@@ -67,20 +73,26 @@ public interface RankingMapper {
     @Select("""
             SELECT lap.*, driver.*, session.*
             FROM lap
-            INNER JOIN (SELECT lap.driver_id, lap.car_model_id, MIN(lap.lap_time_millis) AS lap_time_millis
-                FROM lap
-                INNER JOIN session ON lap.session_id = session.id
-                WHERE valid IS TRUE
-                  AND lap.car_group = #{carGroup}
-                  AND session.track_id = #{trackId}
-                  AND session.session_datetime >= #{from}
-                  AND session.session_datetime <= #{to}
-                GROUP BY lap.driver_id, lap.car_model_id
-            ) fastest_laps ON lap.driver_id = fastest_laps.driver_id
-                          AND lap.car_model_id = fastest_laps.car_model_id
-                          AND lap.lap_time_millis = fastest_laps.lap_time_millis
-            INNER JOIN driver ON lap.driver_id = driver.driver_id
-            INNER JOIN session ON lap.session_id = session.id
+                     INNER JOIN session ON lap.session_id = session.id
+                     INNER JOIN driver ON lap.driver_id = driver.driver_id
+                     INNER JOIN (SELECT lap.driver_id, lap.car_model_id, MIN(lap.lap_time_millis) AS lap_time_millis
+                                 FROM lap
+                                          INNER JOIN session ON lap.session_id = session.id
+                                 WHERE lap.valid = TRUE
+                                   AND lap.car_group = #{carGroup}
+                                   AND session.track_id = #{trackId}
+                                   AND session.session_datetime >= #{from}
+                                   AND session.session_datetime <= #{to}
+                                 GROUP BY lap.driver_id, lap.car_model_id) fastest_laps
+                                ON lap.driver_id = fastest_laps.driver_id
+                                    AND lap.car_model_id = fastest_laps.car_model_id
+                                    AND lap.lap_time_millis = fastest_laps.lap_time_millis
+            WHERE lap.valid = TRUE
+              AND lap.car_group = #{carGroup}
+              AND session.track_id = #{trackId}
+              AND session.session_datetime >= #{from}
+              AND session.session_datetime <= #{to}
+            ORDER BY lap.lap_time_millis;
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to);
 }
