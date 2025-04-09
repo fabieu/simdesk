@@ -61,18 +61,18 @@ public class RankingService {
     }
 
     private List<DriverRanking> getRankingByDriverIdAndCarModel(List<DriverRanking> driverRankings) {
-        HashMap<Pair<String, Integer>, DriverRanking> fastestLapsByDriverAndCarModel = new HashMap<>();
+        HashMap<Pair<String, Integer>, DriverRanking> fastestLapByDriverAndCarModel = new HashMap<>();
 
         for (DriverRanking driverRanking : driverRankings) {
             Pair<String, Integer> key = Pair.of(driverRanking.getDriver().getId(), driverRanking.getCarModelId());
-            DriverRanking value = fastestLapsByDriverAndCarModel.get(key);
+            DriverRanking value = fastestLapByDriverAndCarModel.get(key);
 
             if (value == null || value.getLapTimeMillis() >= driverRanking.getLapTimeMillis()) {
-                fastestLapsByDriverAndCarModel.put(key, driverRanking);
+                fastestLapByDriverAndCarModel.put(key, driverRanking);
             }
         }
 
-        return fastestLapsByDriverAndCarModel.values().stream()
+        return fastestLapByDriverAndCarModel.values().stream()
                 .sorted(new DriverRankingComparator())
                 .toList();
     }

@@ -69,18 +69,18 @@ public interface RankingMapper {
             FROM lap
             INNER JOIN (SELECT lap.driver_id, lap.car_model_id, MIN(lap.lap_time_millis) AS lap_time_millis
                 FROM lap
-                LEFT JOIN session ON lap.session_id = session.id
+                INNER JOIN session ON lap.session_id = session.id
                 WHERE valid IS TRUE
                   AND lap.car_group = #{carGroup}
                   AND session.track_id = #{trackId}
                   AND session.session_datetime >= #{from}
                   AND session.session_datetime <= #{to}
-                GROUP BY lap.driver_id, lap.car_model_id, lap.car_group, session.track_id
+                GROUP BY lap.driver_id, lap.car_model_id
             ) fastest_laps ON lap.driver_id = fastest_laps.driver_id
                           AND lap.car_model_id = fastest_laps.car_model_id
                           AND lap.lap_time_millis = fastest_laps.lap_time_millis
-            LEFT JOIN driver ON lap.driver_id = driver.driver_id
-            LEFT JOIN session ON lap.session_id = session.id
+            INNER JOIN driver ON lap.driver_id = driver.driver_id
+            INNER JOIN session ON lap.session_id = session.id
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to);
 }
