@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
+import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
 import de.sustineo.simdesk.entities.comparator.GroupRankingComparator;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
@@ -28,7 +29,9 @@ public class RankingService {
     }
 
     public List<DriverRanking> getAllTimeDriverRanking(CarGroup carGroup, String trackId, TimeRange timeRange) {
-        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.from(), timeRange.to());
+        List<DriverRanking> driverRankings = rankingMapper.findAllTimeFastestLapsByTrack(carGroup, trackId, timeRange.from(), timeRange.to()).stream()
+                .sorted(new DriverRankingComparator())
+                .toList();
 
         int ranking = 1;
         for (DriverRanking driverRanking : driverRankings) {

@@ -29,7 +29,7 @@ public interface RankingMapper {
             @Result(property = "driver.visibility", column = "visibility"),
             @Result(property = "trackId", column = "track_id"),
     })
-    @Select("""
+    @Select(databaseId = "sqlite", value = """
             SELECT lap.car_group, lap.car_model_id, lap.lap_time_millis, driver.*, session.track_id
             FROM lap
                     INNER JOIN session ON lap.session_id = session.id
@@ -53,6 +53,21 @@ public interface RankingMapper {
                       AND session.session_datetime <= #{to}
             ORDER BY lap.car_group, session.track_id;
             """)
+    @Select(databaseId = "postgres", value = """
+            SELECT DISTINCT ON (session.track_id, lap.car_group)
+                   lap.car_group,
+                   lap.car_model_id,
+                   lap.lap_time_millis,
+                   driver.*,
+                   session.track_id
+            FROM lap
+                     INNER JOIN session ON lap.session_id = session.id
+                     INNER JOIN driver ON lap.driver_id = driver.driver_id
+            WHERE lap.valid IS TRUE
+              AND session.session_datetime >= #{from}
+              AND session.session_datetime <= #{to}
+            ORDER BY lap.car_group, session.track_id, lap.lap_time_millis;
+            """)
     List<GroupRanking> findAllTimeFastestLaps(Instant from, Instant to);
 
     @Results(id = "driverRankingResultMap", value = {
@@ -70,7 +85,7 @@ public interface RankingMapper {
             @Result(property = "session.serverName", column = "server_name"),
             @Result(property = "session.sessionDatetime", column = "session_datetime"),
     })
-    @Select("""
+    @Select(databaseId = "sqlite", value = """
             SELECT lap.*, driver.*, session.*
             FROM lap
                      INNER JOIN session ON lap.session_id = session.id
@@ -92,7 +107,21 @@ public interface RankingMapper {
               AND session.track_id = #{trackId}
               AND session.session_datetime >= #{from}
               AND session.session_datetime <= #{to}
-            ORDER BY lap.lap_time_millis;
+            """)
+    @Select(databaseId = "postgres", value = """
+            SELECT DISTINCT ON (lap.driver_id, lap.car_model_id)
+                   lap.*,
+                   driver.*,
+                   session.*
+            FROM lap
+                     INNER JOIN session ON lap.session_id = session.id
+                     INNER JOIN driver ON lap.driver_id = driver.driver_id
+            WHERE lap.valid = TRUE
+              AND lap.car_group = #{carGroup}
+              AND session.track_id = #{trackId}
+              AND session.session_datetime >= #{from}
+              AND session.session_datetime <= #{to}
+            ORDER BY lap.driver_id, lap.car_model_id, lap.lap_time_millis;
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to);
 }
