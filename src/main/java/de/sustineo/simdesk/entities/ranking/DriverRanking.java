@@ -12,9 +12,9 @@ public class DriverRanking {
     private Integer carModelId;
     private Integer ranking;
     private Long lapTimeMillis;
-    private Long split1Millis;
-    private Long split2Millis;
-    private Long split3Millis;
+    private Long sector1Millis;
+    private Long sector2Millis;
+    private Long sector3Millis;
     private Driver driver;
     private Session session;
 }

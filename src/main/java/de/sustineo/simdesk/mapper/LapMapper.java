@@ -20,9 +20,9 @@ public interface LapMapper {
             @Result(property = "carGroup", column = "car_group"),
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "lapTimeMillis", column = "lap_time_millis"),
-            @Result(property = "split1Millis", column = "split1_millis"),
-            @Result(property = "split2Millis", column = "split2_millis"),
-            @Result(property = "split3Millis", column = "split3_millis"),
+            @Result(property = "sector1Millis", column = "sector1_millis"),
+            @Result(property = "sector2Millis", column = "sector2_millis"),
+            @Result(property = "sector3Millis", column = "sector3_millis"),
             @Result(property = "valid", column = "valid"),
     })
     @Select("""
@@ -52,8 +52,8 @@ public interface LapMapper {
     List<Lap> findByDriverId(String driverId);
 
     @Insert("""
-            INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, split1_millis, split2_millis, split3_millis, valid)
-            VALUES (#{sessionId}, #{driver.id}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{split1Millis}, #{split2Millis}, #{split3Millis}, #{valid})
+            INSERT INTO lap (session_id, driver_id, car_group, car_model_id, lap_time_millis, sector1_millis, sector2_millis, sector3_millis, valid)
+            VALUES (#{sessionId}, #{driver.id}, #{carGroup}, #{carModelId}, #{lapTimeMillis}, #{sector1Millis}, #{sector2Millis}, #{sector3Millis}, #{valid})
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Lap lap);

@@ -173,24 +173,24 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setPartNameGenerator(ranking -> "font-weight-bold")
                 .setSortable(true)
                 .setComparator(Lap::getLapTimeMillis);
-        grid.addColumn(LapRenderer.createSplit1Renderer())
-                .setHeader("Split 1")
+        grid.addColumn(LapRenderer.createSector1Renderer())
+                .setHeader("Sector 1")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(Lap::getSplit1Millis);
-        grid.addColumn(LapRenderer.createSplit2Renderer())
-                .setHeader("Split 2")
+                .setComparator(Lap::getSector1Millis);
+        grid.addColumn(LapRenderer.createSector2Renderer())
+                .setHeader("Sector 2")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(Lap::getSplit2Millis);
-        grid.addColumn(LapRenderer.createSplit3Renderer())
-                .setHeader("Split 3")
+                .setComparator(Lap::getSector2Millis);
+        grid.addColumn(LapRenderer.createSector3Renderer())
+                .setHeader("Sector 3")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(Lap::getSplit3Millis);
+                .setComparator(Lap::getSector3Millis);
 
         grid.setItems(laps);
         grid.setHeightFull();

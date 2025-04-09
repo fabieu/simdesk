@@ -126,24 +126,24 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setPartNameGenerator(ranking -> "font-weight-bold")
                 .setSortable(true)
                 .setComparator(DriverRanking::getLapTimeMillis);
-        Grid.Column<DriverRanking> split1Column = grid.addColumn(DriverRankingRenderer.createSplit1Renderer(topDriverRanking))
-                .setHeader("Split 1")
+        Grid.Column<DriverRanking> sector1Column = grid.addColumn(DriverRankingRenderer.createSector1Renderer(topDriverRanking))
+                .setHeader("Sector 1")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(DriverRanking::getSplit1Millis);
-        Grid.Column<DriverRanking> split2Column = grid.addColumn(DriverRankingRenderer.createSplit2Renderer(topDriverRanking))
-                .setHeader("Split 2")
+                .setComparator(DriverRanking::getSector1Millis);
+        Grid.Column<DriverRanking> sector2Column = grid.addColumn(DriverRankingRenderer.createSector2Renderer(topDriverRanking))
+                .setHeader("Sector 2")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(DriverRanking::getSplit2Millis);
-        Grid.Column<DriverRanking> split3Column = grid.addColumn(DriverRankingRenderer.createSplit3Renderer(topDriverRanking))
-                .setHeader("Split 3")
+                .setComparator(DriverRanking::getSector2Millis);
+        Grid.Column<DriverRanking> sector3Column = grid.addColumn(DriverRankingRenderer.createSector3Renderer(topDriverRanking))
+                .setHeader("Sector 3")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
-                .setComparator(DriverRanking::getSplit3Millis);
+                .setComparator(DriverRanking::getSector3Millis);
         Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> Car.getNameById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)

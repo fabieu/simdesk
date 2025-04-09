@@ -32,9 +32,9 @@ public class LeaderboardLine {
     private List<Driver> drivers;
     @CsvCustomBindByName(column = "Fastest lap", converter = LapTimeConverter.class)
     private Long bestLapTimeMillis;
-    private Long bestSplit1Millis;
-    private Long bestSplit2Millis;
-    private Long bestSplit3Millis;
+    private Long bestSector1Millis;
+    private Long bestSector2Millis;
+    private Long bestSector3Millis;
     @CsvCustomBindByName(column = "Total time", converter = TotalTimeConverter.class)
     private Long totalTimeMillis;
     @CsvBindByName(column = "Laps")
