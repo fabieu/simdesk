@@ -10,7 +10,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
-import de.sustineo.simdesk.entities.weather.OpenWeatherCurrent;
+import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -150,47 +150,55 @@ public class MapView extends BaseView {
             Track track = entry.getKey();
             LMarker trackMarker = entry.getValue();
 
-            Optional<AccWeatherSettings> weatherSettings = weatherService.getAccWeatherSettings(track, raceHours);
-            if (weatherSettings.isPresent()) {
-                String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
+            String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
 
-                OpenWeatherCurrent currentWeather = weatherSettings.get().getWeatherModel().getCurrent();
-                Double currentTemperature = currentWeather.getTemperature();
-                Double currentClouds = currentWeather.getClouds();
-                Double currentPrecipitation = Optional.ofNullable(currentWeather.getRain())
-                        .map(OpenWeatherPrecipitation::getPrecipitation)
-                        .orElse(0.0);
+            StringBuilder trackMarkerTooltip = new StringBuilder("""
+                    <h3 style="color: var(--lumo-primary-text-color)">%s</h3>
+                    """
+                    .formatted(
+                            track.getName()
+                    ));
 
-                trackMarker.closePopup();
-                trackMarker.bindPopup("""
-                        <h3 style="color: var(--lumo-primary-text-color)">%s</h3>
+            Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(track);
+            if (weatherModel.isPresent()) {
+                trackMarkerTooltip.append("""
                         %s
                         <h5 style="color: var(--lumo-primary-text-color)">Current weather</h5>
                         <b>Temperature:</b> %.0f°C <br>
                         <b>Clouds:</b> %.0f%% <br>
                         <b>Precipitation:</b> %.1f mm/h <br>
-                        %s
-                        <h5 style="color: var(--lumo-primary-text-color)">ACC Weather Settings - %s hour(s)</h5>
-                        <b>Temperature:</b> %d°C <br>
-                        <b>Cloud Level:</b> %.2f <br>
-                        <b>Rain Level:</b> %.2f <br>
-                        <b>Randomness:</b> %d <br>
                         """
                         .formatted(
-                                track.getName(),
                                 spacerHtml,
-                                currentTemperature,
-                                currentClouds,
-                                currentPrecipitation,
-                                spacerHtml,
-                                raceHours,
-                                weatherSettings.get().getAmbientTemperature(),
-                                weatherSettings.get().getCloudLevel(),
-                                weatherSettings.get().getRainLevel(),
-                                weatherSettings.get().getRandomness()
+                                weatherModel.get().getCurrent().getTemperature(),
+                                weatherModel.get().getCurrent().getClouds(),
+                                Optional.ofNullable(weatherModel.get().getCurrent().getRain())
+                                        .map(OpenWeatherPrecipitation::getPrecipitation)
+                                        .orElse(0.0)
                         )
                 );
+
+                AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);
+                trackMarkerTooltip.append("""
+                    %s
+                    <h5 style="color: var(--lumo-primary-text-color)">ACC Weather Settings - %s hour(s)</h5>
+                    <b>Temperature:</b> %d°C <br>
+                    <b>Cloud Level:</b> %.2f <br>
+                    <b>Rain Level:</b> %.2f <br>
+                    <b>Randomness:</b> %d <br>
+                    """
+                        .formatted(
+                                spacerHtml,
+                                raceHours,
+                                accWeatherSettings.getAmbientTemperature(),
+                                accWeatherSettings.getCloudLevel(),
+                                accWeatherSettings.getRainLevel(),
+                                accWeatherSettings.getRandomness()
+                        ));
             }
+
+            trackMarker.closePopup();
+            trackMarker.bindPopup(trackMarkerTooltip.toString());
         }
     }
 }

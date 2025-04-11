@@ -35,6 +35,7 @@ import java.util.logging.Level;
 public class WeatherService {
     private static final String OPENWEATHERMAP_ONE_CALL_3_TEMPLATE = "https://api.openweathermap.org/data/3.0/onecall?lat=%s&lon=%s&exclude=minutely,daily,alerts&units=metric&appid=%s";
     private static final int OPENWEATHERMAP_FORECAST_HOURS = 48;
+    private static final int DEFAULT_RACE_HOURS = 1;
 
     private final RestTemplate restTemplate;
 
@@ -73,15 +74,14 @@ public class WeatherService {
         return getOpenWeatherMapUrlTemplate("clouds_new");
     }
 
-    public Optional<AccWeatherSettings> getAccWeatherSettings(Track track, int raceHours) {
-        OpenWeatherModel weatherModel = weatherModelsByTrack.get(track);
-        if (weatherModel == null) {
-            return Optional.empty();
-        }
+    public Optional<OpenWeatherModel> getOpenWeatherModel(Track track) {
+        return Optional.ofNullable(weatherModelsByTrack.get(track));
+    }
 
+    public AccWeatherSettings getAccWeatherSettings(OpenWeatherModel weatherModel, int raceHours) {
         // Set minimum and maximum boundaries for the weather model
         if (raceHours <= 0) {
-            raceHours = 1;
+            raceHours = DEFAULT_RACE_HOURS;
         } else if (raceHours > OPENWEATHERMAP_FORECAST_HOURS) {
             raceHours = OPENWEATHERMAP_FORECAST_HOURS;
         }
@@ -91,15 +91,12 @@ public class WeatherService {
         double cloudLevel = calculateCloudLevel(weatherModel, raceHours, rainLevel);
         int randomness = calculateRandomness(weatherModel, raceHours, rainLevel);
 
-        AccWeatherSettings weatherSettings = AccWeatherSettings.builder()
-                .weatherModel(weatherModel)
+        return AccWeatherSettings.builder()
                 .ambientTemperature(enforceAccTemperatureBoundaries(averageTemperature))
                 .cloudLevel(enforceAccCloudLevelBoundaries(cloudLevel))
                 .rainLevel(enforceAccRainLevelBoundaries(rainLevel))
                 .randomness(enforceAccRandomnessBoundaries(randomness))
                 .build();
-
-        return Optional.of(weatherSettings);
     }
 
     /**
@@ -316,7 +313,8 @@ public class WeatherService {
      * @return The cloud level within the boundaries
      */
     private double enforceAccCloudLevelBoundaries(double cloudLevel) {
-        return Math.min(Math.max(cloudLevel, AccWeatherSettings.MIN_CLOUD_LEVEL), AccWeatherSettings.MAX_CLOUD_LEVEL);
+        double bounded = Math.min(Math.max(cloudLevel, AccWeatherSettings.MIN_CLOUD_LEVEL), AccWeatherSettings.MAX_CLOUD_LEVEL);
+        return Math.round(bounded * 10_000.0) / 10_000.0; // Round to 4 decimal places
     }
 
     /**
@@ -327,7 +325,8 @@ public class WeatherService {
      * @return The rain level within the boundaries
      */
     private double enforceAccRainLevelBoundaries(double rainLevel) {
-        return Math.min(Math.max(rainLevel, AccWeatherSettings.MIN_RAIN_LEVEL), AccWeatherSettings.MAX_RAIN_LEVEL);
+        double bounded = Math.min(Math.max(rainLevel, AccWeatherSettings.MIN_RAIN_LEVEL), AccWeatherSettings.MAX_RAIN_LEVEL);
+        return Math.round(bounded * 10_000.0) / 10_000.0; // Round to 4 decimal places
     }
 
 
