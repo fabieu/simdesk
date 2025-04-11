@@ -39,30 +39,7 @@ public class WeatherController {
             @RequestParam(value = "withWeatherModel", required = false, defaultValue = "false") boolean withWeatherModel,
             @RequestParam(value = "accTrackId", required = false) String accTrackId
     ) {
-        WeatherSettingsOutput weatherSettingsOutput = new WeatherSettingsOutput();
-
-        Track track = null;
-        if (accTrackId != null) {
-            track = Track.getByAccId(accTrackId);
-        }
-
-        if (track == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Track not found: " + track);
-        }
-
-        Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(track);
-        if (weatherModel.isPresent()) {
-            AccWeatherSettings accWeatherSettings = weatherService.getCurrentAccWeatherSettings(weatherModel.get());
-            weatherSettingsOutput.setAccSettings(accWeatherSettings);
-
-            if (withWeatherModel) {
-                weatherSettingsOutput.setWeatherModel(weatherModel.get());
-            }
-        } else {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for track" + track);
-        }
-
-        return weatherSettingsOutput;
+        return getPredictedWeather(-1, withWeatherModel, accTrackId);
     }
 
     @GetMapping("/prediction")
@@ -83,15 +60,15 @@ public class WeatherController {
         }
 
         Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(track);
-        if (weatherModel.isPresent()) {
-            AccWeatherSettings accWeatherSettings = weatherService.getPredictedAccWeatherSettings(weatherModel.get(), raceHours);
-            weatherSettingsOutput.setAccSettings(accWeatherSettings);
-
-            if (withWeatherModel) {
-                weatherSettingsOutput.setWeatherModel(weatherModel.get());
-            }
-        } else {
+        if (weatherModel.isEmpty()) {
             throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for track" + track);
+        }
+
+        AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);
+        weatherSettingsOutput.setAccSettings(accWeatherSettings);
+
+        if (withWeatherModel) {
+            weatherSettingsOutput.setWeatherModel(weatherModel.get());
         }
 
         return weatherSettingsOutput;

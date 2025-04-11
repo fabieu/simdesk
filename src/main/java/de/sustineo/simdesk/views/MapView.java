@@ -178,7 +178,7 @@ public class MapView extends BaseView {
                         )
                 );
 
-                AccWeatherSettings accWeatherSettings = weatherService.getPredictedAccWeatherSettings(weatherModel.get(), raceHours);
+                AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);
                 trackMarkerTooltip.append("""
                     %s
                     <h5 style="color: var(--lumo-primary-text-color)">ACC Weather Settings - %s hour(s)</h5>

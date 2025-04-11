@@ -78,11 +78,7 @@ public class WeatherService {
         return Optional.ofNullable(weatherModelsByTrack.get(track));
     }
 
-    public AccWeatherSettings getCurrentAccWeatherSettings(OpenWeatherModel weatherModel) {
-        return getPredictedAccWeatherSettings(weatherModel, DEFAULT_RACE_HOURS);
-    }
-
-    public AccWeatherSettings getPredictedAccWeatherSettings(OpenWeatherModel weatherModel, int raceHours) {
+    public AccWeatherSettings getAccWeatherSettings(OpenWeatherModel weatherModel, int raceHours) {
         // Set minimum and maximum boundaries for the weather model
         if (raceHours <= 0) {
             raceHours = DEFAULT_RACE_HOURS;
