@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities.json.kunos.acc;
 
-import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import lombok.Builder;
 import lombok.Getter;
 import lombok.Setter;
@@ -18,7 +17,6 @@ public class AccWeatherSettings {
     public static final int MIN_RANDOMNESS = 0;
     public static final int MAX_RANDOMNESS = 3; // randomness above 3 might produce unexpected results
 
-    private OpenWeatherModel weatherModel;
     private Integer ambientTemperature;
     private Double cloudLevel;
     private Double rainLevel;
