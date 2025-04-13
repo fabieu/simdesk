@@ -1,7 +1,7 @@
 buildscript {
     ext {
         vaadinVersion = "24.7.1"
-        flywayVersion = "11.6.0"
+        flywayVersion = "11.7.0"
     }
 }
 
@@ -60,7 +60,7 @@ dependencies {
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.17.0"
     implementation 'commons-codec:commons-codec:1.18.0'
-    implementation 'commons-io:commons-io:2.18.0'
+    implementation 'commons-io:commons-io:2.19.0'
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.2.7"
