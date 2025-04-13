@@ -62,3 +62,11 @@ body[theme~="racing_red"] {
     --lumo-primary-color-50pct: rgba(214, 40, 40, 0.5);
     --lumo-primary-contrast-color: rgb(26, 26, 26);
 }
+
+/* ThemeVariant: PPR */
+body[theme~="ppr"] {
+    --lumo-primary-color: rgb(169, 56, 0);
+    --lumo-primary-color-10pct: rgba(169, 56, 0, 0.2);
+    --lumo-primary-color-50pct: rgba(169, 56, 0, 0.5);
+    --lumo-primary-contrast-color: rgb(26, 26, 26);
+}

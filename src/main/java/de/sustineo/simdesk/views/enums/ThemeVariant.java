@@ -7,6 +7,7 @@ public enum ThemeVariant {
     BLACK_AND_WHITE,
     DEFAULT,
     MODERN_GREEN,
+    PPR,
     RACING_RED,
     SIM2REAL;
 
