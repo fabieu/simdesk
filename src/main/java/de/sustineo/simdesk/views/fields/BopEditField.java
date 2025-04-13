@@ -2,10 +2,11 @@ package de.sustineo.simdesk.views.fields;
 
 import com.vaadin.flow.component.customfield.CustomField;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
+import com.vaadin.flow.dom.Style;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import lombok.Getter;
@@ -36,7 +37,10 @@ public class BopEditField extends CustomField<AccBopEntry> {
                 .withValidator(value -> value >= 0 && value <= 20, "Value must be between 0 and 20%")
                 .bind(AccBopEntry::getRestrictor, AccBopEntry::setRestrictor);
 
-        HorizontalLayout layout = new HorizontalLayout();
+        FlexLayout layout = new FlexLayout();
+        layout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-m)");
         layout.add(ballastField, restrictorField);
 
         add(layout);
