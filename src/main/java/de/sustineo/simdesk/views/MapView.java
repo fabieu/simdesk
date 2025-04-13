@@ -116,7 +116,7 @@ public class MapView extends BaseView {
                 trackMarker.bindTooltip(track.getName());
             }
 
-            trackMarker.bindPopup("<h4 style=\"color: var(--lumo-primary-text-color)\">%s</h4>".formatted(track.getName()));
+            trackMarker.bindPopup("<h4 style=\"color: var(--lumo-header-text-color)\">%s</h4>".formatted(track.getName()));
             trackMarker.addTo(trackLayerGroup);
             trackMarkers.put(track, trackMarker);
         }
@@ -153,7 +153,7 @@ public class MapView extends BaseView {
             String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
 
             StringBuilder trackMarkerTooltip = new StringBuilder("""
-                    <h3 style="color: var(--lumo-primary-text-color)">%s</h3>
+                    <h3 style="color: var(--lumo-header-text-color)">%s</h3>
                     """
                     .formatted(
                             track.getName()
@@ -163,7 +163,7 @@ public class MapView extends BaseView {
             if (weatherModel.isPresent()) {
                 trackMarkerTooltip.append("""
                         %s
-                        <h5 style="color: var(--lumo-primary-text-color)">Current weather</h5>
+                        <h5 style="color: var(--lumo-header-text-color)">Current weather</h5>
                         <b>Temperature:</b> %.0f°C <br>
                         <b>Clouds:</b> %.0f%% <br>
                         <b>Precipitation:</b> %.1f mm/h <br>
@@ -181,7 +181,7 @@ public class MapView extends BaseView {
                 AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);
                 trackMarkerTooltip.append("""
                     %s
-                    <h5 style="color: var(--lumo-primary-text-color)">ACC Weather Settings - %s hour(s)</h5>
+                    <h5 style="color: var(--lumo-header-text-color)">ACC Weather Settings - %s hour(s)</h5>
                     <b>Temperature:</b> %d°C <br>
                     <b>Cloud Level:</b> %.2f <br>
                     <b>Rain Level:</b> %.2f <br>
