@@ -4,8 +4,10 @@ import lombok.Getter;
 
 @Getter
 public enum ThemeVariant {
-    DEFAULT,
     BLACK_AND_WHITE,
+    DEFAULT,
+    MODERN_GREEN,
+    RACING_RED,
     SIM2REAL;
 
     public String getAttribute() {

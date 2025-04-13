@@ -43,6 +43,22 @@ body[theme~="black_and_white"] {
     --lumo-primary-color: rgb(255, 255, 255);
     --lumo-primary-color-10pct: rgba(255, 255, 255, 0.1);
     --lumo-primary-color-50pct: rgba(255, 255, 255, 0.5);
-    --lumo-primary-contrast-color: rgb(0, 0, 0);
+    --lumo-primary-contrast-color: rgb(26, 26, 26);
     --lumo-primary-text-color: var(--lumo-contrast);
+}
+
+/* ThemeVariant: MODERN_GREEN */
+body[theme~="modern_green"] {
+    --lumo-primary-color: rgb(67, 170, 139);
+    --lumo-primary-color-10pct: rgba(67, 170, 139, 0.2);
+    --lumo-primary-color-50pct: rgba(67, 170, 139, 0.5);
+    --lumo-primary-contrast-color: rgb(26, 26, 26);
+}
+
+/* ThemeVariant: RACING_RED */
+body[theme~="racing_red"] {
+    --lumo-primary-color: rgb(214, 40, 40);
+    --lumo-primary-color-10pct: rgba(214, 40, 40, 0.2);
+    --lumo-primary-color-50pct: rgba(214, 40, 40, 0.5);
+    --lumo-primary-contrast-color: rgb(26, 26, 26);
 }
