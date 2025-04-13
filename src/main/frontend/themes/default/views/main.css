@@ -10,7 +10,7 @@
 }
 
 #home-header h1 {
-    color: var(--lumo-primary-color);
+    color: var(--lumo-primary-text-color);
     font-size: 4.5rem;
     text-align: center;
     text-transform: uppercase;
@@ -38,7 +38,8 @@
     font-size: 1.2rem;
     color: var(--lumo-primary-contrast-color);
     background-color: var(--lumo-primary-color);
-    border: 3px solid var(--lumo-primary-color);
+    border: 3px solid var(--lumo-contrast-10pct);
+    border-radius: var(--lumo-border-radius-l);
     display: block;
     margin: var(--lumo-space-m);
     padding: 4rem;

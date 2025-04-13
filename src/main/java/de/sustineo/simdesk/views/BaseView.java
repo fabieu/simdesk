@@ -61,7 +61,7 @@ public abstract class BaseView extends VerticalLayout {
 
         H2 headerText = new H2(heading);
         headerText.getStyle()
-                .setColor("var(--lumo-primary-text-color)")
+                .setColor("var(--lumo-header-text-color)")
                 .setTextAlign(Style.TextAlign.CENTER)
                 .setFontWeight(Style.FontWeight.BOLD);
 

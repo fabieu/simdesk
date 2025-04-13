@@ -23,6 +23,7 @@ body[theme] {
 
 body[theme~="dark"] {
     --lumo-base-color: rgb(26, 26, 26);
+    --lumo-contrast-color: rgb(255, 255, 255);
 }
 
 /* ThemeVariant: DEFAULT */
@@ -35,4 +36,13 @@ body[theme~="sim2real"] {
     --lumo-primary-color-10pct: rgba(224, 173, 6, 0.2);
     --lumo-primary-color-50pct: rgba(250, 205, 56, 0.59);
     --lumo-primary-contrast-color: rgb(26, 26, 26);
+}
+
+/* ThemeVariant: BLACK_AND_WHITE */
+body[theme~="black_and_white"] {
+    --lumo-primary-color: rgb(255, 255, 255);
+    --lumo-primary-color-10pct: rgba(255, 255, 255, 0.1);
+    --lumo-primary-color-50pct: rgba(255, 255, 255, 0.5);
+    --lumo-primary-contrast-color: rgb(0, 0, 0);
+    --lumo-primary-text-color: var(--lumo-contrast);
 }

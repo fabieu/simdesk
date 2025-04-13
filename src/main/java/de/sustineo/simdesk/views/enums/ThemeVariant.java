@@ -4,7 +4,9 @@ import lombok.Getter;
 
 @Getter
 public enum ThemeVariant {
-    DEFAULT, SIM2REAL;
+    DEFAULT,
+    BLACK_AND_WHITE,
+    SIM2REAL;
 
     public String getAttribute() {
         return name().toLowerCase();
