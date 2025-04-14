@@ -96,6 +96,7 @@ public class EntrylistEditorView extends BaseView {
 
     private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
     private List<Driver> drivers = new ArrayList<>();
+    private List<Session> sessions = new ArrayList<>();
 
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> noopComparator = Comparator.comparing(entry -> 0);
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> gridPositionComparator = Comparator.comparing(
@@ -215,10 +216,6 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private Component createFileUpload() {
-        FlexLayout fileUploadLayout = new FlexLayout();
-        fileUploadLayout.getStyle()
-                .setFlexGrow("1");
-
         Button uploadButton = new Button("Upload entrylist.json...");
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -997,10 +994,8 @@ public class EntrylistEditorView extends BaseView {
             dialog.close();
         });
 
-        dialog.getFooter().add(cancelButton, validateButton);
-
-        Upload resultsUpload = new Upload();
         MemoryBuffer memoryBuffer = new MemoryBuffer();
+        Upload resultsUpload = new Upload();
         resultsUpload.setReceiver(memoryBuffer);
         resultsUpload.setDropAllowed(true);
         resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
@@ -1020,6 +1015,25 @@ public class EntrylistEditorView extends BaseView {
         resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         resultsUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
         resultsUpload.addFileRemovedListener(event -> validateButton.setEnabled(false));
+        resultsUpload.getStyle()
+                .setFlexGrow("1");
+
+        Button existingResultsButton = new Button("Select existing results");
+        existingResultsButton.addClassNames("break-word");
+        existingResultsButton.setWidth("25%");
+        existingResultsButton.setHeightFull();
+        existingResultsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        existingResultsButton.getStyle()
+                .setMargin("0");
+        existingResultsButton.addClickListener(event -> {
+            // TODO: Add results selection for existing sessions
+        });
+
+        FlexLayout resultsUploadLayout = new FlexLayout(resultsUpload, existingResultsButton);
+        resultsUploadLayout.setWidthFull();
+        resultsUploadLayout.getStyle()
+                .setAlignItems(Style.AlignItems.CENTER)
+                .set("gap", "var(--lumo-space-m)");
 
         Paragraph importantNote = new Paragraph("IMPORTANT: The car number (raceNumber) will be used to match the results with the entrylist entries. Make sure that the car numbers are matching.");
         importantNote.getStyle()
@@ -1030,7 +1044,13 @@ public class EntrylistEditorView extends BaseView {
         UnorderedList updatedAttributesList = new UnorderedList();
         updatedAttributesList.add(new ListItem("Default grid position"));
 
-        dialog.add(resultsUpload, gridStartPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        VerticalLayout layout = new VerticalLayout(resultsUploadLayout, gridStartPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        layout.setSizeFull();
+        layout.setPadding(false);
+
+        dialog.add(layout);
+        dialog.getFooter().add(cancelButton, validateButton);
+
         return dialog;
     }
 
