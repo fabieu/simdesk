@@ -9,6 +9,7 @@ import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.checkbox.CheckboxGroupVariant;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -48,6 +49,7 @@ import de.sustineo.simdesk.entities.validation.ValidationRule;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
+import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
@@ -76,6 +78,7 @@ public class EntrylistEditorView extends BaseView {
     private final WebStorage.Storage webStorageType = WebStorage.Storage.SESSION_STORAGE;
 
     private final EntrylistService entrylistService;
+    private final DriverService driverService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
     private final JsonClient jsonClient;
@@ -92,6 +95,8 @@ public class EntrylistEditorView extends BaseView {
     private final VerticalLayout entrylistEntriesLayout = new VerticalLayout();
 
     private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
+    private List<Driver> drivers = new ArrayList<>();
+
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> noopComparator = Comparator.comparing(entry -> 0);
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> gridPositionComparator = Comparator.comparing(
             entry -> entry.getKey().getDefaultGridPosition(), Comparator.nullsLast(new AccEntrylistEntryDefaultIntegerComparator())
@@ -109,10 +114,12 @@ public class EntrylistEditorView extends BaseView {
     private final Dialog customCarsUploadDialog = createCustomCarsUploadDialog();
 
     public EntrylistEditorView(EntrylistService entrylistService,
+                               DriverService driverService,
                                ValidationService validationService,
                                NotificationService notificationService,
                                JsonClient jsonClient) {
         this.entrylistService = entrylistService;
+        this.driverService = driverService;
         this.validationService = validationService;
         this.notificationService = notificationService;
         this.jsonClient = jsonClient;
@@ -666,24 +673,22 @@ public class EntrylistEditorView extends BaseView {
             setBackGroundColorForServerAdmins(entrylistEntryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         }
 
-        Button addDriverButton = new Button("Add driver");
+        Button addDriverButton = new Button("Add new driver");
         addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addDriverButton.addClickListener(event -> {
-            List<AccDriver> drivers = entry.getDrivers();
-            if (drivers.size() < AccEntrylistEntry.MAX_DRIVERS) {
-                AccDriver driver = new AccDriver();
-                drivers.add(driver);
-                refreshEntrylistPreview();
+        addDriverButton.addClickListener(event -> addEntrylistDriver(new AccDriver(), entry, entrylistEntryDriverSideListLayout));
 
-                entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
-            } else {
-                notificationService.showWarningNotification("Maximum number of drivers reached");
-            }
+        Button addExistingDriverButton = new Button("Add existing drivers");
+        addExistingDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addExistingDriverButton.addClickListener(event -> {
+            createEntrylistDriversDialog(entry, entrylistEntryDriverSideListLayout).open();
         });
 
-        HorizontalLayout entrylistEntryDriverSideActionLayout = new HorizontalLayout(addDriverButton);
+        FlexLayout entrylistEntryDriverSideActionLayout = new FlexLayout(addDriverButton, addExistingDriverButton);
         entrylistEntryDriverSideActionLayout.setWidthFull();
         entrylistEntryDriverSideActionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        entrylistEntryDriverSideActionLayout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-s)");
 
         VerticalLayout entrylistEntryDriverSideLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistEntryDriverSideListLayout, entrylistEntryDriverSideActionLayout);
         entrylistEntryDriverSideLayout.setPadding(false);
@@ -712,6 +717,18 @@ public class EntrylistEditorView extends BaseView {
 
         entrylistEntryLayout.add(entrylistEntryContainer);
         return entrylistEntryLayout;
+    }
+
+    private void addEntrylistDriver(AccDriver driver, AccEntrylistEntry entry, VerticalLayout entrylistEntryDriverSideListLayout) {
+        List<AccDriver> drivers = entry.getDrivers();
+        if (drivers.size() < AccEntrylistEntry.MAX_DRIVERS) {
+            drivers.add(driver);
+            refreshEntrylistPreview();
+
+            entrylistEntryDriverSideListLayout.add(createEntrylistDriverLayout(driver, entry, entrylistEntryDriverSideListLayout));
+        } else {
+            notificationService.showWarningNotification("Maximum number of drivers reached");
+        }
     }
 
     private Component createEntrylistDriverLayout(AccDriver driver, AccEntrylistEntry entry, VerticalLayout entrylistEntryDriverSideListLayout) {
@@ -1068,6 +1085,54 @@ public class EntrylistEditorView extends BaseView {
         updatedAttributesList.add(new ListItem("Override car model for custom car"));
 
         dialog.add(defaultCustomCarUpload, updateAttributesText, updatedAttributesList);
+        return dialog;
+    }
+
+    private Dialog createEntrylistDriversDialog(AccEntrylistEntry entry, VerticalLayout entrylistEntryDriverSideListLayout) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Add existing drivers");
+
+        if (drivers.isEmpty()) {
+            drivers = driverService.getAllDrivers();
+        }
+
+        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        cancelButton.getStyle()
+                .set("margin-right", "auto");
+
+        MultiSelectComboBox<Driver> driverComboBox = new MultiSelectComboBox<>();
+        Button addButton = new Button("Add");
+
+        addButton.setEnabled(false);
+        addButton.addClickListener(event -> {
+            Set<Driver> selectedItems = driverComboBox.getSelectedItems();
+            if (selectedItems == null || selectedItems.isEmpty()) {
+                return;
+            }
+
+            for (Driver driver : selectedItems) {
+                addEntrylistDriver(new AccDriver(driver), entry, entrylistEntryDriverSideListLayout);
+            }
+
+            dialog.close();
+        });
+
+        driverComboBox.setItems(drivers);
+        driverComboBox.setItemLabelGenerator(Driver::getFullName);
+        driverComboBox.setHelperText("Select one or multiple drivers");
+        driverComboBox.setAutoExpand(MultiSelectComboBox.AutoExpandMode.BOTH);
+        driverComboBox.setSelectedItemsOnTop(true);
+        driverComboBox.setClearButtonVisible(true);
+        driverComboBox.setWidth("75vw");
+        driverComboBox.setMaxWidth("500px");
+        driverComboBox.addValueChangeListener(event -> {
+            addButton.setEnabled(event.getValue() != null && !event.getValue().isEmpty());
+        });
+
+        dialog.add(driverComboBox);
+        dialog.getFooter().add(cancelButton, addButton);
+
         return dialog;
     }
 
