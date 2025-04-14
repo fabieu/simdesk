@@ -12,7 +12,8 @@ import java.util.List;
 public class AccEntrylist {
     public AccEntrylist() {
         this.entries = new ArrayList<>();
-        this.forceEntryList = 0;
+        this.entries.add(new AccEntrylistEntry());
+        this.forceEntryList = 1;
     }
 
     @NotEmpty
