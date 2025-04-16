@@ -434,7 +434,7 @@ public class EntrylistEditorView extends BaseView {
         notificationService.showSuccessNotification("Grid positions reversed successfully");
     }
 
-    private void updateEntrylistFromResults(AccSession accSession, Optional<Integer> gridStartPosition) {
+    private void updateEntrylistFromResults(AccSession accSession, int initialGridPosition) {
         if (entrylist == null || entrylist.getEntries() == null) {
             notificationService.showErrorNotification("Results import failed - Entrylist is missing");
             return;
@@ -445,7 +445,7 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        entrylistService.updateFromResults(entrylist, accSession, gridStartPosition);
+        entrylistService.updateFromResults(entrylist, accSession, initialGridPosition);
         refreshEntrylistEditor();
 
         notificationService.showSuccessNotification("Entrylist updated successfully");
@@ -887,8 +887,7 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private Dialog createValidationDialog() {
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Entrylist validation");
+        Dialog dialog = new Dialog("Entrylist validation");
 
         Checkbox selectAllCheckbox = new Checkbox("Select all");
 
@@ -949,13 +948,6 @@ public class EntrylistEditorView extends BaseView {
         validationRulesLayout.setSpacing(false);
         validationRulesLayout.add(selectAllCheckbox, validationRulesCheckboxGroup);
 
-        dialog.add(validationRulesLayout);
-
-        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        cancelButton.getStyle()
-                .set("margin-right", "auto");
-
         Button validateButton = new Button("Validate");
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
         validateButton.addClickListener(event -> {
@@ -963,7 +955,8 @@ public class EntrylistEditorView extends BaseView {
             dialog.close();
         });
 
-        dialog.getFooter().add(cancelButton, validateButton);
+        dialog.add(validationRulesLayout);
+        dialog.getFooter().add(createDialogCancelButton(dialog), validateButton);
 
         return dialog;
     }
@@ -971,26 +964,21 @@ public class EntrylistEditorView extends BaseView {
     private Dialog createResultsUploadDialog() {
         AtomicReference<AccSession> uploadedSession = new AtomicReference<>();
 
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Upload results");
+        Dialog dialog = new Dialog("Upload results");
 
-        IntegerField gridStartPositionField = new IntegerField("Grid start position");
-        gridStartPositionField.setWidthFull();
-        gridStartPositionField.setMin(1);
-        gridStartPositionField.setMax(120);
-        gridStartPositionField.setPlaceholder("optional");
-        gridStartPositionField.setHelperText("Set the starting position for the grid. Leave empty to start from the first position.");
+        IntegerField initialGridPositionField = new IntegerField("Grid start position");
+        initialGridPositionField.setWidthFull();
+        initialGridPositionField.setMin(1);
+        initialGridPositionField.setMax(120);
+        initialGridPositionField.setPlaceholder("optional");
+        initialGridPositionField.setHelperText("Set the starting position for the grid. Leave empty to start from the first position.");
 
-        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        cancelButton.getStyle()
-                .set("margin-right", "auto");
-
-        Button validateButton = new Button("Update");
-        validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        validateButton.setEnabled(false);
-        validateButton.addClickListener(event -> {
-            updateEntrylistFromResults(uploadedSession.get(), Optional.ofNullable(gridStartPositionField.getValue()));
+        Button updateButton = new Button("Update");
+        updateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        updateButton.setEnabled(false);
+        updateButton.addClickListener(event -> {
+            int initialGridPosition = Optional.ofNullable(initialGridPositionField.getValue()).orElse(1);
+            updateEntrylistFromResults(uploadedSession.get(), initialGridPosition);
             dialog.close();
         });
 
@@ -1010,11 +998,11 @@ public class EntrylistEditorView extends BaseView {
             validationService.validate(session);
 
             uploadedSession.set(session);
-            validateButton.setEnabled(true);
+            updateButton.setEnabled(true);
         });
         resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         resultsUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
-        resultsUpload.addFileRemovedListener(event -> validateButton.setEnabled(false));
+        resultsUpload.addFileRemovedListener(event -> updateButton.setEnabled(false));
         resultsUpload.getStyle()
                 .setFlexGrow("1");
 
@@ -1026,7 +1014,7 @@ public class EntrylistEditorView extends BaseView {
         existingResultsButton.getStyle()
                 .setMargin("0");
         existingResultsButton.addClickListener(event -> {
-            // TODO: Add results selection for existing sessions
+            createSelectExistingResultsDialog().open();
         });
 
         FlexLayout resultsUploadLayout = new FlexLayout(resultsUpload, existingResultsButton);
@@ -1044,26 +1032,26 @@ public class EntrylistEditorView extends BaseView {
         UnorderedList updatedAttributesList = new UnorderedList();
         updatedAttributesList.add(new ListItem("Default grid position"));
 
-        VerticalLayout layout = new VerticalLayout(resultsUploadLayout, gridStartPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        VerticalLayout layout = new VerticalLayout(resultsUploadLayout, initialGridPositionField, importantNote, updateAttributesText, updatedAttributesList);
         layout.setSizeFull();
+        layout.setSpacing(false);
         layout.setPadding(false);
 
         dialog.add(layout);
-        dialog.getFooter().add(cancelButton, validateButton);
+        dialog.getFooter().add(createDialogCancelButton(dialog), updateButton);
 
+        return dialog;
+    }
+
+    private Dialog createSelectExistingResultsDialog() {
+        Dialog dialog = new Dialog("Select existing results");
         return dialog;
     }
 
     private Dialog createCustomCarsUploadDialog() {
         AtomicReference<CustomCar[]> uploadedCustomCars = new AtomicReference<>();
 
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Upload default custom cars");
-
-        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        cancelButton.getStyle()
-                .set("margin-right", "auto");
+        Dialog dialog = new Dialog("Upload default custom cars");
 
         Button validateButton = new Button("Update");
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
@@ -1072,8 +1060,6 @@ public class EntrylistEditorView extends BaseView {
             updateEntrylistFromCustomCars(uploadedCustomCars.get());
             dialog.close();
         });
-
-        dialog.getFooter().add(cancelButton, validateButton);
 
         Upload defaultCustomCarUpload = new Upload();
         MemoryBuffer memoryBuffer = new MemoryBuffer();
@@ -1105,21 +1091,17 @@ public class EntrylistEditorView extends BaseView {
         updatedAttributesList.add(new ListItem("Override car model for custom car"));
 
         dialog.add(defaultCustomCarUpload, updateAttributesText, updatedAttributesList);
+        dialog.getFooter().add(createDialogCancelButton(dialog), validateButton);
+
         return dialog;
     }
 
     private Dialog createEntrylistDriversDialog(AccEntrylistEntry entry, VerticalLayout entrylistEntryDriverSideListLayout) {
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Add existing drivers");
+        Dialog dialog = new Dialog("Add existing drivers");
 
         if (drivers.isEmpty()) {
             drivers = driverService.getAllDrivers();
         }
-
-        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        cancelButton.getStyle()
-                .set("margin-right", "auto");
 
         MultiSelectComboBox<Driver> driverComboBox = new MultiSelectComboBox<>();
         Button addButton = new Button("Add");
@@ -1151,7 +1133,7 @@ public class EntrylistEditorView extends BaseView {
         });
 
         dialog.add(driverComboBox);
-        dialog.getFooter().add(cancelButton, addButton);
+        dialog.getFooter().add(createDialogCancelButton(dialog), addButton);
 
         return dialog;
     }
@@ -1244,8 +1226,7 @@ public class EntrylistEditorView extends BaseView {
 
         // Add dynamic dialog with error references if available
         if (errorReferences != null && !errorReferences.isEmpty()) {
-            Dialog dialog = new Dialog();
-            dialog.setHeaderTitle(validationRule.getFriendlyName());
+            Dialog dialog = new Dialog(validationRule.getFriendlyName());
             dialog.setModal(false);
             dialog.setDraggable(true);
             dialog.setResizable(true);

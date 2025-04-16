@@ -5,6 +5,7 @@ import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.H2;
@@ -114,6 +115,15 @@ public abstract class BaseView extends VerticalLayout {
         Button button = new Button(VaadinIcon.CLOSE.create());
         button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
         return button;
+    }
+
+    protected Button createDialogCancelButton(Dialog dialog) {
+        Button cancelButton = new Button("Cancel");
+        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
+        cancelButton.addClickListener(event -> dialog.close());
+        cancelButton.getStyle()
+                .set("margin-right", "auto");
+        return cancelButton;
     }
 
     protected AbstractIcon<?> getDownloadIcon() {

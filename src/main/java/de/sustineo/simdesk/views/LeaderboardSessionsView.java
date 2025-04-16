@@ -134,6 +134,8 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     }
 
     private Dialog createUploadSessionDialog() {
+        Dialog dialog = new Dialog("Manual session upload");
+
         MultiFileBuffer multiFileBuffer = new MultiFileBuffer();
 
         DateTimePicker dateTimePicker = new DateTimePicker();
@@ -179,16 +181,11 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
         upload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         upload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
 
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Manual session upload");
-
-        Button cancelButton = new Button("Cancel", (e) -> dialog.close());
-        cancelButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY, ButtonVariant.LUMO_ERROR);
-        dialog.getFooter().add(cancelButton);
-
         Paragraph description = new Paragraph("Use the upload form to manually upload one or more session files. The files must conform to the session file format (.json). The maximum file size is 25 MB.");
 
         dialog.add(description, dateTimePicker, upload);
+        dialog.getFooter().add(createDialogCancelButton(dialog));
+
         return dialog;
     }
 
