@@ -206,7 +206,7 @@ public class EntrylistEditorView extends BaseView {
     private Component createNewEntrylistButton() {
         ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
         createNewEntrylistConfirmDialog.addConfirmListener(event -> {
-            createNewEntrylist(new AccEntrylist(), new EntrylistMetadata());
+            createNewEntrylist(AccEntrylist.create(), new EntrylistMetadata());
             entrylistUpload.clearFileList();
         });
 
@@ -219,7 +219,7 @@ public class EntrylistEditorView extends BaseView {
             if (this.entrylist != null) {
                 createNewEntrylistConfirmDialog.open();
             } else {
-                createNewEntrylist(new AccEntrylist(), new EntrylistMetadata());
+                createNewEntrylist(AccEntrylist.create(), new EntrylistMetadata());
                 entrylistUpload.clearFileList();
             }
         });
@@ -485,7 +485,7 @@ public class EntrylistEditorView extends BaseView {
     private Component createEntrylistFooterLayout() {
         Button addEntrylistEntryButton = new Button("Add entry");
         addEntrylistEntryButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(new AccEntrylistEntry()));
+        addEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(AccEntrylistEntry.create()));
 
         HorizontalLayout entrylistActionLayout = new HorizontalLayout(addEntrylistEntryButton);
         entrylistActionLayout.setWidthFull();
@@ -714,7 +714,7 @@ public class EntrylistEditorView extends BaseView {
 
         Button cloneEntrylistEntryButton = new Button("Clone");
         cloneEntrylistEntryButton.setAriaLabel("Clone entry");
-        cloneEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(new AccEntrylistEntry(entry)));
+        cloneEntrylistEntryButton.addClickListener(event -> addEntrylistEntry(AccEntrylistEntry.create(entry)));
 
         HorizontalLayout entrylistEntryHeaderLayout = new HorizontalLayout(cloneEntrylistEntryButton, removeEntrylistEntryButton);
         entrylistEntryHeaderLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
