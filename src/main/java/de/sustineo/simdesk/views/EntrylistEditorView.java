@@ -14,6 +14,11 @@ import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dependency.CssImport;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
+import com.vaadin.flow.component.grid.ColumnTextAlign;
+import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.*;
 import com.vaadin.flow.component.icon.FontIcon;
 import com.vaadin.flow.component.icon.Icon;
@@ -33,6 +38,7 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
+import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -52,9 +58,14 @@ import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
+import de.sustineo.simdesk.services.leaderboard.SessionService;
+import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
+import de.sustineo.simdesk.views.enums.TimeRange;
+import de.sustineo.simdesk.views.filter.GridFilter;
+import de.sustineo.simdesk.views.filter.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -87,6 +98,7 @@ public class EntrylistEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
     private final SecurityService securityService;
+    private final Optional<SessionService> sessionService;
 
     private final SessionComponentFactory sessionComponentFactory;
     private final ButtonComponentFactory buttonComponentFactory;
@@ -128,6 +140,7 @@ public class EntrylistEditorView extends BaseView {
                                ValidationService validationService,
                                NotificationService notificationService,
                                SecurityService securityService,
+                               Optional<SessionService> sessionService,
                                SessionComponentFactory sessionComponentFactory,
                                ButtonComponentFactory buttonComponentFactory,
                                JsonClient jsonClient) {
@@ -136,6 +149,7 @@ public class EntrylistEditorView extends BaseView {
         this.validationService = validationService;
         this.notificationService = notificationService;
         this.securityService = securityService;
+        this.sessionService = sessionService;
         this.sessionComponentFactory = sessionComponentFactory;
         this.buttonComponentFactory = buttonComponentFactory;
         this.jsonClient = jsonClient;
@@ -1055,7 +1069,9 @@ public class EntrylistEditorView extends BaseView {
                 .setFlexGrow("1");
         resultsUploadLayout.add(resultsUpload);
 
-        if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES)) {
+        if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES) && sessionService.isPresent()) {
+            List<Session> sessions = sessionService.get().getAllBySessionTimeRange(TimeRange.LAST_MONTH);
+
             Button existingResultsButton = new Button("Select existing results");
             existingResultsButton.addClassNames("break-word");
             existingResultsButton.setWidth("25%");
@@ -1064,8 +1080,31 @@ public class EntrylistEditorView extends BaseView {
             existingResultsButton.getStyle()
                     .setMargin("0");
             existingResultsButton.addClickListener(event -> {
-                createSelectExistingResultsDialog().open();
+                Dialog sessionGridDialog = new Dialog("Select existing results");
+                sessionGridDialog.setSizeFull();
+
+                Grid<Session> sessionGrid = createSessionGrid(sessions);
+                sessionGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
+                SingleSelect<Grid<Session>, Session> singleSelect = sessionGrid.asSingleSelect();
+                singleSelect.addValueChangeListener(e -> {
+                    Session selectedSession = e.getValue();
+
+                    if (selectedSession != null) {
+                        uploadedSession.set(jsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
+                        updateButton.setEnabled(true);
+                        sessionInformationLayout.removeAll();
+                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(uploadedSession.get()));
+                    }
+
+                    sessionGridDialog.close();
+                });
+
+                sessionGridDialog.add(sessionGrid);
+                sessionGridDialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(sessionGridDialog));
+
+                sessionGridDialog.open();
             });
+
             resultsUploadLayout.add(existingResultsButton);
         }
 
@@ -1089,9 +1128,45 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private Dialog createSelectExistingResultsDialog() {
-        Dialog dialog = new Dialog("Select existing results");
-        return dialog;
+    private Grid<Session> createSessionGrid(List<Session> sessions) {
+        Grid<Session> grid = new Grid<>(Session.class, false);
+        grid.setSizeFull();
+        grid.setMultiSort(true, true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        GridListDataView<Session> dataView = grid.setItems(sessions);
+
+        Grid.Column<Session> weatherColumn = grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.CENTER);
+        Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
+                .setHeader("Session Time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(Session::getSessionDatetime);
+        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
+                .setHeader("Server Name")
+                .setSortable(true)
+                .setTooltipGenerator(Session::getServerName);
+        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+                .setHeader("Track Name")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
+                .setHeader("Session")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+
+        SessionFilter sessionFilter = new SessionFilter(dataView);
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setTrackName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createHeader(sessionFilter::setSessionDescription));
+
+        return grid;
     }
 
     private Dialog createCustomCarsUploadDialog() {
