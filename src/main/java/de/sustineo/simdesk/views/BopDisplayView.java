@@ -27,6 +27,7 @@ import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.generators.BopCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.generators.InactiveBopPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.BopRenderer;
@@ -48,6 +49,9 @@ import java.util.stream.Collectors;
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final BopService bopService;
     private final NotificationService notificationService;
+
+    private final ComponentFactory componentFactory;
+
     private final JsonClient jsonClient;
 
     private RouteParameters routeParameters;
@@ -58,9 +62,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     public BopDisplayView(BopService bopService,
                           NotificationService notificationService,
+                          ComponentFactory componentFactory,
                           JsonClient jsonClient) {
         this.bopService = bopService;
         this.notificationService = notificationService;
+        this.componentFactory = componentFactory;
         this.jsonClient = jsonClient;
 
         setSizeFull();
@@ -142,11 +148,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             Anchor downloadAnchor = new Anchor(bopResource, "");
             downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.removeAll();
-            Button downloadButton = new Button(getDownloadIcon());
+            Button downloadButton = new Button(componentFactory.getDownloadIcon());
             downloadButton.setTooltipText("Download");
             downloadAnchor.add(downloadButton);
 
-            Button shareButton = new Button(getShareIcon());
+            Button shareButton = new Button(componentFactory.getShareIcon());
             shareButton.setTooltipText("Share");
             shareButton.addClickListener(event -> {
                         Page page = UI.getCurrent().getPage();

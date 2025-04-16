@@ -30,6 +30,7 @@ import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.filter.BopManagementFilter;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.generators.BopCarGroupPartNameGenerator;
@@ -59,6 +60,8 @@ public class BopManagementView extends BaseView {
     private final SecurityService securityService;
     private final NotificationService notificationService;
 
+    private final ButtonComponentFactory buttonComponentFactory;
+
     private final List<Bop> bopList = new ArrayList<>();
     private final Grid<Bop> grid = new Grid<>(Bop.class, false);
     private final GridListDataView<Bop> gridDataView = grid.setItems(bopList);
@@ -66,10 +69,12 @@ public class BopManagementView extends BaseView {
 
     public BopManagementView(BopService bopService,
                              SecurityService securityService,
-                             NotificationService notificationService) {
+                             NotificationService notificationService,
+                             ButtonComponentFactory buttonComponentFactory) {
         this.bopService = bopService;
         this.securityService = securityService;
         this.notificationService = notificationService;
+        this.buttonComponentFactory = buttonComponentFactory;
 
         setSizeFull();
         setPadding(false);
@@ -268,7 +273,7 @@ public class BopManagementView extends BaseView {
                 .setSortable(true)
                 .setComparator(Bop::getUpdateDatetime);
         Grid.Column<Bop> editColumn = grid.addComponentColumn(bop -> {
-                    Button editButton = createPrimaryButton("Update");
+                    Button editButton = buttonComponentFactory.createPrimaryButton("Update");
                     editButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -305,10 +310,10 @@ public class BopManagementView extends BaseView {
                 .bind(Bop::getActive, Bop::setActive);
         activeColumn.setEditorComponent(activeField);
 
-        Button saveButton = createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
-        Button cancelButton = createCancelIconButton();
+        Button cancelButton = buttonComponentFactory.createCancelIconButton();
         cancelButton.addClickListener(e -> editor.cancel());
 
         HorizontalLayout actions = new HorizontalLayout(saveButton, cancelButton);

@@ -51,6 +51,8 @@ import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.json.JsonClient;
+import de.sustineo.simdesk.views.components.ButtonComponentFactory;
+import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -81,10 +83,17 @@ public class EntrylistEditorView extends BaseView {
     private final DriverService driverService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
+
+    private final SessionComponentFactory sessionComponentFactory;
+    private final ButtonComponentFactory buttonComponentFactory;
+
     private final JsonClient jsonClient;
 
     private AccEntrylist entrylist;
+    private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
     private EntrylistMetadata entrylistMetadata;
+    private List<Driver> drivers = new ArrayList<>();
+    private List<Session> sessions = new ArrayList<>();
 
     private final Upload entrylistUpload = new Upload();
     private final Anchor downloadAnchor = new Anchor();
@@ -93,10 +102,6 @@ public class EntrylistEditorView extends BaseView {
     private final TextArea entrylistPreview = new TextArea();
     private final VerticalLayout entrylistLayout = new VerticalLayout();
     private final VerticalLayout entrylistEntriesLayout = new VerticalLayout();
-
-    private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
-    private List<Driver> drivers = new ArrayList<>();
-    private List<Session> sessions = new ArrayList<>();
 
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> noopComparator = Comparator.comparing(entry -> 0);
     private final Comparator<Map.Entry<AccEntrylistEntry, Component>> gridPositionComparator = Comparator.comparing(
@@ -109,21 +114,30 @@ public class EntrylistEditorView extends BaseView {
             entry -> entry.getKey().getIsServerAdmin(), Comparator.nullsLast(Comparator.reverseOrder())
     );
 
-    private final ConfirmDialog resetDialog = createResetDialog();
-    private final Dialog validationDialog = createValidationDialog();
-    private final Dialog resultsUploadDialog = createResultsUploadDialog();
-    private final Dialog customCarsUploadDialog = createCustomCarsUploadDialog();
+    private final ConfirmDialog resetDialog;
+    private final Dialog validationDialog;
+    private final Dialog resultsUploadDialog;
+    private final Dialog customCarsUploadDialog;
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                DriverService driverService,
                                ValidationService validationService,
                                NotificationService notificationService,
+                               SessionComponentFactory sessionComponentFactory,
+                               ButtonComponentFactory buttonComponentFactory,
                                JsonClient jsonClient) {
         this.entrylistService = entrylistService;
         this.driverService = driverService;
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.sessionComponentFactory = sessionComponentFactory;
+        this.buttonComponentFactory = buttonComponentFactory;
         this.jsonClient = jsonClient;
+
+        this.resetDialog = createResetDialog();
+        this.validationDialog = createValidationDialog();
+        this.resultsUploadDialog = createResultsUploadDialog();
+        this.customCarsUploadDialog = createCustomCarsUploadDialog();
 
         this.entrylistPreview.setWidthFull();
         this.entrylistPreview.setReadOnly(true);
@@ -280,19 +294,19 @@ public class EntrylistEditorView extends BaseView {
                 .set("gap", "var(--lumo-space-m)");
 
         // Download
-        Button downloadButton = new Button("Download", getDownloadIcon());
+        Button downloadButton = new Button("Download", buttonComponentFactory.getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
 
         this.downloadAnchor.getElement().setAttribute("download", true);
         this.downloadAnchor.add(downloadButton);
 
         // Validation
-        Button validateButton = new Button("Validate", getValidateIcon());
+        Button validateButton = new Button("Validate", buttonComponentFactory.getValidateIcon());
         validateButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
         validateButton.addClickListener(e -> validationDialog.open());
 
         // Reset
-        Button resetButton = new Button("Reset", getResetIcon());
+        Button resetButton = new Button("Reset", buttonComponentFactory.getResetIcon());
         resetButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         resetButton.addClickListener(e -> resetDialog.open());
 
@@ -330,7 +344,7 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistEntriesFromMap();
         });
 
-        Button importResultsButton = new Button("Import results", getUploadIcon());
+        Button importResultsButton = new Button("Import results", buttonComponentFactory.getUploadIcon());
         importResultsButton.addClickListener(event -> resultsUploadDialog.open());
 
         Button loadDefaultCustomCarsButton = new Button("Load custom cars", new Icon(VaadinIcon.CAR));
@@ -956,15 +970,21 @@ public class EntrylistEditorView extends BaseView {
         });
 
         dialog.add(validationRulesLayout);
-        dialog.getFooter().add(createDialogCancelButton(dialog), validateButton);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), validateButton);
 
         return dialog;
     }
 
     private Dialog createResultsUploadDialog() {
         AtomicReference<AccSession> uploadedSession = new AtomicReference<>();
+        HorizontalLayout sessionInformationLayout = new HorizontalLayout();
+        sessionInformationLayout.setWidthFull();
+        sessionInformationLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        sessionInformationLayout.setAlignItems(Alignment.CENTER);
 
         Dialog dialog = new Dialog("Upload results");
+        MemoryBuffer memoryBuffer = new MemoryBuffer();
+        Upload resultsUpload = new Upload();
 
         IntegerField initialGridPositionField = new IntegerField("Grid start position");
         initialGridPositionField.setWidthFull();
@@ -982,12 +1002,18 @@ public class EntrylistEditorView extends BaseView {
             dialog.close();
         });
 
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
-        Upload resultsUpload = new Upload();
+        Button removeSessionButton = buttonComponentFactory.createCancelIconButton();
+        removeSessionButton.setTooltipText("Unselect session");
+        removeSessionButton.addClickListener(event -> {
+            uploadedSession.set(null);
+            resultsUpload.clearFileList();
+            sessionInformationLayout.removeAll();
+        });
+
         resultsUpload.setReceiver(memoryBuffer);
         resultsUpload.setDropAllowed(true);
         resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
-        resultsUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        resultsUpload.setMaxFileSize((int) FileUtils.ONE_MB * 10);
         resultsUpload.setI18n(configureUploadI18N("results.json"));
         resultsUpload.addSucceededListener(event -> {
             InputStream fileData = memoryBuffer.getInputStream();
@@ -999,10 +1025,16 @@ public class EntrylistEditorView extends BaseView {
 
             uploadedSession.set(session);
             updateButton.setEnabled(true);
+            sessionInformationLayout.removeAll();
+            sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session), removeSessionButton);
         });
         resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         resultsUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
-        resultsUpload.addFileRemovedListener(event -> updateButton.setEnabled(false));
+        resultsUpload.addFileRemovedListener(event -> {
+            uploadedSession.set(null);
+            updateButton.setEnabled(false);
+            sessionInformationLayout.removeAll();
+        });
         resultsUpload.getStyle()
                 .setFlexGrow("1");
 
@@ -1032,13 +1064,13 @@ public class EntrylistEditorView extends BaseView {
         UnorderedList updatedAttributesList = new UnorderedList();
         updatedAttributesList.add(new ListItem("Default grid position"));
 
-        VerticalLayout layout = new VerticalLayout(resultsUploadLayout, initialGridPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        VerticalLayout layout = new VerticalLayout(sessionInformationLayout, resultsUploadLayout, initialGridPositionField, importantNote, updateAttributesText, updatedAttributesList);
         layout.setSizeFull();
         layout.setSpacing(false);
         layout.setPadding(false);
 
         dialog.add(layout);
-        dialog.getFooter().add(createDialogCancelButton(dialog), updateButton);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), updateButton);
 
         return dialog;
     }
@@ -1091,7 +1123,7 @@ public class EntrylistEditorView extends BaseView {
         updatedAttributesList.add(new ListItem("Override car model for custom car"));
 
         dialog.add(defaultCustomCarUpload, updateAttributesText, updatedAttributesList);
-        dialog.getFooter().add(createDialogCancelButton(dialog), validateButton);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), validateButton);
 
         return dialog;
     }
@@ -1133,7 +1165,7 @@ public class EntrylistEditorView extends BaseView {
         });
 
         dialog.add(driverComboBox);
-        dialog.getFooter().add(createDialogCancelButton(dialog), addButton);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), addButton);
 
         return dialog;
     }

@@ -29,6 +29,8 @@ import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.SessionFileService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.ButtonComponentFactory;
+import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.SessionFilter;
@@ -58,6 +60,9 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     private final SessionFileService sessionFileService;
     private final NotificationService notificationService;
 
+    private final ButtonComponentFactory buttonComponentFactory;
+    private final SessionComponentFactory sessionComponentFactory;
+
     private Grid<Session> sessionGrid;
     private TimeRange timeRange = TimeRange.LAST_MONTH;
     private RouteParameters routeParameters;
@@ -66,11 +71,15 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     public LeaderboardSessionsView(SessionService sessionService,
                                    SecurityService securityService,
                                    SessionFileService sessionFileService,
-                                   NotificationService notificationService) {
+                                   NotificationService notificationService,
+                                   ButtonComponentFactory buttonComponentFactory,
+                                   SessionComponentFactory sessionComponentFactory) {
         this.sessionService = sessionService;
         this.securityService = securityService;
         this.sessionFileService = sessionFileService;
         this.notificationService = notificationService;
+        this.buttonComponentFactory = buttonComponentFactory;
+        this.sessionComponentFactory = sessionComponentFactory;
     }
 
     @Override
@@ -184,7 +193,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
         Paragraph description = new Paragraph("Use the upload form to manually upload one or more session files. The files must conform to the session file format (.json). The maximum file size is 25 MB.");
 
         dialog.add(description, dateTimePicker, upload);
-        dialog.getFooter().add(createDialogCancelButton(dialog));
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog));
 
         return dialog;
     }
@@ -202,7 +211,7 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
         List<Session> sessions = sessionService.getAllBySessionTimeRange(timeRange);
 
         Grid<Session> grid = new Grid<>(Session.class, false);
-        Grid.Column<Session> weatherColumn = grid.addComponentColumn(this::getWeatherIcon)
+        Grid.Column<Session> weatherColumn = grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
