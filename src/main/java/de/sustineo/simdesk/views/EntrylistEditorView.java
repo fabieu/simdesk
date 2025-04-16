@@ -41,6 +41,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.*;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
@@ -48,6 +49,7 @@ import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
+import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.json.JsonClient;
@@ -75,6 +77,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @PageTitle("Entrylist - Editor")
 @AnonymousAllowed
 public class EntrylistEditorView extends BaseView {
+    private static final Set<UserRoleEnum> ADVANCED_PERMISSION_ROLES = Set.of(UserRoleEnum.ROLE_ADMIN);
     private static final String WEB_STORAGE_KEY_SORTING_MODE = "vaadin.custom.entrylist.sorting.mode";
     private static final String WEB_STORAGE_KEY_SORTING_DIRECTION = "vaadin.custom.entrylist.sorting.direction";
     private final WebStorage.Storage webStorageType = WebStorage.Storage.SESSION_STORAGE;
@@ -83,6 +86,7 @@ public class EntrylistEditorView extends BaseView {
     private final DriverService driverService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
+    private final SecurityService securityService;
 
     private final SessionComponentFactory sessionComponentFactory;
     private final ButtonComponentFactory buttonComponentFactory;
@@ -123,6 +127,7 @@ public class EntrylistEditorView extends BaseView {
                                DriverService driverService,
                                ValidationService validationService,
                                NotificationService notificationService,
+                               SecurityService securityService,
                                SessionComponentFactory sessionComponentFactory,
                                ButtonComponentFactory buttonComponentFactory,
                                JsonClient jsonClient) {
@@ -130,6 +135,7 @@ public class EntrylistEditorView extends BaseView {
         this.driverService = driverService;
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.securityService = securityService;
         this.sessionComponentFactory = sessionComponentFactory;
         this.buttonComponentFactory = buttonComponentFactory;
         this.jsonClient = jsonClient;
@@ -684,22 +690,26 @@ public class EntrylistEditorView extends BaseView {
             setBackGroundColorForServerAdmins(entrylistEntryLayout, Integer.valueOf(1).equals(entry.getIsServerAdmin()));
         }
 
-        Button addDriverButton = new Button("Add new driver");
-        addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addDriverButton.addClickListener(event -> addEntrylistDriver(new AccDriver(), entry, entrylistEntryDriverSideListLayout));
-
-        Button addExistingDriverButton = new Button("Add existing drivers");
-        addExistingDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addExistingDriverButton.addClickListener(event -> {
-            createEntrylistDriversDialog(entry, entrylistEntryDriverSideListLayout).open();
-        });
-
-        FlexLayout entrylistEntryDriverSideActionLayout = new FlexLayout(addDriverButton, addExistingDriverButton);
+        FlexLayout entrylistEntryDriverSideActionLayout = new FlexLayout();
         entrylistEntryDriverSideActionLayout.setWidthFull();
         entrylistEntryDriverSideActionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         entrylistEntryDriverSideActionLayout.getStyle()
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-s)");
+
+        Button addDriverButton = new Button("Add new driver");
+        addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        addDriverButton.addClickListener(event -> addEntrylistDriver(new AccDriver(), entry, entrylistEntryDriverSideListLayout));
+        entrylistEntryDriverSideActionLayout.add(addDriverButton);
+
+        if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES)) {
+            Button addExistingDriverButton = new Button("Add existing drivers");
+            addExistingDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            addExistingDriverButton.addClickListener(event -> {
+                createEntrylistDriversDialog(entry, entrylistEntryDriverSideListLayout).open();
+            });
+            entrylistEntryDriverSideActionLayout.add(addExistingDriverButton);
+        }
 
         VerticalLayout entrylistEntryDriverSideLayout = new VerticalLayout(overrideDriverInfoCheckbox, entrylistEntryDriverSideListLayout, entrylistEntryDriverSideActionLayout);
         entrylistEntryDriverSideLayout.setPadding(false);
@@ -1010,6 +1020,12 @@ public class EntrylistEditorView extends BaseView {
             sessionInformationLayout.removeAll();
         });
 
+        FlexLayout resultsUploadLayout = new FlexLayout();
+        resultsUploadLayout.setWidthFull();
+        resultsUploadLayout.getStyle()
+                .setAlignItems(Style.AlignItems.CENTER)
+                .set("gap", "var(--lumo-space-m)");
+
         resultsUpload.setReceiver(memoryBuffer);
         resultsUpload.setDropAllowed(true);
         resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
@@ -1037,23 +1053,21 @@ public class EntrylistEditorView extends BaseView {
         });
         resultsUpload.getStyle()
                 .setFlexGrow("1");
+        resultsUploadLayout.add(resultsUpload);
 
-        Button existingResultsButton = new Button("Select existing results");
-        existingResultsButton.addClassNames("break-word");
-        existingResultsButton.setWidth("25%");
-        existingResultsButton.setHeightFull();
-        existingResultsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        existingResultsButton.getStyle()
-                .setMargin("0");
-        existingResultsButton.addClickListener(event -> {
-            createSelectExistingResultsDialog().open();
-        });
-
-        FlexLayout resultsUploadLayout = new FlexLayout(resultsUpload, existingResultsButton);
-        resultsUploadLayout.setWidthFull();
-        resultsUploadLayout.getStyle()
-                .setAlignItems(Style.AlignItems.CENTER)
-                .set("gap", "var(--lumo-space-m)");
+        if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES)) {
+            Button existingResultsButton = new Button("Select existing results");
+            existingResultsButton.addClassNames("break-word");
+            existingResultsButton.setWidth("25%");
+            existingResultsButton.setHeightFull();
+            existingResultsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            existingResultsButton.getStyle()
+                    .setMargin("0");
+            existingResultsButton.addClickListener(event -> {
+                createSelectExistingResultsDialog().open();
+            });
+            resultsUploadLayout.add(existingResultsButton);
+        }
 
         Paragraph importantNote = new Paragraph("IMPORTANT: The car number (raceNumber) will be used to match the results with the entrylist entries. Make sure that the car numbers are matching.");
         importantNote.getStyle()
