@@ -38,7 +38,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
-import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -1084,16 +1083,14 @@ public class EntrylistEditorView extends BaseView {
                 sessionGridDialog.setSizeFull();
 
                 Grid<Session> sessionGrid = createSessionGrid(sessions);
-                sessionGrid.setSelectionMode(Grid.SelectionMode.SINGLE);
-                SingleSelect<Grid<Session>, Session> singleSelect = sessionGrid.asSingleSelect();
-                singleSelect.addValueChangeListener(e -> {
-                    Session selectedSession = e.getValue();
+                sessionGrid.asSingleSelect().addValueChangeListener(singeValueChangeEvent -> {
+                    Session selectedSession = singeValueChangeEvent.getValue();
 
                     if (selectedSession != null) {
                         uploadedSession.set(jsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
                         updateButton.setEnabled(true);
                         sessionInformationLayout.removeAll();
-                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(uploadedSession.get()));
+                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(uploadedSession.get()), removeSessionButton);
                     }
 
                     sessionGridDialog.close();
@@ -1101,6 +1098,13 @@ public class EntrylistEditorView extends BaseView {
 
                 sessionGridDialog.add(sessionGrid);
                 sessionGridDialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(sessionGridDialog));
+                sessionGridDialog.addOpenedChangeListener(openedChangeEvent -> {
+                    if (openedChangeEvent.isOpened()) {
+                        // Ensures the grid's column widths are recalculated 50ms after the dialog is opened,
+                        // allowing the layout to adjust properly once the DOM is fully rendered.
+                        sessionGrid.getElement().executeJs("setTimeout(() => this.recalculateColumnWidths(), 50);");
+                    }
+                });
 
                 sessionGridDialog.open();
             });
@@ -1130,35 +1134,36 @@ public class EntrylistEditorView extends BaseView {
 
     private Grid<Session> createSessionGrid(List<Session> sessions) {
         Grid<Session> grid = new Grid<>(Session.class, false);
-        grid.setSizeFull();
-        grid.setMultiSort(true, true);
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        GridListDataView<Session> dataView = grid.setItems(sessions);
-
         Grid.Column<Session> weatherColumn = grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
+                .setHeader("Session")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+                .setHeader("Track Name")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
+                .setHeader("Server Name")
+                .setSortable(true)
+                .setTooltipGenerator(Session::getServerName);
         Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
                 .setHeader("Session Time")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Session::getSessionDatetime);
-        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
-                .setHeader("Server Name")
-                .setSortable(true)
-                .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
-                .setHeader("Track Name")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
-                .setHeader("Session")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
+
+        GridListDataView<Session> dataView = grid.setItems(sessions);
+        grid.setSizeFull();
+        grid.setMultiSort(true, true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
