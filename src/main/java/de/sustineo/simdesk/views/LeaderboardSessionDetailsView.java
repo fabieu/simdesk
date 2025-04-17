@@ -78,11 +78,11 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
 
         LeaderboardLine leaderboardLineWithBestTotalTime = leaderboardLines.stream()
                 .findFirst()
-                .orElse(new LeaderboardLine());
+                .orElse(LeaderboardLine.create());
         LeaderboardLine leaderboardLineWithBestLapTime = leaderboardLines.stream()
                 .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
                 .min(new LeaderboardLineLapTimeComparator())
-                .orElse(new LeaderboardLine());
+                .orElse(LeaderboardLine.create());
 
         Grid<LeaderboardLine> grid = new Grid<>(LeaderboardLine.class, false);
         grid.addColumn(LeaderboardLine::getRanking)

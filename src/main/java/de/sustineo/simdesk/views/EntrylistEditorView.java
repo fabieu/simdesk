@@ -713,7 +713,7 @@ public class EntrylistEditorView extends BaseView {
 
         Button addDriverButton = new Button("Add new driver");
         addDriverButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        addDriverButton.addClickListener(event -> addEntrylistDriver(new AccDriver(), entry, entrylistEntryDriverSideListLayout));
+        addDriverButton.addClickListener(event -> addEntrylistDriver(AccDriver.create(), entry, entrylistEntryDriverSideListLayout));
         entrylistEntryDriverSideActionLayout.add(addDriverButton);
 
         if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES)) {
@@ -868,7 +868,7 @@ public class EntrylistEditorView extends BaseView {
         cloneDriverButton.addClickListener(event -> {
             List<AccDriver> drivers = entry.getDrivers();
             if (drivers.size() < AccEntrylistEntry.MAX_DRIVERS) {
-                AccDriver clonedDriver = new AccDriver(driver);
+                AccDriver clonedDriver = AccDriver.create(driver);
                 drivers.add(clonedDriver);
                 refreshEntrylistPreview();
 
@@ -1235,7 +1235,7 @@ public class EntrylistEditorView extends BaseView {
             }
 
             for (Driver driver : selectedItems) {
-                addEntrylistDriver(new AccDriver(driver), entry, entrylistEntryDriverSideListLayout);
+                addEntrylistDriver(AccDriver.create(driver), entry, entrylistEntryDriverSideListLayout);
             }
 
             dialog.close();

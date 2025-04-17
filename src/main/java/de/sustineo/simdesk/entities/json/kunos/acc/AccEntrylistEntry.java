@@ -41,9 +41,12 @@ public class AccEntrylistEntry {
     private Integer isServerAdmin;
 
     public static AccEntrylistEntry create() {
+        ArrayList<AccDriver> drivers = new ArrayList<>();
+        drivers.add(AccDriver.create());
+
         AccEntrylistEntry entry = new AccEntrylistEntry();
         entry.setUuid(UUID.randomUUID());
-        entry.setDrivers(new ArrayList<>(List.of(new AccDriver())));
+        entry.setDrivers(drivers);
         entry.setRaceNumber(DEFAULT_RACE_NUMBER);
         entry.setForcedCarModel(DEFAULT_FORCED_CAR_MODEL);
         entry.setOverrideDriverInfo(DEFAULT_OVERRIDE_DRIVER_INFO);
