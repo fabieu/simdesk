@@ -1,47 +1,29 @@
 package de.sustineo.simdesk.views;
 
-import com.opencsv.bean.StatefulBeanToCsv;
-import com.opencsv.bean.StatefulBeanToCsvBuilder;
-import com.opencsv.exceptions.CsvDataTypeMismatchException;
-import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
-import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.LeaderboardLineLapTimeComparator;
-import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
-import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.LeaderboardLinePartNameGenerator;
 import de.sustineo.simdesk.views.generators.LeaderboardLinePodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LeaderboardLineRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
-import java.io.ByteArrayInputStream;
-import java.io.IOException;
-import java.io.StringWriter;
-import java.nio.charset.StandardCharsets;
 import java.util.List;
 import java.util.stream.Collectors;
-import java.util.stream.Stream;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -51,16 +33,15 @@ import java.util.stream.Stream;
 public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnterObserver {
     private final SessionService sessionService;
     private final LeaderboardService leaderboardService;
-    private final SecurityService securityService;
 
-    private GridListDataView<LeaderboardLine> dataView;
+    private final SessionComponentFactory sessionComponentFactory;
 
     public LeaderboardSessionDetailsView(SessionService sessionService,
                                          LeaderboardService leaderboardService,
-                                         SecurityService securityService) {
+                                         SessionComponentFactory sessionComponentFactory) {
         this.sessionService = sessionService;
         this.leaderboardService = leaderboardService;
-        this.securityService = securityService;
+        this.sessionComponentFactory = sessionComponentFactory;
     }
 
     @Override
@@ -82,55 +63,12 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
             removeAll();
 
             add(createViewHeader());
-            add(createSessionInformation(session));
+            add(sessionComponentFactory.createSessionInformation(session));
             addAndExpand(createLeaderboardGrid(session));
             add(createFooter());
         } catch (IllegalArgumentException e) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
         }
-    }
-
-    private Component createSessionInformation(Session session) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setPadding(true);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
-        layout.setAlignItems(Alignment.CENTER);
-
-        H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
-
-        Icon weatherIcon = getWeatherIcon(session);
-
-        Span sessionDatetimeBadge = new Span();
-        sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
-        sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
-
-        layout.add(weatherIcon, heading, sessionDatetimeBadge);
-
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
-            StreamResource csvResource = new StreamResource(
-                    String.format("session_table_%s.csv", session.getFileChecksum()),
-                    () -> {
-                        String csv = this.exportCSV();
-                        return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                    }
-            );
-            Anchor downloadSessionAnchor = createDownloadAnchor(csvResource, "Table (CSV)");
-
-            StreamResource fileContentResource = new StreamResource(
-                    String.format("session_file_%s.json", session.getFileChecksum()),
-                    () -> {
-                        String fileContent = session.getFileContent();
-                        return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                    }
-            );
-            Anchor downloadSessionFileAnchor = createDownloadAnchor(fileContentResource, "File (JSON)");
-
-            layout.add(downloadSessionAnchor, downloadSessionFileAnchor);
-        }
-
-        return layout;
     }
 
     private Component createLeaderboardGrid(Session session) {
@@ -140,11 +78,11 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
 
         LeaderboardLine leaderboardLineWithBestTotalTime = leaderboardLines.stream()
                 .findFirst()
-                .orElse(new LeaderboardLine());
+                .orElse(LeaderboardLine.create());
         LeaderboardLine leaderboardLineWithBestLapTime = leaderboardLines.stream()
                 .filter(sessionRanking -> sessionRanking.getBestLapTimeMillis() > 0)
                 .min(new LeaderboardLineLapTimeComparator())
-                .orElse(new LeaderboardLine());
+                .orElse(LeaderboardLine.create());
 
         Grid<LeaderboardLine> grid = new Grid<>(LeaderboardLine.class, false);
         grid.addColumn(LeaderboardLine::getRanking)
@@ -193,7 +131,7 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 .setSortable(true)
                 .setComparator(LeaderboardLine::getBestLapTimeMillis);
 
-        dataView = grid.setItems(leaderboardLines);
+        grid.setItems(leaderboardLines);
         grid.setHeightFull();
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
@@ -218,26 +156,5 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
         });
 
         return grid;
-    }
-
-    private String exportCSV() {
-        if (dataView == null) {
-            return null;
-        }
-
-        Stream<LeaderboardLine> sessionRows = dataView.getItems();
-
-        try (StringWriter writer = new StringWriter()) {
-            StatefulBeanToCsv<LeaderboardLine> sbc = new StatefulBeanToCsvBuilder<LeaderboardLine>(writer)
-                    .withSeparator(';')
-                    .build();
-
-            sbc.write(sessionRows);
-
-            return writer.toString();
-        } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
-            log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
-            return null;
-        }
     }
 }

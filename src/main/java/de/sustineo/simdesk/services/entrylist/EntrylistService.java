@@ -22,34 +22,27 @@ import java.util.stream.Collectors;
 @Log
 @Service
 public class EntrylistService {
-    public void updateFromResults(AccEntrylist entrylist, AccSession accSession, Optional<Integer> gridStartPosition) {
-        Map<Integer, AccEntrylistEntry> entrylistEntriesByRaceNumber = entrylist.getEntries().stream()
-                .filter(accEntrylistEntry -> accEntrylistEntry.getRaceNumber() != null)
+    public void updateFromResults(AccEntrylist entrylist, AccSession accSession, int initialGridPosition) {
+        Map<Integer, AccEntrylistEntry> raceNumberToEntryMap = entrylist.getEntries().stream()
+                .filter(entry -> entry.getRaceNumber() != null)
                 .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
 
         List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
-        for (int i = 0; i < leaderboardLines.size(); i++) {
-            int gridPosition;
 
-            if (gridStartPosition.isPresent()) {
-                gridPosition = i + gridStartPosition.get();
-            } else {
-                gridPosition = i + 1;
-            }
-
-            AccLeaderboardLine leaderboardLine = leaderboardLines.get(i);
-            // Skip entries without laps
+        int currentGridPosition = initialGridPosition;
+        for (AccLeaderboardLine leaderboardLine : leaderboardLines) {
+            // Skip entries without any lap
             if (leaderboardLine.getTiming().getLapCount() == 0) {
                 continue;
             }
 
             // Skip entries without matching entrylist entry
-            AccEntrylistEntry entrylistEntry = entrylistEntriesByRaceNumber.get(leaderboardLine.getCar().getRaceNumber());
+            AccEntrylistEntry entrylistEntry = raceNumberToEntryMap.get(leaderboardLine.getCar().getRaceNumber());
             if (entrylistEntry == null) {
                 continue;
             }
 
-            entrylistEntry.setDefaultGridPosition(gridPosition);
+            entrylistEntry.setDefaultGridPosition(currentGridPosition++);
         }
     }
 

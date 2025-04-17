@@ -3,16 +3,11 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.ScrollOptions;
 import com.vaadin.flow.component.Text;
-import com.vaadin.flow.component.button.Button;
-import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.AbstractIcon;
 import com.vaadin.flow.component.icon.FontIcon;
-import com.vaadin.flow.component.icon.Icon;
-import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Style;
@@ -20,9 +15,7 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.RouteConfiguration;
 import com.vaadin.flow.router.RouteParameters;
-import com.vaadin.flow.server.StreamResource;
 import de.sustineo.simdesk.configuration.Reference;
-import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.utils.ApplicationContextProvider;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.util.LinkedMultiValueMap;
@@ -96,66 +89,6 @@ public abstract class BaseView extends VerticalLayout {
 
         layout.add(githubAnchor, maintainerSpan, versionAnchor);
         return layout;
-    }
-
-    protected Button createPrimaryButton(String label) {
-        Button button = new Button(label);
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        return button;
-    }
-
-    protected Button createSuccessButton(String label) {
-        Button button = new Button(label);
-        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
-        return button;
-    }
-
-    protected Button createCancelIconButton() {
-        Button button = new Button(VaadinIcon.CLOSE.create());
-        button.addThemeVariants(ButtonVariant.LUMO_ICON, ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_ERROR);
-        return button;
-    }
-
-    protected AbstractIcon<?> getDownloadIcon() {
-        return new Icon(VaadinIcon.CLOUD_DOWNLOAD_O);
-    }
-
-    protected AbstractIcon<?> getUploadIcon() {
-        return new Icon(VaadinIcon.CLOUD_UPLOAD_O);
-    }
-
-    protected AbstractIcon<?> getShareIcon() {
-        return new Icon(VaadinIcon.SHARE_SQUARE);
-    }
-
-    protected AbstractIcon<?> getResetIcon() {
-        return new Icon(VaadinIcon.ARROW_BACKWARD);
-    }
-
-    protected AbstractIcon<?> getValidateIcon() {
-        return new Icon(VaadinIcon.CLIPBOARD_CHECK);
-    }
-
-    protected Icon getWeatherIcon(Session session) {
-        Icon icon;
-
-        if (session.getWetSession()) {
-            icon = VaadinIcon.DROP.create();
-            icon.setColor("var(--weather-rainy-color)");
-        } else {
-            icon = VaadinIcon.SUN_O.create();
-            icon.setColor("var(--weather-sunny-color)");
-        }
-
-        return icon;
-    }
-
-    protected Anchor createDownloadAnchor(StreamResource streamResource, String label) {
-        Anchor anchor = new Anchor(streamResource, "");
-        anchor.getElement().setAttribute("download", true);
-        anchor.removeAll();
-        anchor.add(new Button(label, getDownloadIcon()));
-        return anchor;
     }
 
     /**

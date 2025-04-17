@@ -34,6 +34,7 @@ import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.filter.DriverFilter;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import jakarta.annotation.security.RolesAllowed;
@@ -55,18 +56,22 @@ public class SettingsView extends BaseView {
     private final ApiKeyService apiKeyService;
     private final SecurityService securityService;
 
+    private final ButtonComponentFactory buttonComponentFactory;
+
     private final Grid<ApiKey> grid = new Grid<>(ApiKey.class, false);
 
     public SettingsView(NotificationService notificationService,
                         UserService userService,
                         DriverService driverService,
                         ApiKeyService apiKeyService,
-                        SecurityService securityService) {
+                        SecurityService securityService,
+                        ButtonComponentFactory buttonComponentFactory) {
         this.notificationService = notificationService;
         this.userService = userService;
         this.driverService = driverService;
         this.apiKeyService = apiKeyService;
         this.securityService = securityService;
+        this.buttonComponentFactory = buttonComponentFactory;
 
         setSizeFull();
         setPadding(false);
@@ -162,7 +167,7 @@ public class SettingsView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Driver> updateColumn = grid.addComponentColumn(driver -> {
-                    Button updateButton = createPrimaryButton("Update");
+                    Button updateButton = buttonComponentFactory.createPrimaryButton("Update");
                     updateButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -182,10 +187,10 @@ public class SettingsView extends BaseView {
                 .bind(Driver::getVisibility, Driver::setVisibility);
         visibilityColumn.setEditorComponent(visibilityField);
 
-        Button saveButton = createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
-        Button cancelButton = createCancelIconButton();
+        Button cancelButton = buttonComponentFactory.createCancelIconButton();
         cancelButton.addClickListener(e -> editor.cancel());
 
         GridListDataView<Driver> dataView = grid.setItems(driverService.getAllDrivers());
@@ -234,7 +239,7 @@ public class SettingsView extends BaseView {
         nameField.setPlaceholder("API key name");
         nameField.setClearButtonVisible(true);
 
-        Button createButton = createPrimaryButton("Generate");
+        Button createButton = buttonComponentFactory.createPrimaryButton("Generate");
         createButton.addClickListener(e -> {
             if (nameField.getValue() == null || nameField.getValue().isEmpty()) {
                 notificationService.showErrorNotification("API key name is mandatory");
@@ -326,7 +331,7 @@ public class SettingsView extends BaseView {
                 .setWidth("15rem")
                 .setFlexGrow(0);
         Grid.Column<UserRole> updateColumn = grid.addComponentColumn(userRole -> {
-                    Button updateButton = createPrimaryButton("Update");
+                    Button updateButton = buttonComponentFactory.createPrimaryButton("Update");
                     updateButton.addClickListener(e -> {
                         if (editor.isOpen()) {
                             editor.cancel();
@@ -349,10 +354,10 @@ public class SettingsView extends BaseView {
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
         discordRoleIdColumn.setEditorComponent(discordRoleIdField);
 
-        Button saveButton = createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
-        Button cancelButton = createCancelIconButton();
+        Button cancelButton = buttonComponentFactory.createCancelIconButton();
         cancelButton.addClickListener(e -> editor.cancel());
 
         HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);

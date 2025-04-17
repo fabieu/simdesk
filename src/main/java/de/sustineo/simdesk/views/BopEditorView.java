@@ -30,6 +30,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.utils.json.JsonClient;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.fields.BopEditField;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import jakarta.validation.ConstraintViolationException;
@@ -53,6 +54,9 @@ import java.util.Set;
 public class BopEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
+
+    private final ComponentFactory componentFactory;
+
     private final JsonClient jsonClient;
 
     private final FormLayout settingsLayout = new FormLayout();
@@ -65,9 +69,11 @@ public class BopEditorView extends BaseView {
 
     public BopEditorView(ValidationService validationService,
                          NotificationService notificationService,
+                         ComponentFactory componentFactory,
                          JsonClient jsonClient) {
         this.validationService = validationService;
         this.notificationService = notificationService;
+        this.componentFactory = componentFactory;
         this.jsonClient = jsonClient;
 
         setSizeFull();
@@ -246,7 +252,7 @@ public class BopEditorView extends BaseView {
         buttonLayout.setJustifyContentMode(JustifyContentMode.CENTER);
         buttonLayout.setAlignItems(Alignment.CENTER);
 
-        Button downloadButton = new Button("Download", getDownloadIcon());
+        Button downloadButton = new Button("Download", componentFactory.getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
         Anchor downloadAnchor = new Anchor(downloadBop(), "");

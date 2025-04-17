@@ -13,7 +13,7 @@ import java.util.List;
 
 @Data
 @Builder
-@NoArgsConstructor
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class LeaderboardLine {
     private Integer id;
@@ -39,4 +39,8 @@ public class LeaderboardLine {
     private Long totalTimeMillis;
     @CsvBindByName(column = "Laps")
     private Integer lapCount;
+
+    public static LeaderboardLine create() {
+        return new LeaderboardLine();
+    }
 }

@@ -9,9 +9,7 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
-import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.Tab;
@@ -32,7 +30,7 @@ import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.PenaltyService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
-import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.InvalidLapPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LapRenderer;
 import de.sustineo.simdesk.views.renderers.SessionDetailsRenderer;
@@ -59,6 +57,8 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
     private final SecurityService securityService;
     private final DriverService driverService;
 
+    private final SessionComponentFactory sessionComponentFactory;
+
     private List<Lap> laps = new ArrayList<>();
     private List<Penalty> penalties = new ArrayList<>();
 
@@ -66,12 +66,14 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                                             LapService lapService,
                                             PenaltyService penaltyService,
                                             SecurityService securityService,
-                                            DriverService driverService) {
+                                            DriverService driverService,
+                                            SessionComponentFactory sessionComponentFactory) {
         this.sessionService = sessionService;
         this.lapService = lapService;
         this.penaltyService = penaltyService;
         this.securityService = securityService;
         this.driverService = driverService;
+        this.sessionComponentFactory = sessionComponentFactory;
     }
 
     @Override
@@ -103,29 +105,9 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         removeAll();
 
         add(createViewHeader());
-        add(createSessionInformation(session));
+        add(sessionComponentFactory.createSessionInformation(session));
         addAndExpand(createTabSheet(fileChecksum, carId));
         add(createFooter());
-    }
-
-    private Component createSessionInformation(Session session) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setPadding(true);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
-        layout.setAlignItems(Alignment.CENTER);
-
-        H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
-
-        Icon weatherIcon = getWeatherIcon(session);
-
-        Span sessionDatetimeBadge = new Span();
-        sessionDatetimeBadge.setText(FormatUtils.formatDatetime(session.getSessionDatetime()));
-        sessionDatetimeBadge.getElement().getThemeList().add("badge contrast");
-
-        layout.add(weatherIcon, heading, sessionDatetimeBadge);
-        return layout;
     }
 
     private Component createTabSheet(String fileChecksum, int carId) {
@@ -258,7 +240,7 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 }
         );
 
-        Anchor downloadLapsAnchor = createDownloadAnchor(csvResource, "Download laps");
+        Anchor downloadLapsAnchor = sessionComponentFactory.createDownloadAnchor(csvResource, "Download laps");
 
         layout.add(downloadLapsAnchor);
         return layout;

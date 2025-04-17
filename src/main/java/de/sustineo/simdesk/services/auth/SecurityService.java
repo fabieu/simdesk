@@ -16,10 +16,7 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.Arrays;
-import java.util.Map;
-import java.util.Optional;
-import java.util.UUID;
+import java.util.*;
 
 @Log
 @Service
@@ -78,6 +75,11 @@ public class SecurityService {
 
     public Optional<String> getPrincipalName() {
         return authenticationContext.getPrincipalName();
+    }
+
+    public boolean hasAnyAuthority(Collection<UserRoleEnum> userRoles) {
+        return hasAnyAuthority(userRoles.toArray(new UserRoleEnum[0]));
+
     }
 
     public boolean hasAnyAuthority(UserRoleEnum... userRoles) {

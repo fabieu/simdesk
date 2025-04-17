@@ -20,6 +20,7 @@ import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.LapsByCarCarGroupPartNameGenerator;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
@@ -38,13 +39,16 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
     private final DriverService driverService;
     private final LapService lapService;
     private final SessionService sessionService;
+    private final SessionComponentFactory sessionComponentFactory;
 
     public LeaderboardDriverView(DriverService driverService,
                                  LapService lapService,
-                                 SessionService sessionService) {
+                                 SessionService sessionService,
+                                 SessionComponentFactory sessionComponentFactory) {
         this.driverService = driverService;
         this.lapService = lapService;
         this.sessionService = sessionService;
+        this.sessionComponentFactory = sessionComponentFactory;
     }
 
     @Override
@@ -119,7 +123,7 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
         H3 header = new H3("Latest Races");
 
         Grid<Session> grid = new Grid<>(Session.class, false);
-        grid.addComponentColumn(this::getWeatherIcon)
+        grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
