@@ -5,8 +5,10 @@ import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.router.RouterLink;
 import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.views.BaseView;
 import de.sustineo.simdesk.views.LeaderboardDriverView;
+import de.sustineo.simdesk.views.LeaderboardSessionDetailsView;
 
 public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE = """
@@ -15,6 +17,17 @@ public class GridRenderer {
             """;
     static final String RACE_NUMBER_TEMPLATE_NUMBER = "raceNumber";
     static final String RACE_NUMBER_TEMPLATE_BALLAST = "ballastKg";
+
+    static final String SESSION_REFERENCE_TEMPLATE = """
+            <vaadin-button
+            title="Show session"
+            @click="${clickHandler}"
+            theme="tertiary-inline small link">
+            ${item.session.description}
+            </vaadin-button>
+            """;
+    static final String SESSION_REFERENCE_TEMPLATE_SESSION = "session";
+    static final String SESSION_REFERENCE_TEMPLATE_CLICK_HANDLER = "clickHandler";
 
     static final String DRIVER_REFERENCE_TEMPLATE = """
             <vaadin-button
@@ -75,7 +88,7 @@ public class GridRenderer {
             """;
     static final String BOP_RESTRICTOR_TEMPLATE_RESTRICTOR = "restrictor";
 
-    public static String enrichNumber(Integer number) {
+    protected static String enrichNumber(Integer number) {
         if (number == null) {
             return "";
         } else if (number > 0) {
@@ -87,7 +100,7 @@ public class GridRenderer {
         }
     }
 
-    public static String getTimeColor(Long gapMillis) {
+    protected static String getTimeColor(Long gapMillis) {
         if (gapMillis < 0) {
             return "--lumo-success-text-color";
         } else if (gapMillis == 0) {
@@ -97,7 +110,7 @@ public class GridRenderer {
         }
     }
 
-    public static void redirectToDriverProfile(Driver driver) {
+    protected static void redirectToDriverProfile(Driver driver) {
         if (driver == null || driver.getId() == null) {
             return;
         }
@@ -105,6 +118,19 @@ public class GridRenderer {
         RouterLink link = new RouterLink(LeaderboardDriverView.class, new RouteParameters(
                 new RouteParam(BaseView.ROUTE_PARAMETER_DRIVER_ID, driver.getId())
         ));
+
+        UI.getCurrent().getPage().open(link.getHref());
+    }
+
+    protected static void redirectToSessionDetails(Session session) {
+        if (session == null || session.getFileChecksum() == null) {
+            return;
+        }
+
+        RouterLink link = new RouterLink(LeaderboardSessionDetailsView.class, new RouteParameters(
+                new RouteParam(BaseView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum())
+        ));
+
         UI.getCurrent().getPage().open(link.getHref());
     }
 }

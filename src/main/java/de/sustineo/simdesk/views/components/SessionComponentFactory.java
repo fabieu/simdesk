@@ -58,7 +58,7 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType().getDescription(), session.getTrackName(), session.getServerName()));
+        heading.setText(session.getDescription());
 
         Icon weatherIcon = getWeatherIcon(session);
 

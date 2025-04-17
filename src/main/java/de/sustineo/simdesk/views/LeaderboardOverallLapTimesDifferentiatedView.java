@@ -117,7 +117,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         Grid.Column<DriverRanking> driverNameColumn = grid.addColumn(DriverRankingRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setAutoWidth(true)
-                .setFlexGrow(1)
+                .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<DriverRanking> lapTimeColumn = grid.addColumn(DriverRankingRenderer.createLapTimeRenderer(topDriverRanking))
                 .setHeader("Lap Time")
@@ -149,15 +149,9 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<DriverRanking> sessionTypeDescriptionColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getSessionType().getDescription())
+        Grid.Column<DriverRanking> sessionInformationColumn = grid.addColumn(DriverRankingRenderer.createSessionRenderer())
                 .setHeader("Session")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<DriverRanking> serverNameColumn = grid.addColumn(driverRanking -> driverRanking.getSession().getServerName())
-                .setHeader("Server Name")
-                .setSortable(true)
-                .setTooltipGenerator(driverRanking -> driverRanking.getSession().getServerName());
         Grid.Column<DriverRanking> sessionDatetimeColumn = grid.addColumn(driverRanking -> FormatUtils.formatDatetime(driverRanking.getSession().getSessionDatetime()))
                 .setHeader("Session Time")
                 .setAutoWidth(true)
@@ -176,8 +170,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setDriverName));
         headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
-        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setServerName));
-        headerRow.getCell(sessionTypeDescriptionColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setSessionTypeDescription));
+        headerRow.getCell(sessionInformationColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setSessionDescription));
 
         return grid;
     }
