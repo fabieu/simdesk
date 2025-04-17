@@ -215,31 +215,32 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
-                .setHeader("Session Time")
+        Grid.Column<Session> carCountColumn = grid.addColumn(Session::getCarCount)
+                .setHeader("Cars")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
-                .setSortable(true)
-                .setComparator(Session::getSessionDatetime);
-        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
-                .setHeader("Server Name")
-                .setSortable(true)
-                .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
-                .setHeader("Track Name")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
+                .setTextAlign(ColumnTextAlign.END)
                 .setSortable(true);
         Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> carCountColumn = grid.addColumn(Session::getCarCount)
-                .setHeader("Cars")
+        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+                .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
+        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
+                .setHeader("Server Name")
+                .setSortable(true)
+                .setTooltipGenerator(Session::getServerName);
+        Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
+                .setHeader("Session Time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(Session::getSessionDatetime);
 
         GridListDataView<Session> dataView = grid.setItems(sessions);
         grid.setSizeFull();
