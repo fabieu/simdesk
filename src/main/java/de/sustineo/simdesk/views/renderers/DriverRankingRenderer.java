@@ -57,4 +57,10 @@ public class DriverRankingRenderer extends GridRenderer {
                 .withProperty(DRIVER_REFERENCE_TEMPLATE_DRIVER, DriverRanking::getDriver)
                 .withFunction(DRIVER_REFERENCE_TEMPLATE_CLICK_HANDLER, driverRanking -> redirectToDriverProfile(driverRanking.getDriver()));
     }
+
+    public static Renderer<DriverRanking> createSessionRenderer() {
+        return LitRenderer.<DriverRanking>of(SESSION_REFERENCE_TEMPLATE)
+                .withProperty(SESSION_REFERENCE_TEMPLATE_SESSION, DriverRanking::getSession)
+                .withFunction(SESSION_REFERENCE_TEMPLATE_CLICK_HANDLER, driverRanking -> redirectToSessionDetails(driverRanking.getSession()));
+    }
 }

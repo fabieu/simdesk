@@ -82,8 +82,10 @@ public interface RankingMapper {
             @Result(property = "driver.shortName", column = "short_name"),
             @Result(property = "driver.visibility", column = "visibility"),
             @Result(property = "session.sessionType", column = "session_type"),
+            @Result(property = "session.trackId", column = "track_id"),
             @Result(property = "session.serverName", column = "server_name"),
             @Result(property = "session.sessionDatetime", column = "session_datetime"),
+            @Result(property = "session.fileChecksum", column = "file_checksum"),
     })
     @Select(databaseId = "sqlite", value = """
             SELECT lap.*, driver.*, session.*

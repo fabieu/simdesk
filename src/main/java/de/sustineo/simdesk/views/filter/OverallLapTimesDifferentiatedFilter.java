@@ -9,8 +9,7 @@ public class OverallLapTimesDifferentiatedFilter extends GridFilter {
 
     private String driverName;
     private String carModelName;
-    private String serverName;
-    private String sessionTypeDescription;
+    private String sessionDescription;
 
     public OverallLapTimesDifferentiatedFilter(GridListDataView<DriverRanking> dataView) {
         this.dataView = dataView;
@@ -27,22 +26,16 @@ public class OverallLapTimesDifferentiatedFilter extends GridFilter {
         this.dataView.refreshAll();
     }
 
-    public void setServerName(String serverName) {
-        this.serverName = serverName;
-        this.dataView.refreshAll();
-    }
-
-    public void setSessionTypeDescription(String sessionTypeDescription) {
-        this.sessionTypeDescription = sessionTypeDescription;
+    public void setSessionDescription(String sessionTypeDescription) {
+        this.sessionDescription = sessionTypeDescription;
         this.dataView.refreshAll();
     }
 
     public boolean test(DriverRanking driverRanking) {
         boolean matchesDriverFullName = matches(driverRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(Car.getNameById(driverRanking.getCarModelId()), carModelName);
-        boolean matchesServerName = matches(driverRanking.getSession().getServerName(), serverName);
-        boolean matchesSessionTypeDescription = matches(driverRanking.getSession().getSessionType().getDescription(), sessionTypeDescription);
+        boolean matchesSessionDescription = matches(driverRanking.getSession().getDescription(), sessionDescription);
 
-        return matchesDriverFullName && matchesCarModelName && matchesServerName && matchesSessionTypeDescription;
+        return matchesDriverFullName && matchesCarModelName && matchesSessionDescription;
     }
 }

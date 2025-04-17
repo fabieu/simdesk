@@ -26,4 +26,8 @@ public class Session {
     public String getTrackName() {
         return Track.getTrackNameByAccId(trackId);
     }
+
+    public String getDescription() {
+        return String.format("%s - %s - %s", sessionType.getDescription(), getTrackName(), serverName);
+    }
 }
