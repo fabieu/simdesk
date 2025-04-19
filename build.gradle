@@ -1,7 +1,7 @@
 buildscript {
     ext {
-        vaadinVersion = "24.7.1"
-        flywayVersion = "11.7.0"
+        vaadinVersion = "24.7.2"
+        flywayVersion = "11.7.2"
     }
 }
 
@@ -55,7 +55,7 @@ dependencies {
     implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
 
     // Logging
-    implementation "io.logz.logback:logzio-logback-appender:2.2.0"
+    implementation "io.logz.logback:logzio-logback-appender:2.3.0"
 
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.17.0"
