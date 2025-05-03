@@ -3,8 +3,7 @@ updates:
   - package-ecosystem: "gradle"
     directory: "/"
     schedule:
-      interval: "weekly"
-      day: "saturday"
+      interval: "monthly"
       time: "07:00"
     labels:
       - "dependencies"
