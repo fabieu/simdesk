@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.7.2"
+        vaadinVersion = "24.7.3"
         flywayVersion = "11.8.0"
     }
 }
@@ -63,7 +63,7 @@ dependencies {
     implementation 'commons-io:commons-io:2.19.0'
 
     // Misc
-    implementation "com.discord4j:discord4j-core:3.2.7"
+    implementation "com.discord4j:discord4j-core:3.2.8"
     implementation 'com.opencsv:opencsv:5.10'
 
     // OpenAPI documentation
