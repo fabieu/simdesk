@@ -1,5 +1,9 @@
 package de.sustineo.simdesk.views.components;
 
+import com.opencsv.bean.StatefulBeanToCsv;
+import com.opencsv.bean.StatefulBeanToCsvBuilder;
+import com.opencsv.exceptions.CsvDataTypeMismatchException;
+import com.opencsv.exceptions.CsvRequiredFieldEmptyException;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
@@ -9,23 +13,33 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.server.StreamResource;
+import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.services.auth.SecurityService;
+import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
+import java.io.IOException;
+import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
+@Log
 @Service
 public class SessionComponentFactory extends ComponentFactory {
     private final SecurityService securityService;
+    private final LeaderboardService leaderboardService;
 
-    public SessionComponentFactory(SecurityService securityService) {
+    public SessionComponentFactory(SecurityService securityService,
+                                   LeaderboardService leaderboardService) {
         this.securityService = securityService;
+        this.leaderboardService = leaderboardService;
     }
 
     public Icon getWeatherIcon(Session session) {
@@ -69,6 +83,15 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+            StreamResource leaderboardLinesCsvResource = new StreamResource(
+                    String.format("session_table_%s.csv", session.getFileChecksum()),
+                    () -> {
+                        String fileContent = getLeaderboardLinesAsCsv(session);
+                        return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                    }
+            );
+            Anchor leaderboardLinesCsvAnchor = createDownloadAnchor(leaderboardLinesCsvResource, "Table (CSV)");
+
             StreamResource fileContentResource = new StreamResource(
                     String.format("session_file_%s.json", session.getFileChecksum()),
                     () -> {
@@ -76,12 +99,28 @@ public class SessionComponentFactory extends ComponentFactory {
                         return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
                     }
             );
-            Anchor downloadSessionFileAnchor = createDownloadAnchor(fileContentResource, "File (JSON)");
+            Anchor sessionFileJsonAnchor = createDownloadAnchor(fileContentResource, "File (JSON)");
 
-            layout.add(downloadSessionFileAnchor);
+            layout.add(sessionFileJsonAnchor, leaderboardLinesCsvAnchor);
         }
 
         return layout;
+    }
+
+    private String getLeaderboardLinesAsCsv(Session session) {
+        List<LeaderboardLine> leaderboardLines = leaderboardService.getLeaderboardLinesBySessionId(session.getId());
+
+        try (StringWriter writer = new StringWriter()) {
+            StatefulBeanToCsv<LeaderboardLine> sbc = new StatefulBeanToCsvBuilder<LeaderboardLine>(writer)
+                    .build();
+
+            sbc.write(leaderboardLines);
+
+            return writer.toString();
+        } catch (CsvDataTypeMismatchException | CsvRequiredFieldEmptyException | IOException e) {
+            log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
+            return null;
+        }
     }
 
     public Component createSessionInformation(AccSession accSession) {

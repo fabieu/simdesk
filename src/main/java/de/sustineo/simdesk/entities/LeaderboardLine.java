@@ -28,7 +28,7 @@ public class LeaderboardLine {
     private Integer ballastKg;
     @CsvBindByName(column = "Car Number")
     private Integer raceNumber;
-    @CsvBindAndSplitByName(column = "Drivers", elementType = Driver.class, writeDelimiter = ",")
+    @CsvBindAndSplitByName(column = "Drivers", elementType = Driver.class, writeDelimiter = ";")
     private List<Driver> drivers;
     @CsvCustomBindByName(column = "Fastest lap", converter = LapTimeConverter.class)
     private Long bestLapTimeMillis;
