@@ -28,7 +28,6 @@ import com.vaadin.flow.router.RouterLink;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
-import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
@@ -134,38 +133,16 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createNavbarMenu() {
-        MenuBar simulationUserBar = createNavbarMenuBar();
-        simulationUserBar.addThemeVariants(MenuBarVariant.LUMO_DROPDOWN_INDICATORS);
-        addSimulationSelector(simulationUserBar);
-
         MenuBar userMenuBar = createNavbarMenuBar();
         addThemeSwitcher(userMenuBar);
         addUserMenu(userMenuBar);
 
-        HorizontalLayout menuBarLayout = new HorizontalLayout(simulationUserBar, userMenuBar);
+        HorizontalLayout menuBarLayout = new HorizontalLayout(userMenuBar);
         menuBarLayout.setSpacing(false);
         menuBarLayout.getStyle()
                 .setMarginRight("var(--lumo-space-m)");
 
         return menuBarLayout;
-    }
-
-    private void addSimulationSelector(MenuBar menuBar) {
-        Simulation currentSimulation = Simulation.ACC;
-
-        MenuItem simulationMenuItem = menuBar.addItem(currentSimulation.getShortName());
-        simulationMenuItem.getStyle()
-                .setFontWeight(Style.FontWeight.BOLD);
-
-        SubMenu simulationSubMenu = simulationMenuItem.getSubMenu();
-        for (Simulation simulation : Simulation.values()) {
-            MenuItem item = simulationSubMenu.addItem(simulation.getName());
-            item.setEnabled(simulation.isActive());
-            item.addClickListener(event -> {
-                notificationService.showInfoNotification("Mode changed to " + simulation.getName());
-                simulationMenuItem.setText(simulation.getShortName());
-            });
-        }
     }
 
     private void addThemeSwitcher(MenuBar menuBar) {
