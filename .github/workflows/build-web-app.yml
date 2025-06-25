@@ -1,0 +1,132 @@
+name: simdesk-build-publish
+
+on:
+  push:
+    branches:
+      - main
+    paths:
+      - web-app/gradle.properties
+  workflow_dispatch:
+
+concurrency:
+  group: ${{ github.workflow }}-${{ github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  variables:
+    name: Set environment variables
+    runs-on: ubuntu-latest
+    outputs:
+      version: "${{ env.VERSION }}"
+      version-major: "${{ env.VERSION_MAJOR }}"
+      version-minor: "${{ env.VERSION_MINOR }}"
+    timeout-minutes: 5
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Save version to environment
+        run: |
+          VERSION=`cat gradle.properties | grep "version" | cut -d'=' -f2`
+          VERSION="${VERSION#[vV]}"
+          VERSION_MAJOR="${VERSION%%\.*}"
+          VERSION_MINOR="${VERSION#*.}"
+          VERSION_MINOR="${VERSION_MINOR%.*}"
+          echo "VERSION=$VERSION" >> "$GITHUB_ENV"
+          echo "VERSION_MAJOR=$VERSION_MAJOR" >> "$GITHUB_ENV"
+          echo "VERSION_MINOR=$VERSION_MINOR" >> "$GITHUB_ENV"
+        working-directory: web-app
+      - name: Display version
+        run: echo "Version $VERSION ($VERSION_MAJOR.$VERSION_MINOR)"
+
+  test:
+    name: Run tests
+    runs-on: ubuntu-latest
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Run tests
+        run: chmod +x gradlew && sh gradlew :web-app:test
+
+  build-jar:
+    name: Build jar
+    runs-on: ubuntu-latest
+    needs:
+      - test
+    timeout-minutes: 15
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Setup Java
+        uses: actions/setup-java@v4
+        with:
+          java-version: '21'
+          distribution: 'temurin'
+      - name: Setup Gradle
+        uses: gradle/actions/setup-gradle@v4
+      - name: Build jar
+        run: chmod +x gradlew && sh gradlew :web-app:vaadinBuildFrontend :web-app:bootJar
+      - name: Upload artifact
+        uses: actions/upload-artifact@v4
+        with:
+          name: jar
+          path: build/libs/*.jar
+          retention-days: 1
+
+  build-image:
+    name: Build container images
+    runs-on: ubuntu-latest
+    needs:
+      - variables
+      - build-jar
+    permissions:
+      contents: read
+      packages: write
+    container:
+      image: docker:27.0
+    services:
+      dind:
+        image: docker:27.0-dind
+    timeout-minutes: 30
+    env:
+      IMAGE_ID: "${{ vars.CONTAINER_REGISTRY }}/${{ github.repository }}"
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+      - name: Download artifact
+        uses: actions/download-artifact@v4
+        with:
+          name: jar
+          path: web-app/build/libs
+      - name: Login to container registry
+        run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
+      - name: Build images
+        run: docker build --pull -t $IMAGE_ID:latest -t "$IMAGE_ID:${{ needs.variables.outputs.version }}" -t "$IMAGE_ID:${{ needs.variables.outputs.version-major }}" -t "$IMAGE_ID:${{ needs.variables.outputs.version-major }}.${{ needs.variables.outputs.version-minor }}" .
+        working-directory: web-app
+      - name: Push images
+        run: docker push $IMAGE_ID --all-tags
+
+  create-release:
+    name: Create release
+    runs-on: ubuntu-latest
+    needs:
+      - variables
+      - build-image
+    permissions:
+      contents: write
+    timeout-minutes: 5
+    steps:
+      - name: Release
+        uses: softprops/action-gh-release@v2
+        with:
+          name: Release ${{ needs.variables.outputs.version }}
+          tag_name: ${{ needs.variables.outputs.version }}
+          target_commitish: ${{ github.sha }}
+          generate_release_notes: true

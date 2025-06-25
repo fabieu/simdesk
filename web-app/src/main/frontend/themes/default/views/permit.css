@@ -1,0 +1,36 @@
+.permit-badge {
+    margin: 0.1em;
+}
+
+.permit-details-container {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    box-sizing: border-box;
+    gap: var(--lumo-space-s);
+    padding: var(--lumo-space-m);
+}
+
+.permit-explanation ul {
+    margin: 0;
+}
+
+.permit-explanation table {
+    margin: 1rem 0;
+    width: 100%;
+    border-collapse: collapse;
+}
+
+.permit-explanation th {
+    font-weight: bold;
+}
+
+.permit-explanation td {
+    text-align: end;
+}
+
+.permit-explanation td, .permit-explanation th {
+    text-align: center;
+    border: 1px solid var(--lumo-secondary-text-color);
+    padding: 5px;
+}

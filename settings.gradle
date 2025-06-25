@@ -1,1 +1,4 @@
-rootProject.name = 'SimDesk'
+rootProject.name = 'simdesk'
+
+include 'web-app'
+include 'desktop-client'
