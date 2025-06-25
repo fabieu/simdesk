@@ -108,6 +108,9 @@ crashlytics.properties
 crashlytics-build.properties
 fabric.properties
 
+# Vaadin plugin
+.idea/.copilot-plugin
+
 # Editor-based Rest Client
 .idea/httpRequests
 
