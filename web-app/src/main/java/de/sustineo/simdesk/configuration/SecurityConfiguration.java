@@ -27,7 +27,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
-import org.springframework.security.web.util.matcher.AntPathRequestMatcher;
+import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
 
 import java.util.*;
 import java.util.stream.Collectors;
@@ -68,6 +68,8 @@ public class SecurityConfiguration extends VaadinWebSecurity {
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
+        PathPatternRequestMatcher.Builder pathPatternBuilder = PathPatternRequestMatcher.withDefaults();
+
         // Delegating the responsibility of general configurations
         // of http security to the super class. It's configuring
         // the followings: Vaadin's CSRF protection by ignoring
@@ -84,7 +86,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                 )
                 .addFilterAfter(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
-                        .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), new AntPathRequestMatcher("/api/**"))
+                        .defaultAuthenticationEntryPointFor(new HttpStatusEntryPoint(HttpStatus.UNAUTHORIZED), pathPatternBuilder.matcher("/api/**"))
                 )
                 .formLogin(formLogin -> formLogin
                         .loginPage(LOGIN_URL).permitAll()
