@@ -1,14 +1,14 @@
 buildscript {
     ext {
-        vaadinVersion = "24.7.6"
-        flywayVersion = "11.8.2"
+        vaadinVersion = "24.8.0"
+        flywayVersion = "11.10.0"
     }
 }
 
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
-    id "org.springframework.boot" version "3.5.0"
+    id "org.springframework.boot" version "3.5.3"
     id 'com.vaadin' version "${vaadinVersion}"
     id "org.flywaydb.flyway" version "${flywayVersion}"
 }
@@ -49,8 +49,8 @@ dependencies {
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4"
-    runtimeOnly "org.postgresql:postgresql:42.7.6"
-    runtimeOnly "org.xerial:sqlite-jdbc:3.49.1.0"
+    runtimeOnly "org.postgresql:postgresql:42.7.7"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.50.1.0"
     implementation "org.flywaydb:flyway-core:${flywayVersion}"
     implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
 
@@ -64,17 +64,17 @@ dependencies {
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.2.8"
-    implementation 'com.opencsv:opencsv:5.11'
+    implementation 'com.opencsv:opencsv:5.11.2'
 
     // OpenAPI documentation
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.8'
+    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
     implementation 'org.webjars:webjars-locator-lite:1.1.0'
 
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation 'org.testcontainers:junit-jupiter:1.21.1'
-    testImplementation 'org.testcontainers:postgresql:1.21.1'
+    testImplementation 'org.testcontainers:junit-jupiter:1.21.2'
+    testImplementation 'org.testcontainers:postgresql:1.21.2'
 
     compileOnly "org.projectlombok:lombok:1.18.38"
     annotationProcessor "org.projectlombok:lombok:1.18.38"
