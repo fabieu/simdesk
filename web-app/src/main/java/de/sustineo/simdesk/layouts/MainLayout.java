@@ -201,7 +201,7 @@ public class MainLayout extends AppLayout {
                 settingsMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(SettingsView.class)));
             }
 
-            userSubMenu.add(ComponentUtils.createSpacer());
+            userSubMenu.addItem(ComponentUtils.createSpacer());
 
             MenuItem logoutMenuItem = userSubMenu.addItem("Logout");
             logoutMenuItem.addClickListener(event -> securityService.logout());

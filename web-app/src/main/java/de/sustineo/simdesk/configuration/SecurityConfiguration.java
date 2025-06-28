@@ -82,7 +82,7 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         // super.configure(HttpSecurity) as it adds final anyRequest matcher
         http
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(antMatchers(PUBLIC_PATHS)).permitAll()
+                        .requestMatchers(pathMatchers(PUBLIC_PATHS)).permitAll()
                 )
                 .addFilterAfter(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
