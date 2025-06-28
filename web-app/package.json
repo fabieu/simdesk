@@ -72,10 +72,7 @@
     "date-fns": "2.29.3",
     "flag-icons": "^7.2.3",
     "leaflet": "1.9.4",
-    "lit": "3.3.0",
-    "react-dom": "18.3.1",
-    "react": "18.3.1",
-    "react-router": "7.5.2"
+    "lit": "3.3.0"
   },
   "devDependencies": {
     "@babel/preset-react": "7.26.3",
@@ -94,9 +91,7 @@
     "vite-plugin-checker": "0.9.1",
     "workbox-build": "7.3.0",
     "workbox-core": "7.3.0",
-    "workbox-precaching": "7.3.0",
-    "@types/react-dom": "18.3.6",
-    "@types/react": "18.3.20"
+    "workbox-precaching": "7.3.0"
   },
   "vaadin": {
     "dependencies": {
@@ -169,10 +164,7 @@
       "construct-style-sheets-polyfill": "3.1.0",
       "date-fns": "2.29.3",
       "leaflet": "1.9.4",
-      "lit": "3.3.0",
-      "react-dom": "18.3.1",
-      "react": "18.3.1",
-      "react-router": "7.5.2"
+      "lit": "3.3.0"
     },
     "devDependencies": {
       "@babel/preset-react": "7.26.3",
@@ -191,9 +183,7 @@
       "vite-plugin-checker": "0.9.1",
       "workbox-build": "7.3.0",
       "workbox-core": "7.3.0",
-      "workbox-precaching": "7.3.0",
-      "@types/react-dom": "18.3.6",
-      "@types/react": "18.3.20"
+      "workbox-precaching": "7.3.0"
     },
     "hash": "2219696db59f50272af96b7f781e1ff103a57d514b10ba5b6aec6c730a596b45"
   },
