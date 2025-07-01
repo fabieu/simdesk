@@ -1,6 +1,6 @@
 buildscript {
     ext {
-        vaadinVersion = "24.8.0"
+        vaadinVersion = "24.8.1"
         flywayVersion = "11.10.0"
     }
 }
@@ -50,7 +50,7 @@ dependencies {
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.4"
     runtimeOnly "org.postgresql:postgresql:42.7.7"
-    runtimeOnly "org.xerial:sqlite-jdbc:3.50.1.0"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.50.2.0"
     implementation "org.flywaydb:flyway-core:${flywayVersion}"
     implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
 
@@ -73,8 +73,8 @@ dependencies {
     // Development
     developmentOnly 'org.springframework.boot:spring-boot-devtools'
     testImplementation "org.springframework.boot:spring-boot-starter-test"
-    testImplementation 'org.testcontainers:junit-jupiter:1.21.2'
-    testImplementation 'org.testcontainers:postgresql:1.21.2'
+    testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
+    testImplementation 'org.testcontainers:postgresql:1.21.3'
 
     compileOnly "org.projectlombok:lombok:1.18.38"
     annotationProcessor "org.projectlombok:lombok:1.18.38"
