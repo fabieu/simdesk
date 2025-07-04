@@ -4,6 +4,7 @@ options.
 - [Basic configuration](#basic-configuration)
 - [Persistence](persistence.md)
 - [Authentication](auth.md)
+- [Themes](themes.md)
 
 **Features:**
 
@@ -12,7 +13,6 @@ options.
 - [Balance of Performance](acc-bop.md)
 - [Map](map.md)
 - [Discord Integration](discord.md)
-- [Themes](themes.md)
 
 ## Basic configuration
 
