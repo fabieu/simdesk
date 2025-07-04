@@ -11,6 +11,8 @@ options.
 - [Entrylist](acc-entrylist.md)
 - [Balance of Performance](acc-bop.md)
 - [Map](map.md)
+- [Discord Integration](discord.md)
+- [Themes](themes.md)
 
 ## Basic configuration
 

@@ -18,6 +18,9 @@
 - Balance of Performance Management _(Assetto Corsa Competizione)_
 - Balance of Performance Editor _(Assetto Corsa Competizione)_
 - Entrylist Editor with validation _(Assetto Corsa Competizione)_
+- World map with real-time weather _(Assetto Corsa Competizione)_
+- Discord OAuth2 login and bot integration
+- Theme customization with multiple presets
 - Responsive design for mobile and desktop
 
 ## Quick Start

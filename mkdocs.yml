@@ -20,6 +20,8 @@ nav:
           - Entrylist: config/acc-entrylist.md
           - Balance of Performance: config/acc-bop.md
           - Map: config/map.md
+          - Discord Integration: config/discord.md
+  - REST API: api/rest-api.md
   - Contributing: contributing.md
   - Credits: credits.md
 
