@@ -20,6 +20,8 @@ nav:
           - Entrylist: config/acc-entrylist.md
           - Balance of Performance: config/acc-bop.md
           - Map: config/map.md
+          - Discord Integration: config/discord.md
+  - REST API: api/rest-api.md
   - Contributing: contributing.md
   - Credits: credits.md
 
@@ -78,4 +80,4 @@ extra:
       link: https://discordapp.com/users/199177472535822337
   generator: false
 
-copyright: Copyright &copy; 2022-2024 Fabian Eulitz
+copyright: Copyright &copy; Fabian Eulitz
