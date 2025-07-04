@@ -1,9 +1,26 @@
 plugins {
     id 'java'
+    id 'application'
+    id 'org.openjfx.javafxplugin' version '0.0.13'
 }
 
 group = 'de.sustineo.simdesk'
 version = '0.0.1'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+    }
+}
+
+application {
+    mainClass = 'de.sustineo.simdesk.desktop.AccMessageForwarderApp'
+}
+
+javafx {
+    version = '21'
+    modules = [ 'javafx.controls' ]
+}
 
 repositories {
     mavenCentral()
