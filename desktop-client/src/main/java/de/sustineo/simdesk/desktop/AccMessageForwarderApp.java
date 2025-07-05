@@ -16,13 +16,14 @@ import java.net.InetAddress;
 import java.net.InetSocketAddress;
 import java.net.URI;
 import java.net.http.HttpClient;
-import java.net.http.HttpRequest;
-import java.net.http.HttpResponse;
+import java.net.http.WebSocket;
+import java.nio.ByteBuffer;
 import java.time.Duration;
 
 /**
  * JavaFX application that listens for UDP messages from Assetto Corsa Competizione
- * and forwards them to a configurable HTTP endpoint without modifying the received bytes.
+ * and forwards them via WebSocket to a configurable endpoint without modifying the
+ * received bytes.
  */
 public class AccMessageForwarderApp extends Application {
     private TextField urlField;
@@ -33,7 +34,7 @@ public class AccMessageForwarderApp extends Application {
 
     @Override
     public void start(Stage stage) {
-        urlField = new TextField("http://localhost:8080/acc");
+        urlField = new TextField("ws://localhost:8080/acc");
         portField = new TextField("9000");
         passwordField = new PasswordField();
         passwordField.setPromptText("Optional");
@@ -105,6 +106,7 @@ public class AccMessageForwarderApp extends Application {
         private final HttpClient httpClient = HttpClient.newBuilder()
                 .connectTimeout(Duration.ofSeconds(5))
                 .build();
+        private WebSocket webSocket;
 
         ListenerThread(int port, URI uri, String password) {
             this.port = port;
@@ -122,6 +124,13 @@ public class AccMessageForwarderApp extends Application {
             if (socket != null && !socket.isClosed()) {
                 socket.close();
             }
+            if (webSocket != null) {
+                try {
+                    webSocket.sendClose(WebSocket.NORMAL_CLOSURE, "bye").join();
+                } catch (Exception ignored) {
+                    // ignore
+                }
+            }
         }
 
         @Override
@@ -130,6 +139,16 @@ public class AccMessageForwarderApp extends Application {
                 socket = new DatagramSocket(null);
                 socket.setReuseAddress(true);
                 socket.bind(new InetSocketAddress(port));
+
+                webSocket = httpClient.newWebSocketBuilder()
+                        .connectTimeout(Duration.ofSeconds(5))
+                        .buildAsync(uri, new WebSocket.Listener() {
+                            @Override
+                            public void onError(WebSocket ws, Throwable error) {
+                                log("WebSocket error: " + error.getMessage());
+                            }
+                        }).join();
+                log("Connected to " + uri);
 
                 if (password != null && !password.isEmpty()) {
                     byte[] pwdBytes = password.getBytes(java.nio.charset.StandardCharsets.UTF_8);
@@ -159,16 +178,16 @@ public class AccMessageForwarderApp extends Application {
         }
 
         private void forward(byte[] data) {
-            HttpRequest request = HttpRequest.newBuilder(uri)
-                    .POST(HttpRequest.BodyPublishers.ofByteArray(data))
-                    .header("Content-Type", "application/octet-stream")
-                    .build();
-            httpClient.sendAsync(request, HttpResponse.BodyHandlers.discarding())
-                    .whenComplete((resp, throwable) -> {
+            if (webSocket == null) {
+                log("WebSocket not connected");
+                return;
+            }
+            webSocket.sendBinary(ByteBuffer.wrap(data), true)
+                    .whenComplete((ws, throwable) -> {
                         if (throwable != null) {
                             log("Failed to forward packet: " + throwable.getMessage());
                         } else {
-                            log("Forwarded packet, status: " + resp.statusCode());
+                            log("Forwarded packet");
                         }
                     });
         }

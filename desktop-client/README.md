@@ -1,9 +1,9 @@
 # Desktop Client
 
 This simple JavaFX-based application listens for UDP broadcast messages from
-**Assetto Corsa Competizione** and forwards the raw packets to a configurable
-HTTP endpoint. The payload is sent without any modification using the
-`application/octet-stream` content type.
+**Assetto Corsa Competizione** and forwards the raw packets via WebSocket to a
+configurable endpoint. The payload is sent without any modification using the
+binary WebSocket message type.
 
 ## Usage
 
