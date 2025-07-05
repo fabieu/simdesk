@@ -1,19 +1,55 @@
 plugins {
     id 'java'
+    id "org.openjfx.javafxplugin" version "0.0.14"
+    id "io.spring.dependency-management" version "1.1.7"
+    id "org.springframework.boot" version "3.5.3"
 }
 
 group = 'de.sustineo.simdesk'
-version = '0.0.1'
+
+java {
+    toolchain {
+        languageVersion = JavaLanguageVersion.of(21)
+        vendor = JvmVendorSpec.ADOPTIUM
+    }
+}
+
+javafx {
+    version = '21'
+    modules = [ 'javafx.controls' ]
+}
 
 repositories {
     mavenCentral()
 }
 
 dependencies {
-    testImplementation platform('org.junit:junit-bom:5.13.2')
-    testImplementation 'org.junit.jupiter:junit-jupiter'
+    // Spring Boot
+    implementation "org.springframework.boot:spring-boot-starter-json"
+
+    compileOnly("org.projectlombok:lombok:1.18.38")
+    annotationProcessor("org.projectlombok:lombok:1.18.38")
+
+    testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
-test {
-    useJUnitPlatform()
+tasks {
+    test {
+        useJUnitPlatform()
+    }
+
+    bootJar {
+        archiveFileName.set("${project.name}.jar")
+    }
+
+    compileJava {
+        options.deprecation = true
+    }
+}
+
+configurations {
+    developmentOnly
+    runtimeClasspath {
+        extendsFrom developmentOnly
+    }
 }
