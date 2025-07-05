@@ -59,19 +59,19 @@ dependencies {
 
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.17.0"
-    implementation 'commons-codec:commons-codec:1.18.0'
-    implementation 'commons-io:commons-io:2.19.0'
+    implementation "commons-codec:commons-codec:1.18.0"
+    implementation "commons-io:commons-io:2.19.0"
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.2.8"
-    implementation 'com.opencsv:opencsv:5.11.2'
+    implementation "com.opencsv:opencsv:5.11.2"
 
     // OpenAPI documentation
-    implementation 'org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9'
-    implementation 'org.webjars:webjars-locator-lite:1.1.0'
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9"
+    implementation "org.webjars:webjars-locator-lite:1.1.0"
 
     // Development
-    developmentOnly 'org.springframework.boot:spring-boot-devtools'
+    runtimeOnly "org.springframework.boot:spring-boot-devtools"
     testImplementation "org.springframework.boot:spring-boot-starter-test"
     testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
     testImplementation 'org.testcontainers:postgresql:1.21.3'
@@ -96,11 +96,4 @@ tasks {
 
 springBoot {
     buildInfo()
-}
-
-configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
 }

@@ -46,10 +46,3 @@ tasks {
         options.deprecation = true
     }
 }
-
-configurations {
-    developmentOnly
-    runtimeClasspath {
-        extendsFrom developmentOnly
-    }
-}
