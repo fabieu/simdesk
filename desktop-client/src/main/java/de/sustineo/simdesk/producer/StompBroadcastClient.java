@@ -1,0 +1,94 @@
+package de.sustineo.simdesk.producer;
+
+import jakarta.annotation.Nonnull;
+import jakarta.annotation.Nullable;
+import lombok.extern.java.Log;
+import org.springframework.messaging.simp.stomp.StompHeaders;
+import org.springframework.messaging.simp.stomp.StompSession;
+import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.socket.WebSocketHttpHeaders;
+import org.springframework.web.socket.client.standard.StandardWebSocketClient;
+import org.springframework.web.socket.messaging.WebSocketStompClient;
+
+import java.time.Duration;
+import java.util.concurrent.Executors;
+import java.util.concurrent.ScheduledExecutorService;
+import java.util.concurrent.TimeUnit;
+
+@Log
+class StompBroadcastClient {
+    private static final Duration RECONNECT_DELAY = Duration.ofSeconds(1);
+    private static final String API_KEY_HEADER = "X-API-KEY";
+
+    private final String webSocketUrl;
+    private final String apiKey;
+    private final WebSocketStompClient stompClient;
+
+    private StompSession stompSession;
+    private final Object sessionLock = new Object();
+
+    private final ScheduledExecutorService reconnectScheduler = Executors.newSingleThreadScheduledExecutor();
+
+    public StompBroadcastClient(@Nonnull String webSocketUrl, @Nullable String apiKey) {
+        this.webSocketUrl = webSocketUrl;
+        this.apiKey = apiKey;
+        this.stompClient = new WebSocketStompClient(new StandardWebSocketClient());
+
+        // Heartbeat config
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.initialize();
+        this.stompClient.setTaskScheduler(scheduler);
+        this.stompClient.setDefaultHeartbeat(new long[]{10000, 10000});
+    }
+
+    public void connect() {
+        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
+
+        if (apiKey != null) {
+            headers.add(API_KEY_HEADER, apiKey);
+        }
+
+        stompClient.connectAsync(webSocketUrl, headers, new StompSessionHandlerAdapter() {
+
+            @Override
+            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+                log.info("[STOMP] Connected");
+                synchronized (sessionLock) {
+                    stompSession = session;
+                }
+            }
+
+            @Override
+            public void handleTransportError(StompSession session, Throwable exception) {
+                log.severe("[STOMP] Transport error: " + exception.getMessage());
+                attemptReconnect();
+            }
+        });
+    }
+
+    private void attemptReconnect() {
+        reconnectScheduler.schedule(() -> {
+            log.info("[STOMP] Attempting reconnection...");
+            connect();
+        }, RECONNECT_DELAY.toMillis(), TimeUnit.MILLISECONDS);
+    }
+
+    public void disconnect() {
+        reconnectScheduler.shutdownNow();
+        if (stompSession != null && stompSession.isConnected()) {
+            stompSession.disconnect();
+        }
+    }
+
+    public void sendBytes(String destination, byte[] payload) {
+        if (stompSession != null && stompSession.isConnected()) {
+            StompHeaders headers = new StompHeaders();
+            headers.setDestination(destination);
+            headers.setContentType(MimeTypeUtils.APPLICATION_OCTET_STREAM);
+
+            stompSession.send(headers, payload);
+        }
+    }
+}

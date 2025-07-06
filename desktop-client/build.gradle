@@ -26,6 +26,7 @@ repositories {
 dependencies {
     // Spring Boot
     implementation "org.springframework.boot:spring-boot-starter-json"
+    implementation "org.springframework.boot:spring-boot-starter-websocket"
 
     compileOnly("org.projectlombok:lombok:1.18.38")
     annotationProcessor("org.projectlombok:lombok:1.18.38")
@@ -33,16 +34,18 @@ dependencies {
     testImplementation "org.springframework.boot:spring-boot-starter-test"
 }
 
-tasks {
-    test {
-        useJUnitPlatform()
-    }
+springBoot {
+    buildInfo()
+}
 
-    bootJar {
-        archiveFileName.set("${project.name}.jar")
-    }
+test {
+    useJUnitPlatform()
+}
 
-    compileJava {
-        options.deprecation = true
-    }
+bootJar {
+    archiveFileName.set("${project.name}.jar")
+}
+
+compileJava {
+    options.deprecation = true
 }
