@@ -1,6 +1,8 @@
 package de.sustineo.simdesk.views;
 
 import de.sustineo.simdesk.client.AccBroadcastingClient;
+import de.sustineo.simdesk.config.ConfigProperty;
+import de.sustineo.simdesk.config.ConfigService;
 import de.sustineo.simdesk.eventbus.Event;
 import de.sustineo.simdesk.eventbus.EventBus;
 import de.sustineo.simdesk.eventbus.EventListener;
@@ -17,18 +19,24 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketException;
+import java.util.HashMap;
+import java.util.Map;
 import java.util.Objects;
 
 @Component
 public class MainView implements EventListener {
+    private final ConfigService configService;
     private final BuildProperties buildProperties;
+
     private final AccBroadcastingClient accBroadcastingClient;
     private WebSocketProducer webSocketProducer;
 
     private TextArea logArea;
 
 
-    public MainView(BuildProperties buildProperties) {
+    public MainView(ConfigService configService,
+                    BuildProperties buildProperties) {
+        this.configService = configService;
         this.buildProperties = buildProperties;
         this.accBroadcastingClient = AccBroadcastingClient.getClient();
 
@@ -36,9 +44,18 @@ public class MainView implements EventListener {
     }
 
     public void start(Stage stage) {
+        String initialWebsocketUrl = configService.getProperty(ConfigProperty.WEBSOCKET_URL);
+        String initialWebsocketApiKey = configService.getProperty(ConfigProperty.WEBSOCKET_API_KEY);
+        String initialSessionId = configService.getProperty(ConfigProperty.SESSION_ID);
+
         TextField urlField = new TextField();
-        TextField sessionField = new TextField();
+        urlField.setText(initialWebsocketUrl);
+
         PasswordField apiKeyField = new PasswordField();
+        apiKeyField.setText(initialWebsocketApiKey);
+
+        TextField sessionField = new TextField(initialSessionId);
+        sessionField.setText(initialSessionId);
 
         logArea = new TextArea();
         logArea.setEditable(false);
@@ -58,9 +75,10 @@ public class MainView implements EventListener {
 
         startButton.setOnAction(e -> {
             String websocketUrl = urlField.getText().trim();
+            String websocketApiKey = apiKeyField.getText().trim();
             String sessionId = sessionField.getText().trim();
-            String apiKey = apiKeyField.getText().trim();
-            webSocketProducer = new WebSocketProducer(websocketUrl, apiKey, sessionId);
+
+            webSocketProducer = new WebSocketProducer(websocketUrl, websocketApiKey, sessionId);
             try {
                 accBroadcastingClient.connectAutomatic();
                 webSocketProducer.connect();
@@ -72,6 +90,13 @@ public class MainView implements EventListener {
             } catch (SocketException ex) {
                 log("Failed to connect: " + ex.getMessage());
             }
+
+            // Save the configuration properties
+            Map<ConfigProperty, String> configProperties = new HashMap<>();
+            configProperties.put(ConfigProperty.WEBSOCKET_URL, websocketUrl);
+            configProperties.put(ConfigProperty.WEBSOCKET_API_KEY, websocketApiKey);
+            configProperties.put(ConfigProperty.SESSION_ID, sessionId);
+            configService.setProperties(configProperties);
         });
 
         stopButton.setOnAction(e -> {
@@ -103,10 +128,10 @@ public class MainView implements EventListener {
 
         grid.add(new Label("WebSocket URL:"), 0, 0);
         grid.add(urlField, 1, 0);
-        grid.add(new Label("Session ID:"), 0, 1);
-        grid.add(sessionField, 1, 1);
-        grid.add(new Label("API Key:"), 0, 2);
-        grid.add(apiKeyField, 1, 2);
+        grid.add(new Label("API Key:"), 0, 1);
+        grid.add(apiKeyField, 1, 1);
+        grid.add(new Label("Session ID:"), 0, 2);
+        grid.add(sessionField, 1, 2);
 
         // Buttons in right-side column
         VBox buttonBox = new VBox(10, startButton, stopButton);
