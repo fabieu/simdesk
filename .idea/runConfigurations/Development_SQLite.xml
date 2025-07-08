@@ -10,7 +10,7 @@
       <env name="SIMDESK_THEME" value="default" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
-    <module name="simdesk.web-app.main" />
+    <module name="simdesk.simdesk-web.main" />
     <option name="SHORTEN_COMMAND_LINE" value="ARGS_FILE" />
     <option name="SPRING_BOOT_MAIN_CLASS" value="de.sustineo.simdesk.SimDeskApplication" />
     <option name="WORKING_DIRECTORY" value="file://$MODULE_DIR$" />

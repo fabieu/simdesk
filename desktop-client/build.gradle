@@ -42,10 +42,30 @@ test {
     useJUnitPlatform()
 }
 
-bootJar {
-    archiveFileName.set("${project.name}.jar")
-}
-
 compileJava {
     options.deprecation = true
+}
+
+tasks.register('jpackageBuild', Exec) {
+    group = 'build'
+    description = 'Package the application as a native image using jpackage'
+
+    dependsOn bootJar
+
+    def appName = project.name
+    def inputDir = layout.buildDirectory.dir("libs").get().asFile
+    def outputDir = layout.buildDirectory.dir("jpackage").get().asFile
+    def mainJar = bootJar.archiveFileName.get()
+
+    doFirst {
+        delete outputDir
+        mkdir outputDir
+    }
+
+    commandLine 'jpackage',
+            '--type', 'app-image',
+            '--input', inputDir,
+            '--dest', outputDir,
+            '--name', appName,
+            '--main-jar', mainJar
 }

@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.config;
 
 import lombok.extern.java.Log;
+import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Service;
 
 import java.io.FileInputStream;
@@ -8,17 +9,19 @@ import java.io.FileOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
 import java.util.Map;
+import java.util.Objects;
 import java.util.Properties;
 
 @Log
 @Service
 public class ConfigService {
-    private static final String PROPERTIES_FILE_PATH = "simdesk-client.properties";
-
     private final Properties properties = new Properties();
+    private final String propertiesFilePath;
 
-    public ConfigService() {
-        try (InputStream inputStream = new FileInputStream(PROPERTIES_FILE_PATH)) {
+    public ConfigService(BuildProperties buildProperties) {
+        this.propertiesFilePath = Objects.requireNonNull(buildProperties.getName()) + ".properties";
+
+        try (InputStream inputStream = new FileInputStream(propertiesFilePath)) {
             properties.load(inputStream);
         } catch (IOException e) {
             // If the properties file does not exist, we will create a new one
@@ -77,7 +80,7 @@ public class ConfigService {
      * If the file does not exist, it will be created.
      */
     private void persistProperties() {
-        try (FileOutputStream outputStream = new FileOutputStream(PROPERTIES_FILE_PATH)) {
+        try (FileOutputStream outputStream = new FileOutputStream(propertiesFilePath)) {
             this.properties.store(outputStream, "SimDesk Client Properties");
         } catch (IOException e) {
             log.severe("Failed to save configuration file: " + e.getMessage());
