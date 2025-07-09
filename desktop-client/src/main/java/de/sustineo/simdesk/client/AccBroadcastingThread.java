@@ -57,11 +57,11 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
                 AccBroadcastingProtocol.processMessage(new ByteArrayInputStream(response.getData()), this);
                 afterPacketReceived(response.getData()[0]);
             } catch (SocketTimeoutException e) {
-                log.log(Level.WARNING, "Socket timed out.", e);
+                log.log(Level.WARNING, "Socket timed out.", e.getMessage());
                 exitState = ExitState.TIMEOUT;
                 running = false;
             } catch (PortUnreachableException e) {
-                log.log(Level.SEVERE, "Socket is unreachable", e);
+                log.log(Level.SEVERE, "Socket is unreachable", e.getMessage());
                 exitState = ExitState.PORT_UNREACHABLE;
                 running = false;
             } catch (SocketException e) {
@@ -69,16 +69,16 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
                     log.info("Socket was closed by user.");
                     exitState = ExitState.USER;
                 } else {
-                    log.log(Level.SEVERE, "Socket closed unexpected.", e);
+                    log.log(Level.SEVERE, "Socket closed unexpected.", e.getMessage());
                     exitState = ExitState.EXCEPTION;
                 }
                 running = false;
             } catch (IOException e) {
-                log.log(Level.SEVERE, "Error in the listener thread", e);
+                log.log(Level.SEVERE, "Error in the listener thread", e.getMessage());
                 exitState = ExitState.EXCEPTION;
                 running = false;
             } catch (StackOverflowError e) {
-                log.log(Level.SEVERE, "Overflow in listener thread", e);
+                log.log(Level.SEVERE, "Overflow in listener thread", e.getMessage());
                 exitState = ExitState.EXCEPTION;
                 running = false;
             }

@@ -1,0 +1,23 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<configuration scan="true">
+
+    <include resource="org/springframework/boot/logging/logback/defaults.xml"/>
+
+    <include resource="org/springframework/boot/logging/logback/console-appender.xml"/>
+
+    <appender name="TEXTAREA" class="de.sustineo.simdesk.logging.TextAreaAppender">
+        <!-- using a PatternLayout here so you get the same style as console/file -->
+        <layout class="ch.qos.logback.classic.PatternLayout">
+            <pattern>%d{HH:mm:ss} %-5level - %msg%n</pattern>
+        </layout>
+    </appender>
+
+    <logger name="de.sustineo.simdesk" level="INFO" additivity="true">
+        <appender-ref ref="TEXTAREA"/>
+    </logger>
+
+    <root level="INFO">
+        <appender-ref ref="CONSOLE"/>
+    </root>
+
+</configuration>
