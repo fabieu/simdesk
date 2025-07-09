@@ -19,7 +19,7 @@ import java.util.concurrent.TimeUnit;
 
 @Log
 class StompBroadcastClient {
-    private static final Duration RECONNECT_DELAY = Duration.ofSeconds(1);
+    private static final Duration RECONNECT_DELAY = Duration.ofSeconds(3);
     private static final String API_KEY_HEADER = "X-API-KEY";
 
     private final String webSocketUrl;
@@ -54,7 +54,7 @@ class StompBroadcastClient {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
-                log.info("[STOMP] Connected");
+                log.info(String.format("Connected to WebSocket connection [%s]", webSocketUrl));
                 synchronized (sessionLock) {
                     stompSession = session;
                 }
@@ -62,7 +62,7 @@ class StompBroadcastClient {
 
             @Override
             public void handleTransportError(StompSession session, Throwable exception) {
-                log.severe("[STOMP] Transport error: " + exception.getMessage());
+                log.severe(String.format("Transport error: %s", exception.getMessage()));
                 attemptReconnect();
             }
         });
@@ -70,7 +70,7 @@ class StompBroadcastClient {
 
     private void attemptReconnect() {
         reconnectScheduler.schedule(() -> {
-            log.info("[STOMP] Attempting reconnection...");
+            log.info(String.format("Attempting reconnect to WebSocket connection [%s]", webSocketUrl));
             connect();
         }, RECONNECT_DELAY.toMillis(), TimeUnit.MILLISECONDS);
     }
@@ -80,6 +80,7 @@ class StompBroadcastClient {
         if (stompSession != null && stompSession.isConnected()) {
             stompSession.disconnect();
         }
+        log.info(String.format("Closed WebSocket connection to [%s]", webSocketUrl));
     }
 
     public void sendBytes(String destination, byte[] payload) {

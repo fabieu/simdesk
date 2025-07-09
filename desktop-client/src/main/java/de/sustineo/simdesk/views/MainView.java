@@ -33,7 +33,6 @@ public class MainView implements EventListener {
 
     private TextArea logArea;
 
-
     public MainView(ConfigService configService,
                     BuildProperties buildProperties) {
         this.configService = configService;
@@ -65,18 +64,36 @@ public class MainView implements EventListener {
         startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
         startButton.setPrefWidth(150);
         startButton.setMaxWidth(Double.MAX_VALUE);
-        startButton.setDisable(false);
 
         Button stopButton = new Button("Stop");
         stopButton.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold;");
         stopButton.setPrefWidth(150);
         stopButton.setMaxWidth(Double.MAX_VALUE);
-        stopButton.setDisable(true);
 
         startButton.setOnAction(e -> {
-            String websocketUrl = urlField.getText().trim();
-            String websocketApiKey = apiKeyField.getText().trim();
-            String sessionId = sessionField.getText().trim();
+            String websocketUrl = urlField.getText();
+            if (websocketUrl == null || websocketUrl.isEmpty()) {
+                log("Invalid configuration: WebSocket URL cannot be empty.");
+                return;
+            } else {
+                websocketUrl = websocketUrl.trim();
+            }
+
+            String websocketApiKey = apiKeyField.getText();
+            if (websocketApiKey == null || websocketApiKey.isEmpty()) {
+                log("Invalid configuration: WebSocket API Key cannot be empty.");
+                return;
+            } else {
+                websocketApiKey = websocketApiKey.trim();
+            }
+
+            String sessionId = sessionField.getText();
+            if (sessionId == null || sessionId.isEmpty()) {
+                log("Invalid configuration: Session ID cannot be empty.");
+                return;
+            } else {
+                sessionId = sessionId.trim();
+            }
 
             webSocketProducer = new WebSocketProducer(websocketUrl, websocketApiKey, sessionId);
             try {
@@ -85,7 +102,6 @@ public class MainView implements EventListener {
 
                 if (accBroadcastingClient.isConnected()) {
                     startButton.setDisable(true);
-                    stopButton.setDisable(false);
                 }
             } catch (SocketException ex) {
                 log("Failed to connect: " + ex.getMessage());
@@ -100,12 +116,13 @@ public class MainView implements EventListener {
         });
 
         stopButton.setOnAction(e -> {
-            accBroadcastingClient.disconnect();
-            webSocketProducer.disconnect();
+            if (webSocketProducer != null) {
+                webSocketProducer.disconnect();
+            }
 
+            accBroadcastingClient.disconnect();
             if (!accBroadcastingClient.isConnected()) {
                 startButton.setDisable(false);
-                stopButton.setDisable(true);
             }
         });
 
