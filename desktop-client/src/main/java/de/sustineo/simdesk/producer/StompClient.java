@@ -18,29 +18,29 @@ import java.util.concurrent.ScheduledExecutorService;
 import java.util.concurrent.TimeUnit;
 
 @Log
-class StompBroadcastClient {
-    private static final Duration RECONNECT_DELAY = Duration.ofSeconds(3);
+class StompClient {
     private static final String API_KEY_HEADER = "X-API-KEY";
+    private static final Duration RECONNECT_DELAY = Duration.ofSeconds(3);
 
     private final String webSocketUrl;
     private final String apiKey;
-    private final WebSocketStompClient stompClient;
 
+    private final WebSocketStompClient webSocketStompClient;
     private StompSession stompSession;
+
     private final Object sessionLock = new Object();
 
     private final ScheduledExecutorService reconnectScheduler = Executors.newSingleThreadScheduledExecutor();
 
-    public StompBroadcastClient(@Nonnull String webSocketUrl, @Nullable String apiKey) {
+    public StompClient(@Nonnull String webSocketUrl, @Nullable String apiKey) {
         this.webSocketUrl = webSocketUrl;
         this.apiKey = apiKey;
-        this.stompClient = new WebSocketStompClient(new StandardWebSocketClient());
 
-        // Heartbeat config
         ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
         scheduler.initialize();
-        this.stompClient.setTaskScheduler(scheduler);
-        this.stompClient.setDefaultHeartbeat(new long[]{10000, 10000});
+
+        this.webSocketStompClient = new WebSocketStompClient(new StandardWebSocketClient());
+        this.webSocketStompClient.setTaskScheduler(scheduler);
     }
 
     public void connect() {
@@ -50,7 +50,7 @@ class StompBroadcastClient {
             headers.add(API_KEY_HEADER, apiKey);
         }
 
-        stompClient.connectAsync(webSocketUrl, headers, new StompSessionHandlerAdapter() {
+        webSocketStompClient.connectAsync(webSocketUrl, headers, new StompSessionHandlerAdapter() {
 
             @Override
             public void afterConnected(StompSession session, StompHeaders connectedHeaders) {

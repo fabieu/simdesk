@@ -6,6 +6,8 @@ import java.util.List;
 
 public interface AccBroadcastingProtocolCallback {
 
+    void onPacketReceived(byte[] payload);
+
     void onRegistrationResult(int connectionID, boolean success, boolean readOnly, String message);
 
     void onRealtimeUpdate(SessionInfo sessionInfo);
@@ -19,6 +21,4 @@ public interface AccBroadcastingProtocolCallback {
     void onEntryListCarUpdate(CarInfo carInfo);
 
     void onBroadcastingEvent(BroadcastingEvent event);
-
-    void afterPacketReceived(byte type);
 }

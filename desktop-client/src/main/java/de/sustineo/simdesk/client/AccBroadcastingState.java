@@ -21,19 +21,18 @@ public class AccBroadcastingState {
     private InetAddress hostAddress;
     private int hostPort;
     @Builder.Default
-    private String displayName = "SimDesk";
+    private String displayName = "SimDesk Live Timing";
     @Builder.Default
     private String connectionPassword = "";
     @Builder.Default
     private String commandPassword = "";
-    private int updateInterval;
+    @Builder.Default
+    private int updateInterval = 100;
     @Builder.Default
     private SessionId currentSessionId = SessionId.dummy();
     @Builder.Default
     private int connectionId = -1;
     private boolean readOnly;
-    @Builder.Default
-    private boolean gameConnected = false;
     @Builder.Default
     private TrackInfo trackInfo = new TrackInfo();
     @Builder.Default
@@ -68,7 +67,6 @@ public class AccBroadcastingState {
         accBroadcastingState.currentSessionId = this.currentSessionId;
         accBroadcastingState.connectionId = this.connectionId;
         accBroadcastingState.readOnly = this.readOnly;
-        accBroadcastingState.gameConnected = this.gameConnected;
         accBroadcastingState.trackInfo = this.trackInfo;
         accBroadcastingState.session = this.session.copy();
         accBroadcastingState.cars = this.cars.entrySet().stream().collect(Collectors.toMap(Map.Entry::getKey, entry -> entry.getValue().copy()));

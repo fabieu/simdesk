@@ -13,6 +13,8 @@ import lombok.extern.java.Log;
 import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.net.*;
+import java.time.Duration;
+import java.time.Instant;
 import java.util.HashMap;
 import java.util.List;
 import java.util.Map;
@@ -21,16 +23,20 @@ import java.util.stream.Collectors;
 
 @Log
 public class AccBroadcastingThread extends Thread implements AccBroadcastingProtocolCallback {
+    private static final int BUFFER_SIZE = 2048;
+    private static final Duration SOCKET_TIMEOUT = Duration.ofSeconds(10);
+
     private final AccBroadcastingState accBroadcastingState;
 
     private final DatagramSocket socket;
-    private ExitState exitState = ExitState.NONE;
-    private boolean forceExit = false;
     private boolean running = true;
+    private boolean forceExit = false;
+    private ExitState exitState = ExitState.NONE;
+
 
     private final Map<SessionType, Integer> sessionCounter = new HashMap<>();
     private SessionPhase sessionPhase = SessionPhase.NONE;
-    private long lastTimeEntryListRequest = 0;
+    private Instant lastEntryListRequest = Instant.now();
 
     public AccBroadcastingThread(AccBroadcastingState accBroadcastingState) throws SocketException {
         super("ACC connection thread");
@@ -39,55 +45,49 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
         Thread.setDefaultUncaughtExceptionHandler(new UncaughtExceptionHandler());
 
         this.socket = new DatagramSocket();
-        this.socket.setSoTimeout(10000);
+        this.socket.setSoTimeout((int) SOCKET_TIMEOUT.toMillis());
         this.socket.connect(accBroadcastingState.getHostAddress(), accBroadcastingState.getHostPort());
     }
 
     @Override
     public void run() {
         EventBus.publish(new ConnectionOpenedEvent());
-        log.info("Starting connection thread");
 
         sendRegisterRequest();
 
         while (running) {
             try {
-                DatagramPacket response = new DatagramPacket(new byte[2048], 2048);
+                DatagramPacket response = new DatagramPacket(new byte[BUFFER_SIZE], BUFFER_SIZE);
                 socket.receive(response);
+
+                onPacketReceived(response.getData());
+
                 AccBroadcastingProtocol.processMessage(new ByteArrayInputStream(response.getData()), this);
-                afterPacketReceived(response.getData()[0]);
             } catch (SocketTimeoutException e) {
-                log.log(Level.WARNING, "Socket timed out.", e.getMessage());
+                log.warning("ACC Socket timed out");
                 exitState = ExitState.TIMEOUT;
                 running = false;
             } catch (PortUnreachableException e) {
-                log.log(Level.SEVERE, "Socket is unreachable", e.getMessage());
+                log.severe("ACC Socket is unreachable");
                 exitState = ExitState.PORT_UNREACHABLE;
                 running = false;
             } catch (SocketException e) {
                 if (forceExit) {
-                    log.info("Socket was closed by user.");
+                    log.info("ACC Socket was closed by user.");
                     exitState = ExitState.USER;
                 } else {
-                    log.log(Level.SEVERE, "Socket closed unexpected.", e.getMessage());
+                    log.severe(String.format("ACC Socket closed unexpected: %s", e.getMessage()));
                     exitState = ExitState.EXCEPTION;
                 }
                 running = false;
-            } catch (IOException e) {
-                log.log(Level.SEVERE, "Error in the listener thread", e.getMessage());
-                exitState = ExitState.EXCEPTION;
-                running = false;
-            } catch (StackOverflowError e) {
-                log.log(Level.SEVERE, "Overflow in listener thread", e.getMessage());
+            } catch (StackOverflowError | IOException e) {
+                log.severe(String.format("Error in ACC listener thread: %s", e.getMessage()));
                 exitState = ExitState.EXCEPTION;
                 running = false;
             }
         }
 
-        accBroadcastingState.setGameConnected(false);
-
         EventBus.publish(new ConnectionClosedEvent(exitState));
-        log.info("Connection thread done");
     }
 
     public void close() {
@@ -98,16 +98,6 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
 
     public boolean isConnected() {
         return socket != null && socket.isConnected() && super.isAlive() && running;
-    }
-
-    public void sendRequest(byte[] requestBytes) {
-        if (socket.isConnected()) {
-            try {
-                socket.send(new DatagramPacket(requestBytes, requestBytes.length));
-            } catch (IOException e) {
-                log.log(Level.SEVERE, "Error sending request.", e);
-            }
-        }
     }
 
     /**
@@ -145,9 +135,10 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
             return;
         }
 
-        long now = System.currentTimeMillis();
-        if (now - lastTimeEntryListRequest > 5000) {
-            lastTimeEntryListRequest = now;
+        // Avoid sending too many entrylist requests in a short time
+        Instant now = Instant.now();
+        if (Duration.between(lastEntryListRequest, now).compareTo(Duration.ofSeconds(5)) > 0) {
+            lastEntryListRequest = now;
             sendRequest(AccBroadcastingProtocol.buildEntryListRequest(accBroadcastingState.getConnectionId()));
         }
     }
@@ -163,23 +154,31 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
         sendRequest(AccBroadcastingProtocol.buildTrackDataRequest(accBroadcastingState.getConnectionId()));
     }
 
+    private void sendRequest(byte[] requestBytes) {
+        if (socket.isConnected()) {
+            try {
+                socket.send(new DatagramPacket(requestBytes, requestBytes.length));
+            } catch (IOException e) {
+                log.log(Level.SEVERE, "Error sending request.", e);
+            }
+        }
+    }
+
     @Override
-    public void afterPacketReceived(byte type) {
-        EventBus.publish(new AfterPacketReceivedEvent(type, 0));
+    public void onPacketReceived(byte[] payload) {
+        EventBus.publish(new PacketReceivedEvent(payload));
     }
 
     @Override
     public void onRegistrationResult(int connectionId, boolean success, boolean readOnly, String message) {
         if (!success) {
-            log.info("Connection refused\n" + message);
-            exitState = ExitState.REFUSED;
+            log.warning("Connection refused: " + message);
             running = false;
             return;
         }
 
         accBroadcastingState.setConnectionId(connectionId);
         accBroadcastingState.setReadOnly(readOnly);
-        accBroadcastingState.setGameConnected(true);
 
         sendEntryListRequest();
         sendTrackDataRequest();

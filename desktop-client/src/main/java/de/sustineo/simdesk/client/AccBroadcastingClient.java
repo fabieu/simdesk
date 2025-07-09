@@ -16,17 +16,12 @@ import java.net.SocketException;
 
 @Log
 public class AccBroadcastingClient implements EventListener {
-    private static final int UPDATE_INTERVAL_DEFAULT = 100;
-
-    private final ObjectMapper objectMapper;
-
     private static AccBroadcastingClient instance;
-    private AccBroadcastingThread thread;
-    private AccBroadcastingState accBroadcastingState = new AccBroadcastingState();
+    private static AccBroadcastingThread thread;
+
+    private final ObjectMapper objectMapper = new ObjectMapper();
 
     private AccBroadcastingClient() {
-        this.objectMapper = new ObjectMapper();
-
         EventBus.register(this);
     }
 
@@ -38,72 +33,61 @@ public class AccBroadcastingClient implements EventListener {
         return instance;
     }
 
-    public AccBroadcastingState getState() {
-        return accBroadcastingState.copy();
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        if (event instanceof ConnectionClosedEvent) {
-            thread = null;
-        }
-    }
-
     /**
-     * Connects to the game client.
+     * Connects to the game client with automatic settings.
+     * The settings are read from the broadcasting.json file in the user's Documents folder.
      *
-     * @param displayName        The display name of this connection.
-     * @param connectionPassword The password for this connection.
-     * @param commandPassword    The command password.
-     * @param updateInterval     The interval in which to receive updates.
-     * @param hostAddress        Host address of the server.
-     * @param hostPort           Host port of the server.
+     * @throws SocketException if there is an error creating the socket.
      */
-    public void connect(@NonNull String displayName, @NonNull String connectionPassword, @NonNull String commandPassword, int updateInterval, @NonNull InetAddress hostAddress, int hostPort) throws SocketException {
-        if (thread != null) {
-            return;
-        }
-
-        log.fine(String.format("Connecting to game with: displayName=%s, connectionPassword=%s, commandPassword=%s, updateInterval=%d, hostAddress=%s, hostPort=%d",
-                displayName, connectionPassword, commandPassword, updateInterval, hostAddress, hostPort)
-        );
-
-
-        if (updateInterval < 0) {
-            throw new IllegalArgumentException("Update interval cannot be less than 0");
-        }
-
-        accBroadcastingState = AccBroadcastingState.builder()
-                .displayName(displayName)
-                .connectionPassword(connectionPassword)
-                .commandPassword(commandPassword)
-                .updateInterval(updateInterval)
-                .hostAddress(hostAddress)
-                .hostPort(hostPort)
-                .build();
-
-        thread = new AccBroadcastingThread(accBroadcastingState);
-        thread.start();
-    }
-
-    public void connectAutomatic() throws SocketException {
-        log.fine("Try connecting with automatic settings");
-
+    public void connectAutomatically() throws SocketException {
         String filename = System.getProperty("user.home") + "/Documents/Assetto Corsa Competizione/Config/broadcasting.json";
+
+        log.fine("Try connecting with automatic settings from " + filename);
 
         ConnectionInfo connectionInfo;
         try {
             connectionInfo = objectMapper.readValue(new File(filename), ConnectionInfo.class);
         } catch (IOException e) {
-            throw new RuntimeException("Configuration file not found at " + filename);
+            throw new IllegalArgumentException("Configuration file not found at " + filename);
         }
 
-        connect("ACC Live timing",
-                connectionInfo.getConnectionPassword(),
+        connect(connectionInfo.getConnectionPassword(),
                 connectionInfo.getCommandPassword(),
-                UPDATE_INTERVAL_DEFAULT,
                 InetAddress.getLoopbackAddress(),
                 connectionInfo.getPort());
+    }
+
+    /**
+     * Connects to the game client.
+     *
+     * @param connectionPassword The password for this connection.
+     * @param commandPassword    The command password.
+     * @param hostAddress        Host address of the server.
+     * @param hostPort           Host port of the server.
+     */
+    public void connect(@NonNull String connectionPassword, @NonNull String commandPassword, @NonNull InetAddress hostAddress, int hostPort) throws SocketException {
+        if (thread != null) {
+            return;
+        }
+
+        AccBroadcastingState accBroadcastingState = AccBroadcastingState.builder()
+                .connectionPassword(connectionPassword)
+                .commandPassword(commandPassword)
+                .hostAddress(hostAddress)
+                .hostPort(hostPort)
+                .build();
+
+        log.fine(String.format("Connecting to ACC with: displayName=%s, connectionPassword=%s, commandPassword=%s, updateInterval=%d, hostAddress=%s, hostPort=%d",
+                accBroadcastingState.getDisplayName(),
+                accBroadcastingState.getConnectionPassword(),
+                accBroadcastingState.getCommandPassword(),
+                accBroadcastingState.getUpdateInterval(),
+                accBroadcastingState.getHostAddress(),
+                accBroadcastingState.getHostPort()
+        ));
+
+        thread = new AccBroadcastingThread(accBroadcastingState);
+        thread.start();
     }
 
     /**
@@ -129,5 +113,12 @@ public class AccBroadcastingClient implements EventListener {
         }
 
         return false;
+    }
+
+    @Override
+    public void onEvent(Event event) {
+        if (event instanceof ConnectionClosedEvent) {
+            thread = null;
+        }
     }
 }

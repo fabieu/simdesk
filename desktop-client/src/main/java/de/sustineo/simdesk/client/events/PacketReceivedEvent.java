@@ -8,7 +8,6 @@ import lombok.ToString;
 @Getter
 @RequiredArgsConstructor
 @ToString
-public class AfterPacketReceivedEvent extends Event {
-    private final byte type;
-    private final int packageCount;
+public class PacketReceivedEvent extends Event {
+    private final byte[] payload;
 }

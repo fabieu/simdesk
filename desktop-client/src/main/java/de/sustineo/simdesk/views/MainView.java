@@ -3,9 +3,6 @@ package de.sustineo.simdesk.views;
 import de.sustineo.simdesk.client.AccBroadcastingClient;
 import de.sustineo.simdesk.config.ConfigProperty;
 import de.sustineo.simdesk.config.ConfigService;
-import de.sustineo.simdesk.eventbus.Event;
-import de.sustineo.simdesk.eventbus.EventBus;
-import de.sustineo.simdesk.eventbus.EventListener;
 import de.sustineo.simdesk.logging.TextAreaAppender;
 import de.sustineo.simdesk.producer.WebSocketProducer;
 import javafx.geometry.HPos;
@@ -28,7 +25,7 @@ import java.util.Objects;
 
 @Log
 @Component
-public class MainView implements EventListener {
+public class MainView {
     private final ConfigService configService;
     private final BuildProperties buildProperties;
 
@@ -40,8 +37,6 @@ public class MainView implements EventListener {
         this.configService = configService;
         this.buildProperties = buildProperties;
         this.accBroadcastingClient = AccBroadcastingClient.getClient();
-
-        EventBus.register(this);
     }
 
     public void start(Stage stage) {
@@ -95,7 +90,7 @@ public class MainView implements EventListener {
 
             webSocketProducer = new WebSocketProducer(websocketUrl, websocketApiKey, sessionId);
             try {
-                accBroadcastingClient.connectAutomatic();
+                accBroadcastingClient.connectAutomatically();
                 webSocketProducer.connect();
 
                 if (accBroadcastingClient.isConnected()) {
@@ -182,10 +177,5 @@ public class MainView implements EventListener {
         stage.setScene(scene);
 
         stage.show();
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        log.info(event.toString());
     }
 }

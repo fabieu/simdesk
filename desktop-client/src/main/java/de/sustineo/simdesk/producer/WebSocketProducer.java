@@ -12,13 +12,13 @@ import java.util.Objects;
 
 @Log
 public class WebSocketProducer implements EventListener {
-    private final StompBroadcastClient stompClient;
+    private final StompClient stompClient;
     private final String sessionId;
 
     public WebSocketProducer(@Nonnull String webSocketUrl, @Nullable String apiKey, @Nonnull String sessionId) {
         this.sessionId = Objects.requireNonNull(sessionId);
 
-        this.stompClient = new StompBroadcastClient(webSocketUrl, apiKey);
+        this.stompClient = new StompClient(webSocketUrl, apiKey);
     }
 
     public void connect() {
