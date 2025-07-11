@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.producer;
 
+import de.sustineo.simdesk.client.AccBroadcastingClient;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import lombok.extern.java.Log;
@@ -12,6 +13,7 @@ import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
+import java.lang.reflect.Type;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -29,6 +31,8 @@ class StompClient {
     private StompSession stompSession;
 
     private final Object sessionLock = new Object();
+
+    private final AccBroadcastingClient accBroadcastingClient = AccBroadcastingClient.getClient();
 
     private final ScheduledExecutorService reconnectScheduler = Executors.newSingleThreadScheduledExecutor();
 
@@ -51,12 +55,26 @@ class StompClient {
         }
 
         webSocketStompClient.connectAsync(webSocketUrl, headers, new StompSessionHandlerAdapter() {
-
             @Override
-            public void afterConnected(StompSession session, StompHeaders connectedHeaders) {
+            public void afterConnected(@Nonnull StompSession session, @Nonnull StompHeaders connectedHeaders) {
                 log.info(String.format("Connected to WebSocket connection [%s]", webSocketUrl));
                 synchronized (sessionLock) {
                     stompSession = session;
+
+                    session.subscribe("/session/queue/acc/requests", new StompSessionHandlerAdapter() {
+                        @Override
+                        @Nonnull
+                        public Type getPayloadType(@Nonnull StompHeaders headers) {
+                            return byte[].class;
+                        }
+
+                        @Override
+                        public void handleFrame(@Nonnull StompHeaders headers, Object payload) {
+                            if (payload instanceof byte[] requestBytes) {
+                                accBroadcastingClient.sendRequest(requestBytes);
+                            }
+                        }
+                    });
                 }
             }
 

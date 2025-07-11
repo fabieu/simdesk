@@ -154,7 +154,7 @@ public class AccBroadcastingThread extends Thread implements AccBroadcastingProt
         sendRequest(AccBroadcastingProtocol.buildTrackDataRequest(accBroadcastingState.getConnectionId()));
     }
 
-    private void sendRequest(byte[] requestBytes) {
+    public void sendRequest(byte[] requestBytes) {
         if (socket.isConnected()) {
             try {
                 socket.send(new DatagramPacket(requestBytes, requestBytes.length));

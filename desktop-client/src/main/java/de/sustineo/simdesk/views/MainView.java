@@ -4,7 +4,7 @@ import de.sustineo.simdesk.client.AccBroadcastingClient;
 import de.sustineo.simdesk.config.ConfigProperty;
 import de.sustineo.simdesk.config.ConfigService;
 import de.sustineo.simdesk.logging.TextAreaAppender;
-import de.sustineo.simdesk.producer.WebSocketProducer;
+import de.sustineo.simdesk.producer.WebSocketClient;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -30,7 +30,7 @@ public class MainView {
     private final BuildProperties buildProperties;
 
     private final AccBroadcastingClient accBroadcastingClient;
-    private WebSocketProducer webSocketProducer;
+    private WebSocketClient webSocketClient;
 
     public MainView(ConfigService configService,
                     BuildProperties buildProperties) {
@@ -88,10 +88,10 @@ public class MainView {
                 sessionId = sessionId.trim();
             }
 
-            webSocketProducer = new WebSocketProducer(websocketUrl, websocketApiKey, sessionId);
+            webSocketClient = new WebSocketClient(websocketUrl, websocketApiKey, sessionId);
             try {
                 accBroadcastingClient.connectAutomatically();
-                webSocketProducer.connect();
+                webSocketClient.connect();
 
                 if (accBroadcastingClient.isConnected()) {
                     startButton.setDisable(true);
@@ -109,8 +109,8 @@ public class MainView {
         });
 
         stopButton.setOnAction(e -> {
-            if (webSocketProducer != null) {
-                webSocketProducer.disconnect();
+            if (webSocketClient != null) {
+                webSocketClient.disconnect();
             }
 
             accBroadcastingClient.disconnect();

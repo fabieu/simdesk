@@ -11,11 +11,11 @@ import java.nio.charset.StandardCharsets;
 import java.util.Objects;
 
 @Log
-public class WebSocketProducer implements EventListener {
+public class WebSocketClient implements EventListener {
     private final StompClient stompClient;
     private final String sessionId;
 
-    public WebSocketProducer(@Nonnull String webSocketUrl, @Nullable String apiKey, @Nonnull String sessionId) {
+    public WebSocketClient(@Nonnull String webSocketUrl, @Nullable String apiKey, @Nonnull String sessionId) {
         this.sessionId = Objects.requireNonNull(sessionId);
 
         this.stompClient = new StompClient(webSocketUrl, apiKey);

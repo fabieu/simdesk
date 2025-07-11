@@ -115,6 +115,14 @@ public class AccBroadcastingClient implements EventListener {
         return false;
     }
 
+    public void sendRequest(byte[] requestBytes) {
+        if (!thread.isConnected()) {
+            return;
+        }
+
+        thread.sendRequest(requestBytes);
+    }
+
     @Override
     public void onEvent(Event event) {
         if (event instanceof ConnectionClosedEvent) {
