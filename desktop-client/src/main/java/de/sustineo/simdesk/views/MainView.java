@@ -42,7 +42,7 @@ public class MainView {
     public void start(Stage stage) {
         String initialWebsocketUrl = configService.getProperty(ConfigProperty.WEBSOCKET_URL);
         String initialWebsocketApiKey = configService.getProperty(ConfigProperty.WEBSOCKET_API_KEY);
-        String initialSessionId = configService.getProperty(ConfigProperty.SESSION_ID);
+        String initialDashboardId = configService.getProperty(ConfigProperty.DASHBOARD_ID);
 
         TextField urlField = new TextField();
         urlField.setText(initialWebsocketUrl);
@@ -50,8 +50,8 @@ public class MainView {
         PasswordField apiKeyField = new PasswordField();
         apiKeyField.setText(initialWebsocketApiKey);
 
-        TextField sessionField = new TextField(initialSessionId);
-        sessionField.setText(initialSessionId);
+        TextField dashboardField = new TextField(initialDashboardId);
+        dashboardField.setText(initialDashboardId);
 
         Button startButton = new Button("Start");
         startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
@@ -80,22 +80,18 @@ public class MainView {
                 websocketApiKey = websocketApiKey.trim();
             }
 
-            String sessionId = sessionField.getText();
-            if (sessionId == null || sessionId.isEmpty()) {
-                log.severe("Invalid configuration: Session ID cannot be empty.");
+            String dashboardId = dashboardField.getText();
+            if (dashboardId == null || dashboardId.isEmpty()) {
+                log.severe("Invalid configuration: Dashboard ID cannot be empty.");
                 return;
             } else {
-                sessionId = sessionId.trim();
+                dashboardId = dashboardId.trim();
             }
 
-            webSocketClient = new WebSocketClient(websocketUrl, websocketApiKey, sessionId);
+            webSocketClient = new WebSocketClient(websocketUrl, websocketApiKey, dashboardId);
             try {
                 accBroadcastingClient.connectAutomatically();
                 webSocketClient.connect();
-
-                if (accBroadcastingClient.isConnected()) {
-                    startButton.setDisable(true);
-                }
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
             }
@@ -104,7 +100,7 @@ public class MainView {
             Map<ConfigProperty, String> configProperties = new HashMap<>();
             configProperties.put(ConfigProperty.WEBSOCKET_URL, websocketUrl);
             configProperties.put(ConfigProperty.WEBSOCKET_API_KEY, websocketApiKey);
-            configProperties.put(ConfigProperty.SESSION_ID, sessionId);
+            configProperties.put(ConfigProperty.DASHBOARD_ID, dashboardId);
             configService.setProperties(configProperties);
         });
 
@@ -114,9 +110,6 @@ public class MainView {
             }
 
             accBroadcastingClient.disconnect();
-            if (!accBroadcastingClient.isConnected()) {
-                startButton.setDisable(false);
-            }
         });
 
         // Buttons in right-side column
@@ -145,8 +138,8 @@ public class MainView {
         grid.add(urlField, 1, 0);
         grid.add(new Label("API Key:"), 0, 1);
         grid.add(apiKeyField, 1, 1);
-        grid.add(new Label("Session ID:"), 0, 2);
-        grid.add(sessionField, 1, 2);
+        grid.add(new Label("Dashboard ID:"), 0, 2);
+        grid.add(dashboardField, 1, 2);
         grid.add(buttonBox, 2, 0, 1, 3);
 
         TextArea logArea = new TextArea();

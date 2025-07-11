@@ -27,7 +27,7 @@ public class AccBroadcastingState {
     @Builder.Default
     private String commandPassword = "";
     @Builder.Default
-    private int updateInterval = 100;
+    private int updateInterval = 500;
     @Builder.Default
     private SessionId currentSessionId = SessionId.dummy();
     @Builder.Default

@@ -8,7 +8,7 @@ import lombok.RequiredArgsConstructor;
 public enum ConfigProperty {
     WEBSOCKET_URL("websocket.url", null),
     WEBSOCKET_API_KEY("websocket.apiKey", null),
-    SESSION_ID("session.id", null),
+    DASHBOARD_ID("dashboard.id", null),
     ;
 
     private final String key;
