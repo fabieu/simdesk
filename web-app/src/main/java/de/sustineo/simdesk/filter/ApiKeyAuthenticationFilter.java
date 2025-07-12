@@ -7,9 +7,9 @@ import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
-import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.GrantedAuthority;
@@ -24,15 +24,11 @@ import java.util.List;
 import java.util.Optional;
 
 @Order(1)
-@Component
 @Log
+@Component
+@RequiredArgsConstructor
 public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     private final ApiKeyService apiKeyService;
-
-    @Autowired
-    public ApiKeyAuthenticationFilter(ApiKeyService apiKeyService) {
-        this.apiKeyService = apiKeyService;
-    }
 
     @Override
     protected void doFilterInternal(@Nonnull HttpServletRequest request, @Nonnull HttpServletResponse response, @Nonnull FilterChain filterChain) throws ServletException, IOException {
@@ -59,7 +55,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
 
     /**
      * Extracts the API key from the HTTPServletRequest by checking the following locations in order:
-     * HTTP authorization header, Request parameter ('apiKey')
+     * HTTP authorization header, HTTP X-API-KEY header
      *
      * @param request The request to process
      * @return The api key string or null if none is found
@@ -71,7 +67,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             return authorizationHeader.replaceAll("Bearer\\s*", "");
         }
 
-        // Retrieve api key from header "x-api-key"
-        return request.getHeader("x-api-key");
+        // Retrieve api key from header "X-API-KEY"
+        return request.getHeader("X-API-KEY");
     }
 }

@@ -1,0 +1,6 @@
+spring:
+  main:
+    banner-mode: off
+logging:
+  file:
+    name: logs/simdesk-client.log

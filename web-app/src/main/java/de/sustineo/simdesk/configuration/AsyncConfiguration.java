@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.configuration;
 
+import com.vaadin.flow.spring.annotation.VaadinTaskExecutor;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.scheduling.annotation.EnableAsync;
@@ -16,6 +17,7 @@ public class AsyncConfiguration {
      * @return Default executor for @Async
      */
     @Bean
+    @VaadinTaskExecutor
     public Executor taskExecutor() {
         int numOfCores = Runtime.getRuntime().availableProcessors();
         int poolSize = numOfCores * 4;
