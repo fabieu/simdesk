@@ -2,10 +2,7 @@ package de.sustineo.simdesk.socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.sustineo.simdesk.entities.ConnectionInfo;
-import de.sustineo.simdesk.entities.events.ConnectionClosedEvent;
-import de.sustineo.simdesk.eventbus.Event;
-import de.sustineo.simdesk.eventbus.EventBus;
-import de.sustineo.simdesk.eventbus.EventListener;
+import lombok.Getter;
 import lombok.NonNull;
 import lombok.extern.java.Log;
 
@@ -15,23 +12,12 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 @Log
-public class AccSocketClient implements EventListener {
-    private static AccSocketClient instance;
-    private static AccSocketThread thread;
+public class AccSocketClient {
+    @Getter
+    private static final AccSocketClient instance = new AccSocketClient();
+    private AccSocketThread thread;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
-
-    private AccSocketClient() {
-        EventBus.register(this);
-    }
-
-    public static AccSocketClient getInstance() {
-        if (instance == null) {
-            instance = new AccSocketClient();
-        }
-
-        return instance;
-    }
 
     /**
      * Connects to the game client with automatic settings.
@@ -65,7 +51,7 @@ public class AccSocketClient implements EventListener {
      * @param hostAddress        Host address of the server.
      * @param hostPort           Host port of the server.
      */
-    public void connect(@NonNull String connectionPassword, @NonNull String commandPassword, @NonNull InetAddress hostAddress, int hostPort) throws SocketException {
+    public synchronized void connect(@NonNull String connectionPassword, @NonNull String commandPassword, @NonNull InetAddress hostAddress, int hostPort) throws SocketException {
         if (thread != null) {
             return;
         }
@@ -93,13 +79,14 @@ public class AccSocketClient implements EventListener {
     /**
      * Disconnects from the game client.
      */
-    public void disconnect() {
+    public synchronized void disconnect() {
         if (thread == null) {
             return;
         }
 
         thread.sendUnregisterRequest();
         thread.close();
+        thread = null;
     }
 
     /**
@@ -107,7 +94,7 @@ public class AccSocketClient implements EventListener {
      *
      * @return true if connected, false otherwise.
      */
-    public boolean isConnected() {
+    public synchronized boolean isConnected() {
         if (thread != null) {
             return thread.isConnected();
         }
@@ -115,18 +102,11 @@ public class AccSocketClient implements EventListener {
         return false;
     }
 
-    public void sendRequest(byte[] requestBytes) {
-        if (!thread.isConnected()) {
+    public synchronized void sendRequest(byte[] requestBytes) {
+        if (!isConnected()) {
             return;
         }
 
         thread.sendRequest(requestBytes);
-    }
-
-    @Override
-    public void onEvent(Event event) {
-        if (event instanceof ConnectionClosedEvent) {
-            thread = null;
-        }
     }
 }

@@ -29,14 +29,10 @@ public class MainView {
     private final ConfigService configService;
     private final BuildProperties buildProperties;
 
-    private final AccSocketClient accSocketClient;
-    private WebSocketClient webSocketClient;
-
     public MainView(ConfigService configService,
                     BuildProperties buildProperties) {
         this.configService = configService;
         this.buildProperties = buildProperties;
-        this.accSocketClient = AccSocketClient.getInstance();
     }
 
     public void start(Stage stage) {
@@ -88,10 +84,10 @@ public class MainView {
                 dashboardId = dashboardId.trim();
             }
 
-            webSocketClient = new WebSocketClient(websocketUrl, websocketApiKey, dashboardId);
             try {
-                accSocketClient.connectAutomatically();
-                webSocketClient.connect();
+                WebSocketClient.getInstance().connect(websocketUrl, websocketApiKey, dashboardId);
+                AccSocketClient.getInstance().connectAutomatically();
+
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
             }
@@ -105,11 +101,8 @@ public class MainView {
         });
 
         stopButton.setOnAction(e -> {
-            if (webSocketClient != null) {
-                webSocketClient.disconnect();
-            }
-
-            accSocketClient.disconnect();
+            WebSocketClient.getInstance().disconnect();
+            AccSocketClient.getInstance().disconnect();
         });
 
         // Buttons in right-side column

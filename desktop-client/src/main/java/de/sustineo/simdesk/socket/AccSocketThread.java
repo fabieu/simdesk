@@ -1,9 +1,6 @@
 package de.sustineo.simdesk.socket;
 
-import de.sustineo.simdesk.entities.ExitState;
-import de.sustineo.simdesk.entities.events.ConnectionClosedEvent;
-import de.sustineo.simdesk.entities.events.ConnectionOpenedEvent;
-import de.sustineo.simdesk.entities.events.PacketReceivedEvent;
+import de.sustineo.simdesk.entities.PacketReceivedEvent;
 import de.sustineo.simdesk.eventbus.EventBus;
 import lombok.extern.java.Log;
 
@@ -22,7 +19,6 @@ public class AccSocketThread extends Thread {
     private final DatagramSocket socket;
     private boolean running = true;
     private boolean forceExit = false;
-    private ExitState exitState = ExitState.NONE;
 
     public AccSocketThread(AccSocketState accSocketState) throws SocketException {
         super("ACC connection thread");
@@ -44,8 +40,6 @@ public class AccSocketThread extends Thread {
 
     @Override
     public void run() {
-        EventBus.publish(new ConnectionOpenedEvent());
-
         sendRegisterRequest();
 
         while (running) {
@@ -56,29 +50,22 @@ public class AccSocketThread extends Thread {
                 EventBus.publish(new PacketReceivedEvent(response.getData()));
             } catch (SocketTimeoutException e) {
                 log.warning("ACC Socket timed out");
-                exitState = ExitState.TIMEOUT;
                 running = false;
             } catch (PortUnreachableException e) {
                 log.severe("ACC Socket is unreachable");
-                exitState = ExitState.PORT_UNREACHABLE;
                 running = false;
             } catch (SocketException e) {
                 if (forceExit) {
                     log.info("ACC Socket was closed by user.");
-                    exitState = ExitState.USER;
                 } else {
                     log.severe(String.format("ACC Socket closed unexpected: %s", e.getMessage()));
-                    exitState = ExitState.EXCEPTION;
                 }
                 running = false;
             } catch (StackOverflowError | IOException e) {
                 log.severe(String.format("Error in ACC listener thread: %s", e.getMessage()));
-                exitState = ExitState.EXCEPTION;
                 running = false;
             }
         }
-
-        EventBus.publish(new ConnectionClosedEvent(exitState));
     }
 
     public void close() {

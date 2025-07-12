@@ -1,5 +1,4 @@
-
-package de.sustineo.simdesk.client.events;
+package de.sustineo.simdesk.entities;
 
 import de.sustineo.simdesk.eventbus.Event;
 import lombok.Getter;
@@ -9,5 +8,6 @@ import lombok.ToString;
 @Getter
 @RequiredArgsConstructor
 @ToString
-public class ConnectionOpenedEvent extends Event {
+public class PacketReceivedEvent extends Event {
+    private final byte[] payload;
 }
