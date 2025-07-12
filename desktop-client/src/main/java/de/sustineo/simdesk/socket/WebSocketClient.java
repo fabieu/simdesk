@@ -46,7 +46,7 @@ public final class WebSocketClient implements EventListener {
         }
 
         if (event instanceof PacketReceivedEvent packetReceivedEvent) {
-            stompClient.sendBytes("/app/livetiming", packetReceivedEvent.getPayload(), dashboardId);
+            stompClient.sendBytes("/app/acc/livetiming", packetReceivedEvent.getPayload(), dashboardId);
         }
     }
 }

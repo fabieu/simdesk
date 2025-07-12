@@ -35,8 +35,6 @@ class StompClient {
     private final Object sessionLock = new Object();
     private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
-    private final AccSocketClient accSocketClient = AccSocketClient.getInstance();
-
     public StompClient(@Nonnull String webSocketUrl, @Nullable String apiKey) {
         this.webSocketUrl = webSocketUrl;
         this.apiKey = apiKey;
@@ -81,7 +79,7 @@ class StompClient {
                 synchronized (sessionLock) {
                     stompSession = session;
 
-                    subscribeToAccQueue(session);
+                    subscribeToRequestCallback(session);
                 }
             }
 
@@ -150,7 +148,7 @@ class StompClient {
                 StompHeaders headers = new StompHeaders();
                 headers.setDestination(destination);
                 headers.setContentType(MimeTypeUtils.APPLICATION_OCTET_STREAM);
-                headers.set("dashboardId", dashboardId);
+                headers.set("dashboard-id", dashboardId);
 
                 stompSession.send(headers, payload);
             }
@@ -163,8 +161,8 @@ class StompClient {
      *
      * @param session The STOMP session to subscribe to.
      */
-    private void subscribeToAccQueue(StompSession session) {
-        String destination = "/user/queue/acc.request";
+    private void subscribeToRequestCallback(StompSession session) {
+        String destination = "/user/queue/acc/socket.request";
 
         session.subscribe(destination, new StompSessionHandlerAdapter() {
             @Override
@@ -175,7 +173,8 @@ class StompClient {
 
             @Override
             public void handleFrame(@Nonnull StompHeaders headers, Object payload) {
-                accSocketClient.sendRequest((byte[]) payload);
+                log.info(String.format("Received request on destination [%s]: %s", destination, payload));
+                //accSocketClient.sendRequest((byte[]) payload);
             }
         });
 
