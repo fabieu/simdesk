@@ -15,10 +15,10 @@ import org.springframework.stereotype.Controller;
 public class LiveTimingController {
     private final LiveTimingService liveTimingService;
 
-    @MessageMapping("/acc/livetiming")
+    @MessageMapping("/acc/live-timing")
     public void handleLiveTimingUpdate(@Payload byte[] payload,
                                        @Header("dashboard-id") String dashboardId,
-                                       @Header(SimpMessageHeaderAccessor.SESSION_ID_HEADER) String sessionId) {
-        liveTimingService.handleLivetimingEvent(sessionId, dashboardId, payload);
+                                       SimpMessageHeaderAccessor headerAccessor) {
+        liveTimingService.handleLivetimingEvent(headerAccessor.getSessionId(), dashboardId, payload);
     }
 }

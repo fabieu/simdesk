@@ -2,9 +2,10 @@ package de.sustineo.simdesk.socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
 import de.sustineo.simdesk.entities.ConnectionInfo;
-import lombok.Getter;
 import lombok.NonNull;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.stereotype.Component;
 
 import java.io.File;
 import java.io.IOException;
@@ -12,12 +13,12 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 @Log
+@Component
+@RequiredArgsConstructor
 public class AccSocketClient {
-    @Getter
-    private static final AccSocketClient instance = new AccSocketClient();
-    private AccSocketThread thread;
+    private final ObjectMapper objectMapper;
 
-    private final ObjectMapper objectMapper = new ObjectMapper();
+    private AccSocketThread thread;
 
     /**
      * Connects to the game client with automatic settings.
@@ -63,7 +64,7 @@ public class AccSocketClient {
                 .hostPort(hostPort)
                 .build();
 
-        log.fine(String.format("Connecting to ACC with: displayName=%s, connectionPassword=%s, commandPassword=%s, updateInterval=%d, hostAddress=%s, hostPort=%d",
+        log.info(String.format("Connecting to AccSocket with displayName=%s, connectionPassword=%s, commandPassword=%s, updateInterval=%d, hostAddress=%s, hostPort=%d",
                 accSocketState.getDisplayName(),
                 accSocketState.getConnectionPassword(),
                 accSocketState.getCommandPassword(),

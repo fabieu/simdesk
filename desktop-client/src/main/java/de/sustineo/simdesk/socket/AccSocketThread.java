@@ -49,16 +49,16 @@ public class AccSocketThread extends Thread {
 
                 EventBus.publish(new PacketReceivedEvent(response.getData()));
             } catch (SocketTimeoutException e) {
-                log.warning("ACC Socket timed out");
+                log.warning("Timed out during connection to AccSocket");
                 running = false;
             } catch (PortUnreachableException e) {
-                log.severe("ACC Socket is unreachable");
+                log.severe("Unreachable AccSocket");
                 running = false;
             } catch (SocketException e) {
                 if (forceExit) {
-                    log.info("ACC Socket closed by user");
+                    log.info("Closed AccSocket due to user request");
                 } else {
-                    log.severe(String.format("ACC Socket closed unexpected: %s", e.getMessage()));
+                    log.severe(String.format("Closed AccSocket unexpectedly: %s", e.getMessage()));
                 }
                 running = false;
             } catch (StackOverflowError | IOException e) {

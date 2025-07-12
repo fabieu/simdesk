@@ -14,6 +14,7 @@ import javafx.scene.image.Image;
 import javafx.scene.layout.*;
 import javafx.scene.text.Font;
 import javafx.stage.Stage;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
@@ -25,15 +26,12 @@ import java.util.Objects;
 
 @Log
 @Component
+@RequiredArgsConstructor
 public class MainView {
+    private final AccSocketClient accSocketClient;
+    private final WebSocketClient webSocketClient;
     private final ConfigService configService;
     private final BuildProperties buildProperties;
-
-    public MainView(ConfigService configService,
-                    BuildProperties buildProperties) {
-        this.configService = configService;
-        this.buildProperties = buildProperties;
-    }
 
     public void start(Stage stage) {
         String initialWebsocketUrl = configService.getProperty(ConfigProperty.WEBSOCKET_URL);
@@ -85,8 +83,8 @@ public class MainView {
             }
 
             try {
-                AccSocketClient.getInstance().connectAutomatically();
-                WebSocketClient.getInstance().connect(websocketUrl, websocketApiKey, dashboardId);
+                accSocketClient.connectAutomatically();
+                webSocketClient.connect(websocketUrl, websocketApiKey, dashboardId);
 
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
@@ -101,8 +99,8 @@ public class MainView {
         });
 
         stopButton.setOnAction(e -> {
-            AccSocketClient.getInstance().disconnect();
-            WebSocketClient.getInstance().disconnect();
+            accSocketClient.disconnect();
+            webSocketClient.disconnect();
         });
 
         // Buttons in right-side column
