@@ -85,8 +85,8 @@ public class MainView {
             }
 
             try {
-                WebSocketClient.getInstance().connect(websocketUrl, websocketApiKey, dashboardId);
                 AccSocketClient.getInstance().connectAutomatically();
+                WebSocketClient.getInstance().connect(websocketUrl, websocketApiKey, dashboardId);
 
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
@@ -101,8 +101,8 @@ public class MainView {
         });
 
         stopButton.setOnAction(e -> {
-            WebSocketClient.getInstance().disconnect();
             AccSocketClient.getInstance().disconnect();
+            WebSocketClient.getInstance().disconnect();
         });
 
         // Buttons in right-side column

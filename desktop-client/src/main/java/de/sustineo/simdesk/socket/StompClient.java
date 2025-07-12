@@ -179,6 +179,6 @@ class StompClient {
             }
         });
 
-        log.info(String.format("Subscribed to STOMP destination [%s]", destination));
+        log.info(String.format("Subscribed to destination [%s]", destination));
     }
 }

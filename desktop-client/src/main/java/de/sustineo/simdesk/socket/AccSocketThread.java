@@ -56,7 +56,7 @@ public class AccSocketThread extends Thread {
                 running = false;
             } catch (SocketException e) {
                 if (forceExit) {
-                    log.info("ACC Socket was closed by user.");
+                    log.info("ACC Socket closed by user");
                 } else {
                     log.severe(String.format("ACC Socket closed unexpected: %s", e.getMessage()));
                 }
