@@ -1,10 +1,10 @@
 package de.sustineo.simdesk.views;
 
-import de.sustineo.simdesk.client.AccBroadcastingClient;
 import de.sustineo.simdesk.config.ConfigProperty;
 import de.sustineo.simdesk.config.ConfigService;
 import de.sustineo.simdesk.logging.TextAreaAppender;
-import de.sustineo.simdesk.producer.WebSocketClient;
+import de.sustineo.simdesk.socket.AccSocketClient;
+import de.sustineo.simdesk.socket.WebSocketClient;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -29,14 +29,14 @@ public class MainView {
     private final ConfigService configService;
     private final BuildProperties buildProperties;
 
-    private final AccBroadcastingClient accBroadcastingClient;
+    private final AccSocketClient accSocketClient;
     private WebSocketClient webSocketClient;
 
     public MainView(ConfigService configService,
                     BuildProperties buildProperties) {
         this.configService = configService;
         this.buildProperties = buildProperties;
-        this.accBroadcastingClient = AccBroadcastingClient.getClient();
+        this.accSocketClient = AccSocketClient.getInstance();
     }
 
     public void start(Stage stage) {
@@ -90,7 +90,7 @@ public class MainView {
 
             webSocketClient = new WebSocketClient(websocketUrl, websocketApiKey, dashboardId);
             try {
-                accBroadcastingClient.connectAutomatically();
+                accSocketClient.connectAutomatically();
                 webSocketClient.connect();
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
@@ -109,7 +109,7 @@ public class MainView {
                 webSocketClient.disconnect();
             }
 
-            accBroadcastingClient.disconnect();
+            accSocketClient.disconnect();
         });
 
         // Buttons in right-side column

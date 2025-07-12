@@ -1,8 +1,8 @@
-package de.sustineo.simdesk.client;
+package de.sustineo.simdesk.socket;
 
 import com.fasterxml.jackson.databind.ObjectMapper;
-import de.sustineo.simdesk.client.events.ConnectionClosedEvent;
-import de.sustineo.simdesk.client.protocol.ConnectionInfo;
+import de.sustineo.simdesk.entities.ConnectionInfo;
+import de.sustineo.simdesk.entities.events.ConnectionClosedEvent;
 import de.sustineo.simdesk.eventbus.Event;
 import de.sustineo.simdesk.eventbus.EventBus;
 import de.sustineo.simdesk.eventbus.EventListener;
@@ -15,19 +15,19 @@ import java.net.InetAddress;
 import java.net.SocketException;
 
 @Log
-public class AccBroadcastingClient implements EventListener {
-    private static AccBroadcastingClient instance;
-    private static AccBroadcastingThread thread;
+public class AccSocketClient implements EventListener {
+    private static AccSocketClient instance;
+    private static AccSocketThread thread;
 
     private final ObjectMapper objectMapper = new ObjectMapper();
 
-    private AccBroadcastingClient() {
+    private AccSocketClient() {
         EventBus.register(this);
     }
 
-    public static AccBroadcastingClient getClient() {
+    public static AccSocketClient getInstance() {
         if (instance == null) {
-            instance = new AccBroadcastingClient();
+            instance = new AccSocketClient();
         }
 
         return instance;
@@ -70,7 +70,7 @@ public class AccBroadcastingClient implements EventListener {
             return;
         }
 
-        AccBroadcastingState accBroadcastingState = AccBroadcastingState.builder()
+        AccSocketState accSocketState = AccSocketState.builder()
                 .connectionPassword(connectionPassword)
                 .commandPassword(commandPassword)
                 .hostAddress(hostAddress)
@@ -78,15 +78,15 @@ public class AccBroadcastingClient implements EventListener {
                 .build();
 
         log.fine(String.format("Connecting to ACC with: displayName=%s, connectionPassword=%s, commandPassword=%s, updateInterval=%d, hostAddress=%s, hostPort=%d",
-                accBroadcastingState.getDisplayName(),
-                accBroadcastingState.getConnectionPassword(),
-                accBroadcastingState.getCommandPassword(),
-                accBroadcastingState.getUpdateInterval(),
-                accBroadcastingState.getHostAddress(),
-                accBroadcastingState.getHostPort()
+                accSocketState.getDisplayName(),
+                accSocketState.getConnectionPassword(),
+                accSocketState.getCommandPassword(),
+                accSocketState.getUpdateInterval(),
+                accSocketState.getHostAddress(),
+                accSocketState.getHostPort()
         ));
 
-        thread = new AccBroadcastingThread(accBroadcastingState);
+        thread = new AccSocketThread(accSocketState);
         thread.start();
     }
 

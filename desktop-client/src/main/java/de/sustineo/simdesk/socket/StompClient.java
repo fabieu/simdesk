@@ -1,6 +1,5 @@
-package de.sustineo.simdesk.producer;
+package de.sustineo.simdesk.socket;
 
-import de.sustineo.simdesk.client.AccBroadcastingClient;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import lombok.extern.java.Log;
@@ -36,7 +35,7 @@ class StompClient {
     private final Object sessionLock = new Object();
     private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
-    private final AccBroadcastingClient accBroadcastingClient = AccBroadcastingClient.getClient();
+    private final AccSocketClient accSocketClient = AccSocketClient.getInstance();
 
     public StompClient(@Nonnull String webSocketUrl, @Nullable String apiKey) {
         this.webSocketUrl = webSocketUrl;
@@ -160,7 +159,7 @@ class StompClient {
 
     /**
      * Subscribes to the ACC request queue on the STOMP server.
-     * This method listens for incoming requests and forwards them to the AccBroadcastingClient.
+     * This method listens for incoming requests and forwards them to the AccSocketClient.
      *
      * @param session The STOMP session to subscribe to.
      */
@@ -176,9 +175,7 @@ class StompClient {
 
             @Override
             public void handleFrame(@Nonnull StompHeaders headers, Object payload) {
-                if (payload instanceof byte[] requestBytes) {
-                    accBroadcastingClient.sendRequest(requestBytes);
-                }
+                accSocketClient.sendRequest((byte[]) payload);
             }
         });
 

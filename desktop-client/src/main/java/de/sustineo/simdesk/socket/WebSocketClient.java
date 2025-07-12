@@ -1,6 +1,6 @@
-package de.sustineo.simdesk.producer;
+package de.sustineo.simdesk.socket;
 
-import de.sustineo.simdesk.client.events.PacketReceivedEvent;
+import de.sustineo.simdesk.entities.events.PacketReceivedEvent;
 import de.sustineo.simdesk.eventbus.Event;
 import de.sustineo.simdesk.eventbus.EventBus;
 import de.sustineo.simdesk.eventbus.EventListener;
