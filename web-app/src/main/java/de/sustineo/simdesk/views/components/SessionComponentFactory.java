@@ -29,15 +29,16 @@ import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Optional;
 
 @Log
 @Service
 public class SessionComponentFactory extends ComponentFactory {
     private final SecurityService securityService;
-    private final LeaderboardService leaderboardService;
+    private final Optional<LeaderboardService> leaderboardService;
 
     public SessionComponentFactory(SecurityService securityService,
-                                   LeaderboardService leaderboardService) {
+                                   Optional<LeaderboardService> leaderboardService) {
         this.securityService = securityService;
         this.leaderboardService = leaderboardService;
     }
@@ -83,14 +84,17 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.add(weatherIcon, heading, sessionDatetimeBadge);
 
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
-            StreamResource leaderboardLinesCsvResource = new StreamResource(
-                    String.format("session_table_%s.csv", session.getFileChecksum()),
-                    () -> {
-                        String fileContent = getLeaderboardLinesAsCsv(session);
-                        return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                    }
-            );
-            Anchor leaderboardLinesCsvAnchor = createDownloadAnchor(leaderboardLinesCsvResource, "Table (CSV)");
+            if (leaderboardService.isPresent()) {
+                StreamResource leaderboardLinesCsvResource = new StreamResource(
+                        String.format("session_table_%s.csv", session.getFileChecksum()),
+                        () -> {
+                            String fileContent = getLeaderboardLinesAsCsv(session);
+                            return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
+                        }
+                );
+                Anchor leaderboardLinesCsvAnchor = createDownloadAnchor(leaderboardLinesCsvResource, "Table (CSV)");
+                layout.add(leaderboardLinesCsvAnchor);
+            }
 
             StreamResource fileContentResource = new StreamResource(
                     String.format("session_file_%s.json", session.getFileChecksum()),
@@ -101,14 +105,18 @@ public class SessionComponentFactory extends ComponentFactory {
             );
             Anchor sessionFileJsonAnchor = createDownloadAnchor(fileContentResource, "File (JSON)");
 
-            layout.add(sessionFileJsonAnchor, leaderboardLinesCsvAnchor);
+            layout.add(sessionFileJsonAnchor);
         }
 
         return layout;
     }
 
     private String getLeaderboardLinesAsCsv(Session session) {
-        List<LeaderboardLine> leaderboardLines = leaderboardService.getLeaderboardLinesBySessionId(session.getId());
+        if (leaderboardService.isEmpty()) {
+            return null;
+        }
+
+        List<LeaderboardLine> leaderboardLines = leaderboardService.get().getLeaderboardLinesBySessionId(session.getId());
 
         try (StringWriter writer = new StringWriter()) {
             StatefulBeanToCsv<LeaderboardLine> sbc = new StatefulBeanToCsvBuilder<LeaderboardLine>(writer)

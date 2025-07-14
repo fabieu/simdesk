@@ -33,7 +33,6 @@ import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.MenuService;
-import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.views.*;
@@ -47,7 +46,6 @@ public class MainLayout extends AppLayout {
     private final ThemeService themeService;
     private final SecurityService securityService;
     private final MenuService menuService;
-    private final NotificationService notificationService;
 
     private final String privacyUrl;
     private final String impressumUrl;
@@ -56,13 +54,11 @@ public class MainLayout extends AppLayout {
     public MainLayout(ThemeService themeService,
                       SecurityService securityService,
                       MenuService menuService,
-                      NotificationService notificationService,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.themeService = themeService;
-        this.notificationService = notificationService;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
