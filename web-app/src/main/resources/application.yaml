@@ -54,8 +54,6 @@ vaadin:
   productionMode: true
   heartbeatInterval: 60
   closeIdleSessions: true
-  react:
-    enable: false
   exclude-urls:
     - /api/**
     - /swagger-ui/**
