@@ -2,3 +2,6 @@ rootProject.name = 'simdesk'
 
 include 'web-app'
 include 'desktop-client'
+
+project(':web-app').name = 'simdesk-web'
+project(':desktop-client').name = 'simdesk-desktop'
