@@ -99,3 +99,7 @@ and [MIT License](https://github.com/testcontainers/testcontainers-java/blob/mai
 [vaadin-maps-leaflet-flow](https://github.com/xdev-software/vaadin-maps-leaflet-flow)
 by [XDEV Software](https://xdev.software/)
 and [Apache License 2.0](https://github.com/xdev-software/vaadin-maps-leaflet-flow/blob/develop/LICENSE)
+
+[ACC-Race-Control](https://github.com/LennysLounge/ACC-Race-Control)
+by [Leonard Schüngel](https://github.com/LennysLounge)
+and [MIT License](https://github.com/LennysLounge/ACC-Race-Control/blob/master/LICENSE.txt)
