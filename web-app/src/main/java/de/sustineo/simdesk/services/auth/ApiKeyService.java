@@ -3,7 +3,8 @@ package de.sustineo.simdesk.services.auth;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.mapper.UserApiKeyMapper;
 import de.sustineo.simdesk.mapper.UserPermissionMapper;
-import org.apache.commons.lang3.RandomStringUtils;
+import de.sustineo.simdesk.services.IdGenerator;
+import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;
 import org.springframework.cache.CacheManager;
 import org.springframework.cache.annotation.Cacheable;
@@ -13,20 +14,14 @@ import java.util.List;
 import java.util.Optional;
 
 @Service
+@RequiredArgsConstructor
 public class ApiKeyService {
     private static final String CACHE_ACTIVE_API_KEYS = "activeApiKeys";
 
     private final UserApiKeyMapper apiKeyMapper;
     private final UserPermissionMapper userPermissionMapper;
     private final CacheManager cacheManager;
-
-    public ApiKeyService(UserApiKeyMapper apiKeyMapper,
-                         UserPermissionMapper userPermissionMapper,
-                         CacheManager cacheManager) {
-        this.apiKeyMapper = apiKeyMapper;
-        this.userPermissionMapper = userPermissionMapper;
-        this.cacheManager = cacheManager;
-    }
+    private final IdGenerator idGenerator;
 
     public List<ApiKey> getByUserId(Integer userId) {
         return apiKeyMapper.findByUserId(userId);
@@ -49,7 +44,7 @@ public class ApiKeyService {
     }
 
     public void create(Integer userId, String name) {
-        apiKeyMapper.insert(userId, generateApiKey(), name);
+        apiKeyMapper.insert(userId, generateKey(), name);
     }
 
     public void deleteApiKey(ApiKey apiKey) {
@@ -70,7 +65,7 @@ public class ApiKeyService {
         cache.evict(apiKey.getApiKey());
     }
 
-    private String generateApiKey() {
-        return RandomStringUtils.secureStrong().next(32, true, true);
+    private String generateKey() {
+        return idGenerator.generateRandomString(32);
     }
 }
