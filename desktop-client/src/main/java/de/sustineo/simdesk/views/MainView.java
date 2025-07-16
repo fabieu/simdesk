@@ -5,6 +5,7 @@ import de.sustineo.simdesk.config.ConfigService;
 import de.sustineo.simdesk.logging.TextAreaAppender;
 import de.sustineo.simdesk.socket.AccSocketClient;
 import de.sustineo.simdesk.socket.WebSocketClient;
+import javafx.application.Platform;
 import javafx.geometry.HPos;
 import javafx.geometry.Insets;
 import javafx.geometry.Pos;
@@ -38,45 +39,60 @@ public class MainView {
         String initialWebsocketApiKey = configService.getProperty(ConfigProperty.WEBSOCKET_API_KEY);
         String initialDashboardId = configService.getProperty(ConfigProperty.DASHBOARD_ID);
 
-        TextField urlField = new TextField();
-        urlField.setText(initialWebsocketUrl);
+        Label websocketUrlLabel = new Label("WebSocket URL:");
+        TextField websocketUrlField = new TextField();
+        if (initialWebsocketUrl == null) {
+            websocketUrlField.setPromptText("wss://example.com/ws"); // Example placeholder
+        } else {
+            websocketUrlField.setText(initialWebsocketUrl);
+        }
 
-        PasswordField apiKeyField = new PasswordField();
-        apiKeyField.setText(initialWebsocketApiKey);
+        Label websocketApiKeyLabel = new Label("API Key:");
+        PasswordField websocketApiKeyField = new PasswordField();
+        if (initialWebsocketApiKey == null) {
+            websocketApiKeyField.setPromptText("********************************"); // Example placeholder
+        } else {
+            websocketApiKeyField.setText(initialWebsocketApiKey);
+        }
 
-        TextField dashboardField = new TextField(initialDashboardId);
-        dashboardField.setText(initialDashboardId);
+        Label dashboardIdLabel = new Label("Dashboard ID:");
+        TextField dashboardIdField = new TextField(initialDashboardId);
+        if (initialDashboardId == null) {
+            dashboardIdField.setPromptText("l0cuoMojUk"); // Example placeholder
+        } else {
+            dashboardIdField.setText(initialDashboardId);
+        }
 
         Button startButton = new Button("Start");
-        startButton.setStyle("-fx-background-color: #4CAF50; -fx-text-fill: white; -fx-font-weight: bold;");
+        startButton.setStyle("-fx-background-color: #388E3C; -fx-text-fill: white; -fx-font-weight: bold;");
         startButton.setPrefWidth(150);
         startButton.setMaxWidth(Double.MAX_VALUE);
 
         Button stopButton = new Button("Stop");
-        stopButton.setStyle("-fx-background-color: #F44336; -fx-text-fill: white; -fx-font-weight: bold;");
+        stopButton.setStyle("-fx-background-color: #D32F2F; -fx-text-fill: white; -fx-font-weight: bold;");
         stopButton.setPrefWidth(150);
         stopButton.setMaxWidth(Double.MAX_VALUE);
 
         startButton.setOnAction(e -> {
-            String websocketUrl = urlField.getText();
+            String websocketUrl = websocketUrlField.getText();
             if (websocketUrl == null || websocketUrl.isEmpty()) {
-                log.severe("Invalid configuration: WebSocket URL cannot be empty.");
+                log.severe("Invalid configuration: WebSocket URL is missing.");
                 return;
             } else {
                 websocketUrl = websocketUrl.trim();
             }
 
-            String websocketApiKey = apiKeyField.getText();
+            String websocketApiKey = websocketApiKeyField.getText();
             if (websocketApiKey == null || websocketApiKey.isEmpty()) {
-                log.severe("Invalid configuration: WebSocket API Key cannot be empty.");
+                log.severe("Invalid configuration: WebSocket API Key is missing.");
                 return;
             } else {
                 websocketApiKey = websocketApiKey.trim();
             }
 
-            String dashboardId = dashboardField.getText();
+            String dashboardId = dashboardIdField.getText();
             if (dashboardId == null || dashboardId.isEmpty()) {
-                log.severe("Invalid configuration: Dashboard ID cannot be empty.");
+                log.severe("Invalid configuration: Dashboard ID is missing.");
                 return;
             } else {
                 dashboardId = dashboardId.trim();
@@ -85,7 +101,6 @@ public class MainView {
             try {
                 accSocketClient.connectAutomatically();
                 webSocketClient.connect(websocketUrl, websocketApiKey, dashboardId);
-
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
             }
@@ -125,18 +140,19 @@ public class MainView {
 
         grid.getColumnConstraints().addAll(col1, col2, col3);
 
-        grid.add(new Label("WebSocket URL:"), 0, 0);
-        grid.add(urlField, 1, 0);
-        grid.add(new Label("API Key:"), 0, 1);
-        grid.add(apiKeyField, 1, 1);
-        grid.add(new Label("Dashboard ID:"), 0, 2);
-        grid.add(dashboardField, 1, 2);
+        grid.add(websocketUrlLabel, 0, 0);
+        grid.add(websocketUrlField, 1, 0);
+        grid.add(websocketApiKeyLabel, 0, 1);
+        grid.add(websocketApiKeyField, 1, 1);
+        grid.add(dashboardIdLabel, 0, 2);
+        grid.add(dashboardIdField, 1, 2);
         grid.add(buttonBox, 2, 0, 1, 3);
 
         TextArea logArea = new TextArea();
         logArea.setFont(Font.font("Monospaced", 13));
         logArea.setEditable(false);
         logArea.setWrapText(false);
+        logArea.setFocusTraversable(false);
         TextAreaAppender.addTextArea(logArea);
 
         Button clearLogAreaButton = new Button("Clear logs");
@@ -161,5 +177,8 @@ public class MainView {
         stage.setScene(scene);
 
         stage.show();
+
+        // Do not focus any input field on startup
+        Platform.runLater(root::requestFocus);
     }
 }
