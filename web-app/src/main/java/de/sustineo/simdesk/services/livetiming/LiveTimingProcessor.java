@@ -1,58 +1,66 @@
-package de.sustineo.simdesk.entities.livetiming.protocol;
+package de.sustineo.simdesk.services.livetiming;
 
+import de.sustineo.simdesk.entities.livetiming.protocol.*;
 import de.sustineo.simdesk.entities.livetiming.protocol.enums.*;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
-import java.io.ByteArrayOutputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
 import java.util.*;
 
 @Log
-public class AccBroadcastingProtocol {
-    private static final byte BROADCASTING_PROTOCOL_VERSION = 0x04;
+@Service
+@RequiredArgsConstructor
+public class LiveTimingProcessor {
+    private final LiveTimingStateService liveTimingStateService;
 
-    public static void processMessage(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    public void processMessage(String sessionId, String dashboardId, byte[] payload) {
+        log.fine("Handle livetiming payload from dashboardId: " + dashboardId + ", data: " + new String(payload));
+
+        ByteArrayInputStream inputStream = new ByteArrayInputStream(payload);
+
         byte messageType = readByte(inputStream);
         switch (messageType) {
             case InboundMessageTypes.REGISTRATION_RESULT:
-                readRegistrationResult(inputStream, callback);
+                processRegistrationResult(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.REALTIME_UPDATE:
-                readRealtimeUpdate(inputStream, callback);
+                processRealtimeUpdate(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.REALTIME_CAR_UPDATE:
-                readRealtimeCarUpdate(inputStream, callback);
+                processRealtimeCarUpdate(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.ENTRY_LIST:
-                readEntryList(inputStream, callback);
+                processEntryList(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.TRACK_DATA:
-                readTrackData(inputStream, callback);
+                processTrackData(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.ENTRY_LIST_CAR:
-                readEntryListCar(inputStream, callback);
+                processEntryListCar(sessionId, dashboardId, inputStream);
                 break;
             case InboundMessageTypes.BROADCASTING_EVENT:
-                readBroadcastingEvent(inputStream, callback);
+                processBroadcastingEvent(sessionId, dashboardId, inputStream);
                 break;
-
             default:
                 log.warning("Unknown message type: " + messageType);
         }
     }
 
-    private static void readRegistrationResult(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
-        int connectionID = readInt32(inputStream);
+    private void processRegistrationResult(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
+        int connectionId = readInt32(inputStream);
         boolean connectionSuccess = readByte(inputStream) > 0;
         boolean isReadonly = readByte(inputStream) == 0;
         String errorMessage = readString(inputStream);
-        callback.onRegistrationResult(connectionID, connectionSuccess, isReadonly, errorMessage);
+
+        liveTimingStateService.handleRegistrationResult(sessionId, dashboardId, connectionId, connectionSuccess, isReadonly, errorMessage);
     }
 
-    private static void readRealtimeUpdate(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processRealtimeUpdate(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int eventIndex = readUInt16(inputStream);
         int sessionIndex = readUInt16(inputStream);
         SessionType sessionType = SessionType.fromId(readByte(inputStream));
@@ -105,10 +113,10 @@ public class AccBroadcastingProtocol {
                 .bestSessionLap(bestSessionLap)
                 .build();
 
-        callback.onRealtimeUpdate(sessionInfo);
+        liveTimingStateService.handleRealtimeUpdate(sessionId, dashboardId, sessionInfo);
     }
 
-    private static void readRealtimeCarUpdate(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processRealtimeCarUpdate(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int carId = readUInt16(inputStream);
         int driverIndex = readUInt16(inputStream);
         byte driverCount = readByte(inputStream);
@@ -128,7 +136,7 @@ public class AccBroadcastingProtocol {
         LapInfo lasLap = readLap(inputStream);
         LapInfo currentLap = readLap(inputStream);
 
-        RealtimeInfo info = RealtimeInfo.builder()
+        RealtimeInfo realtimeInfo = RealtimeInfo.builder()
                 .carId(carId)
                 .driverIndex(driverIndex)
                 .driverCount(driverCount)
@@ -149,10 +157,10 @@ public class AccBroadcastingProtocol {
                 .currentLap(currentLap)
                 .build();
 
-        callback.onRealtimeCarUpdate(info);
+        liveTimingStateService.handleRealtimeCarUpdate(sessionId, dashboardId, realtimeInfo);
     }
 
-    private static void readEntryList(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processEntryList(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int connectionId = readInt32(inputStream);
         int carEntryCount = readUInt16(inputStream);
 
@@ -161,10 +169,10 @@ public class AccBroadcastingProtocol {
             cars.add(readUInt16(inputStream));
         }
 
-        callback.onEntryListUpdate(cars);
+        liveTimingStateService.handleEntryListUpdate(sessionId, dashboardId, cars);
     }
 
-    private static void readEntryListCar(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processEntryListCar(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int carId = readUInt16(inputStream);
         byte carModelType = readByte(inputStream);
         String teamName = readString(inputStream);
@@ -205,25 +213,26 @@ public class AccBroadcastingProtocol {
                 .realtime(new RealtimeInfo())
                 .build();
 
-        callback.onEntryListCarUpdate(carInfo);
+        liveTimingStateService.handleEntrylistCarUpdate(sessionId, dashboardId, carInfo);
     }
 
-    private static void readBroadcastingEvent(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processBroadcastingEvent(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         BroadcastingEventType type = BroadcastingEventType.fromId(readByte(inputStream));
         String message = readString(inputStream);
         int timeMs = readInt32(inputStream);
         int carId = readInt32(inputStream);
 
-        BroadcastingEvent event = BroadcastingEvent.builder()
+        BroadcastingEvent broadcastingEvent = BroadcastingEvent.builder()
                 .type(type)
                 .message(message)
                 .timeMs(timeMs)
                 .carId(carId)
                 .build();
-        callback.onBroadcastingEvent(event);
+
+        liveTimingStateService.handleBroadcastingEvent(sessionId, dashboardId, broadcastingEvent);
     }
 
-    private static void readTrackData(ByteArrayInputStream inputStream, AccBroadcastingProtocolCallback callback) {
+    private void processTrackData(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int connectionID = readInt32(inputStream);
         String trackName = readString(inputStream);
         int trackId = readInt32(inputStream);
@@ -249,7 +258,7 @@ public class AccBroadcastingProtocol {
             hudPages.add(readString(inputStream));
         }
 
-        TrackInfo info = TrackInfo.builder()
+        TrackInfo trackInfo = TrackInfo.builder()
                 .trackName(trackName)
                 .trackId(trackId)
                 .trackMeters(trackMeters)
@@ -257,85 +266,10 @@ public class AccBroadcastingProtocol {
                 .hudPages(Collections.unmodifiableList(hudPages))
                 .build();
 
-        callback.onTrackData(info);
+        liveTimingStateService.handleTrackData(sessionId, dashboardId, trackInfo);
     }
 
-    public static byte[] buildRegisterRequest(String name, String password, int interval, String commandPassword) {
-        ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(OutboundMessageTypes.REGISTER_COMMAND_APPLICATION);
-        message.write(BROADCASTING_PROTOCOL_VERSION);
-        writeString(message, name);
-        writeString(message, password);
-        message.write(toByteArray(interval, 4), 0, 4);
-        writeString(message, commandPassword);
-        return message.toByteArray();
-    }
-
-    public static byte[] buildUnregisterRequest(int connectionID) {
-        ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(OutboundMessageTypes.UNREGISTER_COMMAND_APPLICATION);
-        message.write(toByteArray(connectionID, 4), 0, 4);
-        return message.toByteArray();
-    }
-
-    public static byte[] buildEntryListRequest(int connectionID) {
-        ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(OutboundMessageTypes.REQUEST_ENTRY_LIST);
-        message.write(toByteArray(connectionID, 4), 0, 4);
-        return message.toByteArray();
-    }
-
-    public static byte[] buildTrackDataRequest(int connectionID) {
-        ByteArrayOutputStream message = new ByteArrayOutputStream();
-        message.write(OutboundMessageTypes.REQUEST_TRACK_DATA);
-        message.write(toByteArray(connectionID, 4), 0, 4);
-        return message.toByteArray();
-    }
-
-    private static void writeString(ByteArrayOutputStream outputStream, String message) {
-        outputStream.write(toByteArray(message.length(), 2), 0, 2);
-        outputStream.write(message.getBytes(), 0, message.length());
-    }
-
-    private static byte[] toByteArray(int n, int length) {
-        byte[] result = new byte[length];
-        for (int i = 0; i < length; i++) {
-            result[i] = (byte) (n & 0xFF);
-            n = n >> 8;
-        }
-        return result;
-    }
-
-    private static byte readByte(ByteArrayInputStream in) {
-        return (byte) in.read();
-    }
-
-    private static int readUInt16(ByteArrayInputStream in) {
-        byte[] int32 = new byte[2];
-        in.read(int32, 0, 2);
-        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getShort();
-    }
-
-    private static int readInt32(ByteArrayInputStream in) {
-        byte[] int32 = new byte[4];
-        in.read(int32, 0, 4);
-        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getInt();
-    }
-
-    private static String readString(ByteArrayInputStream in) {
-        int length = readUInt16(in);
-        byte[] message = new byte[length];
-        in.read(message, 0, length);
-        return new String(message, StandardCharsets.UTF_8);
-    }
-
-    private static float readFloat(ByteArrayInputStream in) {
-        byte[] int32 = new byte[4];
-        in.read(int32, 0, 4);
-        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getFloat();
-    }
-
-    private static LapInfo readLap(ByteArrayInputStream inputStream) {
+    private LapInfo readLap(ByteArrayInputStream inputStream) {
         int lapTimeMS = readInt32(inputStream);
         int carId = readUInt16(inputStream);
         int driverIndex = readUInt16(inputStream);
@@ -372,15 +306,37 @@ public class AccBroadcastingProtocol {
                 .build();
     }
 
-    public interface OutboundMessageTypes {
-        byte REGISTER_COMMAND_APPLICATION = 0x01;
-        byte UNREGISTER_COMMAND_APPLICATION = 0x09;
-        byte REQUEST_ENTRY_LIST = 0x0A;
-        byte REQUEST_TRACK_DATA = 0x0B;
-        byte CHANGE_FOCUS = 0x32;
+
+    private byte readByte(ByteArrayInputStream in) {
+        return (byte) in.read();
     }
 
-    public interface InboundMessageTypes {
+    private int readUInt16(ByteArrayInputStream in) {
+        byte[] int32 = new byte[2];
+        in.read(int32, 0, 2);
+        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getShort();
+    }
+
+    private int readInt32(ByteArrayInputStream in) {
+        byte[] int32 = new byte[4];
+        in.read(int32, 0, 4);
+        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getInt();
+    }
+
+    private String readString(ByteArrayInputStream in) {
+        int length = readUInt16(in);
+        byte[] message = new byte[length];
+        in.read(message, 0, length);
+        return new String(message, StandardCharsets.UTF_8);
+    }
+
+    private float readFloat(ByteArrayInputStream in) {
+        byte[] int32 = new byte[4];
+        in.read(int32, 0, 4);
+        return ByteBuffer.wrap(int32).order(ByteOrder.LITTLE_ENDIAN).getFloat();
+    }
+
+    private interface InboundMessageTypes {
         byte REGISTRATION_RESULT = 0x01;
         byte REALTIME_UPDATE = 0x02;
         byte REALTIME_CAR_UPDATE = 0x03;
@@ -389,5 +345,4 @@ public class AccBroadcastingProtocol {
         byte ENTRY_LIST_CAR = 0x06;
         byte BROADCASTING_EVENT = 0x07;
     }
-
 }
