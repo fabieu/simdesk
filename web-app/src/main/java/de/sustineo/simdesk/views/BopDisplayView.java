@@ -18,11 +18,11 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -180,7 +180,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             grid.setSelectionMode(Grid.SelectionMode.NONE);
             grid.setPartNameGenerator(new BopCarGroupPartNameGenerator());
 
-            grid.addColumn(bop -> Car.getNameById(bop.getCarId()))
+            grid.addColumn(bop -> AccCar.getModelById(bop.getCarId()))
                     .setHeader("Car")
                     .setSortable(true);
             grid.addColumn(BopRenderer.createRestrictorRenderer())

@@ -8,11 +8,11 @@ import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
 import de.sustineo.simdesk.entities.comparator.LeaderboardLineLapTimeComparator;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
@@ -98,12 +98,12 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(LeaderboardLine::getRaceNumber);
-        grid.addColumn(leaderboardLine -> Car.getGroupById(leaderboardLine.getCarModelId()))
+        grid.addColumn(leaderboardLine -> AccCar.getGroupById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(leaderboardLine -> Car.getNameById(leaderboardLine.getCarModelId()))
+        grid.addColumn(leaderboardLine -> AccCar.getModelById(leaderboardLine.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

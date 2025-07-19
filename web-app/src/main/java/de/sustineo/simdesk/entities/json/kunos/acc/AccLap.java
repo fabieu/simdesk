@@ -7,7 +7,8 @@ import java.util.List;
 
 @Data
 public class AccLap {
-    private Integer carId;
+    @JsonProperty("carId")
+    private Integer teamId;
     private Integer driverIndex;
     @JsonProperty("laptime")
     private Long lapTimeMillis;

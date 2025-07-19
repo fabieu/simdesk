@@ -22,10 +22,10 @@ import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
@@ -177,7 +177,7 @@ public class BopManagementView extends BaseView {
         carGroupFilterComboBox.addValueChangeListener(e -> {
             CarGroup carGroup = e.getValue();
             if (carGroup != null) {
-                gridFilters.put(GRID_FILTER_CAR_GROUP, bop -> carGroup.equals(Car.getGroupById(bop.getCarId())));
+                gridFilters.put(GRID_FILTER_CAR_GROUP, bop -> carGroup.equals(AccCar.getGroupById(bop.getCarId())));
             } else {
                 gridFilters.remove(GRID_FILTER_CAR_GROUP);
             }
@@ -239,7 +239,7 @@ public class BopManagementView extends BaseView {
         Grid.Column<Bop> trackNameColumn = grid.addColumn(bop -> Track.getTrackNameByAccId(bop.getTrackId()))
                 .setHeader("Track")
                 .setSortable(true);
-        Grid.Column<Bop> carNameColumn = grid.addColumn(bop -> Car.getNameById(bop.getCarId()))
+        Grid.Column<Bop> carModelColumn = grid.addColumn(bop -> AccCar.getModelById(bop.getCarId()))
                 .setHeader("Car")
                 .setSortable(true);
         Grid.Column<Bop> restrictorColumn = grid.addColumn(BopRenderer.createRestrictorRenderer())
@@ -323,7 +323,7 @@ public class BopManagementView extends BaseView {
         BopManagementFilter filter = new BopManagementFilter(gridDataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(filter::setTrackName));
-        headerRow.getCell(carNameColumn).setComponent(GridFilter.createHeader(filter::setCarName));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(filter::setCarModel));
         headerRow.getCell(activeColumn).setComponent(GridFilter.createHeader(filter::setActive));
         headerRow.getCell(usernameColumn).setComponent(GridFilter.createHeader(filter::setUsername));
 

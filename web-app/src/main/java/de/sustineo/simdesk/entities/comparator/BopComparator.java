@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.entities.comparator;
 
 import de.sustineo.simdesk.entities.Bop;
-import de.sustineo.simdesk.entities.Car;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
 import java.util.ArrayList;
 import java.util.Comparator;
@@ -12,8 +12,8 @@ public class BopComparator implements Comparator<Bop> {
 
     public BopComparator() {
         comparatorList.add(Comparator.comparing(Bop::getTrackId));
-        comparatorList.add(Comparator.comparing(bop -> Car.getGroupById(bop.getCarId())));
-        comparatorList.add(Comparator.comparing(bop -> Car.getNameById(bop.getCarId())));
+        comparatorList.add(Comparator.comparing(bop -> AccCar.getGroupById(bop.getCarId())));
+        comparatorList.add(Comparator.comparing(bop -> AccCar.getModelById(bop.getCarId())));
     }
 
     @Override

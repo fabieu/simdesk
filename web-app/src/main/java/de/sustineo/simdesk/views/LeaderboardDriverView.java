@@ -14,7 +14,8 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.*;
-import de.sustineo.simdesk.entities.record.LapsByCar;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
+import de.sustineo.simdesk.entities.record.LapsByAccCar;
 import de.sustineo.simdesk.entities.record.LapsByTrack;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -177,8 +178,8 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
                 .filter(lap -> lap.getCarModelId() != null)
                 .collect(Collectors.groupingBy(Lap::getCarModelId));
 
-        List<LapsByCar> lapsByCar = lapsByCarId.entrySet().stream()
-                .map(entry -> LapsByCar.of(Car.getCarById(entry.getKey()), entry.getValue()))
+        List<LapsByAccCar> lapsByAccCar = lapsByCarId.entrySet().stream()
+                .map(entry -> LapsByAccCar.of(AccCar.getCarById(entry.getKey()), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
                 .toList();
 
@@ -187,8 +188,8 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
 
         H3 header = new H3("Favorite cars");
 
-        Grid<LapsByCar> grid = new Grid<>(LapsByCar.class, false);
-        grid.addColumn(item -> item.car().getName())
+        Grid<LapsByAccCar> grid = new Grid<>(LapsByAccCar.class, false);
+        grid.addColumn(item -> item.car().getModel())
                 .setHeader("Car Name")
                 .setSortable(true);
         grid.addColumn(item -> item.car().getGroup())
@@ -207,7 +208,7 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
                 .setFlexGrow(0)
                 .setSortable(true);
 
-        grid.setItems(lapsByCar);
+        grid.setItems(lapsByAccCar);
         grid.setAllRowsVisible(true);
         grid.setMultiSort(true, true);
         grid.setSelectionMode(Grid.SelectionMode.NONE);

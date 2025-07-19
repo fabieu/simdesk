@@ -1,10 +1,10 @@
 package de.sustineo.simdesk.eventbus;
 
-import java.util.LinkedList;
+import java.util.ArrayList;
 import java.util.List;
 
 public class EventBus {
-    private static final List<EventListener> listeners = new LinkedList<>();
+    private static final List<EventListener> listeners = new ArrayList<>();
     private static final Object syncObject = new Object();
 
     public static void register(EventListener listener) {

@@ -6,8 +6,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
 import com.vaadin.flow.dom.Style;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccDriverCategory;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccNationality;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccDriverCategory;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccNationality;
 
 public class EntrylistRenderer {
     public static Renderer<AccDriverCategory> createAccDriverCategoryRenderer() {

@@ -2,7 +2,7 @@ package de.sustineo.simdesk.entities;
 
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
-import de.sustineo.simdesk.services.converter.csv.CarModelConverter;
+import de.sustineo.simdesk.services.converter.csv.AccCarConverter;
 import de.sustineo.simdesk.services.converter.csv.LapTimeConverter;
 import lombok.*;
 
@@ -16,7 +16,7 @@ public class Lap {
     @CsvBindByName(column = "Driver")
     private Driver driver;
     private CarGroup carGroup;
-    @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
+    @CsvCustomBindByName(column = "Car Model", converter = AccCarConverter.class)
     private Integer carModelId;
     @CsvCustomBindByName(column = "Lap time", converter = LapTimeConverter.class)
     private Long lapTimeMillis;

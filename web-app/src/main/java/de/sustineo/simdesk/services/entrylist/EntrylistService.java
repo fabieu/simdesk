@@ -37,7 +37,7 @@ public class EntrylistService {
             }
 
             // Skip entries without matching entrylist entry
-            AccEntrylistEntry entrylistEntry = raceNumberToEntryMap.get(leaderboardLine.getCar().getRaceNumber());
+            AccEntrylistEntry entrylistEntry = raceNumberToEntryMap.get(leaderboardLine.getTeam().getRaceNumber());
             if (entrylistEntry == null) {
                 continue;
             }

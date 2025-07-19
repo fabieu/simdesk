@@ -11,8 +11,8 @@ import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -118,7 +118,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         Grid.Column<GroupRanking> driverNameColumn = grid.addColumn(GroupRankingRenderer.createDriverRenderer())
                 .setHeader("Driver")
                 .setSortable(true);
-        Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(groupRanking -> Car.getNameById(groupRanking.getCarModelId()))
+        Grid.Column<GroupRanking> carModelNameColumn = grid.addColumn(groupRanking -> AccCar.getModelById(groupRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setSortable(true);
 

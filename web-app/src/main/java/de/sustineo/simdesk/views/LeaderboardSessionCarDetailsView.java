@@ -20,11 +20,11 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -134,12 +134,12 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
                 .setSortable(true)
                 .setTextAlign(ColumnTextAlign.CENTER)
                 .setFrozen(true);
-        grid.addColumn(lap -> Car.getGroupById(lap.getCarModelId()))
+        grid.addColumn(lap -> AccCar.getGroupById(lap.getCarModelId()))
                 .setHeader("Car Group")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(lap -> Car.getNameById(lap.getCarModelId()))
+        grid.addColumn(lap -> AccCar.getModelById(lap.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
