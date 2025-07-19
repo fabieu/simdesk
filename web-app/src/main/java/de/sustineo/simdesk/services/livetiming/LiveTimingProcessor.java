@@ -1,9 +1,11 @@
 package de.sustineo.simdesk.services.livetiming;
 
+import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.*;
 import de.sustineo.simdesk.entities.livetiming.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayInputStream;
@@ -13,6 +15,7 @@ import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
 
+@Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Log
 @Service
 @RequiredArgsConstructor

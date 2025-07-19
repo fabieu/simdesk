@@ -1,7 +1,9 @@
 package de.sustineo.simdesk.services.livetiming;
 
+import de.sustineo.simdesk.configuration.ProfileManager;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.context.annotation.Profile;
 import org.springframework.messaging.MessageHeaders;
 import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
@@ -10,6 +12,7 @@ import org.springframework.stereotype.Service;
 
 import java.io.ByteArrayOutputStream;
 
+@Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Log
 @Service
 @RequiredArgsConstructor

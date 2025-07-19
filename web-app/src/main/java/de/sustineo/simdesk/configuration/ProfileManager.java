@@ -11,6 +11,7 @@ public class ProfileManager {
     public static final String PROFILE_ENTRYLIST = "acc-entrylist";
     public static final String PROFILE_BOP = "acc-bop";
     public static final String PROFILE_MAP = "map";
+    public static final String PROFILE_LIVE_TIMING = "acc-live-timing";
     public static final String PROFILE_DISCORD = "discord";
     public static final String PROFILE_DEBUG = "debug";
     private static Environment environment;
@@ -37,6 +38,10 @@ public class ProfileManager {
 
     public static boolean isMapProfileEnabled() {
         return isActive(PROFILE_MAP);
+    }
+
+    public static boolean isLiveTimingProfileEnabled() {
+        return isActive(PROFILE_LIVE_TIMING);
     }
 
     public static boolean isDiscordProfileEnabled() {
