@@ -38,6 +38,6 @@ public class DriverConverter extends BaseConverter {
     }
 
     private Integer getDriverIndex(AccDriver accDriver, AccLeaderboardLine accLeaderboardLine) {
-        return accLeaderboardLine.getCar().getDrivers().indexOf(accDriver);
+        return accLeaderboardLine.getTeam().getDrivers().indexOf(accDriver);
     }
 }

@@ -1,12 +1,14 @@
 package de.sustineo.simdesk.entities.json.kunos.acc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
 import lombok.Data;
 
 import java.util.List;
 
 @Data
 public class AccLeaderboardLine {
-    private AccCar car;
+    @JsonProperty("car")
+    private AccTeam team;
     private AccDriver currentDriver;
     private Integer currentDriverIndex;
     private AccTiming timing;

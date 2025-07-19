@@ -39,11 +39,11 @@ public class AccSession {
         }
     }
 
-    public Optional<AccCar> getCarById(Integer carId) {
+    public Optional<AccTeam> getTeamById(Integer teamId) {
         return sessionResult.getLeaderboardLines().stream()
-                .filter(accLeaderboardLine -> accLeaderboardLine.getCar().getCarId().equals(carId))
+                .filter(accLeaderboardLine -> accLeaderboardLine.getTeam().getTeamId().equals(teamId))
                 .findFirst()
-                .map(AccLeaderboardLine::getCar);
+                .map(AccLeaderboardLine::getTeam);
 
     }
 }

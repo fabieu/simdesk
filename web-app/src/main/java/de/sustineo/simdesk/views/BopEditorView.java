@@ -22,11 +22,11 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.utils.json.JsonClient;
@@ -62,7 +62,7 @@ public class BopEditorView extends BaseView {
     private final FormLayout settingsLayout = new FormLayout();
     private final FormLayout carsLayout = new FormLayout();
     private final ComboBox<Track> trackComboBox = new ComboBox<>("Track");
-    private final MultiSelectComboBox<Car> carsComboBox = new MultiSelectComboBox<>("Cars");
+    private final MultiSelectComboBox<AccCar> carsComboBox = new MultiSelectComboBox<>("Cars");
     private final TextArea previewTextArea = new TextArea("Preview");
     private final LinkedHashMap<Integer, Component> currentCarComponents = new LinkedHashMap<>();
     private AccBop currentBop = new AccBop();
@@ -127,7 +127,7 @@ public class BopEditorView extends BaseView {
                 }
 
                 Track track = currentBop.getTrack();
-                List<Car> cars = currentBop.getCars();
+                List<AccCar> cars = currentBop.getCars();
 
                 trackComboBox.setValue(track);
                 carsComboBox.setValue(cars);
@@ -194,9 +194,9 @@ public class BopEditorView extends BaseView {
             }
         });
 
-        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getName().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
-        carsComboBox.setItems(carFilter, Car.getAllSortedByName());
-        carsComboBox.setItemLabelGenerator(Car::getName);
+        ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
+        carsComboBox.setItems(carFilter, AccCar.getAllSortedByModel());
+        carsComboBox.setItemLabelGenerator(AccCar::getModel);
         carsComboBox.setClassNameGenerator(car -> car.getGroup().name());
         carsComboBox.setPlaceholder("Select cars...");
         carsComboBox.setHelperText(String.format("Available filters: Car Name, Car Group (%s)", String.join(", ", CarGroup.getValidNames())));
@@ -210,8 +210,13 @@ public class BopEditorView extends BaseView {
 
                 // Add entries and bop edit fields for newly selected cars
                 event.getValue().forEach(car -> {
-                    if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getModelId()))) {
-                        AccBopEntry entry = new AccBopEntry(trackComboBox.getValue().getAccId(), car.getModelId(), 0, 0);
+                    if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getId()))) {
+                        AccBopEntry entry = AccBopEntry.builder()
+                                .trackId(trackComboBox.getValue().getAccId())
+                                .carId(car.getId())
+                                .ballastKg(0)
+                                .restrictor(0)
+                                .build();
                         currentBop.getEntries().add(entry);
                         currentCarComponents.put(entry.getCarId(), createBopEditField(entry));
                     }
@@ -220,7 +225,7 @@ public class BopEditorView extends BaseView {
                 // Remove entries and bop edit fields for cars that are not selected anymore
                 Set<AccBopEntry> entriesToRemove = new HashSet<>();
                 currentBop.getEntries().forEach(entry -> {
-                    if (!event.getValue().contains(new Car(entry.getCarId(), entry.getCarName()))) {
+                    if (!event.getValue().contains(AccCar.getCarById(entry.getCarId()))) {
                         entriesToRemove.add(entry);
                         currentCarComponents.remove(entry.getCarId());
                     }

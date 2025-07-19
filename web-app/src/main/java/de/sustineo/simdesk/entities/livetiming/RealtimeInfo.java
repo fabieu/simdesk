@@ -1,7 +1,7 @@
 
-package de.sustineo.simdesk.entities.livetiming.protocol;
+package de.sustineo.simdesk.entities.livetiming;
 
-import de.sustineo.simdesk.entities.livetiming.protocol.enums.CarLocation;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCarLocation;
 import lombok.*;
 
 @Data
@@ -19,7 +19,7 @@ public class RealtimeInfo {
     private float pitch;
     private float roll;
     @Builder.Default
-    private CarLocation location = CarLocation.NONE;
+    private AccCarLocation location = AccCarLocation.NONE;
     private int kmh;
     private int position;
     private int cupPosition;

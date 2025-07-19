@@ -1,16 +1,16 @@
 package de.sustineo.simdesk.services.converter.csv;
 
 import com.opencsv.bean.AbstractBeanField;
-import de.sustineo.simdesk.entities.Car;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
-public class CarModelConverter<T, I> extends AbstractBeanField<T, I> {
+public class AccCarConverter<T, I> extends AbstractBeanField<T, I> {
     @Override
     protected Object convert(String value) {
-        return Car.getModelIdByName(value);
+        return AccCar.getIdByName(value);
     }
 
     @Override
     public String convertToWrite(Object value) {
-        return Car.getNameById((Integer) value);
+        return AccCar.getModelById((Integer) value);
     }
 }

@@ -1,5 +1,5 @@
 
-package de.sustineo.simdesk.entities.livetiming.protocol.enums;
+package de.sustineo.simdesk.entities.json.kunos.acc.enums;
 
 
 import lombok.Getter;
@@ -7,7 +7,7 @@ import lombok.RequiredArgsConstructor;
 
 @Getter
 @RequiredArgsConstructor
-public enum BroadcastingEventType {
+public enum AccBroadcastingEventType {
     NONE(0),
     GREEN_FLAG(1),
     SESSION_OVER(2),
@@ -19,7 +19,7 @@ public enum BroadcastingEventType {
 
     private final int id;
 
-    public static BroadcastingEventType fromId(int id) {
+    public static AccBroadcastingEventType fromId(int id) {
         return switch (id) {
             case 1 -> GREEN_FLAG;
             case 2 -> SESSION_OVER;

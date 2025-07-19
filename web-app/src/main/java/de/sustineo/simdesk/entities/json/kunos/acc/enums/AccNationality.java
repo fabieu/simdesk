@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.json.kunos.acc;
+package de.sustineo.simdesk.entities.json.kunos.acc.enums;
 
 import com.fasterxml.jackson.annotation.JsonValue;
 import lombok.Getter;
@@ -89,7 +89,7 @@ public enum AccNationality {
     VENEZUELA(76, "Venezuela", "VE"),
     WALES(77, "Wales", "GB-WLS"),
     ZIMBABWE(80, "Zimbabwe", "ZW"),
-    _OTHER(0, "Other", "XX");
+    UNKNOWN(0, "Unknown", "XX");
 
     @JsonValue
     private final int id;
@@ -100,5 +100,15 @@ public enum AccNationality {
         this.id = id;
         this.shortName = shortName;
         this.alpha2Code = alpha2Code;
+    }
+
+    public static AccNationality getById(int id) {
+        for (AccNationality nationality : AccNationality.values()) {
+            if (nationality.id == id) {
+                return nationality;
+            }
+        }
+
+        return AccNationality.UNKNOWN;
     }
 }

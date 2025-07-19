@@ -45,10 +45,21 @@ import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.*;
+import de.sustineo.simdesk.entities.CustomCar;
+import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.SortingDirection;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
-import de.sustineo.simdesk.entities.json.kunos.acc.*;
+import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
+import de.sustineo.simdesk.entities.entrylist.EntrylistSortingMode;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylist;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylistEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccDriverCategory;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccNationality;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
@@ -586,16 +597,16 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistPreview();
         });
 
-        ComboBox<Car> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        ComboBox.ItemFilter<Car> carFilter = (car, filterString) -> car.getName().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
-        forcedCarModelComboBox.setItems(carFilter, Car.getAllSortedByName());
-        forcedCarModelComboBox.setItemLabelGenerator(Car::getName);
+        ComboBox<AccCar> forcedCarModelComboBox = new ComboBox<>("Car Model");
+        ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
+        forcedCarModelComboBox.setItems(carFilter, AccCar.getAllSortedByModel());
+        forcedCarModelComboBox.setItemLabelGenerator(AccCar::getModel);
         forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
-        forcedCarModelComboBox.setValue(Car.getCarById(entry.getForcedCarModel()));
+        forcedCarModelComboBox.setValue(AccCar.getCarById(entry.getForcedCarModel()));
         forcedCarModelComboBox.addValueChangeListener(event -> {
             Integer carId = Optional.of(event)
                     .map(ComboBox.ValueChangeEvent::getValue)
-                    .map(Car::getModelId)
+                    .map(AccCar::getId)
                     .orElse(AccEntrylistEntry.DEFAULT_FORCED_CAR_MODEL);
 
             entry.setForcedCarModel(carId);

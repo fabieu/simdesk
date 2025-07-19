@@ -1,8 +1,8 @@
 
-package de.sustineo.simdesk.entities.livetiming.protocol;
+package de.sustineo.simdesk.entities.livetiming;
 
-import de.sustineo.simdesk.entities.livetiming.protocol.enums.SessionPhase;
-import de.sustineo.simdesk.entities.livetiming.protocol.enums.SessionType;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccSessionPhase;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccSessionType;
 import lombok.*;
 
 
@@ -14,18 +14,15 @@ public class SessionInfo {
     private int eventIndex;
     private int sessionIndex;
     @Builder.Default
-    private SessionType sessionType = SessionType.NONE;
+    private AccSessionType sessionType = AccSessionType.NONE;
     @Builder.Default
-    private SessionPhase phase = SessionPhase.NONE;
+    private AccSessionPhase phase = AccSessionPhase.NONE;
     private int sessionTime;
     private int sessionEndTime;
     private int focusedCarIndex;
-    @Builder.Default
-    private String activeCameraSet = "";
-    @Builder.Default
-    private String activeCamera = "";
-    @Builder.Default
-    private String currentHudPage = "";
+    private String activeCameraSet;
+    private String activeCamera;
+    private String currentHudPage;
     private boolean replayPlaying;
     private int replaySessionTime;
     private int replayRemainingTime;

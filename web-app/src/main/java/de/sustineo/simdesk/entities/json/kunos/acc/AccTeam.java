@@ -1,17 +1,21 @@
 package de.sustineo.simdesk.entities.json.kunos.acc;
 
+import com.fasterxml.jackson.annotation.JsonProperty;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCupCategory;
 import lombok.Data;
 
 import java.util.List;
 import java.util.Optional;
 
 @Data
-public class AccCar {
-    private Integer carId;
+public class AccTeam {
+    @JsonProperty("carId")
+    private Integer teamId;
     private Integer raceNumber;
-    private Integer carModel;
+    @JsonProperty("carModel")
+    private Integer carModelId;
     private AccCupCategory cupCategory;
-    private String carGroup; // unused
+    private String carGroup; // unused, calculated from carId
     private String teamName;
     private Integer nationality;
     private Integer carGuid;

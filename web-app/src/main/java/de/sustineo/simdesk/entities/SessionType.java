@@ -1,5 +1,10 @@
 package de.sustineo.simdesk.entities;
 
+import lombok.Getter;
+import lombok.RequiredArgsConstructor;
+
+@Getter
+@RequiredArgsConstructor
 public enum SessionType {
     FP("Free Practice"),
     Q("Qualifying"),
@@ -7,12 +12,4 @@ public enum SessionType {
     UNKNOWN("Unknown");
 
     private final String description;
-
-    SessionType(String description) {
-        this.description = description;
-    }
-
-    public String getDescription() {
-        return description;
-    }
 }

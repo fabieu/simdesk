@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.livetiming;
 
-import de.sustineo.simdesk.entities.livetiming.protocol.*;
-import de.sustineo.simdesk.entities.livetiming.protocol.enums.*;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.*;
+import de.sustineo.simdesk.entities.livetiming.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
@@ -10,6 +10,7 @@ import java.io.ByteArrayInputStream;
 import java.nio.ByteBuffer;
 import java.nio.ByteOrder;
 import java.nio.charset.StandardCharsets;
+import java.time.Duration;
 import java.util.*;
 
 @Log
@@ -19,8 +20,6 @@ public class LiveTimingProcessor {
     private final LiveTimingStateService liveTimingStateService;
 
     public void processMessage(String sessionId, String dashboardId, byte[] payload) {
-        log.fine("Handle livetiming payload from dashboardId: " + dashboardId + ", data: " + new String(payload));
-
         ByteArrayInputStream inputStream = new ByteArrayInputStream(payload);
 
         byte messageType = readByte(inputStream);
@@ -63,8 +62,8 @@ public class LiveTimingProcessor {
     private void processRealtimeUpdate(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int eventIndex = readUInt16(inputStream);
         int sessionIndex = readUInt16(inputStream);
-        SessionType sessionType = SessionType.fromId(readByte(inputStream));
-        SessionPhase phase = SessionPhase.fromId(readByte(inputStream));
+        AccSessionType sessionType = AccSessionType.fromId(readByte(inputStream));
+        AccSessionPhase phase = AccSessionPhase.getById(readByte(inputStream));
         float sessionTime = readFloat(inputStream);
         float sessionEndTime = readFloat(inputStream);
 
@@ -124,7 +123,7 @@ public class LiveTimingProcessor {
         float yaw = readFloat(inputStream);  // falsely documented as posX
         float pitch = readFloat(inputStream);// falsely documented as posY
         float roll = readFloat(inputStream);  // falsely documented as yaw
-        CarLocation location = CarLocation.fromId(readByte(inputStream));
+        AccCarLocation location = AccCarLocation.getById(readByte(inputStream));
         int kmh = readUInt16(inputStream);
         int position = readUInt16(inputStream);
         int cupPosition = readUInt16(inputStream);
@@ -164,7 +163,7 @@ public class LiveTimingProcessor {
         int connectionId = readInt32(inputStream);
         int carEntryCount = readUInt16(inputStream);
 
-        List<Integer> cars = new LinkedList<>();
+        List<Integer> cars = new ArrayList<>(carEntryCount);
         for (int i = 0; i < carEntryCount; i++) {
             cars.add(readUInt16(inputStream));
         }
@@ -174,21 +173,21 @@ public class LiveTimingProcessor {
 
     private void processEntryListCar(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int carId = readUInt16(inputStream);
-        byte carModelType = readByte(inputStream);
+        byte carModelId = readByte(inputStream);
         String teamName = readString(inputStream);
         int carNumber = readInt32(inputStream);
         byte cupCategory = readByte(inputStream);
         byte currentDriverIndex = readByte(inputStream);
         int carNationality = readUInt16(inputStream);
 
-        int _driverCount = readByte(inputStream);
-        List<DriverInfo> drivers = new LinkedList<>();
-        for (int i = 0; i < _driverCount; i++) {
+        int driverCount = readByte(inputStream);
+        List<DriverInfo> drivers = new ArrayList<>(driverCount);
+        for (int i = 0; i < driverCount; i++) {
             String firstName = readString(inputStream);
             String lastName = readString(inputStream);
             String shortName = readString(inputStream);
-            DriverCategory category = DriverCategory.fromId(readByte(inputStream));
-            Nationality driverNationality = Nationality.fromId(readUInt16(inputStream));
+            AccDriverCategory category = AccDriverCategory.getById(readByte(inputStream));
+            AccNationality driverNationality = AccNationality.getById(readUInt16(inputStream));
 
             DriverInfo driverInfo = DriverInfo.builder()
                     .firstName(firstName)
@@ -202,34 +201,33 @@ public class LiveTimingProcessor {
         }
 
         CarInfo carInfo = CarInfo.builder()
-                .carId(carId)
-                .carModel(CarModel.fromType(carModelType))
+                .id(carId)
+                .car(AccCar.getCarById(carModelId))
                 .teamName(teamName)
                 .carNumber(carNumber)
-                .cupCategory(cupCategory)
+                .cupCategory(AccCupCategory.getById(cupCategory))
                 .currentDriverIndex(currentDriverIndex)
                 .carNationality(carNationality)
                 .drivers(drivers)
-                .realtime(new RealtimeInfo())
                 .build();
 
         liveTimingStateService.handleEntrylistCarUpdate(sessionId, dashboardId, carInfo);
     }
 
     private void processBroadcastingEvent(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
-        BroadcastingEventType type = BroadcastingEventType.fromId(readByte(inputStream));
+        AccBroadcastingEventType type = AccBroadcastingEventType.fromId(readByte(inputStream));
         String message = readString(inputStream);
         int timeMs = readInt32(inputStream);
         int carId = readInt32(inputStream);
 
-        BroadcastingEvent broadcastingEvent = BroadcastingEvent.builder()
+        BroadcastingInfo broadcastingInfo = BroadcastingInfo.builder()
                 .type(type)
                 .message(message)
                 .timeMs(timeMs)
                 .carId(carId)
                 .build();
 
-        liveTimingStateService.handleBroadcastingEvent(sessionId, dashboardId, broadcastingEvent);
+        liveTimingStateService.handleBroadcastingEvent(sessionId, dashboardId, broadcastingInfo);
     }
 
     private void processTrackData(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
@@ -240,20 +238,20 @@ public class LiveTimingProcessor {
 
         Map<String, List<String>> cameraSets = new HashMap<>();
         byte cameraSetCount = readByte(inputStream);
-        for (int camSet = 0; camSet < cameraSetCount; camSet++) {
-            String camSetName = readString(inputStream);
-            cameraSets.put(camSetName, new LinkedList<>());
+        for (int i = 0; i < cameraSetCount; i++) {
+            String cameraSetName = readString(inputStream);
 
             byte cameraCount = readByte(inputStream);
-            for (int cam = 0; cam < cameraCount; cam++) {
-
-                String camName = readString(inputStream);
-                cameraSets.get(camSetName).add(camName);
+            List<String> cameraNames = new ArrayList<>(cameraCount);
+            for (int j = 0; j < cameraCount; j++) {
+                cameraNames.add(readString(inputStream));
             }
+
+            cameraSets.put(cameraSetName, cameraNames);
         }
 
-        List<String> hudPages = new LinkedList<>();
         byte hudPagesCount = readByte(inputStream);
+        List<String> hudPages = new ArrayList<>(hudPagesCount);
         for (int i = 0; i < hudPagesCount; i++) {
             hudPages.add(readString(inputStream));
         }
@@ -270,12 +268,12 @@ public class LiveTimingProcessor {
     }
 
     private LapInfo readLap(ByteArrayInputStream inputStream) {
-        int lapTimeMS = readInt32(inputStream);
+        int lapTimeMillis = readInt32(inputStream);
         int carId = readUInt16(inputStream);
         int driverIndex = readUInt16(inputStream);
 
         int splitCount = readByte(inputStream);
-        List<Integer> splits = new LinkedList<>();
+        List<Integer> splits = new ArrayList<>(3);
         for (int i = 0; i < splitCount; i++) {
             splits.add(readInt32(inputStream));
         }
@@ -288,19 +286,19 @@ public class LiveTimingProcessor {
 
         boolean isOutLap = readByte(inputStream) > 0;
         boolean isInLap = readByte(inputStream) > 0;
-        LapType type = LapType.REGULAR;
+        AccLapType type = AccLapType.REGULAR;
         if (isOutLap) {
-            type = LapType.OUTLAP;
+            type = AccLapType.OUTLAP;
         } else if (isInLap) {
-            type = LapType.INLAP;
+            type = AccLapType.INLAP;
         }
 
         return LapInfo.builder()
-                .lapTimeMS(lapTimeMS)
+                .lapTime(Duration.ofMillis(lapTimeMillis))
                 .carId(carId)
                 .driverIndex(driverIndex)
                 .splits(splits)
-                .isInvalid(isInvalid)
+                .isValid(!isInvalid)
                 .isValidForBest(isValidForBest)
                 .type(type)
                 .build();

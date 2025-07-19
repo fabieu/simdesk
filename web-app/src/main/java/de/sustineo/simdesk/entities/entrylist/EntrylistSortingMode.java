@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities;
+package de.sustineo.simdesk.entities.entrylist;
 
 import lombok.Getter;
 

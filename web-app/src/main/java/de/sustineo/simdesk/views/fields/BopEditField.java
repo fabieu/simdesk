@@ -7,8 +7,8 @@ import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.data.converter.StringToIntegerConverter;
 import com.vaadin.flow.dom.Style;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import lombok.Getter;
 import org.apache.commons.lang3.math.NumberUtils;
 
@@ -20,8 +20,8 @@ public class BopEditField extends CustomField<AccBopEntry> {
 
     public BopEditField(AccBopEntry entry) {
         Integer carId = entry.getCarId();
-        String carName = Car.getNameById(carId);
-        setLabel(String.format("%s (ID: %s)", carName, carId));
+        String carModel = AccCar.getModelById(carId);
+        setLabel(String.format("%s (ID: %s)", carModel, carId));
 
         ballastField.setSuffixComponent(new Span("kg"));
         binder.forField(ballastField)

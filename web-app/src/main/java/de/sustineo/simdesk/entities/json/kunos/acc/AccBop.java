@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.entities.json.kunos.acc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
 import lombok.Data;
@@ -33,9 +33,9 @@ public class AccBop {
     }
 
     @JsonIgnore
-    public List<Car> getCars() {
+    public List<AccCar> getCars() {
         return entries.stream()
-                .map(entry -> new Car(entry.getCarId(), entry.getCarName()))
+                .map(entry -> AccCar.getCarById(entry.getCarId()))
                 .collect(Collectors.toList());
     }
 

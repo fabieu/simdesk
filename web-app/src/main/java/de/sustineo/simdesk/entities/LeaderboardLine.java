@@ -3,8 +3,8 @@ package de.sustineo.simdesk.entities;
 import com.opencsv.bean.CsvBindAndSplitByName;
 import com.opencsv.bean.CsvBindByName;
 import com.opencsv.bean.CsvCustomBindByName;
-import de.sustineo.simdesk.entities.json.kunos.acc.AccCupCategory;
-import de.sustineo.simdesk.services.converter.csv.CarModelConverter;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCupCategory;
+import de.sustineo.simdesk.services.converter.csv.AccCarConverter;
 import de.sustineo.simdesk.services.converter.csv.LapTimeConverter;
 import de.sustineo.simdesk.services.converter.csv.TotalTimeConverter;
 import lombok.*;
@@ -23,7 +23,7 @@ public class LeaderboardLine {
     private AccCupCategory cupCategory;
     @CsvBindByName(column = "Car Group")
     private Integer carId;
-    @CsvCustomBindByName(column = "Car Model", converter = CarModelConverter.class)
+    @CsvCustomBindByName(column = "Car Model", converter = AccCarConverter.class)
     private Integer carModelId;
     private Integer ballastKg;
     @CsvBindByName(column = "Car Number")

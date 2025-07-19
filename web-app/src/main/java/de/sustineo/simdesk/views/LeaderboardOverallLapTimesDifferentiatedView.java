@@ -11,9 +11,9 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.utils.FormatUtils;
@@ -144,7 +144,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(DriverRanking::getSector3Millis);
-        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> Car.getNameById(driverRanking.getCarModelId()))
+        Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> AccCar.getModelById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setAutoWidth(true)
                 .setFlexGrow(0)

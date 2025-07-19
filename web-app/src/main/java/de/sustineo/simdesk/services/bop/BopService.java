@@ -2,9 +2,9 @@ package de.sustineo.simdesk.services.bop;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
-import de.sustineo.simdesk.entities.Car;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.mapper.BopMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;
@@ -33,7 +33,7 @@ public class BopService {
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeBopTable() {
         Set<Pair<String, Integer>> availableTrackCarPairs = Track.getAllSortedByNameForAcc().stream()
-                .flatMap(track -> Car.getAllSortedByName().stream().map(car -> Pair.of(track.getAccId(), car.getModelId())))
+                .flatMap(track -> AccCar.getAllSortedByModel().stream().map(car -> Pair.of(track.getAccId(), car.getId())))
                 .collect(Collectors.toSet());
 
         Set<Pair<String, Integer>> currentTrackCarPairs = bopMapper.findAll().stream()
