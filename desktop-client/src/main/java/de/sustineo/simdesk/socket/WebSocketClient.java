@@ -13,13 +13,16 @@ import org.springframework.messaging.simp.stomp.StompHeaders;
 import org.springframework.messaging.simp.stomp.StompSession;
 import org.springframework.messaging.simp.stomp.StompSessionHandlerAdapter;
 import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+import org.springframework.security.web.csrf.DefaultCsrfToken;
 import org.springframework.stereotype.Component;
 import org.springframework.util.MimeTypeUtils;
+import org.springframework.web.client.RestTemplate;
 import org.springframework.web.socket.WebSocketHttpHeaders;
 import org.springframework.web.socket.client.standard.StandardWebSocketClient;
 import org.springframework.web.socket.messaging.WebSocketStompClient;
 
 import java.lang.reflect.Type;
+import java.net.URI;
 import java.time.Duration;
 import java.util.concurrent.Executors;
 import java.util.concurrent.ScheduledExecutorService;
@@ -41,6 +44,7 @@ public class WebSocketClient implements EventListener {
     private static final String SOCKET_DEST_LIVE_TIMING = "/app/acc/live-timing";
     private static final String SOCKET_QUEUE_REQUEST = "/user/queue/acc/request";
 
+    private final RestTemplate restTemplate = new RestTemplate();
     private final AccSocketClient accSocketClient;
     private final WebSocketStompClient webSocketStompClient;
     private final ThreadPoolTaskScheduler taskScheduler = new ThreadPoolTaskScheduler();
@@ -50,7 +54,8 @@ public class WebSocketClient implements EventListener {
     private final Object sessionLock = new Object();
     private final AtomicBoolean reconnecting = new AtomicBoolean(false);
 
-    private volatile String webSocketUrl;
+    private volatile URI websocketHost;
+    private volatile URI websocketUrl;
     private volatile String apiKey;
     private volatile String dashboardId;
 
@@ -82,22 +87,32 @@ public class WebSocketClient implements EventListener {
     /**
      * Connects to the STOMP server using the provided WebSocket URL, API key, and dashboard ID.
      *
-     * @param webSocketUrl The WebSocket URL to connect to.
+     * @param websocketHost The WebSocket Host to connect to.
      * @param apiKey       The API key for authentication (can be null).
      * @param dashboardId  The dashboard ID to use for the connection.
      */
-    public void connect(@Nonnull String webSocketUrl, @Nullable String apiKey, @Nonnull String dashboardId) {
+    public void connect(@Nonnull URI websocketHost, @Nullable String apiKey, @Nonnull String dashboardId) {
         if (isConnected()) {
             return;
         }
 
-        this.webSocketUrl = webSocketUrl;
+        this.websocketHost = websocketHost;
+        this.websocketUrl = getWebsocketUrl(websocketHost);
         this.apiKey = apiKey;
         this.dashboardId = dashboardId;
 
         doConnect();
 
-        log.info(String.format("Connecting to WebSocket [%s] with dashboardId [%s]", webSocketUrl, dashboardId));
+        log.info(String.format("Connecting to WebSocket [%s] with dashboardId [%s]", websocketUrl, dashboardId));
+    }
+
+
+    private URI getWebsocketUrl(URI websocketHost) {
+        String scheme = websocketHost.getScheme().equals("https") ? "wss" : "ws";
+        String host = websocketHost.getHost();
+        int port = websocketHost.getPort() != -1 ? websocketHost.getPort() : (scheme.equals("wss") ? 443 : 80);
+
+        return URI.create(String.format("%s://%s:%d/ws", scheme, host, port));
     }
 
     /**
@@ -111,7 +126,7 @@ public class WebSocketClient implements EventListener {
                 stompSession.disconnect();
                 stompSession = null;
 
-                log.info(String.format("Closed WebSocket to [%s] due to user request", webSocketUrl));
+                log.info(String.format("Closed WebSocket to [%s] due to user request", websocketUrl));
             }
         }
 
@@ -119,12 +134,28 @@ public class WebSocketClient implements EventListener {
     }
 
     private void doConnect() {
-        WebSocketHttpHeaders headers = new WebSocketHttpHeaders();
-        if (apiKey != null) {
-            headers.add(API_KEY_HEADER, apiKey);
+        WebSocketHttpHeaders handshakeHeaders = new WebSocketHttpHeaders();
+        StompHeaders connectHeaders = new StompHeaders();
+
+        String csrfEndpoint = websocketHost + "/csrf";
+        try {
+            DefaultCsrfToken csrfToken = restTemplate.getForObject(csrfEndpoint, DefaultCsrfToken.class);
+            if (csrfToken != null) {
+                String headerName = csrfToken.getHeaderName();
+                String token = csrfToken.getToken();
+
+                handshakeHeaders.add(headerName, token);
+                connectHeaders.add(headerName, token);
+            }
+        } catch (Exception e) {
+            log.severe(String.format("Failed to retrieve CSRF token from %s: %s", csrfEndpoint, e.getMessage()));
         }
 
-        webSocketStompClient.connectAsync(webSocketUrl, headers, new StompSessionHandlerAdapter() {
+        if (apiKey != null) {
+            handshakeHeaders.add(API_KEY_HEADER, apiKey);
+        }
+
+        webSocketStompClient.connectAsync(websocketUrl.toString(), handshakeHeaders, connectHeaders, new StompSessionHandlerAdapter() {
             @Override
             public void afterConnected(@Nonnull StompSession session, @Nonnull StompHeaders connectedHeaders) {
                 synchronized (sessionLock) {
@@ -159,7 +190,7 @@ public class WebSocketClient implements EventListener {
         }
 
         reconnectScheduler.schedule(() -> {
-            log.info(String.format("Attempting reconnection to WebSocket [%s]", webSocketUrl));
+            log.info(String.format("Attempting reconnection to WebSocket [%s]", websocketUrl));
             if (!isConnected()) {
                 doConnect();
             }

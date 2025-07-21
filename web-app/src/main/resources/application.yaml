@@ -99,6 +99,9 @@ spring:
 logging:
   level:
     #org.springframework.cache: TRACE
+    org.springframework.security: DEBUG
+    org.springframework.web.socket: DEBUG
+    org.springframework.messaging: DEBUG
     de.sustineo.simdesk: DEBUG
     de.sustineo.simdesk.mapper: INFO
 vaadin:

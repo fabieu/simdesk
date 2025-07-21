@@ -6,7 +6,7 @@ import lombok.RequiredArgsConstructor;
 @Getter
 @RequiredArgsConstructor
 public enum ConfigProperty {
-    WEBSOCKET_URL("websocket.url", null),
+    WEBSOCKET_HOST("websocket.host", null),
     WEBSOCKET_API_KEY("websocket.apiKey", null),
     DASHBOARD_ID("dashboard.id", null),
     ;
