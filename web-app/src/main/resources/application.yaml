@@ -83,6 +83,8 @@ simdesk:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}
       password: ${SIMDESK_ADMIN_PASSWORD:#{null}}
+  cors:
+    allowed-origins: ${SIMDESK_CORS_ALLOWED_ORIGINS}
 springdoc:
   swagger-ui:
     disable-swagger-default-url: true
@@ -99,6 +101,9 @@ spring:
 logging:
   level:
     #org.springframework.cache: TRACE
+    #org.springframework.security: DEBUG
+    #org.springframework.web.socket: DEBUG
+    #org.springframework.messaging: DEBUG
     de.sustineo.simdesk: DEBUG
     de.sustineo.simdesk.mapper: INFO
 vaadin:
@@ -109,6 +114,9 @@ management:
   endpoints:
     access:
       default: read_only
+simdesk:
+  cors:
+    allowed-origins: "http://localhost"
 
 ---
 spring:
