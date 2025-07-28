@@ -21,6 +21,8 @@ import org.springframework.boot.info.BuildProperties;
 import org.springframework.stereotype.Component;
 
 import java.net.SocketException;
+import java.net.URI;
+import java.net.URISyntaxException;
 import java.util.HashMap;
 import java.util.Map;
 import java.util.Objects;
@@ -35,16 +37,16 @@ public class MainView {
     private final BuildProperties buildProperties;
 
     public void start(Stage stage) {
-        String initialWebsocketUrl = configService.getProperty(ConfigProperty.WEBSOCKET_URL);
+        String initialWebsocketHost = configService.getProperty(ConfigProperty.WEBSOCKET_HOST);
         String initialWebsocketApiKey = configService.getProperty(ConfigProperty.WEBSOCKET_API_KEY);
         String initialDashboardId = configService.getProperty(ConfigProperty.DASHBOARD_ID);
 
         Label websocketUrlLabel = new Label("WebSocket URL:");
-        TextField websocketUrlField = new TextField();
-        if (initialWebsocketUrl == null) {
-            websocketUrlField.setPromptText("wss://example.com/ws"); // Example placeholder
+        TextField websocketHostField = new TextField();
+        if (initialWebsocketHost == null) {
+            websocketHostField.setPromptText("https://example.com"); // Example placeholder
         } else {
-            websocketUrlField.setText(initialWebsocketUrl);
+            websocketHostField.setText(initialWebsocketHost);
         }
 
         Label websocketApiKeyLabel = new Label("API Key:");
@@ -74,12 +76,12 @@ public class MainView {
         stopButton.setMaxWidth(Double.MAX_VALUE);
 
         startButton.setOnAction(e -> {
-            String websocketUrl = websocketUrlField.getText();
-            if (websocketUrl == null || websocketUrl.isEmpty()) {
-                log.severe("Invalid configuration: WebSocket URL is missing.");
+            URI websocketHost;
+            try {
+                websocketHost = new URI(websocketHostField.getText());
+            } catch (URISyntaxException | NullPointerException ex) {
+                log.severe("Invalid configuration: WebSocket URL is missing or invalid.");
                 return;
-            } else {
-                websocketUrl = websocketUrl.trim();
             }
 
             String websocketApiKey = websocketApiKeyField.getText();
@@ -100,14 +102,14 @@ public class MainView {
 
             try {
                 accSocketClient.connectAutomatically();
-                webSocketClient.connect(websocketUrl, websocketApiKey, dashboardId);
+                webSocketClient.connect(websocketHost, websocketApiKey, dashboardId);
             } catch (SocketException ex) {
                 log.severe("Failed to connect: " + ex.getMessage());
             }
 
             // Save the configuration properties
             Map<ConfigProperty, String> configProperties = new HashMap<>();
-            configProperties.put(ConfigProperty.WEBSOCKET_URL, websocketUrl);
+            configProperties.put(ConfigProperty.WEBSOCKET_HOST, websocketHost.toString());
             configProperties.put(ConfigProperty.WEBSOCKET_API_KEY, websocketApiKey);
             configProperties.put(ConfigProperty.DASHBOARD_ID, dashboardId);
             configService.setProperties(configProperties);
@@ -141,7 +143,7 @@ public class MainView {
         grid.getColumnConstraints().addAll(col1, col2, col3);
 
         grid.add(websocketUrlLabel, 0, 0);
-        grid.add(websocketUrlField, 1, 0);
+        grid.add(websocketHostField, 1, 0);
         grid.add(websocketApiKeyLabel, 0, 1);
         grid.add(websocketApiKeyField, 1, 1);
         grid.add(dashboardIdLabel, 0, 2);

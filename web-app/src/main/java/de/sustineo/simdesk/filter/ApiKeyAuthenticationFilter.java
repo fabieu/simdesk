@@ -12,15 +12,12 @@ import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
-import org.springframework.security.core.GrantedAuthority;
-import org.springframework.security.core.authority.AuthorityUtils;
 import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
 import javax.annotation.Nonnull;
 import java.io.IOException;
-import java.util.List;
 import java.util.Optional;
 
 @Order(1)
@@ -37,15 +34,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
             Optional<ApiKey> apiKey = apiKeyService.getActiveByApiKey(apiKeyFromRequest);
 
             if (apiKey.isPresent()) {
-                List<GrantedAuthority> grantedAuthorities = AuthorityUtils.NO_AUTHORITIES;
-                if (apiKey.get().getRoles() != null) {
-                    List<String> roles = apiKey.get().getRoles().stream()
-                            .map(Enum::name)
-                            .toList();
-                    grantedAuthorities = AuthorityUtils.createAuthorityList(roles);
-                }
-
-                ApiKeyAuthenticationToken apiToken = new ApiKeyAuthenticationToken(apiKey.get(), grantedAuthorities);
+                ApiKeyAuthenticationToken apiToken = new ApiKeyAuthenticationToken(apiKey.get(), apiKey.get().getGrantedAuthorities());
                 SecurityContextHolder.getContext().setAuthentication(apiToken);
             }
         }
@@ -68,6 +57,6 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
         }
 
         // Retrieve api key from header "X-API-KEY"
-        return request.getHeader("X-API-KEY");
+        return request.getHeader(ApiKey.HEADER_NAME);
     }
 }

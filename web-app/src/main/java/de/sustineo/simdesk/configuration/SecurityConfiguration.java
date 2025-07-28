@@ -6,13 +6,13 @@ import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
-import org.springframework.security.config.annotation.web.builders.WebSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.core.GrantedAuthority;
 import org.springframework.security.core.authority.SimpleGrantedAuthority;
@@ -36,6 +36,7 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@RequiredArgsConstructor
 public class SecurityConfiguration extends VaadinWebSecurity {
     private final String[] PUBLIC_PATHS = {
             "/public/**",
@@ -58,14 +59,6 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
     private final Optional<DiscordService> discordService;
     private final UserService userService;
-
-    public SecurityConfiguration(ApiKeyAuthenticationFilter apiKeyAuthenticationFilter,
-                                 Optional<DiscordService> discordService,
-                                 UserService userService) {
-        this.apiKeyAuthenticationFilter = apiKeyAuthenticationFilter;
-        this.discordService = discordService;
-        this.userService = userService;
-    }
 
     @Override
     protected void configure(HttpSecurity http) throws Exception {
@@ -112,11 +105,6 @@ public class SecurityConfiguration extends VaadinWebSecurity {
         // This is important to register your login view to the
         // navigation access control mechanism:
         setLoginView(http, LoginView.class);
-    }
-
-    @Override
-    public void configure(WebSecurity web) throws Exception {
-        super.configure(web);
     }
 
     @Bean

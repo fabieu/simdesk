@@ -29,7 +29,7 @@ public class ApiKeyService {
 
     @Cacheable(cacheNames = CACHE_ACTIVE_API_KEYS)
     public Optional<ApiKey> getActiveByApiKey(String apiKeyString) {
-        if (apiKeyString == null) {
+        if (apiKeyString == null || apiKeyString.isBlank()) {
             return Optional.empty();
         }
 

@@ -44,6 +44,9 @@ dependencies {
     implementation "org.springframework.boot:spring-boot-starter-websocket"
     implementation "org.springframework.security:spring-security-oauth2-client"
 
+    // Spring Framework
+    implementation "org.springframework.security:spring-security-messaging"
+
     // Vaadin
     implementation "com.vaadin:vaadin-spring-boot-starter"
     implementation "software.xdev:vaadin-maps-leaflet-flow:4.6.3"
