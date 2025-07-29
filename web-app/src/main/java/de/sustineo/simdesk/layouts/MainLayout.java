@@ -37,6 +37,7 @@ import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.views.*;
 import org.springframework.beans.factory.annotation.Value;
+import org.springframework.boot.info.BuildProperties;
 
 import java.util.*;
 
@@ -46,6 +47,7 @@ public class MainLayout extends AppLayout {
     private final ThemeService themeService;
     private final SecurityService securityService;
     private final MenuService menuService;
+    private final BuildProperties buildProperties;
 
     private final String privacyUrl;
     private final String impressumUrl;
@@ -54,11 +56,13 @@ public class MainLayout extends AppLayout {
     public MainLayout(ThemeService themeService,
                       SecurityService securityService,
                       MenuService menuService,
+                      BuildProperties buildProperties,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.themeService = themeService;
+        this.buildProperties = buildProperties;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
@@ -197,9 +201,11 @@ public class MainLayout extends AppLayout {
                 settingsMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(SettingsView.class)));
             }
 
-            userSubMenu.addItem(ComponentUtils.createSpacer());
+            Span logoutText = new Span("Logout");
+            logoutText.getStyle()
+                    .setColor("var(--lumo-error-text-color)");
 
-            MenuItem logoutMenuItem = userSubMenu.addItem("Logout");
+            MenuItem logoutMenuItem = userSubMenu.addItem(logoutText);
             logoutMenuItem.addClickListener(event -> securityService.logout());
         } else {
             MenuItem loginMenuItem = userSubMenu.addItem("Login");
@@ -240,28 +246,56 @@ public class MainLayout extends AppLayout {
     }
 
     private Component createDrawerFooter() {
-        VerticalLayout footerLayout = new VerticalLayout();
-        footerLayout.setPadding(false);
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
+        layout.setSpacing(false);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+        layout.add(createDrawerFooterLinkLayout(), createDrawerFooterVersionLayout());
+        return layout;
+    }
 
-        // Layout for custom links
-        VerticalLayout linkLayout = new VerticalLayout();
-        linkLayout.setSpacing(false);
-        linkLayout.setPadding(false);
-        linkLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+    private Component createDrawerFooterLinkLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setSpacing(false);
+        layout.setPadding(false);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         if (impressumUrl != null && !impressumUrl.isEmpty()) {
-            linkLayout.add(new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK));
+            layout.add(new Anchor(impressumUrl, "Impressum", AnchorTarget.BLANK));
         }
 
         if (privacyUrl != null && !privacyUrl.isEmpty()) {
-            linkLayout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
+            layout.add(new Anchor(privacyUrl, "Privacy policy", AnchorTarget.BLANK));
         }
 
-        linkLayout.add(new Anchor(Reference.SIMDESK_CREDITS, "Credits", AnchorTarget.BLANK));
+        layout.add(new Anchor(Reference.SIMDESK_CREDITS, "Credits", AnchorTarget.BLANK));
 
-        // Combine layouts
-        footerLayout.add(linkLayout);
-        return footerLayout;
+        return layout;
+    }
+
+    private Component createDrawerFooterVersionLayout() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setPadding(true);
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+
+        // Version badge + reference to GitHub release
+        Span versionBadge = new Span("Version " + buildProperties.getVersion());
+        versionBadge.getElement().getThemeList().add("badge contrast");
+
+        FontIcon githubIcon = new FontIcon("fa-brands", "fa-github");
+        githubIcon.getStyle()
+                .setMargin("0 var(--lumo-space-s)")
+                .setFontSize("var(--lumo-font-size-s)")
+                .setColor("var(--lumo-body-text-color)");
+
+        Anchor versionAnchor = new Anchor(Reference.GITHUB_RELEASES);
+        versionAnchor.add(githubIcon, versionBadge);
+        versionAnchor.setTarget(AnchorTarget.BLANK);
+
+        layout.add(versionAnchor);
+
+        return layout;
     }
 
     private Component createMenuHeader(String title) {

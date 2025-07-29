@@ -83,7 +83,6 @@ public class BopManagementView extends BaseView {
         add(createViewHeader());
         add(createActionsLayout());
         addAndExpand(createBopGrid());
-        add(createFooter());
 
         initializeBopList();
     }

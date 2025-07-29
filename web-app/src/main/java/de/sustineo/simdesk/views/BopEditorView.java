@@ -82,7 +82,6 @@ public class BopEditorView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createFormLayout());
-        add(createFooter());
 
         reloadComponents();
     }

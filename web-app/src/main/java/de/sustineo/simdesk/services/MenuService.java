@@ -28,7 +28,6 @@ public class MenuService {
 
     public List<MenuEntity> getItems() {
         List<MenuEntity> items = new ArrayList<>();
-        items.add(MenuEntity.of(MenuEntityCategory.MAIN, "Home", VaadinIcon.HOME, MainView.class));
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
             items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.CLOCK, LeaderboardOverallLapTimesView.class));

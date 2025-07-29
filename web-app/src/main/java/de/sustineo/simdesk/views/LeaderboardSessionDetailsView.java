@@ -65,7 +65,6 @@ public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnt
             add(createViewHeader());
             add(sessionComponentFactory.createSessionInformation(session));
             addAndExpand(createLeaderboardGrid(session));
-            add(createFooter());
         } catch (IllegalArgumentException e) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
         }

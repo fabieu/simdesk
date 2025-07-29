@@ -107,7 +107,6 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
         add(createViewHeader());
         add(sessionComponentFactory.createSessionInformation(session));
         addAndExpand(createTabSheet(fileChecksum, carId));
-        add(createFooter());
     }
 
     private Component createTabSheet(String fileChecksum, int carId) {

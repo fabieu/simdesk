@@ -84,7 +84,6 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         add(createViewHeader());
         add(createTrackSelectionLayout());
         addAndExpand(createBopGrid());
-        add(createFooter());
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.existsInAcc(trackIdParameter.get())) {
