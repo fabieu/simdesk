@@ -72,7 +72,6 @@ public class LeaderboardDriverView extends BaseView implements BeforeEnterObserv
 
             add(createViewHeader(driver.getFullName()));
             addAndExpand(createDriverLayout(driver));
-            add(createFooter());
         } catch (IllegalArgumentException e) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
         }

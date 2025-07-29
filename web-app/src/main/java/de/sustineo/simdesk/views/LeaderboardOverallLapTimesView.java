@@ -65,7 +65,6 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
         addAndExpand(rankingGrid);
-        add(createFooter());
     }
 
     @Override

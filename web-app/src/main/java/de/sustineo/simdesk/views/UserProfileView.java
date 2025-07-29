@@ -37,7 +37,6 @@ public class UserProfileView extends BaseView {
         setAlignItems(Alignment.CENTER);
 
         addAndExpand(createUserHeader());
-        add(createFooter());
     }
 
     private Component createUserHeader() {

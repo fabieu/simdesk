@@ -186,7 +186,6 @@ public class EntrylistEditorView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createEntrylistContainer());
-        add(createFooter());
     }
 
     private void resetEntities() {

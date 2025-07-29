@@ -35,7 +35,6 @@ public class MainView extends BaseView {
 
         add(createHeader());
         addAndExpand(createMainMenu());
-        add(createFooter());
     }
 
     private Component createHeader() {
@@ -51,7 +50,6 @@ public class MainView extends BaseView {
 
     private Component createMainMenu() {
         Map<MenuEntityCategory, List<MenuEntity>> menuMap = menuService.getItemsByCategory();
-        menuMap.remove(MenuEntityCategory.MAIN);
 
         Div menuContainer = new Div();
         menuContainer.addClassNames("home-menu-container", "pure-g");

@@ -58,7 +58,6 @@ public class MapView extends BaseView {
         add(createViewHeader());
         add(createMapHeader());
         addAndExpand(createMap());
-        add(createFooter());
 
         updateWeatherMarkers(DEFAULT_RACE_HOURS);
     }

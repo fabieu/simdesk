@@ -79,7 +79,6 @@ public class SettingsView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createFormLayout());
-        add(createFooter());
     }
 
     private Component createFormLayout() {

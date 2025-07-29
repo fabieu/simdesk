@@ -103,7 +103,6 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
         add(createViewHeader());
         add(createSelectHeader(this.timeRange));
         addAndExpand(sessionGrid);
-        add(createFooter());
     }
 
     @Override
