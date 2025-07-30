@@ -5,7 +5,7 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.icon.AbstractIcon;
 import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import org.springframework.stereotype.Service;
 
 @Service
@@ -30,9 +30,8 @@ public class ComponentFactory {
         return new Icon(VaadinIcon.CLIPBOARD_CHECK);
     }
 
-    public Anchor createDownloadAnchor(StreamResource streamResource, String label) {
-        Anchor anchor = new Anchor(streamResource, "");
-        anchor.getElement().setAttribute("download", true);
+    public Anchor createDownloadAnchor(DownloadHandler downloadHandler, String label) {
+        Anchor anchor = new Anchor(downloadHandler, "");
         anchor.removeAll();
         anchor.add(new Button(label, getDownloadIcon()));
         return anchor;

@@ -10,7 +10,7 @@ import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import lombok.Getter;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
 import org.springframework.context.annotation.Profile;
@@ -357,7 +357,7 @@ public class WeatherService {
 
             try {
                 String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, track.getLatitude(), track.getLongitude(), openweathermapApiKey);
-                log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), StringUtils.replace(url, openweathermapApiKey, Constants.HIDDEN)));
+                log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), Strings.CS.replace(url, openweathermapApiKey, Constants.HIDDEN)));
 
                 OpenWeatherModel weatherModel = restTemplate.getForObject(url, OpenWeatherModel.class);
                 weatherModelsByTrack.put(track, weatherModel);

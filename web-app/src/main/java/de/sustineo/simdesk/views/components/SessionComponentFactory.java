@@ -12,7 +12,7 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
-import com.vaadin.flow.server.StreamResource;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.Track;
@@ -24,7 +24,6 @@ import de.sustineo.simdesk.utils.FormatUtils;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -85,25 +84,31 @@ public class SessionComponentFactory extends ComponentFactory {
 
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
             if (leaderboardService.isPresent()) {
-                StreamResource leaderboardLinesCsvResource = new StreamResource(
-                        String.format("session_table_%s.csv", session.getFileChecksum()),
-                        () -> {
-                            String fileContent = getLeaderboardLinesAsCsv(session);
-                            return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                        }
-                );
-                Anchor leaderboardLinesCsvAnchor = createDownloadAnchor(leaderboardLinesCsvResource, "Table (CSV)");
+                DownloadHandler leaderboardLinesDownloadHandler = (event) -> {
+                    String fileContent = getLeaderboardLinesAsCsv(session);
+
+                    if (fileContent != null) {
+                        event.setFileName(String.format("session_table_%s.csv", session.getFileChecksum()));
+                        event.getOutputStream().write(fileContent.getBytes(StandardCharsets.UTF_8));
+                    } else {
+                        event.getResponse().setStatus(404);
+                    }
+                };
+                Anchor leaderboardLinesCsvAnchor = createDownloadAnchor(leaderboardLinesDownloadHandler, "Table (CSV)");
                 layout.add(leaderboardLinesCsvAnchor);
             }
 
-            StreamResource fileContentResource = new StreamResource(
-                    String.format("session_file_%s.json", session.getFileChecksum()),
-                    () -> {
-                        String fileContent = session.getFileContent();
-                        return new ByteArrayInputStream(fileContent != null ? fileContent.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                    }
-            );
-            Anchor sessionFileJsonAnchor = createDownloadAnchor(fileContentResource, "File (JSON)");
+            DownloadHandler fileContentDownloadHandler = (event) -> {
+                String fileContent = session.getFileContent();
+                if (fileContent != null) {
+                    event.setFileName(String.format("session_file_%s.json", session.getFileChecksum()));
+                    event.getOutputStream().write(fileContent.getBytes(StandardCharsets.UTF_8));
+                } else {
+                    event.getResponse().setStatus(404);
+                }
+            };
+
+            Anchor sessionFileJsonAnchor = createDownloadAnchor(fileContentDownloadHandler, "File (JSON)");
 
             layout.add(sessionFileJsonAnchor);
         }

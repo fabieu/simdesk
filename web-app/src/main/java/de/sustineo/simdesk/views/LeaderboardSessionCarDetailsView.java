@@ -17,8 +17,8 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
@@ -37,7 +37,6 @@ import de.sustineo.simdesk.views.renderers.SessionDetailsRenderer;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
-import java.io.ByteArrayInputStream;
 import java.io.IOException;
 import java.io.StringWriter;
 import java.nio.charset.StandardCharsets;
@@ -231,15 +230,18 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
     private Component createStatisticsLayout(String fileChecksum, int carId) {
         VerticalLayout layout = new VerticalLayout();
 
-        StreamResource csvResource = new StreamResource(
-                String.format("session_laps_%s_%s.csv", fileChecksum, carId),
-                () -> {
-                    String csv = this.exportLapsCSV();
-                    return new ByteArrayInputStream(csv != null ? csv.getBytes(StandardCharsets.UTF_8) : new byte[0]);
-                }
-        );
+        DownloadHandler downloadHandler = (event) -> {
+            event.setFileName(String.format("session_laps_%s_%s.csv", fileChecksum, carId));
 
-        Anchor downloadLapsAnchor = sessionComponentFactory.createDownloadAnchor(csvResource, "Download laps");
+            String csv = this.exportLapsCSV();
+            if (csv != null) {
+                event.getOutputStream().write(csv.getBytes(StandardCharsets.UTF_8));
+            } else {
+                event.getResponse().setStatus(404);
+            }
+        };
+
+        Anchor downloadLapsAnchor = sessionComponentFactory.createDownloadAnchor(downloadHandler, "Download laps");
 
         layout.add(downloadLapsAnchor);
         return layout;

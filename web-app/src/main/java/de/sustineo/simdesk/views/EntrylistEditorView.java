@@ -36,13 +36,14 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.component.upload.receivers.MemoryBuffer;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.server.streams.DownloadHandler;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CustomCar;
@@ -84,8 +85,6 @@ import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
 import java.util.*;
@@ -119,7 +118,6 @@ public class EntrylistEditorView extends BaseView {
     private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
     private EntrylistMetadata entrylistMetadata;
     private List<Driver> drivers = new ArrayList<>();
-    private List<Session> sessions = new ArrayList<>();
 
     private final Upload entrylistUpload = new Upload();
     private final Anchor downloadAnchor = new Anchor();
@@ -262,21 +260,27 @@ public class EntrylistEditorView extends BaseView {
         Button uploadButton = new Button("Upload entrylist.json...");
         uploadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
-        entrylistUpload.setReceiver(memoryBuffer);
+        entrylistUpload.setUploadHandler(UploadHandler.inMemory(this::handleEntrylistUpload));
         entrylistUpload.setUploadButton(uploadButton);
         entrylistUpload.setDropAllowed(true);
         entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
         entrylistUpload.setMaxFileSize((int) FileUtils.ONE_MB);
         entrylistUpload.setI18n(configureUploadI18N("entrylist.json"));
-        entrylistUpload.addSucceededListener(event -> {
-            InputStream fileData = memoryBuffer.getInputStream();
+        entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        entrylistUpload.addFileRemovedListener(event -> resetDialog.open());
+        entrylistUpload.getStyle()
+                .setFlexGrow("1");
 
-            AccEntrylist entrylist = jsonClient.fromJson(fileData, AccEntrylist.class);
+        return entrylistUpload;
+    }
+
+    private void handleEntrylistUpload(UploadMetadata metadata, byte[] data) {
+        try {
+            AccEntrylist entrylist = jsonClient.fromJson(new String(data), AccEntrylist.class);
             EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
-                    .fileName(event.getFileName())
-                    .type(event.getMIMEType())
-                    .contentLength(event.getContentLength())
+                    .fileName(metadata.fileName())
+                    .type(metadata.contentType())
+                    .contentLength(metadata.contentLength())
                     .build();
 
             // Validate entrylist file against syntax and semantic rules
@@ -294,14 +298,9 @@ public class EntrylistEditorView extends BaseView {
                 createNewEntrylist(entrylist, entrylistMetadata);
                 createSuccessNotification(entrylistMetadata.getFileName(), "Entrylist loaded successfully");
             }
-        });
-        entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
-        entrylistUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
-        entrylistUpload.addFileRemovedListener(event -> resetDialog.open());
-        entrylistUpload.getStyle()
-                .setFlexGrow("1");
-
-        return entrylistUpload;
+        } catch (Exception e) {
+            notificationService.showErrorNotification(e.getLocalizedMessage());
+        }
     }
 
     private UploadI18N configureUploadI18N(String fileName) {
@@ -343,17 +342,15 @@ public class EntrylistEditorView extends BaseView {
         return buttonLayout;
     }
 
-    private StreamResource downloadEntrylist(EntrylistMetadata entrylistMetadata) {
-        return new StreamResource(
-                Objects.requireNonNullElse(entrylistMetadata.getFileName(), "entrylist.json"),
-                () -> {
-                    if (entrylist == null) {
-                        return new ByteArrayInputStream(new byte[0]);
-                    }
-
-                    return new ByteArrayInputStream(jsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
-                }
-        );
+    private DownloadHandler getEntrylistDownloadHandler() {
+        return (event) -> {
+            if (entrylist != null) {
+                event.setFileName(Objects.requireNonNullElse(entrylistMetadata.getFileName(), "entrylist.json"));
+                event.getOutputStream().write(jsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
+            } else {
+                event.getResponse().setStatus(404);
+            }
+        };
     }
 
     private Component createEntrylistHeaderLayout() {
@@ -1016,7 +1013,6 @@ public class EntrylistEditorView extends BaseView {
         sessionInformationLayout.setAlignItems(Alignment.CENTER);
 
         Dialog dialog = new Dialog("Upload results");
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
         Upload resultsUpload = new Upload();
 
         IntegerField initialGridPositionField = new IntegerField("Grid start position");
@@ -1049,26 +1045,26 @@ public class EntrylistEditorView extends BaseView {
                 .setAlignItems(Style.AlignItems.CENTER)
                 .set("gap", "var(--lumo-space-m)");
 
-        resultsUpload.setReceiver(memoryBuffer);
         resultsUpload.setDropAllowed(true);
         resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
         resultsUpload.setMaxFileSize((int) FileUtils.ONE_MB * 10);
         resultsUpload.setI18n(configureUploadI18N("results.json"));
-        resultsUpload.addSucceededListener(event -> {
-            InputStream fileData = memoryBuffer.getInputStream();
+        resultsUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+            try {
+                AccSession session = jsonClient.fromJson(new String(data), AccSession.class);
 
-            AccSession session = jsonClient.fromJson(fileData, AccSession.class);
+                // Validate results file against syntax and semantic rules
+                validationService.validate(session);
 
-            // Validate results file against syntax and semantic rules
-            validationService.validate(session);
-
-            uploadedSession.set(session);
-            updateButton.setEnabled(true);
-            sessionInformationLayout.removeAll();
-            sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session), removeSessionButton);
-        });
+                uploadedSession.set(session);
+                updateButton.setEnabled(true);
+                sessionInformationLayout.removeAll();
+                sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session), removeSessionButton);
+            } catch (Exception e) {
+                notificationService.showErrorNotification(Duration.ZERO, e.getLocalizedMessage());
+            }
+        }));
         resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
-        resultsUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
         resultsUpload.addFileRemovedListener(event -> {
             uploadedSession.set(null);
             updateButton.setEnabled(false);
@@ -1198,27 +1194,26 @@ public class EntrylistEditorView extends BaseView {
         });
 
         Upload defaultCustomCarUpload = new Upload();
-        MemoryBuffer memoryBuffer = new MemoryBuffer();
-        defaultCustomCarUpload.setReceiver(memoryBuffer);
         defaultCustomCarUpload.setDropAllowed(true);
         defaultCustomCarUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
         defaultCustomCarUpload.setMaxFileSize((int) FileUtils.ONE_MB);
         defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
-        defaultCustomCarUpload.addSucceededListener(event -> {
-            InputStream fileData = memoryBuffer.getInputStream();
+        defaultCustomCarUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+            try {
+                CustomCar[] customCars = jsonClient.fromJson(new String(data), CustomCar[].class);
 
-            CustomCar[] customCars = jsonClient.fromJson(fileData, CustomCar[].class);
+                // Validate results file against syntax and semantic rules
+                for (CustomCar customCar : customCars) {
+                    validationService.validate(customCar);
+                }
 
-            // Validate results file against syntax and semantic rules
-            for (CustomCar customCar : customCars) {
-                validationService.validate(customCar);
+                uploadedCustomCars.set(customCars);
+                validateButton.setEnabled(true);
+            } catch (Exception e) {
+                notificationService.showErrorNotification(Duration.ZERO, e.getLocalizedMessage());
             }
-
-            uploadedCustomCars.set(customCars);
-            validateButton.setEnabled(true);
-        });
+        }));
         defaultCustomCarUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
-        defaultCustomCarUpload.addFailedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getReason().getMessage()));
         defaultCustomCarUpload.addFileRemovedListener(event -> validateButton.setEnabled(false));
 
         Paragraph updateAttributesText = new Paragraph("The custom cars file will be used to update the following fields of the entrylist:");
@@ -1302,7 +1297,7 @@ public class EntrylistEditorView extends BaseView {
         resetEntities();
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
-        this.downloadAnchor.setHref(downloadEntrylist(entrylistMetadata));
+        this.downloadAnchor.setHref(getEntrylistDownloadHandler());
         refreshEntrylistEditor();
         refreshEntrylistPreview();
     }

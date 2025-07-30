@@ -16,11 +16,11 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.component.upload.receivers.FileData;
-import com.vaadin.flow.component.upload.receivers.MultiFileBuffer;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.server.streams.TemporaryFileFactory;
+import com.vaadin.flow.server.streams.UploadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
@@ -144,8 +144,6 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
     private Dialog createUploadSessionDialog() {
         Dialog dialog = new Dialog("Manual session upload");
 
-        MultiFileBuffer multiFileBuffer = new MultiFileBuffer();
-
         DateTimePicker dateTimePicker = new DateTimePicker();
         dateTimePicker.setLabel("Session datetime");
         dateTimePicker.setRequiredIndicatorVisible(true);
@@ -164,30 +162,28 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
         Upload upload = new Upload();
         upload.setI18n(configureUploadI18N());
-        upload.setReceiver(multiFileBuffer);
         upload.setDropAllowed(true);
         upload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
         upload.setMaxFileSize((int) (25 * FileUtils.ONE_MB));
-        upload.addSucceededListener(event -> {
-            FileData fileData = multiFileBuffer.getFileData(event.getFileName());
-
+        upload.setUploadHandler(UploadHandler.toFile((metadata, file) -> {
             try {
-                Path file = fileData.getFile().getAbsoluteFile().toPath();
+                Path path = file.getAbsoluteFile().toPath();
                 Instant sessionDatetime = ZonedDateTime.of(dateTimePicker.getValue(), BrowserTimeZone.get()).toInstant();
 
-                sessionFileService.handleSessionFileWithSessionDatetimeOverride(file, sessionDatetime);
+                sessionFileService.handleSessionFileWithSessionDatetimeOverride(path, sessionDatetime);
 
-                notificationService.showSuccessNotification(String.format("%s - Session upload successfully", fileData.getFileName()));
+                notificationService.showSuccessNotification(String.format("%s - Session upload successfully", metadata.fileName()));
             } catch (Exception e) {
-                log.log(Level.SEVERE, String.format("Could not upload session file %s", fileData.getFileName()), e);
-                notificationService.showErrorNotification(String.format("%s - Session upload failed", fileData.getFileName()));
+                log.log(Level.SEVERE, String.format("Could not upload session file %s", metadata.fileName()), e);
+                notificationService.showErrorNotification(String.format("%s - Session upload failed", metadata.fileName()));
             } finally {
-                boolean deleted = fileData.getFile().delete();
-                log.fine(String.format("Deleted temporary file %s: %s", fileData.getFile().getAbsolutePath(), deleted));
+                String filePath = file.getAbsolutePath();
+                boolean deleted = file.delete();
+                log.fine(String.format("Deleted temporary file %s: %s", filePath, deleted));
             }
-        });
+        }, new TemporaryFileFactory()));
+
         upload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
-        upload.addFailedListener(event -> notificationService.showErrorNotification(event.getReason().getMessage()));
 
         Paragraph description = new Paragraph("Use the upload form to manually upload one or more session files. The files must conform to the session file format (.json). The maximum file size is 25 MB.");
 
