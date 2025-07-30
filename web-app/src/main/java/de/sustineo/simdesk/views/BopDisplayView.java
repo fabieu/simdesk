@@ -14,8 +14,8 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.router.*;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Track;
@@ -35,7 +35,6 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.io.ByteArrayInputStream;
 import java.nio.charset.StandardCharsets;
 import java.time.Instant;
 import java.util.*;
@@ -129,22 +128,21 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
             VerticalLayout trackLayout = new VerticalLayout();
             trackLayout.setPadding(false);
 
-            StreamResource bopResource = new StreamResource(
-                    String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())),
-                    () -> {
-                        List<AccBopEntry> accBopEntries = entry.getValue().stream()
-                                .map(bopService::convertToAccBopEntry)
-                                .toList();
-                        String json = jsonClient.toJson(new AccBop(accBopEntries));
-                        return new ByteArrayInputStream(json.getBytes(StandardCharsets.UTF_8));
-                    }
-            );
+            DownloadHandler downloadHandler = (event) -> {
+                List<AccBopEntry> accBopEntries = entry.getValue().stream()
+                        .map(bopService::convertToAccBopEntry)
+                        .toList();
+                String json = jsonClient.toJson(new AccBop(accBopEntries));
+
+                event.setFileName(String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())));
+                event.getOutputStream().write(json.getBytes(StandardCharsets.UTF_8));
+            };
 
             // Header
             H2 trackTitle = new H2(Track.getTrackNameByAccId(trackId));
             scrollTargets.put(trackId, trackTitle);
 
-            Anchor downloadAnchor = new Anchor(bopResource, "");
+            Anchor downloadAnchor = new Anchor(downloadHandler, "");
             downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.removeAll();
             Button downloadButton = new Button(componentFactory.getDownloadIcon());

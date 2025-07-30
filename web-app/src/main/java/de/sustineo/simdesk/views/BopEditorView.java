@@ -15,12 +15,12 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.component.upload.receivers.MultiFileMemoryBuffer;
 import com.vaadin.flow.data.binder.ValidationException;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
-import com.vaadin.flow.server.StreamResource;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
@@ -33,13 +33,10 @@ import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.fields.BopEditField;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
-import jakarta.validation.ConstraintViolationException;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
 
-import java.io.ByteArrayInputStream;
-import java.io.InputStream;
 import java.nio.charset.StandardCharsets;
 import java.util.HashSet;
 import java.util.LinkedHashMap;
@@ -54,9 +51,7 @@ import java.util.Set;
 public class BopEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
-
     private final ComponentFactory componentFactory;
-
     private final JsonClient jsonClient;
 
     private final FormLayout settingsLayout = new FormLayout();
@@ -104,42 +99,15 @@ public class BopEditorView extends BaseView {
                 .setFontSize("var(--lumo-font-size-s)")
                 .setColor("var(--lumo-secondary-text-color)");
 
-        MultiFileMemoryBuffer multiFileMemoryBuffer = new MultiFileMemoryBuffer();
-        Upload fileUpload = new Upload(multiFileMemoryBuffer);
+
+        Upload fileUpload = new Upload();
+        fileUpload.setUploadHandler(UploadHandler.inMemory(this::handleBopFileUpload));
         fileUpload.setWidthFull();
+        fileUpload.setI18n(configureUploadI18N());
         fileUpload.setDropAllowed(true);
         fileUpload.setAcceptedFileTypes("application/json", ".json");
-        fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
-        fileUpload.setI18n(configureUploadI18N());
-        fileUpload.addSucceededListener(event -> {
-            String fileName = event.getFileName();
-            InputStream fileData = multiFileMemoryBuffer.getInputStream(fileName);
-
-            try {
-                currentBop = jsonClient.fromJson(fileData, AccBop.class);
-                validationService.validate(currentBop);
-
-                if (currentBop.isMultiTrack()) {
-                    String errorMessage = String.format("Please upload %s with settings for only one track.", fileName);
-                    notificationService.showErrorNotification(errorMessage);
-                    return;
-                }
-
-                Track track = currentBop.getTrack();
-                List<AccCar> cars = currentBop.getCars();
-
-                trackComboBox.setValue(track);
-                carsComboBox.setValue(cars);
-
-                currentBop.getEntries().forEach(entry -> currentCarComponents.put(entry.getCarId(), createBopEditField(entry)));
-
-                reloadComponents();
-            } catch (ConstraintViolationException e) {
-                throw new RuntimeException("Invalid bop file", e);
-            }
-        });
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
-        fileUpload.addFailedListener(event -> notificationService.showErrorNotification(event.getFileName() + TEXT_DELIMITER + event.getReason().getMessage()));
+        fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
 
         fileUploadLayout.add(fileUpload, fileUploadHint);
         return fileUploadLayout;
@@ -156,6 +124,31 @@ public class BopEditorView extends BaseView {
         i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB.");
 
         return i18n;
+    }
+
+    private void handleBopFileUpload(UploadMetadata metadata, byte[] data) {
+        try {
+            currentBop = jsonClient.fromJson(new String(data), AccBop.class);
+            validationService.validate(currentBop);
+
+            if (currentBop.isMultiTrack()) {
+                String errorMessage = String.format("Please upload %s with settings for only one track.", metadata.fileName());
+                notificationService.showErrorNotification(errorMessage);
+                return;
+            }
+
+            Track track = currentBop.getTrack();
+            List<AccCar> cars = currentBop.getCars();
+
+            trackComboBox.setValue(track);
+            carsComboBox.setValue(cars);
+
+            currentBop.getEntries().forEach(entry -> currentCarComponents.put(entry.getCarId(), createBopEditField(entry)));
+
+            reloadComponents();
+        } catch (Exception e) {
+            notificationService.showErrorNotification(metadata.fileName() + TEXT_DELIMITER + e.getLocalizedMessage());
+        }
     }
 
     private BopEditField createBopEditField(AccBopEntry initEntry) {
@@ -259,8 +252,10 @@ public class BopEditorView extends BaseView {
         Button downloadButton = new Button("Download", componentFactory.getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
-        Anchor downloadAnchor = new Anchor(downloadBop(), "");
-        downloadAnchor.getElement().setAttribute("download", true);
+        Anchor downloadAnchor = new Anchor((event) -> {
+            event.setFileName("bop.json");
+            event.getOutputStream().write(jsonClient.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
+        }, "");
         downloadAnchor.removeAll();
         downloadAnchor.add(downloadButton);
 
@@ -279,13 +274,6 @@ public class BopEditorView extends BaseView {
 
         verticalLayout.add(settingsLayout, carsLayout, buttonLayout, previewTextArea);
         return verticalLayout;
-    }
-
-    private StreamResource downloadBop() {
-        return new StreamResource(
-                "bop.json",
-                () -> new ByteArrayInputStream(jsonClient.toJson(currentBop).getBytes(StandardCharsets.UTF_8))
-        );
     }
 
     private void resetBop() {
