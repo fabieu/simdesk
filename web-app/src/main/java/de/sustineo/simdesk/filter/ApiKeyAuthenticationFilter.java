@@ -9,7 +9,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
-import org.apache.commons.lang3.StringUtils;
+import org.apache.commons.lang3.Strings;
 import org.springframework.core.annotation.Order;
 import org.springframework.http.HttpHeaders;
 import org.springframework.security.core.context.SecurityContextHolder;
@@ -52,7 +52,7 @@ public class ApiKeyAuthenticationFilter extends OncePerRequestFilter {
     protected String extractApiKeyFromRequest(HttpServletRequest request) {
         // Retrieve api key from header "Authorization", with Bearer prefix removed
         String authorizationHeader = request.getHeader(HttpHeaders.AUTHORIZATION);
-        if (StringUtils.startsWith(authorizationHeader, "Bearer ")) {
+        if (Strings.CI.startsWith(authorizationHeader, "Bearer ")) {
             return authorizationHeader.replaceAll("Bearer\\s*", "");
         }
 
