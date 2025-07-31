@@ -4,6 +4,7 @@ import de.sustineo.simdesk.utils.json.JsonClient;
 import lombok.RequiredArgsConstructor;
 import org.apache.ibatis.type.BaseTypeHandler;
 import org.apache.ibatis.type.JdbcType;
+import org.postgresql.util.PGobject;
 
 import java.sql.CallableStatement;
 import java.sql.PreparedStatement;
@@ -16,33 +17,37 @@ public class JsonTypeHandler<T> extends BaseTypeHandler<T> {
 
     @Override
     public void setNonNullParameter(PreparedStatement ps, int i, T parameter, JdbcType jdbcType) throws SQLException {
-        ps.setString(i, JsonClient.toJson(parameter));
+        String json = JsonClient.toJson(parameter);
+
+        if (jdbcType == JdbcType.OTHER) {
+            // Assume it's JSON/JSONB (PostgreSQL-specific)
+            PGobject pgObject = new PGobject();
+            pgObject.setType("jsonb");
+            pgObject.setValue(json);
+            ps.setObject(i, pgObject);
+        } else {
+            // Fallback for TEXT, VARCHAR, etc.
+            ps.setString(i, json);
+        }
     }
 
     @Override
     public T getNullableResult(ResultSet rs, String columnName) throws SQLException {
-        String json = rs.getString(columnName);
-        if (json == null) {
-            return null;
-        }
-
-        return JsonClient.fromJson(json, type);
+        return parseJson(rs.getString(columnName));
     }
 
     @Override
     public T getNullableResult(ResultSet rs, int columnIndex) throws SQLException {
-        String json = rs.getString(columnIndex);
-        if (json == null) {
-            return null;
-        }
-
-        return JsonClient.fromJson(json, type);
+        return parseJson(rs.getString(columnIndex));
     }
 
     @Override
     public T getNullableResult(CallableStatement cs, int columnIndex) throws SQLException {
-        String json = cs.getString(columnIndex);
-        if (json == null) {
+        return parseJson(cs.getString(columnIndex));
+    }
+
+    private T parseJson(String json) {
+        if (json == null || json.isBlank()) {
             return null;
         }
 

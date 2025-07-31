@@ -181,7 +181,7 @@ public class SettingsView extends BaseView {
 
         Select<Visibility> visibilityField = new Select<>();
         visibilityField.setWidthFull();
-        visibilityField.setItems(Visibility.values());
+        visibilityField.setItems(Visibility.PRIVATE, Visibility.PUBLIC);
         binder.forField(visibilityField)
                 .bind(Driver::getVisibility, Driver::setVisibility);
         visibilityColumn.setEditorComponent(visibilityField);

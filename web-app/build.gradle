@@ -46,7 +46,7 @@ dependencies {
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
-    runtimeOnly "org.postgresql:postgresql:42.7.7"
+    implementation "org.postgresql:postgresql:42.7.7"
     runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
     implementation "org.flywaydb:flyway-database-postgresql"
 
