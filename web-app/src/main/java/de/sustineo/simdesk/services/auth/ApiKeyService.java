@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.services.auth;
 
 import de.sustineo.simdesk.entities.auth.ApiKey;
-import de.sustineo.simdesk.mapper.UserApiKeyMapper;
-import de.sustineo.simdesk.mapper.UserPermissionMapper;
+import de.sustineo.simdesk.mybatis.mapper.UserApiKeyMapper;
+import de.sustineo.simdesk.mybatis.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.cache.Cache;

@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.mapper;
+package de.sustineo.simdesk.mybatis.mapper;
 
 import de.sustineo.simdesk.entities.auth.UserPermission;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;

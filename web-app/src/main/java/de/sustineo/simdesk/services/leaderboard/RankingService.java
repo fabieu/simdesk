@@ -6,7 +6,7 @@ import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
 import de.sustineo.simdesk.entities.comparator.GroupRankingComparator;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
-import de.sustineo.simdesk.mapper.RankingMapper;
+import de.sustineo.simdesk.mybatis.mapper.RankingMapper;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

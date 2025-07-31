@@ -5,7 +5,7 @@ import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
-import de.sustineo.simdesk.mapper.BopMapper;
+import de.sustineo.simdesk.mybatis.mapper.BopMapper;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.context.event.ApplicationReadyEvent;

@@ -4,7 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.mapper.SessionMapper;
+import de.sustineo.simdesk.mybatis.mapper.SessionMapper;
 import de.sustineo.simdesk.services.converter.SessionConverter;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import lombok.extern.java.Log;
