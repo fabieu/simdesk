@@ -4,7 +4,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.mapper.PenaltyMapper;
+import de.sustineo.simdesk.mybatis.mapper.PenaltyMapper;
 import de.sustineo.simdesk.services.converter.PenaltyConverter;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
