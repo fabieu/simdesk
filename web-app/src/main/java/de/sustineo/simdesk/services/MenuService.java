@@ -30,8 +30,16 @@ public class MenuService {
         List<MenuEntity> items = new ArrayList<>();
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.CLOCK, LeaderboardOverallLapTimesView.class));
+            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.TROPHY, LeaderboardOverallLapTimesView.class));
             items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
+        }
+
+        if (ProfileManager.isLiveTimingProfileEnabled()) {
+            items.add(MenuEntity.of(MenuEntityCategory.LIVE_TIMING, "Dashboards", VaadinIcon.CLOCK, DashboardView.class));
+        }
+
+        if (ProfileManager.isEntrylistProfileEnabled()) {
+            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
@@ -42,10 +50,6 @@ public class MenuService {
             }
 
             items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
-        }
-
-        if (ProfileManager.isEntrylistProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
         if (ProfileManager.isMapProfileEnabled()) {

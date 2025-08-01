@@ -1,11 +1,13 @@
 package de.sustineo.simdesk.mybatis.mapper;
 
+import de.sustineo.simdesk.entities.Visibility;
 import de.sustineo.simdesk.entities.livetiming.Dashboard;
 import de.sustineo.simdesk.entities.livetiming.DashboardState;
 import de.sustineo.simdesk.mybatis.typehandler.JsonTypeHandler;
 import org.apache.ibatis.annotations.*;
 import org.springframework.stereotype.Component;
 
+import java.util.Collection;
 import java.util.List;
 
 @Component
@@ -24,8 +26,17 @@ public interface DashboardMapper {
             @Result(property = "updateDatetime", column = "update_datetime"),
             @Result(property = "createDatetime", column = "create_datetime"),
     })
-    @Select("SELECT * FROM dashboard ORDER BY create_datetime DESC")
-    List<Dashboard> findAll();
+    @Select("""
+            <script>
+                SELECT * FROM dashboard
+                WHERE visibility IN
+                    <foreach item='item' collection='visibility' open='(' separator=',' close=')'>
+                        #{item}
+                    </foreach>
+                ORDER BY create_datetime DESC
+            </script>
+            """)
+    List<Dashboard> findAllByVisibility(Collection<Visibility> visibility);
 
     @ResultMap("dashboardResultMap")
     @Select("SELECT * FROM dashboard WHERE id = #{id}")
