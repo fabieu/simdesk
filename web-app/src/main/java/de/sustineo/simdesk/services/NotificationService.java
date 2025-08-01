@@ -86,7 +86,7 @@ public class NotificationService {
 
     private void showNotification(NotificationType notificationType, Duration duration, Component... components) {
         Notification notification = new Notification();
-        notification.setPosition(Notification.Position.TOP_END);
+        notification.setPosition(Notification.Position.BOTTOM_END);
         notification.addThemeVariants(getNotificationVariant(notificationType));
         notification.setDuration((int) duration.toMillis());
 
