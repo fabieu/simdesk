@@ -1,16 +1,9 @@
-buildscript {
-    ext {
-        vaadinVersion = "24.8.5"
-        flywayVersion = "11.10.5"
-    }
-}
-
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
     id "org.springframework.boot" version "3.5.4"
-    id 'com.vaadin' version "${vaadinVersion}"
-    id "org.flywaydb.flyway" version "${flywayVersion}"
+    id 'com.vaadin' version "24.8.5"
+    id "org.flywaydb.flyway" version "11.10.5"
 }
 
 group = "de.sustineo.simdesk"
@@ -29,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+        mavenBom "com.vaadin:vaadin-bom:24.8.5"
     }
 }
 
@@ -55,8 +48,7 @@ dependencies {
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
     runtimeOnly "org.postgresql:postgresql:42.7.7"
     runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
-    implementation "org.flywaydb:flyway-core:${flywayVersion}"
-    implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
+    implementation "org.flywaydb:flyway-database-postgresql"
 
     // Logging
     implementation "io.logz.logback:logzio-logback-appender:2.4.0"
