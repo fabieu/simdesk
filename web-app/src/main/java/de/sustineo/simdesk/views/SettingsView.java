@@ -186,7 +186,7 @@ public class SettingsView extends BaseView {
                 .bind(Driver::getVisibility, Driver::setVisibility);
         visibilityColumn.setEditorComponent(visibilityField);
 
-        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
         Button cancelButton = buttonComponentFactory.createCancelIconButton();
@@ -353,7 +353,7 @@ public class SettingsView extends BaseView {
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
         discordRoleIdColumn.setEditorComponent(discordRoleIdField);
 
-        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
         Button cancelButton = buttonComponentFactory.createCancelIconButton();
