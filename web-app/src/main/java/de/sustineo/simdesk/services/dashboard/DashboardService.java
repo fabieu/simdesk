@@ -31,4 +31,8 @@ public class DashboardService {
 
         return dashboardMapper.findAllByVisibility(visibilitySet);
     }
+
+    public Dashboard getByDashboardId(String dashboardId) {
+        return dashboardMapper.findById(dashboardId);
+    }
 }

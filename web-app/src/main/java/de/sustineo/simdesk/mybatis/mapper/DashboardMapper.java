@@ -41,7 +41,7 @@ public interface DashboardMapper {
 
     @ResultMap("dashboardResultMap")
     @Select("SELECT * FROM dashboard WHERE id = #{id}")
-    List<Dashboard> findById(String id);
+    Dashboard findById(String id);
 
     @Insert("""
             INSERT INTO dashboard (id, visibility, name, description, broadcast_url, start_datetime, end_datetime)

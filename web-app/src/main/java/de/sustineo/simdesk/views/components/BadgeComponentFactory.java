@@ -5,9 +5,12 @@ import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.dom.ThemeList;
 import de.sustineo.simdesk.entities.Visibility;
+import de.sustineo.simdesk.entities.livetiming.Dashboard;
 import jakarta.annotation.Nonnull;
 import org.springframework.stereotype.Service;
 
+import java.time.Instant;
+import java.time.temporal.ChronoUnit;
 import java.util.Objects;
 
 @Service
@@ -30,13 +33,18 @@ public class BadgeComponentFactory extends ComponentFactory {
         return badge;
     }
 
-    public Span getLiveBadge() {
+    public Span getLiveBadge(Dashboard dashboard) {
         Icon icon = new Icon(VaadinIcon.EXCLAMATION_CIRCLE_O);
         icon.getStyle().setPadding("var(--lumo-space-xs)");
 
         Span badge = new Span(icon, new Span("LIVE"));
         badge.getElement().getThemeList().add("badge primary error");
         badge.addClassName("badge-live");
+
+        // Hide badge if the dashboard state datetime is null or more than 5 minutes old
+        if (dashboard.getStateDatetime() == null || dashboard.getStateDatetime().isBefore(Instant.now().minus(5, ChronoUnit.MINUTES))) {
+            badge.setVisible(false);
+        }
 
         return badge;
     }

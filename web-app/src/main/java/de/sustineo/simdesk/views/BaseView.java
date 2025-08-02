@@ -42,7 +42,7 @@ public abstract class BaseView extends VerticalLayout {
         return createViewHeader(getAnnotatedPageTitle());
     }
 
-    protected Component createViewHeader(String heading) {
+    protected Component createViewHeader(String heading, Component... components) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.addClassNames("header");
 
@@ -53,6 +53,7 @@ public abstract class BaseView extends VerticalLayout {
                 .setFontWeight(Style.FontWeight.BOLD);
 
         layout.add(headerText);
+        layout.add(components);
 
         return layout;
     }

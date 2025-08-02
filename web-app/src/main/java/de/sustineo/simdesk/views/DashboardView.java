@@ -24,18 +24,15 @@ import de.sustineo.simdesk.services.dashboard.DashboardService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.BadgeComponentFactory;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
-import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
 import java.time.Instant;
 import java.time.format.TextStyle;
-import java.time.temporal.ChronoUnit;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
 import java.util.Locale;
 
-@Log
 @Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Route(value = "/dashboards")
 @PageTitle("Dashboards")
@@ -118,13 +115,7 @@ public class DashboardView extends BaseView {
         layout.setWidthFull();
 
         H3 name = new H3(dashboard.getName());
-
-        Span liveBadge = badgeComponentFactory.getLiveBadge();
-        if (dashboard.getStateDatetime() == null || dashboard.getStateDatetime().isBefore(Instant.now().minus(5, ChronoUnit.MINUTES))) {
-            // Hide the live badge if the dashboard state datetime is null or more than 5 minutes old
-            liveBadge.setVisible(false);
-        }
-
+        Span liveBadge = badgeComponentFactory.getLiveBadge(dashboard);
         Span visibilityBadge = badgeComponentFactory.getVisibilityBadge(dashboard.getVisibility());
 
         layout.add(name, visibilityBadge, liveBadge);
@@ -172,9 +163,8 @@ public class DashboardView extends BaseView {
         Button editButton = buttonComponentFactory.createWarningButton("Edit");
 
         Button viewButton = buttonComponentFactory.createPrimarySuccessButton("View");
-        viewButton.addClickListener(event -> {
-            getUI().ifPresent(ui -> ui.navigate(DashboardView.class, new RouteParam(ROUTE_PARAMETER_DASHBOARD_ID, dashboard.getId())));
-        });
+        viewButton.addClickListener(event -> getUI()
+                .ifPresent(ui -> ui.navigate(DashboardDetailedView.class, new RouteParam(ROUTE_PARAMETER_DASHBOARD_ID, dashboard.getId()))));
 
         Button deleteButton = buttonComponentFactory.createErrorButton("Delete");
 
