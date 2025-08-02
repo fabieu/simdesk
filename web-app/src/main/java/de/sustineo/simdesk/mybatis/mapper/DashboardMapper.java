@@ -57,4 +57,10 @@ public interface DashboardMapper {
             WHERE id = #{id}
             """)
     void updateState(String id, DashboardState state);
+
+    @Delete("""
+            DELETE FROM dashboard
+            WHERE id = #{id}
+            """)
+    void delete(String id);
 }

@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -166,9 +167,12 @@ public class DashboardView extends BaseView {
         viewButton.addClickListener(event -> getUI()
                 .ifPresent(ui -> ui.navigate(DashboardDetailedView.class, new RouteParam(ROUTE_PARAMETER_DASHBOARD_ID, dashboard.getId()))));
 
-        Button deleteButton = buttonComponentFactory.createErrorButton("Delete");
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_MANAGER)) {
+        ConfirmDialog deleteConfirmDialog = createDeleteConfirmDialog(dashboard);
+        Button deleteButton = buttonComponentFactory.createErrorButton("Delete");
+        deleteButton.addClickListener(event -> deleteConfirmDialog.open());
+
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
             layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
             layout.add(editButton, viewButton, deleteButton);
         } else {
@@ -177,6 +181,31 @@ public class DashboardView extends BaseView {
         }
 
         return layout;
+    }
+
+    private ConfirmDialog createDeleteConfirmDialog(Dashboard dashboard) {
+        ConfirmDialog confirmDialog = new ConfirmDialog();
+        confirmDialog.setHeader("Delete dashboard: " + dashboard.getName());
+        confirmDialog.setText(String.format("""
+                Are you sure you want to delete the dashboard "%s"?
+                This action cannot be undone."
+                """, dashboard.getName()));
+        confirmDialog.setConfirmText("Permanently delete");
+        confirmDialog.setConfirmButtonTheme("primary error");
+        confirmDialog.addConfirmListener(event -> deleteDashboard(dashboard));
+        confirmDialog.setCancelable(true);
+        confirmDialog.setCancelButtonTheme("tertiary error");
+        return confirmDialog;
+    }
+
+    private void deleteDashboard(Dashboard dashboard) {
+        Component dashboardCard = dashboardCardMap.remove(dashboard.getId());
+        if (dashboardCard != null) {
+            dashboardCard.removeFromParent();
+            dashboardService.deleteDashboard(dashboard.getId());
+            notificationService.showSuccessNotification(String.format("Dashboard \"%s\" deleted successfully", dashboard.getName()));
+        }
+
     }
 
     private void reloadDashboardCards() {

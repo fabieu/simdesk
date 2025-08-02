@@ -7,6 +7,7 @@ import de.sustineo.simdesk.mybatis.mapper.DashboardMapper;
 import de.sustineo.simdesk.services.IdGenerator;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import lombok.RequiredArgsConstructor;
+import org.springframework.security.access.prepost.PreAuthorize;
 import org.springframework.stereotype.Service;
 
 import java.util.Arrays;
@@ -34,5 +35,10 @@ public class DashboardService {
 
     public Dashboard getByDashboardId(String dashboardId) {
         return dashboardMapper.findById(dashboardId);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public void deleteDashboard(String id) {
+        dashboardMapper.delete(id);
     }
 }
