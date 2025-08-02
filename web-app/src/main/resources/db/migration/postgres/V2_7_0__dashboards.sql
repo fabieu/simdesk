@@ -8,6 +8,10 @@ CREATE TABLE IF NOT EXISTS dashboard
     start_datetime  TIMESTAMP,
     end_datetime    TIMESTAMP,
     state           JSONB,
+    state_datetime TIMESTAMP,
     update_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
     create_datetime TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
+
+CREATE INDEX idx_dashboard_visibility
+    ON dashboard (visibility);

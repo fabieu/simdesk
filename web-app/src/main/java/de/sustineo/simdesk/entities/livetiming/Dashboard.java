@@ -18,6 +18,7 @@ public class Dashboard {
     private Instant startDatetime;
     private Instant endDatetime;
     private DashboardState state;
+    private Instant stateDatetime;
     private Instant updateDatetime;
     private Instant createDatetime;
 }

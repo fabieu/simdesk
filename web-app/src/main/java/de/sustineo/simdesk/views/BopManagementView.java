@@ -309,7 +309,7 @@ public class BopManagementView extends BaseView {
                 .bind(Bop::getActive, Bop::setActive);
         activeColumn.setEditorComponent(activeField);
 
-        Button saveButton = buttonComponentFactory.createSuccessButton("Save");
+        Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
 
         Button cancelButton = buttonComponentFactory.createCancelIconButton();

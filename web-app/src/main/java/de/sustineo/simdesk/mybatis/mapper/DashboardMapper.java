@@ -23,6 +23,7 @@ public interface DashboardMapper {
             @Result(property = "startDatetime", column = "start_datetime"),
             @Result(property = "endDatetime", column = "end_datetime"),
             @Result(property = "state", column = "state", typeHandler = JsonTypeHandler.class),
+            @Result(property = "stateDatetime", column = "state_datetime"),
             @Result(property = "updateDatetime", column = "update_datetime"),
             @Result(property = "createDatetime", column = "create_datetime"),
     })
@@ -33,7 +34,7 @@ public interface DashboardMapper {
                     <foreach item='item' collection='visibility' open='(' separator=',' close=')'>
                         #{item}
                     </foreach>
-                ORDER BY create_datetime DESC
+                ORDER BY state_datetime DESC NULLS LAST, create_datetime DESC
             </script>
             """)
     List<Dashboard> findAllByVisibility(Collection<Visibility> visibility);
@@ -51,7 +52,8 @@ public interface DashboardMapper {
 
     @Update("""
             UPDATE dashboard
-            SET state = (#{state})
+            SET state = (#{state}),
+                state_datetime = NOW(),
             WHERE id = #{id}
             """)
     void updateState(String id, DashboardState state);

@@ -14,9 +14,21 @@ public class ButtonComponentFactory extends ComponentFactory {
         return button;
     }
 
-    public Button createSuccessButton(String label) {
+    public Button createPrimarySuccessButton(String label) {
         Button button = new Button(label);
         button.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        return button;
+    }
+
+    public Button createWarningButton(String label) {
+        Button button = new Button(label);
+        button.addThemeVariants(ButtonVariant.LUMO_WARNING);
+        return button;
+    }
+
+    public Button createErrorButton(String label) {
+        Button button = new Button(label);
+        button.addThemeVariants(ButtonVariant.LUMO_ERROR);
         return button;
     }
 
