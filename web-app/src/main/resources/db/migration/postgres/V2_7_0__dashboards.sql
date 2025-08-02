@@ -1,4 +1,4 @@
-CREATE TABLE IF NOT EXISTS dashboard
+CREATE TABLE IF NOT EXISTS simdesk.dashboard
 (
     id              VARCHAR(12) PRIMARY KEY,
     visibility      TEXT      NOT NULL,
