@@ -1,16 +1,9 @@
-buildscript {
-    ext {
-        vaadinVersion = "24.8.3"
-        flywayVersion = "11.10.2"
-    }
-}
-
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
-    id "org.springframework.boot" version "3.5.3"
-    id 'com.vaadin' version "${vaadinVersion}"
-    id "org.flywaydb.flyway" version "${flywayVersion}"
+    id "org.springframework.boot" version "3.5.4"
+    id 'com.vaadin' version "24.8.5"
+    id "org.flywaydb.flyway" version "11.10.5"
 }
 
 group = "de.sustineo.simdesk"
@@ -29,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:$vaadinVersion"
+        mavenBom "com.vaadin:vaadin-bom:24.8.5"
     }
 }
 
@@ -54,21 +47,20 @@ dependencies {
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
     runtimeOnly "org.postgresql:postgresql:42.7.7"
-    runtimeOnly "org.xerial:sqlite-jdbc:3.50.2.0"
-    implementation "org.flywaydb:flyway-core:${flywayVersion}"
-    implementation "org.flywaydb:flyway-database-postgresql:${flywayVersion}"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
+    implementation "org.flywaydb:flyway-database-postgresql"
 
     // Logging
     implementation "io.logz.logback:logzio-logback-appender:2.4.0"
 
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.18.0"
-    implementation "commons-codec:commons-codec:1.18.0"
-    implementation "commons-io:commons-io:2.19.0"
+    implementation "commons-codec:commons-codec:1.19.0"
+    implementation "commons-io:commons-io:2.20.0"
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.2.8"
-    implementation "com.opencsv:opencsv:5.11.2"
+    implementation "com.opencsv:opencsv:5.12.0"
 
     // OpenAPI documentation
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.9"
