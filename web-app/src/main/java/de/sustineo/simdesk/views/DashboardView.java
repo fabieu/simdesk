@@ -4,8 +4,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.markdown.Markdown;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -94,57 +94,31 @@ public class DashboardView extends BaseView {
 
     private Component createDashboardCard(Dashboard dashboard) {
         VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
         layout.getStyle()
                 .setBorder("1px solid var(--lumo-contrast-10pct)");
 
-        Div container = new Div();
-        container.setWidthFull();
-        container.addClassNames("pure-g");
-        container.add(createDashboardCardBasicInfo(dashboard), createDashboardCardDetails(dashboard), createDashboardCardActions(dashboard));
+        layout.add(createDashboardCardHeader(dashboard));
 
-        layout.add(container);
+        if (dashboard.getDescription() != null) {
+            layout.add(createDashboardCardDescription(dashboard.getDescription()));
+        }
+
+        if (dashboard.getStartDatetime() != null || dashboard.getEndDatetime() != null) {
+            layout.add(createTimetable(dashboard.getStartDatetime(), dashboard.getEndDatetime()));
+        }
+
+        layout.add(createDashboardCardActions(dashboard));
+
         return layout;
     }
 
-    private Component createDashboardCardBasicInfo(Dashboard dashboard) {
-        Div container = new Div();
-        container.addClassNames("pure-u-1", "pure-u-md-1-2");
-
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-        layout.setPadding(false);
-        layout.getStyle()
-                .setMarginBottom("var(--lumo-space-m)");
+    private Component createDashboardCardHeader(Dashboard dashboard) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
 
         H3 name = new H3(dashboard.getName());
-        layout.add(name);
 
-        if (dashboard.getDescription() != null) {
-            Paragraph description = new Paragraph(dashboard.getDescription());
-            layout.add(description);
-        }
-
-        container.add(layout);
-        return container;
-    }
-
-    private Component createDashboardCardDetails(Dashboard dashboard) {
-        Div container = new Div();
-        container.addClassNames("pure-u-1", "pure-u-md-1-2");
-
-        VerticalLayout layout = new VerticalLayout();
-        layout.setWidthFull();
-        layout.setPadding(false);
-        layout.getStyle()
-                .setMarginBottom("var(--lumo-space-m)");
-
-        layout.add(createVisibilityAndLiveLayout(dashboard), createTimetableLayout(dashboard));
-
-        container.add(layout);
-        return container;
-    }
-
-    private Component createVisibilityAndLiveLayout(Dashboard dashboard) {
         Span liveBadge = badgeComponentFactory.getLiveBadge();
         if (dashboard.getStateDatetime() == null || dashboard.getStateDatetime().isBefore(Instant.now().minus(5, ChronoUnit.MINUTES))) {
             // Hide the live badge if the dashboard state datetime is null or more than 5 minutes old
@@ -153,34 +127,36 @@ public class DashboardView extends BaseView {
 
         Span visibilityBadge = badgeComponentFactory.getVisibilityBadge(dashboard.getVisibility());
 
-        HorizontalLayout layout = new HorizontalLayout(liveBadge, visibilityBadge);
-        layout.setWidthFull();
-        layout.setPadding(false);
-        layout.setJustifyContentMode(JustifyContentMode.END);
-
+        layout.add(name, visibilityBadge, liveBadge);
         return layout;
     }
 
-    private Component createTimetableLayout(Dashboard dashboard) {
+    private Component createDashboardCardDescription(String description) {
+        Markdown markdown = new Markdown(description);
+        markdown.setWidthFull();
+        return markdown;
+    }
+
+    private Component createTimetable(Instant startDatetime, Instant endDatetime) {
         FlexLayout layout = new FlexLayout();
         layout.setWidthFull();
-        layout.setJustifyContentMode(JustifyContentMode.END);
+        layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         layout.getStyle()
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-m)");
 
-        if (dashboard.getStartDatetime() != null) {
+        if (startDatetime != null) {
             TextField startTimeField = new TextField("Start Time");
             startTimeField.setReadOnly(true);
-            startTimeField.setValue(FormatUtils.formatDatetime(dashboard.getStartDatetime()));
+            startTimeField.setValue(FormatUtils.formatDatetime(startDatetime));
             startTimeField.setTooltipText(BrowserTimeZone.get().getDisplayName(TextStyle.FULL, Locale.getDefault()));
             layout.add(startTimeField);
         }
 
-        if (dashboard.getEndDatetime() != null) {
+        if (endDatetime != null) {
             TextField endTimeField = new TextField("End Time");
             endTimeField.setReadOnly(true);
-            endTimeField.setValue(FormatUtils.formatDatetime(dashboard.getEndDatetime()));
+            endTimeField.setValue(FormatUtils.formatDatetime(endDatetime));
             endTimeField.setTooltipText(BrowserTimeZone.get().getDisplayName(TextStyle.FULL, Locale.getDefault()));
             layout.add(endTimeField);
         }
@@ -189,9 +165,6 @@ public class DashboardView extends BaseView {
     }
 
     private Component createDashboardCardActions(Dashboard dashboard) {
-        Div container = new Div();
-        container.addClassNames("pure-u-1");
-
         HorizontalLayout layout = new HorizontalLayout();
         layout.setWidthFull();
         layout.setPadding(false);
@@ -213,8 +186,7 @@ public class DashboardView extends BaseView {
             layout.add(viewButton);
         }
 
-        container.add(layout);
-        return container;
+        return layout;
     }
 
     private void reloadDashboardCards() {
