@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.mapper;
+package de.sustineo.simdesk.mybatis.mapper;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;

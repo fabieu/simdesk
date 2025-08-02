@@ -1,6 +1,5 @@
-package de.sustineo.simdesk.mapper;
+package de.sustineo.simdesk.mybatis.mapper;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
@@ -8,13 +7,11 @@ import org.apache.ibatis.annotations.Mapper;
 import org.apache.ibatis.annotations.Result;
 import org.apache.ibatis.annotations.Results;
 import org.apache.ibatis.annotations.Select;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.time.Instant;
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Component
 @Mapper
 public interface RankingMapper {

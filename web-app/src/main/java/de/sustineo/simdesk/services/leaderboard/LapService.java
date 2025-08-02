@@ -5,7 +5,7 @@ import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.mapper.LapMapper;
+import de.sustineo.simdesk.mybatis.mapper.LapMapper;
 import de.sustineo.simdesk.services.converter.LapConverter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Autowired;
