@@ -45,7 +45,7 @@ public class DashboardView extends BaseView {
     private final ButtonComponentFactory buttonComponentFactory;
     private final BadgeComponentFactory badgeComponentFactory;
 
-    private final VerticalLayout dashboardCardLayout = new VerticalLayout();
+    private final VerticalLayout dashboardCardListLayout = new VerticalLayout();
     private final HashMap<String, Component> dashboardCardMap = new LinkedHashMap<>();
 
     public DashboardView(DashboardService dashboardService,
@@ -64,10 +64,10 @@ public class DashboardView extends BaseView {
         setSpacing(false);
 
         add(createViewHeader());
-        addAndExpand(createDashboardList());
+        addAndExpand(createDashboardLayout());
     }
 
-    private Component createDashboardList() {
+    private Component createDashboardLayout() {
         Div container = new Div();
         container.addClassNames("container", "bg-light");
         container.getStyle()
@@ -83,11 +83,25 @@ public class DashboardView extends BaseView {
             });
         }
 
-        reloadDashboardCards();
+        dashboardCardListLayout.setPadding(false);
+        dashboardCardListLayout.add(dashboardCardMap.values());
 
-        container.add(dashboardCardLayout);
+        VerticalLayout dashboardLayout = new VerticalLayout();
+        dashboardLayout.add(dashboardCardListLayout, createDashboardActions());
 
+        container.add(dashboardLayout);
         return container;
+    }
+
+    private Component createDashboardActions() {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+
+        Button createDashboardButton = buttonComponentFactory.createPrimarySuccessButton("Create new dashboard");
+
+        layout.add(createDashboardButton);
+        return layout;
     }
 
     private Component createDashboardCard(Dashboard dashboard) {
@@ -205,11 +219,5 @@ public class DashboardView extends BaseView {
             dashboardService.deleteDashboard(dashboard.getId());
             notificationService.showSuccessNotification(String.format("Dashboard \"%s\" deleted successfully", dashboard.getName()));
         }
-
-    }
-
-    private void reloadDashboardCards() {
-        dashboardCardLayout.removeAll();
-        dashboardCardLayout.add(dashboardCardMap.values());
     }
 }
