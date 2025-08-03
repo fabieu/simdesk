@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -11,6 +12,7 @@ import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
@@ -25,14 +27,13 @@ import de.sustineo.simdesk.services.dashboard.DashboardService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.BadgeComponentFactory;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
+import de.sustineo.simdesk.views.forms.DashboardEditForm;
 import org.springframework.context.annotation.Profile;
 
 import java.time.Instant;
-import java.time.format.TextStyle;
 import java.util.HashMap;
 import java.util.LinkedHashMap;
 import java.util.List;
-import java.util.Locale;
 
 @Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Route(value = "/dashboards")
@@ -67,11 +68,34 @@ public class DashboardView extends BaseView {
         addAndExpand(createDashboardLayout());
     }
 
+    private boolean hasManagementAccess() {
+        return securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN);
+    }
+
     private Component createDashboardLayout() {
         Div container = new Div();
         container.addClassNames("container", "bg-light");
         container.getStyle()
                 .setPadding("0");
+
+        dashboardCardListLayout.setPadding(false);
+
+        reloadDashboardCards();
+
+        VerticalLayout dashboardLayout = new VerticalLayout();
+        dashboardLayout.add(dashboardCardListLayout);
+
+        if (hasManagementAccess()) {
+            dashboardLayout.add(createDashboardActions());
+        }
+
+        container.add(dashboardLayout);
+        return container;
+    }
+
+    private void reloadDashboardCards() {
+        dashboardCardMap.clear();
+        dashboardCardListLayout.removeAll();
 
         List<Dashboard> dashboardList = dashboardService.findAll();
         if (dashboardList.isEmpty()) {
@@ -83,14 +107,7 @@ public class DashboardView extends BaseView {
             });
         }
 
-        dashboardCardListLayout.setPadding(false);
         dashboardCardListLayout.add(dashboardCardMap.values());
-
-        VerticalLayout dashboardLayout = new VerticalLayout();
-        dashboardLayout.add(dashboardCardListLayout, createDashboardActions());
-
-        container.add(dashboardLayout);
-        return container;
     }
 
     private Component createDashboardActions() {
@@ -99,6 +116,7 @@ public class DashboardView extends BaseView {
         layout.setJustifyContentMode(JustifyContentMode.CENTER);
 
         Button createDashboardButton = buttonComponentFactory.createPrimarySuccessButton("Create new dashboard");
+        createDashboardButton.addClickListener(event -> createNewDashboardDialog().open());
 
         layout.add(createDashboardButton);
         return layout;
@@ -155,7 +173,7 @@ public class DashboardView extends BaseView {
             TextField startTimeField = new TextField("Start Time");
             startTimeField.setReadOnly(true);
             startTimeField.setValue(FormatUtils.formatDatetime(startDatetime));
-            startTimeField.setTooltipText(BrowserTimeZone.get().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            startTimeField.setTooltipText(BrowserTimeZone.getDisplayName());
             layout.add(startTimeField);
         }
 
@@ -163,7 +181,7 @@ public class DashboardView extends BaseView {
             TextField endTimeField = new TextField("End Time");
             endTimeField.setReadOnly(true);
             endTimeField.setValue(FormatUtils.formatDatetime(endDatetime));
-            endTimeField.setTooltipText(BrowserTimeZone.get().getDisplayName(TextStyle.FULL, Locale.getDefault()));
+            endTimeField.setTooltipText(BrowserTimeZone.getDisplayName());
             layout.add(endTimeField);
         }
 
@@ -176,6 +194,7 @@ public class DashboardView extends BaseView {
         layout.setPadding(false);
 
         Button editButton = buttonComponentFactory.createWarningButton("Edit");
+        editButton.addClickListener(event -> createEditDashboardDialog(dashboard).open());
 
         Button viewButton = buttonComponentFactory.createPrimarySuccessButton("View");
         viewButton.addClickListener(event -> getUI()
@@ -186,7 +205,7 @@ public class DashboardView extends BaseView {
         Button deleteButton = buttonComponentFactory.createErrorButton("Delete");
         deleteButton.addClickListener(event -> deleteConfirmDialog.open());
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+        if (hasManagementAccess()) {
             layout.setJustifyContentMode(JustifyContentMode.BETWEEN);
             layout.add(editButton, viewButton, deleteButton);
         } else {
@@ -201,8 +220,8 @@ public class DashboardView extends BaseView {
         ConfirmDialog confirmDialog = new ConfirmDialog();
         confirmDialog.setHeader("Delete dashboard: " + dashboard.getName());
         confirmDialog.setText(String.format("""
-                Are you sure you want to delete the dashboard "%s"?
-                This action cannot be undone."
+                Are you sure you want to delete the dashboard: %s?
+                This action cannot be undone!"
                 """, dashboard.getName()));
         confirmDialog.setConfirmText("Permanently delete");
         confirmDialog.setConfirmButtonTheme("primary error");
@@ -215,9 +234,69 @@ public class DashboardView extends BaseView {
     private void deleteDashboard(Dashboard dashboard) {
         Component dashboardCard = dashboardCardMap.remove(dashboard.getId());
         if (dashboardCard != null) {
-            dashboardCard.removeFromParent();
             dashboardService.deleteDashboard(dashboard.getId());
-            notificationService.showSuccessNotification(String.format("Dashboard \"%s\" deleted successfully", dashboard.getName()));
+
+            dashboardCard.removeFromParent();
+            notificationService.showSuccessNotification("Successfully deleted dashboard: " + dashboard.getName());
         }
+    }
+
+    private Dialog createNewDashboardDialog() {
+        Dashboard dashboard = dashboardService.createDashboard();
+        return createEditDashboardDialog(dashboard);
+    }
+
+    private Dialog createEditDashboardDialog(Dashboard dashboard) {
+        Dialog dialog = new Dialog();
+        dialog.setResizable(true);
+        dialog.setWidth("800px");
+
+        DashboardEditMode editMode;
+        if (dashboard.getName() == null) {
+            editMode = DashboardEditMode.CREATE;
+        } else {
+            editMode = DashboardEditMode.UPDATE;
+        }
+
+        switch (editMode) {
+            case CREATE -> dialog.setHeaderTitle("Create new dashboard");
+            case UPDATE -> dialog.setHeaderTitle("Edit dashboard: " + dashboard.getName());
+        }
+
+        Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
+        saveButton.setEnabled(false);
+
+        DashboardEditForm dashboardEditForm = new DashboardEditForm(dashboard);
+        Binder<Dashboard> binder = dashboardEditForm.getBinder();
+        binder.addStatusChangeListener(event -> saveButton.setEnabled(binder.isValid()));
+
+        saveButton.addClickListener(event -> {
+            try {
+                binder.writeBean(dashboard);
+                dashboardService.upsertDashboard(dashboard);
+
+                reloadDashboardCards();
+                dialog.close();
+
+                switch (editMode) {
+                    case CREATE ->
+                            notificationService.showSuccessNotification("Successfully created new dashboard: " + dashboard.getName());
+                    case UPDATE ->
+                            notificationService.showSuccessNotification("Successfully updated dashboard: " + dashboard.getName());
+                }
+            } catch (Exception e) {
+                notificationService.showErrorNotification("Failed to save dashboard: " + e.getMessage());
+            }
+        });
+
+        dialog.add(dashboardEditForm);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), saveButton);
+
+        return dialog;
+    }
+
+    private enum DashboardEditMode {
+        CREATE,
+        UPDATE,
     }
 }

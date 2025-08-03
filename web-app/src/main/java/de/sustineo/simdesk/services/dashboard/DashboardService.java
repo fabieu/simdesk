@@ -18,9 +18,16 @@ import java.util.Set;
 @Service
 @RequiredArgsConstructor
 public class DashboardService {
+    private static final int DASHBOARD_ID_LENGTH = 12;
+
     private final DashboardMapper dashboardMapper;
     private final IdGenerator idGenerator;
     private final SecurityService securityService;
+
+    public Dashboard createDashboard() {
+        String dashboardId = idGenerator.generateRandomString(DASHBOARD_ID_LENGTH);
+        return new Dashboard(dashboardId);
+    }
 
     public List<Dashboard> findAll() {
         Set<Visibility> visibilitySet = new HashSet<>();
@@ -40,5 +47,10 @@ public class DashboardService {
     @PreAuthorize("hasAnyRole('ADMIN')")
     public void deleteDashboard(String id) {
         dashboardMapper.delete(id);
+    }
+
+    @PreAuthorize("hasAnyRole('ADMIN')")
+    public void upsertDashboard(Dashboard dashboard) {
+        dashboardMapper.upsert(dashboard);
     }
 }

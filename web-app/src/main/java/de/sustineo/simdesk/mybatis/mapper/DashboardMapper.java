@@ -63,4 +63,18 @@ public interface DashboardMapper {
             WHERE id = #{id}
             """)
     void delete(String id);
+
+    @Insert("""
+            INSERT INTO dashboard AS d(id, visibility, name, description, broadcast_url, start_datetime, end_datetime)
+            VALUES (#{id}, #{visibility}, #{name}, #{description}, #{broadcastUrl}, #{startDatetime}, #{endDatetime})
+            ON CONFLICT (id) DO UPDATE
+            SET name = COALESCE(EXCLUDED."name", d."name"),
+                visibility = COALESCE(EXCLUDED.visibility, d.visibility),
+                description = COALESCE(EXCLUDED.description, d.description),
+                broadcast_url = COALESCE(EXCLUDED.broadcast_url, d.broadcast_url),
+                start_datetime = COALESCE(EXCLUDED.start_datetime, d.start_datetime),
+                end_datetime = COALESCE(EXCLUDED.end_datetime, d.end_datetime),
+                update_datetime = CURRENT_TIMESTAMP
+            """)
+    void upsert(Dashboard dashboard);
 }

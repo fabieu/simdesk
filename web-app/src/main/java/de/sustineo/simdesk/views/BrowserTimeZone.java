@@ -4,23 +4,14 @@ import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.page.ExtendedClientDetails;
 import com.vaadin.flow.server.VaadinSession;
 
+import java.time.Instant;
+import java.time.LocalDateTime;
 import java.time.ZoneId;
 import java.time.ZoneOffset;
+import java.time.format.TextStyle;
+import java.util.Locale;
 
 public final class BrowserTimeZone {
-    /**
-     * Returns the current {@link ExtendedClientDetails}, which is stored in the current session.
-     * You need to populate this field first, by using {@link #init()},
-     * otherwise this will return null.
-     */
-    public static ExtendedClientDetails getExtendedClientDetails() {
-        return VaadinSession.getCurrent().getAttribute(ExtendedClientDetails.class);
-    }
-
-    public static void setExtendedClientDetails(ExtendedClientDetails extendedClientDetails) {
-        VaadinSession.getCurrent().setAttribute(ExtendedClientDetails.class, extendedClientDetails);
-    }
-
     /**
      * Initializes the {@link ExtendedClientDetails} in the current session.
      */
@@ -28,6 +19,19 @@ public final class BrowserTimeZone {
         if (getExtendedClientDetails() == null) {
             UI.getCurrent().getPage().retrieveExtendedClientDetails(BrowserTimeZone::setExtendedClientDetails);
         }
+    }
+
+    /**
+     * Returns the current {@link ExtendedClientDetails}, which is stored in the current session.
+     * You need to populate this field first, by using {@link #init()},
+     * otherwise this will return null.
+     */
+    private static ExtendedClientDetails getExtendedClientDetails() {
+        return VaadinSession.getCurrent().getAttribute(ExtendedClientDetails.class);
+    }
+
+    private static void setExtendedClientDetails(ExtendedClientDetails extendedClientDetails) {
+        VaadinSession.getCurrent().setAttribute(ExtendedClientDetails.class, extendedClientDetails);
     }
 
     /**
@@ -48,5 +52,28 @@ public final class BrowserTimeZone {
         }
 
         return ZoneOffset.UTC;
+    }
+
+    /**
+     * Returns the current time zone of the browser as a string.
+     *
+     * @return String representation of the time zone.
+     */
+    public static String getDisplayName() {
+        return get().getDisplayName(TextStyle.FULL, Locale.getDefault());
+    }
+
+    /**
+     * Converts the given Instant to a LocalDateTime in the browser's time zone.
+     *
+     * @param instant the Instant to convert
+     * @return LocalDateTime in the browser's time zone, or null if the instant is null
+     */
+    public static LocalDateTime atLocalDateTime(Instant instant) {
+        if (instant == null) {
+            return null;
+        }
+
+        return LocalDateTime.ofInstant(instant, get());
     }
 }
