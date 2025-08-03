@@ -3,39 +3,42 @@ package de.sustineo.simdesk.utils.json;
 import com.fasterxml.jackson.core.JacksonException;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import lombok.SneakyThrows;
-import org.springframework.stereotype.Service;
+import org.springframework.context.ApplicationContext;
+import org.springframework.context.ApplicationContextAware;
+import org.springframework.stereotype.Component;
 
 import java.io.InputStream;
 
-@Service
-public class JsonClient {
-    private final ObjectMapper objectMapper;
+@Component
+public final class JsonClient implements ApplicationContextAware {
+    private static ObjectMapper objectMapper;
 
-    public JsonClient(ObjectMapper objectMapper) {
-        this.objectMapper = objectMapper;
+    @Override
+    public void setApplicationContext(ApplicationContext applicationContext) {
+        JsonClient.objectMapper = applicationContext.getBean(ObjectMapper.class);
     }
 
     @SneakyThrows
-    public String toJson(Object entity) {
+    public static String toJson(Object entity) {
         return objectMapper.writeValueAsString(entity);
     }
 
     @SneakyThrows
-    public String toJsonPretty(Object entity) {
+    public static String toJsonPretty(Object entity) {
         return objectMapper.writerWithDefaultPrettyPrinter().writeValueAsString(entity);
     }
 
     @SneakyThrows
-    public <T> T fromJson(String json, Class<T> valueType) {
+    public static <T> T fromJson(String json, Class<T> valueType) {
         return objectMapper.readValue(json, valueType);
     }
 
     @SneakyThrows
-    public <T> T fromJson(InputStream inputStream, Class<T> valueType) {
+    public static <T> T fromJson(InputStream inputStream, Class<T> valueType) {
         return objectMapper.readValue(inputStream, valueType);
     }
 
-    public boolean isValid(String json) {
+    public static boolean isValid(String json) {
         try {
             objectMapper.readTree(json);
         } catch (JacksonException e) {

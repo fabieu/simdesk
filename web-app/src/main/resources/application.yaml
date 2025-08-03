@@ -105,7 +105,7 @@ logging:
     #org.springframework.web.socket: DEBUG
     #org.springframework.messaging: DEBUG
     de.sustineo.simdesk: DEBUG
-    de.sustineo.simdesk.mapper: INFO
+    de.sustineo.simdesk.mybatis: INFO
 vaadin:
   productionMode: false
   heartbeatInterval: 60

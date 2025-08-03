@@ -1,14 +1,11 @@
-package de.sustineo.simdesk.mapper;
+package de.sustineo.simdesk.mybatis.mapper;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import org.apache.ibatis.annotations.*;
-import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;
 
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Component
 @Mapper
 public interface LeaderboardMapper {
@@ -20,7 +17,7 @@ public interface LeaderboardMapper {
             @Result(property = "carModelId", column = "car_model_id"),
             @Result(property = "ballastKg", column = "ballast_kg"),
             @Result(property = "raceNumber", column = "race_number"),
-            @Result(property = "drivers", column = "{sessionId=session_id, carId=car_id}", many = @Many(select = "de.sustineo.simdesk.mapper.DriverMapper.findBySessionIdAndCarId")),
+            @Result(property = "drivers", column = "{sessionId=session_id, carId=car_id}", many = @Many(select = "de.sustineo.simdesk.mybatis.mapper.DriverMapper.findBySessionIdAndCarId")),
             @Result(property = "bestLapTimeMillis", column = "best_lap_time_millis"),
             @Result(property = "bestSector1Millis", column = "best_sector1_millis"),
             @Result(property = "bestSector2Millis", column = "best_sector2_millis"),

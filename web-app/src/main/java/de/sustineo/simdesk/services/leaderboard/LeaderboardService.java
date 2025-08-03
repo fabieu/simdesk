@@ -6,7 +6,7 @@ import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
-import de.sustineo.simdesk.mapper.LeaderboardMapper;
+import de.sustineo.simdesk.mybatis.mapper.LeaderboardMapper;
 import de.sustineo.simdesk.services.converter.LeaderboardConverter;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;

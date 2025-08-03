@@ -23,6 +23,7 @@ public abstract class BaseView extends VerticalLayout {
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";
     public static final String ROUTE_PARAMETER_FILE_CHECKSUM = "fileChecksum";
     public static final String ROUTE_PARAMETER_DRIVER_ID = "driverId";
+    public static final String ROUTE_PARAMETER_DASHBOARD_ID = "dashboardId";
 
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";
@@ -41,7 +42,7 @@ public abstract class BaseView extends VerticalLayout {
         return createViewHeader(getAnnotatedPageTitle());
     }
 
-    protected Component createViewHeader(String heading) {
+    protected Component createViewHeader(String heading, Component... components) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.addClassNames("header");
 
@@ -52,6 +53,7 @@ public abstract class BaseView extends VerticalLayout {
                 .setFontWeight(Style.FontWeight.BOLD);
 
         layout.add(headerText);
+        layout.add(components);
 
         return layout;
     }
