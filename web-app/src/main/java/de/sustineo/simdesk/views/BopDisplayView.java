@@ -48,10 +48,7 @@ import java.util.stream.Collectors;
 public class BopDisplayView extends BaseView implements BeforeEnterObserver {
     private final BopService bopService;
     private final NotificationService notificationService;
-
     private final ComponentFactory componentFactory;
-
-    private final JsonClient jsonClient;
 
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
@@ -61,12 +58,10 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
 
     public BopDisplayView(BopService bopService,
                           NotificationService notificationService,
-                          ComponentFactory componentFactory,
-                          JsonClient jsonClient) {
+                          ComponentFactory componentFactory) {
         this.bopService = bopService;
         this.notificationService = notificationService;
         this.componentFactory = componentFactory;
-        this.jsonClient = jsonClient;
 
         setSizeFull();
         setPadding(false);
@@ -132,7 +127,7 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
                 List<AccBopEntry> accBopEntries = entry.getValue().stream()
                         .map(bopService::convertToAccBopEntry)
                         .toList();
-                String json = jsonClient.toJson(new AccBop(accBopEntries));
+                String json = JsonClient.toJson(new AccBop(accBopEntries));
 
                 event.setFileName(String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())));
                 event.getOutputStream().write(json.getBytes(StandardCharsets.UTF_8));

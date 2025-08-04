@@ -52,7 +52,6 @@ public class BopEditorView extends BaseView {
     private final ValidationService validationService;
     private final NotificationService notificationService;
     private final ComponentFactory componentFactory;
-    private final JsonClient jsonClient;
 
     private final FormLayout settingsLayout = new FormLayout();
     private final FormLayout carsLayout = new FormLayout();
@@ -64,12 +63,10 @@ public class BopEditorView extends BaseView {
 
     public BopEditorView(ValidationService validationService,
                          NotificationService notificationService,
-                         ComponentFactory componentFactory,
-                         JsonClient jsonClient) {
+                         ComponentFactory componentFactory) {
         this.validationService = validationService;
         this.notificationService = notificationService;
         this.componentFactory = componentFactory;
-        this.jsonClient = jsonClient;
 
         setSizeFull();
         setPadding(false);
@@ -128,7 +125,7 @@ public class BopEditorView extends BaseView {
 
     private void handleBopFileUpload(UploadMetadata metadata, byte[] data) {
         try {
-            currentBop = jsonClient.fromJson(new String(data), AccBop.class);
+            currentBop = JsonClient.fromJson(new String(data), AccBop.class);
             validationService.validate(currentBop);
 
             if (currentBop.isMultiTrack()) {
@@ -254,7 +251,7 @@ public class BopEditorView extends BaseView {
 
         Anchor downloadAnchor = new Anchor((event) -> {
             event.setFileName("bop.json");
-            event.getOutputStream().write(jsonClient.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
+            event.getOutputStream().write(JsonClient.toJson(currentBop).getBytes(StandardCharsets.UTF_8));
         }, "");
         downloadAnchor.removeAll();
         downloadAnchor.add(downloadButton);
@@ -285,7 +282,7 @@ public class BopEditorView extends BaseView {
     }
 
     private void reloadComponents() {
-        previewTextArea.setValue(jsonClient.toJsonPretty(currentBop));
+        previewTextArea.setValue(JsonClient.toJsonPretty(currentBop));
         carsLayout.removeAll();
         carsLayout.add(currentCarComponents.values());
     }

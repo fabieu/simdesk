@@ -112,8 +112,6 @@ public class EntrylistEditorView extends BaseView {
     private final SessionComponentFactory sessionComponentFactory;
     private final ButtonComponentFactory buttonComponentFactory;
 
-    private final JsonClient jsonClient;
-
     private AccEntrylist entrylist;
     private LinkedHashMap<AccEntrylistEntry, Component> entrylistEntriesMap = new LinkedHashMap<>();
     private EntrylistMetadata entrylistMetadata;
@@ -150,8 +148,7 @@ public class EntrylistEditorView extends BaseView {
                                SecurityService securityService,
                                Optional<SessionService> sessionService,
                                SessionComponentFactory sessionComponentFactory,
-                               ButtonComponentFactory buttonComponentFactory,
-                               JsonClient jsonClient) {
+                               ButtonComponentFactory buttonComponentFactory) {
         this.entrylistService = entrylistService;
         this.driverService = driverService;
         this.validationService = validationService;
@@ -160,7 +157,6 @@ public class EntrylistEditorView extends BaseView {
         this.sessionService = sessionService;
         this.sessionComponentFactory = sessionComponentFactory;
         this.buttonComponentFactory = buttonComponentFactory;
-        this.jsonClient = jsonClient;
 
         this.resetDialog = createResetDialog();
         this.validationDialog = createValidationDialog();
@@ -276,7 +272,7 @@ public class EntrylistEditorView extends BaseView {
 
     private void handleEntrylistUpload(UploadMetadata metadata, byte[] data) {
         try {
-            AccEntrylist entrylist = jsonClient.fromJson(new String(data), AccEntrylist.class);
+            AccEntrylist entrylist = JsonClient.fromJson(new String(data), AccEntrylist.class);
             EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
                     .fileName(metadata.fileName())
                     .type(metadata.contentType())
@@ -346,7 +342,7 @@ public class EntrylistEditorView extends BaseView {
         return (event) -> {
             if (entrylist != null) {
                 event.setFileName(Objects.requireNonNullElse(entrylistMetadata.getFileName(), "entrylist.json"));
-                event.getOutputStream().write(jsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
+                event.getOutputStream().write(JsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
             } else {
                 event.getResponse().setStatus(404);
             }
@@ -445,7 +441,7 @@ public class EntrylistEditorView extends BaseView {
             return;
         }
 
-        entrylistPreview.setValue(jsonClient.toJsonPretty(entrylist));
+        entrylistPreview.setValue(JsonClient.toJsonPretty(entrylist));
     }
 
     private void addEntrylistEntry(AccEntrylistEntry entry) {
@@ -1051,7 +1047,7 @@ public class EntrylistEditorView extends BaseView {
         resultsUpload.setI18n(configureUploadI18N("results.json"));
         resultsUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccSession session = jsonClient.fromJson(new String(data), AccSession.class);
+                AccSession session = JsonClient.fromJson(new String(data), AccSession.class);
 
                 // Validate results file against syntax and semantic rules
                 validationService.validate(session);
@@ -1093,7 +1089,7 @@ public class EntrylistEditorView extends BaseView {
                     Session selectedSession = singeValueChangeEvent.getValue();
 
                     if (selectedSession != null) {
-                        uploadedSession.set(jsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
+                        uploadedSession.set(JsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
                         updateButton.setEnabled(true);
                         sessionInformationLayout.removeAll();
                         sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(uploadedSession.get()), removeSessionButton);
@@ -1200,7 +1196,7 @@ public class EntrylistEditorView extends BaseView {
         defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
         defaultCustomCarUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                CustomCar[] customCars = jsonClient.fromJson(new String(data), CustomCar[].class);
+                CustomCar[] customCars = JsonClient.fromJson(new String(data), CustomCar[].class);
 
                 // Validate results file against syntax and semantic rules
                 for (CustomCar customCar : customCars) {
@@ -1369,7 +1365,7 @@ public class EntrylistEditorView extends BaseView {
             dialogLayout.add(errorMessage);
 
             for (Object reference : errorReferences) {
-                Span referenceSpan = new Span(jsonClient.toJsonPretty(reference));
+                Span referenceSpan = new Span(JsonClient.toJsonPretty(reference));
                 referenceSpan.setWhiteSpace(HasText.WhiteSpace.PRE_LINE);
 
                 dialogLayout.add(new Div(referenceSpan));
