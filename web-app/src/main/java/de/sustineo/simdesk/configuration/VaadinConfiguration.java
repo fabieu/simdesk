@@ -1,11 +1,9 @@
 package de.sustineo.simdesk.configuration;
 
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.component.page.Inline;
-import com.vaadin.flow.component.page.Meta;
-import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.component.page.*;
 import com.vaadin.flow.server.AppShellSettings;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.theme.Theme;
 
 import java.util.Map;
@@ -14,6 +12,7 @@ import java.util.Map;
  * An interface to configure application features and the host page where the Vaadin application is running.
  * It automatically configures the index.html page.
  */
+@Push(PushMode.MANUAL)
 @Viewport("width=device-width, initial-scale=1")
 @Meta(name = "Author", content = "Fabian Eulitz")
 @Meta(name = "robots", content = "noindex, nofollow")
