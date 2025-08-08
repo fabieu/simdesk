@@ -24,23 +24,20 @@ public class DashboardDetailedView extends BaseView implements BeforeEnterObserv
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         String dashboardId = beforeEnterEvent.getRouteParameters().get(ROUTE_PARAMETER_DASHBOARD_ID).orElseThrow();
 
-        try {
-            Dashboard dashboard = dashboardService.getByDashboardId(dashboardId);
-            if (dashboard == null) {
-                throw new IllegalArgumentException("Dashboard with dashboard id " + dashboardId + " does not exist.");
-            }
-
-            setSizeFull();
-            setSpacing(false);
-            setPadding(false);
-
-            removeAll();
-
-            add(createViewHeader(dashboard.getName(), badgeComponentFactory.getLiveBadge(dashboard)));
-            addAndExpand(createDashboardLayout(dashboard));
-        } catch (IllegalArgumentException e) {
+        Dashboard dashboard = dashboardService.getByDashboardId(dashboardId);
+        if (dashboard == null) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
+            return;
         }
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
+        removeAll();
+
+        add(createViewHeader(dashboard.getName(), badgeComponentFactory.getLiveBadge(dashboard)));
+        addAndExpand(createDashboardLayout(dashboard));
     }
 
     private Component createDashboardLayout(Dashboard dashboard) {

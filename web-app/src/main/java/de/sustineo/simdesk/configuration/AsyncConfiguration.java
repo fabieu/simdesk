@@ -19,15 +19,13 @@ public class AsyncConfiguration {
     @Bean
     @VaadinTaskExecutor
     public Executor taskExecutor() {
-        int numOfCores = Runtime.getRuntime().availableProcessors();
-        int poolSize = numOfCores * 4;
-        int awaitTerminationSeconds = 5;
+        int poolSize = Runtime.getRuntime().availableProcessors() * 4;
 
         ThreadPoolTaskExecutor executor = new ThreadPoolTaskExecutor();
         executor.setCorePoolSize(poolSize);
         executor.setMaxPoolSize(poolSize);
         executor.setThreadNamePrefix("task-");
-        executor.setAwaitTerminationSeconds(awaitTerminationSeconds);
+        executor.setAwaitTerminationSeconds(5);
         executor.setWaitForTasksToCompleteOnShutdown(true);
         executor.initialize();
         return executor;
