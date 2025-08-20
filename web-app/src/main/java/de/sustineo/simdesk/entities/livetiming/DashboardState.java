@@ -3,8 +3,10 @@ package de.sustineo.simdesk.entities.livetiming;
 import lombok.Data;
 
 import java.time.Instant;
+import java.util.LinkedHashSet;
 import java.util.Map;
 import java.util.Optional;
+import java.util.Set;
 import java.util.concurrent.ConcurrentHashMap;
 
 @Data
@@ -15,6 +17,7 @@ public class DashboardState {
     private Map<Integer, CarInfo> cars = new ConcurrentHashMap<>();
     private SessionInfo sessionInfo;
     private TrackInfo trackInfo;
+    private Set<BroadcastingInfo> broadcastingInfos = new LinkedHashSet<>();
 
     private Instant lastEntryListUpdate = Instant.EPOCH;
 
@@ -28,5 +31,9 @@ public class DashboardState {
 
     public void setCarInfo(int carId, CarInfo carInfo) {
         cars.put(carId, carInfo);
+    }
+
+    public void addBroadcastingInfo(BroadcastingInfo broadcastingInfo) {
+        broadcastingInfos.add(broadcastingInfo);
     }
 }

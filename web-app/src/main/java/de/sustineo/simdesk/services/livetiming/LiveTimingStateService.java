@@ -2,6 +2,7 @@ package de.sustineo.simdesk.services.livetiming;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.livetiming.*;
+import de.sustineo.simdesk.entities.livetiming.events.*;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.ApplicationEventPublisher;
@@ -34,8 +35,8 @@ public class LiveTimingStateService {
         dashboardStates.put(dashboardState.getDashboardId(), dashboardState);
     }
 
-    public void handleRegistrationResult(String sessionId, String dashboardId, int connectionID, boolean connectionSuccess, boolean isReadonly, String errorMessage) {
-        log.info("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Readonly: " + isReadonly + " Error Message: " + errorMessage);
+    public void handleRegistrationResult(String sessionId, String dashboardId, int connectionID, boolean connectionSuccess, boolean readOnly, String errorMessage) {
+        log.info("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Read-only: " + readOnly + " Error Message: " + errorMessage);
 
         Instant now = Instant.now();
         boolean requestEntrylist;
@@ -60,40 +61,43 @@ public class LiveTimingStateService {
     }
 
     public void handleRealtimeUpdate(String sessionId, String dashboardId, SessionInfo sessionInfo) {
-        log.info("Session Info: " + sessionInfo);
+        log.info(String.format("Received realtime update for dashboard %s: %s", dashboardId, sessionInfo));
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
             dashboardState.setSessionInfo(sessionInfo);
+            dashboardState.getBroadcastingInfos().clear(); // Clear previous broadcasting infos
 
-            checkForDisconnects(dashboardState.getCars().values());
+            checkForDisconnect(dashboardId, dashboardState.getCars().values());
 
             updateDashboardState(dashboardState);
         }
 
-        eventPublisher.publishEvent(LiveTimingEvent.of(sessionInfo, dashboardId));
+        eventPublisher.publishEvent(new SessionEvent(sessionInfo, dashboardId));
     }
 
-    private void checkForDisconnects(Collection<CarInfo> cars) {
+    private void checkForDisconnect(String dashboardId, Collection<CarInfo> carInfos) {
         Instant now = Instant.now();
 
-        for (CarInfo car : cars) {
-            if (car.isConnected()) {
-                if (Duration.between(car.getLastUpdate(), now).compareTo(Duration.ofSeconds(10)) > 0) {
-                    car.setConnected(false);
+        for (CarInfo carInfo : carInfos) {
+            log.fine(String.format("Car %s received last update %sms ago.", carInfo.getCarNumberString(), Duration.between(now, carInfo.getLastUpdate()).toMillis()));
 
-                    log.fine("Car " + car.getCarNumberString() + " received last update " + Duration.between(now, car.getLastUpdate()).toMillis() + "ms ago.");
-                    log.info("Car disconnected: " + car.getCarNumberString() + "\t" + car.getDriver().getFullName());
-                    //TODO: Publish car disconnected event
+            if (carInfo.isConnected()) {
+                if (Duration.between(carInfo.getLastUpdate(), now).compareTo(Duration.ofSeconds(10)) > 0) {
+                    carInfo.setConnected(false);
+
+                    log.info(String.format("Car %s with driver %s disconnected.", carInfo.getCarNumberString(), carInfo.getDriver().getFullName()));
+                    eventPublisher.publishEvent(new CarDisconnectedEvent(carInfo, dashboardId));
                 }
             }
         }
     }
 
     public void handleRealtimeCarUpdate(String sessionId, String dashboardId, RealtimeInfo realtimeInfo) {
-        log.info("Realtime Info: " + realtimeInfo);
+        log.info(String.format("Received realtime update for dashboard %s: %s", dashboardId, realtimeInfo));
 
         boolean requestEntrylist = false;
+        CarInfo currentCarInfo = null;
         Integer connectionId;
 
         DashboardState dashboardState = getDashboardState(dashboardId);
@@ -102,7 +106,7 @@ public class LiveTimingStateService {
 
             Optional<CarInfo> carInfo = dashboardState.getCarInfo(realtimeInfo.getCarId());
             if (carInfo.isPresent()) {
-                CarInfo currentCarInfo = carInfo.get();
+                currentCarInfo = carInfo.get();
                 currentCarInfo.setLastUpdate(Instant.now());
                 currentCarInfo.setConnected(true);
                 currentCarInfo.setDriverIndexRealtime(realtimeInfo.getDriverIndex());
@@ -135,17 +139,17 @@ public class LiveTimingStateService {
             liveTimingRequestService.sendEntrylistRequest(sessionId, connectionId);
         }
 
-        eventPublisher.publishEvent(LiveTimingEvent.of(realtimeInfo, dashboardId));
+        if (currentCarInfo != null) {
+            eventPublisher.publishEvent(new CarEvent(currentCarInfo, dashboardId));
+        }
     }
 
     public void handleEntryListUpdate(String sessionId, String dashboardId, List<Integer> cars) {
-        log.info("Entrylist update for cars: " + cars);
-
-        eventPublisher.publishEvent(LiveTimingEvent.of(cars, dashboardId));
+        log.info(String.format("Received entry list update for dashboard %s: %s", dashboardId, cars));
     }
 
     public void handleEntrylistCarUpdate(String sessionId, String dashboardId, CarInfo carInfo) {
-        log.info("Car Info: " + carInfo);
+        log.info(String.format("Received entrylist car update for dashboard %s: %s", dashboardId, carInfo));
 
         boolean newConnection;
 
@@ -166,27 +170,33 @@ public class LiveTimingStateService {
             currentCarInfo.setNationality(carInfo.getNationality());
             currentCarInfo.setDrivers(carInfo.getDrivers());
 
-            dashboardState.setCarInfo(currentCarInfo.getId(),  currentCarInfo);
+            dashboardState.setCarInfo(currentCarInfo.getId(), currentCarInfo);
 
             updateDashboardState(dashboardState);
         }
 
         if (newConnection) {
-            log.info(String.format("Car connected: #%s \t %s", carInfo.getCarNumber(), carInfo.getDriver().getFullName()));
-            //TODO: Publish car connected event
+            log.info(String.format("Car connected: %s \t %s", carInfo.getCarNumberString(), carInfo.getDriver().getFullName()));
+            eventPublisher.publishEvent(new CarConnectedEvent(carInfo, dashboardId));
         }
 
-        eventPublisher.publishEvent(LiveTimingEvent.of(carInfo, dashboardId));
+        eventPublisher.publishEvent(new CarEvent(carInfo, dashboardId));
     }
 
     public void handleBroadcastingEvent(String sessionId, String dashboardId, BroadcastingInfo broadcastingInfo) {
-        log.info("Broadcasting Event: " + broadcastingInfo);
+        log.info(String.format("Received broadcasting event for dashboard %s: %s", dashboardId, broadcastingInfo));
 
-        eventPublisher.publishEvent(LiveTimingEvent.of(broadcastingInfo, dashboardId));
+        DashboardState dashboardState = getDashboardState(dashboardId);
+        synchronized (dashboardState) {
+            dashboardState.addBroadcastingInfo(broadcastingInfo);
+            updateDashboardState(dashboardState);
+        }
+
+        eventPublisher.publishEvent(new BroadcastingEvent(broadcastingInfo, dashboardId));
     }
 
     public void handleTrackData(String sessionId, String dashboardId, TrackInfo trackInfo) {
-        log.info("Track Info: " + trackInfo);
+        log.info(String.format("Received track info for dashboard %s: %s", dashboardId, trackInfo));
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
@@ -194,6 +204,6 @@ public class LiveTimingStateService {
             updateDashboardState(dashboardState);
         }
 
-        eventPublisher.publishEvent(LiveTimingEvent.of(trackInfo, dashboardId));
+        eventPublisher.publishEvent(new TrackEvent(trackInfo, dashboardId));
     }
 }

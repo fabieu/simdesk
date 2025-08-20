@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.entities.livetiming;
+package de.sustineo.simdesk.entities.livetiming.events;
 
 import lombok.Getter;
 import org.springframework.context.ApplicationEvent;
@@ -7,13 +7,9 @@ import org.springframework.context.ApplicationEvent;
 public class LiveTimingEvent<T> extends ApplicationEvent {
     private final String dashboardId;
 
-    private LiveTimingEvent(T source, String dashboardId) {
+    protected LiveTimingEvent(T source, String dashboardId) {
         super(source);
 
         this.dashboardId = dashboardId;
-    }
-
-    public static <T> LiveTimingEvent<T> of(T source, String dashboardId) {
-        return new LiveTimingEvent<>(source, dashboardId);
     }
 }

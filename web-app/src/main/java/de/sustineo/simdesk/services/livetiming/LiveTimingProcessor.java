@@ -56,10 +56,10 @@ public class LiveTimingProcessor {
     private void processRegistrationResult(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
         int connectionId = readInt32(inputStream);
         boolean connectionSuccess = readByte(inputStream) > 0;
-        boolean isReadonly = readByte(inputStream) == 0;
+        boolean readOnly = readByte(inputStream) == 0;
         String errorMessage = readString(inputStream);
 
-        liveTimingStateService.handleRegistrationResult(sessionId, dashboardId, connectionId, connectionSuccess, isReadonly, errorMessage);
+        liveTimingStateService.handleRegistrationResult(sessionId, dashboardId, connectionId, connectionSuccess, readOnly, errorMessage);
     }
 
     private void processRealtimeUpdate(String sessionId, String dashboardId, ByteArrayInputStream inputStream) {
