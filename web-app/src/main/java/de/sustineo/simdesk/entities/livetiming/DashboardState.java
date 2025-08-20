@@ -25,6 +25,26 @@ public class DashboardState {
         this.dashboardId = dashboardId;
     }
 
+    /**
+     * Checks if an entry list request should be made based on the last update time.
+     * If more than 5 seconds have passed since the last update, it returns true.
+     * Otherwise, it returns false.
+     *
+     * @return true if an entry list request should be made, false otherwise
+     */
+    public boolean shouldRequestEntrylist() {
+        Instant now = Instant.now();
+
+        // Request entry list if it has been more than 5 seconds since the last update
+        boolean requestEntrylist = now.minusSeconds(5).isAfter(lastEntryListUpdate);
+
+        if (requestEntrylist) {
+            lastEntryListUpdate = now;
+        }
+
+        return requestEntrylist;
+    }
+
     public Optional<CarInfo> getCarInfo(int carId) {
         return Optional.ofNullable(cars.get(carId));
     }

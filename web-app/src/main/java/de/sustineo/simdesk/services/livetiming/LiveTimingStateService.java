@@ -38,17 +38,13 @@ public class LiveTimingStateService {
     public void handleRegistrationResult(String sessionId, String dashboardId, int connectionID, boolean connectionSuccess, boolean readOnly, String errorMessage) {
         log.info("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Read-only: " + readOnly + " Error Message: " + errorMessage);
 
-        Instant now = Instant.now();
         boolean requestEntrylist;
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
-            dashboardState.getConnections().put(sessionId, connectionID);
+            requestEntrylist = dashboardState.shouldRequestEntrylist();
 
-            requestEntrylist = now.minusSeconds(5).isAfter(dashboardState.getLastEntryListUpdate());
-            if (requestEntrylist) {
-                dashboardState.setLastEntryListUpdate(now);
-            }
+            dashboardState.getConnections().put(sessionId, connectionID);
 
             updateDashboardState(dashboardState);
         }
@@ -94,7 +90,7 @@ public class LiveTimingStateService {
     }
 
     public void handleRealtimeCarUpdate(String sessionId, String dashboardId, RealtimeInfo realtimeInfo) {
-        log.info(String.format("Received realtime update for dashboard %s: %s", dashboardId, realtimeInfo));
+        log.info(String.format("Received realtime car update for dashboard %s: %s", dashboardId, realtimeInfo));
 
         boolean requestEntrylist = false;
         CarInfo currentCarInfo = null;
@@ -130,12 +126,12 @@ public class LiveTimingStateService {
                 dashboardState.setCarInfo(carInfo.get().getId(), currentCarInfo);
                 updateDashboardState(dashboardState);
             } else {
-                log.info(String.format("Realtime update for unknown car: %s. Sending entrylist request.", realtimeInfo.getCarId()));
-                requestEntrylist = true;
+                requestEntrylist = dashboardState.shouldRequestEntrylist();
             }
         }
 
         if (requestEntrylist && connectionId != null) {
+            log.info(String.format("Received update for unknown car %s, requesting entry list for dashboard %s", realtimeInfo.getCarId(), dashboardId));
             liveTimingRequestService.sendEntrylistRequest(sessionId, connectionId);
         }
 
