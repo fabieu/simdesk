@@ -184,7 +184,7 @@ public class BopEditorView extends BaseView {
         });
 
         ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
-        carsComboBox.setItems(carFilter, AccCar.getAllSortedByModel());
+        carsComboBox.setItems(carFilter, AccCar.getAll());
         carsComboBox.setItemLabelGenerator(AccCar::getModel);
         carsComboBox.setClassNameGenerator(car -> car.getGroup().name());
         carsComboBox.setPlaceholder("Select cars...");

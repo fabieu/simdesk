@@ -18,6 +18,7 @@ import java.util.Objects;
 public abstract class BaseView extends VerticalLayout {
     public static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     public static final String QUERY_PARAMETER_TRACK_ID = "track";
+    public static final String QUERY_PARAMETER_CAR_ID = "carId";
     public static final String ROUTE_PARAMETER_CAR_ID = "carId";
     public static final String ROUTE_PARAMETER_CAR_GROUP = "carGroup";
     public static final String ROUTE_PARAMETER_TRACK_ID = "trackId";

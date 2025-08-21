@@ -16,7 +16,6 @@ import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
-import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
@@ -25,7 +24,9 @@ import de.sustineo.simdesk.views.renderers.DriverRankingRenderer;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
+import java.util.LinkedHashMap;
 import java.util.List;
+import java.util.Map;
 import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -35,10 +36,15 @@ import java.util.Optional;
 public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
     private final RankingService rankingService;
 
-    private Grid<DriverRanking> rankingGrid;
-    private TimeRange timeRange = TimeRange.ALL_TIME;
     private RouteParameters routeParameters;
     private QueryParameters queryParameters;
+
+    private Grid<DriverRanking> rankingGrid;
+
+    private CarGroup carGroup;
+    private Track track;
+    private TimeRange timeRange = TimeRange.ALL_TIME;
+    private AccCar car;
 
     public LeaderboardOverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
@@ -51,35 +57,48 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
         String carGroup = routeParameters.get(ROUTE_PARAMETER_CAR_GROUP).orElseThrow();
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
-        Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
-
-        if (Track.existsInAcc(trackId) && CarGroup.exists(carGroup)) {
-            if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
-                this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
-            }
-
-            this.rankingGrid = createRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, this.timeRange);
-
-            setSizeFull();
-            setSpacing(false);
-            setPadding(false);
-
-            removeAll();
-
-            add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
-            add(createSelectHeader(carGroup, trackId, this.timeRange));
-            addAndExpand(this.rankingGrid);
-        } else {
+        if (!Track.existsInAcc(trackId) || !CarGroup.exists(carGroup)) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
+            return;
         }
+
+        this.track = EnumUtils.getEnumIgnoreCase(Track.class, trackId);
+        this.carGroup = EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup);
+
+        Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
+        if (timeRange.isPresent() && EnumUtils.isValidEnumIgnoreCase(TimeRange.class, timeRange.get())) {
+            this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
+        }
+
+        Optional<String> car = queryParameters.getSingleParameter(QUERY_PARAMETER_CAR_ID);
+        try {
+            if (car.isPresent() && !car.get().isEmpty()) {
+                this.car = AccCar.getCarById(Integer.parseInt(car.get()));
+            }
+        } catch (NumberFormatException e) {
+            this.car = null; // If parsing fails, set car to null
+        }
+
+
+        this.rankingGrid = createRankingGrid();
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
+        removeAll();
+
+        add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
+        add(createSelectHeader());
+        addAndExpand(this.rankingGrid);
     }
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
+        updateQueryParameters();
     }
 
-    private Component createSelectHeader(String carGroup, String trackId, TimeRange timeRange) {
+    private Component createSelectHeader() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.addClassNames("header");
         layout.setJustifyContentMode(JustifyContentMode.END);
@@ -87,22 +106,38 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setPaddingTop("0")
                 .setMarginBottom("0");
 
+        // Car selection
+        Select<AccCar> carSelect = new Select<>();
+        carSelect.setItems(AccCar.getAllByGroup(carGroup));
+        carSelect.setValue(car);
+        carSelect.setEmptySelectionAllowed(true);
+        carSelect.setEmptySelectionCaption("All Cars");
+        carSelect.setItemLabelGenerator(item -> item != null ? item.getModel() : "All Cars");
+        carSelect.setMinWidth("300px");
+        carSelect.addValueChangeListener(event -> {
+            this.car = event.getValue();
+            reloadRankingGrid();
+            updateQueryParameters();
+        });
+        layout.add(carSelect);
+
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
         timeRangeSelect.setValue(timeRange);
         timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
-            replaceRankingGrid(EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup), trackId, event.getValue());
-            updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
+            this.timeRange = event.getValue();
+            reloadRankingGrid();
+            updateQueryParameters();
         });
 
         layout.add(timeRangeSelect);
         return layout;
     }
 
-    private Grid<DriverRanking> createRankingGrid(CarGroup carGroup, String trackId, TimeRange timeRange) {
-        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, trackId, timeRange);
+    private Grid<DriverRanking> createRankingGrid() {
+        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, track.getAccId(), timeRange);
         DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
 
         Grid<DriverRanking> grid = new Grid<>(DriverRanking.class, false);
@@ -151,12 +186,6 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         Grid.Column<DriverRanking> sessionInformationColumn = grid.addColumn(DriverRankingRenderer.createSessionRenderer())
                 .setHeader("Session")
                 .setSortable(true);
-        Grid.Column<DriverRanking> sessionDatetimeColumn = grid.addColumn(driverRanking -> FormatUtils.formatDatetime(driverRanking.getSession().getSessionDatetime()))
-                .setHeader("Session Time")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true)
-                .setComparator(driverRanking -> driverRanking.getSession().getSessionDatetime());
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
         grid.setSizeFull();
@@ -174,9 +203,21 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         return grid;
     }
 
-    private void replaceRankingGrid(CarGroup carGroup, String trackId, TimeRange timeRange) {
-        Grid<DriverRanking> grid = createRankingGrid(carGroup, trackId, timeRange);
-        replace(this.rankingGrid, grid);
+    private void reloadRankingGrid() {
+        Grid<DriverRanking> grid = createRankingGrid();
+        replace(rankingGrid, grid);
+
         this.rankingGrid = grid;
+    }
+
+    private void updateQueryParameters() {
+        Map<String, List<String>> queryParams = new LinkedHashMap<>();
+        if (car != null) {
+            queryParams.put(QUERY_PARAMETER_CAR_ID, List.of(String.valueOf(car.getId())));
+        }
+
+        queryParams.put(QUERY_PARAMETER_TIME_RANGE, List.of(timeRange.name().toLowerCase()));
+
+        updateQueryParameters(routeParameters, new QueryParameters(queryParams));
     }
 }

@@ -54,7 +54,7 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
             this.timeRange = EnumUtils.getEnumIgnoreCase(TimeRange.class, timeRange.get());
         }
 
-        this.rankingGrid = createRankingGrid(this.timeRange);
+        this.rankingGrid = createRankingGrid();
 
         setSizeFull();
         setPadding(false);
@@ -63,16 +63,16 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         removeAll();
 
         add(createViewHeader());
-        add(createSelectHeader(this.timeRange));
+        add(createSelectHeader());
         addAndExpand(rankingGrid);
     }
 
     @Override
     public void afterNavigation(AfterNavigationEvent event) {
-        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, this.timeRange.name().toLowerCase()));
+        updateQueryParameters();
     }
 
-    private Component createSelectHeader(TimeRange timeRange) {
+    private Component createSelectHeader() {
         HorizontalLayout layout = new HorizontalLayout();
         layout.addClassNames("header");
         layout.setJustifyContentMode(JustifyContentMode.END);
@@ -87,15 +87,16 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
-            replaceRankingGrid(event.getValue());
-            updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
+            this.timeRange = event.getValue();
+            reloadRankingGrid();
+            updateQueryParameters();
         });
         layout.add(timeRangeSelect);
 
         return layout;
     }
 
-    private Grid<GroupRanking> createRankingGrid(TimeRange timeRange) {
+    private Grid<GroupRanking> createRankingGrid() {
         List<GroupRanking> groupRankings = rankingService.getAllTimeGroupRanking(timeRange);
 
         Grid<GroupRanking> grid = new Grid<>(GroupRanking.class, false);
@@ -155,9 +156,14 @@ public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEn
         return grid;
     }
 
-    private void replaceRankingGrid(TimeRange timeRange) {
-        Grid<GroupRanking> grid = createRankingGrid(timeRange);
-        replace(this.rankingGrid, grid);
+    private void reloadRankingGrid() {
+        Grid<GroupRanking> grid = createRankingGrid();
+        replace(rankingGrid, grid);
+
         this.rankingGrid = grid;
+    }
+
+    private void updateQueryParameters() {
+        updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, timeRange.name().toLowerCase()));
     }
 }
