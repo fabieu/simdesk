@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -8,6 +9,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -107,19 +109,20 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setMarginBottom("0");
 
         // Car selection
-        Select<AccCar> carSelect = new Select<>();
-        carSelect.setItems(AccCar.getAllByGroup(carGroup));
-        carSelect.setValue(car);
-        carSelect.setEmptySelectionAllowed(true);
-        carSelect.setEmptySelectionCaption("All Cars");
-        carSelect.setItemLabelGenerator(item -> item != null ? item.getModel() : "All Cars");
-        carSelect.setMinWidth("300px");
-        carSelect.addValueChangeListener(event -> {
+        ComboBox<AccCar> carComboBox = new ComboBox<>();
+        carComboBox.setItems(AccCar.getAllByGroup(carGroup));
+        carComboBox.setValue(car);
+        carComboBox.setPlaceholder("All Cars");
+        carComboBox.setItemLabelGenerator(AccCar::getModel);
+        carComboBox.setClassNameGenerator(item -> item.getGroup().name());
+        carComboBox.setClearButtonVisible(true);
+        carComboBox.setMinWidth("300px");
+        carComboBox.addValueChangeListener(event -> {
             this.car = event.getValue();
             reloadRankingGrid();
             updateQueryParameters();
         });
-        layout.add(carSelect);
+        layout.add(carComboBox);
 
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
@@ -180,11 +183,6 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
                 .setComparator(DriverRanking::getSector3Millis);
         Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> AccCar.getModelById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<DriverRanking> sessionInformationColumn = grid.addColumn(DriverRankingRenderer.createSessionRenderer())
-                .setHeader("Session")
                 .setSortable(true);
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
@@ -192,13 +190,25 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         grid.setMultiSort(true, true);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
+
+        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
+        SingleSelect<Grid<DriverRanking>, DriverRanking> singleSelect = grid.asSingleSelect();
+        singleSelect.addValueChangeListener(e -> {
+            DriverRanking selectedGroupRanking = e.getValue();
+
+            if (selectedGroupRanking != null && selectedGroupRanking.getSession() != null) {
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
+                        new RouteParameters(
+                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedGroupRanking.getSession().getFileChecksum())
+                        )
+                ));
+            }
+        });
 
         OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setDriverName));
         headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
-        headerRow.getCell(sessionInformationColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setSessionDescription));
 
         return grid;
     }
