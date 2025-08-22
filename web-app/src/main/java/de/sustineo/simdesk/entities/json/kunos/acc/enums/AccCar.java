@@ -115,10 +115,16 @@ public enum AccCar {
                 .orElse(CarGroup.UNKNOWN);
     }
 
-    public static List<AccCar> getAllSortedByModel() {
+    public static List<AccCar> getAll() {
         return Stream.of(values())
                 .filter(car -> car != AccCar.UNKNOWN)
                 .sorted(Comparator.comparing(AccCar::getModel))
+                .collect(Collectors.toList());
+    }
+
+    public static List<AccCar> getAllByGroup(CarGroup carGroup) {
+        return getAll().stream()
+                .filter(car -> carGroup == car.getGroup())
                 .collect(Collectors.toList());
     }
 }

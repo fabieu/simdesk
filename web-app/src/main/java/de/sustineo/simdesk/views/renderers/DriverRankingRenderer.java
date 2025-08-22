@@ -16,7 +16,7 @@ public class DriverRankingRenderer extends GridRenderer {
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getLapTimeMillis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getLapTimeMillis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getLapTimeMillis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getLapTimeColor(driverRanking.getLapTimeMillis() - fastestTimeMillis));
     }
 
     public static Renderer<DriverRanking> createSector1Renderer(DriverRanking topDriverRanking) {
@@ -27,7 +27,7 @@ public class DriverRankingRenderer extends GridRenderer {
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector1Millis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector1Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector1Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getLapTimeColor(driverRanking.getSector1Millis() - fastestTimeMillis));
     }
 
     public static Renderer<DriverRanking> createSector2Renderer(DriverRanking topDriverRanking) {
@@ -38,7 +38,7 @@ public class DriverRankingRenderer extends GridRenderer {
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector2Millis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector2Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector2Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getLapTimeColor(driverRanking.getSector2Millis() - fastestTimeMillis));
     }
 
     public static Renderer<DriverRanking> createSector3Renderer(DriverRanking topDriverRanking) {
@@ -49,7 +49,35 @@ public class DriverRankingRenderer extends GridRenderer {
         return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
                 .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector3Millis()))
                 .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getSector3Millis() - fastestTimeMillis))
-                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTimeColor(driverRanking.getSector3Millis() - fastestTimeMillis));
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getLapTimeColor(driverRanking.getSector3Millis() - fastestTimeMillis));
+    }
+
+    public static Renderer<DriverRanking> createTheoreticalBestLapTimeRenderer() {
+        return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getTheoreticalBestLapMillis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getTheoreticalBestLapMillis() - driverRanking.getLapTimeMillis()))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTheoreticalLapTimeColor(driverRanking.getBestSectors().getTheoreticalBestLapMillis() - driverRanking.getLapTimeMillis()));
+    }
+
+    public static Renderer<DriverRanking> createBestSector1Renderer() {
+        return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector1Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector1Millis() - driverRanking.getSector1Millis()))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTheoreticalLapTimeColor(driverRanking.getBestSectors().getBestSector1Millis() - driverRanking.getSector1Millis()));
+    }
+
+    public static Renderer<DriverRanking> createBestSector2Renderer() {
+        return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector2Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector2Millis() - driverRanking.getSector2Millis()))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTheoreticalLapTimeColor(driverRanking.getBestSectors().getBestSector2Millis() - driverRanking.getSector2Millis()));
+    }
+
+    public static Renderer<DriverRanking> createBestSector3Renderer() {
+        return LitRenderer.<DriverRanking>of(TIMING_TEMPLATE)
+                .withProperty(TIMING_TEMPLATE_TIME, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector3Millis()))
+                .withProperty(TIMING_TEMPLATE_TIME_GAP, driverRanking -> FormatUtils.formatLapTime(driverRanking.getBestSectors().getBestSector3Millis() - driverRanking.getSector3Millis()))
+                .withProperty(TIMING_TEMPLATE_COLOR, driverRanking -> getTheoreticalLapTimeColor(driverRanking.getBestSectors().getBestSector3Millis() - driverRanking.getSector3Millis()));
     }
 
     public static Renderer<DriverRanking> createDriverRenderer() {

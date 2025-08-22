@@ -35,9 +35,9 @@ public class LeaderboardLineRenderer extends GridRenderer {
                 })
                 .withProperty(TIMING_TEMPLATE_COLOR, leaderboardLine -> {
                     if (leaderboardLine.getBestLapTimeMillis() > 0) {
-                        return getTimeColor(leaderboardLine.getBestLapTimeMillis() - bestLapTimeMillis);
+                        return getLapTimeColor(leaderboardLine.getBestLapTimeMillis() - bestLapTimeMillis);
                     } else {
-                        return getTimeColor(0L);
+                        return getLapTimeColor(0L);
                     }
                 })
                 .withProperty(TIMING_TEMPLATE_FASTEST_LAP, leaderboardLine -> leaderboardLine.getBestLapTimeMillis() != 0 && leaderboardLine.getBestLapTimeMillis() == bestLapTimeMillis);
