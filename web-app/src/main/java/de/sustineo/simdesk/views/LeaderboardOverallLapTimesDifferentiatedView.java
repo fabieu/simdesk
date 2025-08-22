@@ -137,7 +137,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
     }
 
     private Grid<DriverRanking> createRankingGrid() {
-        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, track.getAccId(), timeRange);
+        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, track.getAccId(), timeRange, car);
         DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
 
         Grid<DriverRanking> grid = new Grid<>(DriverRanking.class, false);

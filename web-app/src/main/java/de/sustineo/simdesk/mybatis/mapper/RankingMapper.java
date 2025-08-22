@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.mybatis.mapper;
 
 import de.sustineo.simdesk.entities.CarGroup;
+import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import org.apache.ibatis.annotations.Mapper;
@@ -85,30 +86,35 @@ public interface RankingMapper {
             @Result(property = "session.fileChecksum", column = "file_checksum"),
     })
     @Select(databaseId = "sqlite", value = """
+            <script>
             SELECT lap.*, driver.*, session.*
             FROM lap
                      INNER JOIN session ON lap.session_id = session.id
                      INNER JOIN driver ON lap.driver_id = driver.driver_id
-                     INNER JOIN (SELECT lap.driver_id, lap.car_model_id, MIN(lap.lap_time_millis) AS lap_time_millis
+                     INNER JOIN (SELECT lap.driver_id, MIN(lap.lap_time_millis) AS lap_time_millis
                                  FROM lap
-                                          INNER JOIN session ON lap.session_id = session.id
+                                    INNER JOIN session ON lap.session_id = session.id
                                  WHERE lap.valid = TRUE
                                    AND lap.car_group = #{carGroup}
+                                   <if test='car != null'>
+                                   AND lap.car_model_id = #{car.id}
+                                   </if>
                                    AND session.track_id = #{trackId}
-                                   AND session.session_datetime >= #{from}
-                                   AND session.session_datetime <= #{to}
-                                 GROUP BY lap.driver_id, lap.car_model_id) fastest_laps
+                                   AND session.session_datetime <![CDATA[>=]]> #{from}
+                                   AND session.session_datetime <![CDATA[<=]]> #{to}
+                                 GROUP BY lap.driver_id) fastest_laps
                                 ON lap.driver_id = fastest_laps.driver_id
-                                    AND lap.car_model_id = fastest_laps.car_model_id
                                     AND lap.lap_time_millis = fastest_laps.lap_time_millis
             WHERE lap.valid = TRUE
               AND lap.car_group = #{carGroup}
               AND session.track_id = #{trackId}
-              AND session.session_datetime >= #{from}
-              AND session.session_datetime <= #{to}
+              AND session.session_datetime <![CDATA[>=]]> #{from}
+              AND session.session_datetime <![CDATA[<=]]> #{to}
+            </script>
             """)
     @Select(databaseId = "postgres", value = """
-            SELECT DISTINCT ON (lap.driver_id, lap.car_model_id)
+            <script>
+            SELECT DISTINCT ON (lap.driver_id)
                    lap.*,
                    driver.*,
                    session.*
@@ -117,10 +123,14 @@ public interface RankingMapper {
                      INNER JOIN driver ON lap.driver_id = driver.driver_id
             WHERE lap.valid = TRUE
               AND lap.car_group = #{carGroup}
+              <if test='car != null'>
+              AND lap.car_model_id = #{car.id}
+              </if>
               AND session.track_id = #{trackId}
-              AND session.session_datetime >= #{from}
-              AND session.session_datetime <= #{to}
-            ORDER BY lap.driver_id, lap.car_model_id, lap.lap_time_millis;
+              AND session.session_datetime <![CDATA[>=]]> #{from}
+              AND session.session_datetime <![CDATA[<=]]> #{to}
+            ORDER BY lap.driver_id, lap.lap_time_millis;
+            </script>
             """)
-    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to);
+    List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to, AccCar car);
 }
