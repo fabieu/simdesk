@@ -100,11 +100,19 @@ public class GridRenderer {
         }
     }
 
-    protected static String getTimeColor(Long gapMillis) {
+    protected static String getLapTimeColor(Long gapMillis) {
         if (gapMillis < 0) {
             return "--lumo-success-text-color";
         } else if (gapMillis == 0) {
             return "--lumo-secondary-text-color";
+        } else {
+            return "--lumo-error-text-color";
+        }
+    }
+
+    protected static String getTheoreticalLapTimeColor(Long gapMillis) {
+        if (gapMillis == 0) {
+            return "--lumo-success-text-color";
         } else {
             return "--lumo-error-text-color";
         }

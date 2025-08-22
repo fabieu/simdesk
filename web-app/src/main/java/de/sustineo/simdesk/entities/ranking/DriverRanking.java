@@ -16,5 +16,6 @@ public class DriverRanking {
     private Long sector2Millis;
     private Long sector3Millis;
     private Driver driver;
+    private DriverBestSectors bestSectors;
     private Session session;
 }

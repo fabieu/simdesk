@@ -112,7 +112,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         ComboBox<AccCar> carComboBox = new ComboBox<>();
         carComboBox.setItems(AccCar.getAllByGroup(carGroup));
         carComboBox.setValue(car);
-        carComboBox.setPlaceholder("All Cars");
+        carComboBox.setPlaceholder("All cars");
         carComboBox.setItemLabelGenerator(AccCar::getModel);
         carComboBox.setClassNameGenerator(item -> item.getGroup().name());
         carComboBox.setClearButtonVisible(true);
@@ -184,6 +184,30 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         Grid.Column<DriverRanking> carModelColumn = grid.addColumn(driverRanking -> AccCar.getModelById(driverRanking.getCarModelId()))
                 .setHeader("Car Model")
                 .setSortable(true);
+        Grid.Column<DriverRanking> theoreticalBestLapTimeColumn = grid.addColumn(DriverRankingRenderer.createTheoreticalBestLapTimeRenderer())
+                .setHeader("Theoretical Best")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(driverRanking -> driverRanking.getBestSectors().getTheoreticalBestLapMillis());
+        Grid.Column<DriverRanking> bestSector1Column = grid.addColumn(DriverRankingRenderer.createBestSector1Renderer())
+                .setHeader("Best Sector 1")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(driverRanking -> driverRanking.getBestSectors().getBestSector1Millis());
+        Grid.Column<DriverRanking> bestSector2Column = grid.addColumn(DriverRankingRenderer.createBestSector2Renderer())
+                .setHeader("Best Sector 2")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(driverRanking -> driverRanking.getBestSectors().getBestSector2Millis());
+        Grid.Column<DriverRanking> bestSector3Column = grid.addColumn(DriverRankingRenderer.createBestSector3Renderer())
+                .setHeader("Best Sector 3")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true)
+                .setComparator(driverRanking -> driverRanking.getBestSectors().getBestSector3Millis());
 
         GridListDataView<DriverRanking> dataView = grid.setItems(driverRankings);
         grid.setSizeFull();

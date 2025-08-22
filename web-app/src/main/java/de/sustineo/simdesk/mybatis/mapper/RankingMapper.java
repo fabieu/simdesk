@@ -2,6 +2,7 @@ package de.sustineo.simdesk.mybatis.mapper;
 
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
+import de.sustineo.simdesk.entities.ranking.DriverBestSectors;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import org.apache.ibatis.annotations.Mapper;
@@ -133,4 +134,32 @@ public interface RankingMapper {
             </script>
             """)
     List<DriverRanking> findAllTimeFastestLapsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to, AccCar car);
+
+    @Results(id = "driverBestSectors", value = {
+            @Result(property = "driverId", column = "driver_id"),
+            @Result(property = "bestSector1Millis", column = "best_sector1_millis"),
+            @Result(property = "bestSector2Millis", column = "best_sector2_millis"),
+            @Result(property = "bestSector3Millis", column = "best_sector3_millis"),
+    })
+    @Select(value = """
+            <script>
+            SELECT
+                lap.driver_id,
+                MIN(CASE WHEN lap.sector1_millis > 0 THEN lap.sector1_millis END) AS best_sector1_millis,
+                MIN(CASE WHEN lap.sector2_millis > 0 THEN lap.sector2_millis END) AS best_sector2_millis,
+                MIN(CASE WHEN lap.sector3_millis > 0 THEN lap.sector3_millis END) AS best_sector3_millis
+            FROM lap
+            INNER JOIN session ON lap.session_id = session.id
+            WHERE lap.valid = TRUE
+              AND lap.car_group = #{carGroup}
+              <if test='car != null'>
+              AND lap.car_model_id = #{car.id}
+              </if>
+              AND session.track_id = #{trackId}
+              AND session.session_datetime <![CDATA[>=]]> #{from}
+              AND session.session_datetime <![CDATA[<=]]> #{to}
+            GROUP BY lap.driver_id
+            </script>
+            """)
+    List<DriverBestSectors> findBestSectorsByTrack(CarGroup carGroup, String trackId, Instant from, Instant to, AccCar car);
 }
