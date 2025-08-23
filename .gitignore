@@ -1,6 +1,5 @@
 ### Custom ###
 *.env
-*.properties
 *.db
 *.db-shm
 *.db-wal

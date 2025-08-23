@@ -5,12 +5,15 @@ on:
     branches:
       - main
     paths:
-      - web-app/gradle.properties
+      - simdesk-web/gradle.properties
   workflow_dispatch:
 
 concurrency:
   group: ${{ github.workflow }}-${{ github.ref }}
   cancel-in-progress: true
+
+env:
+  ARTIFACT_DIR: /artifacts
 
 jobs:
   variables:
@@ -34,7 +37,7 @@ jobs:
           echo "VERSION=$VERSION" >> "$GITHUB_ENV"
           echo "VERSION_MAJOR=$VERSION_MAJOR" >> "$GITHUB_ENV"
           echo "VERSION_MINOR=$VERSION_MINOR" >> "$GITHUB_ENV"
-        working-directory: web-app
+        working-directory: simdesk-web
       - name: Display version
         run: echo "Version $VERSION ($VERSION_MAJOR.$VERSION_MINOR)"
 
@@ -74,12 +77,12 @@ jobs:
       - name: Build jar
         run: chmod +x gradlew && sh gradlew :simdesk-web:vaadinBuildFrontend :simdesk-web:bootJar
       - name: Move artifacts
-        run: mkdir -p build/libs && mv web-app/build/libs/* build/libs/
+        run: mkdir -p ${{ env.ARTIFACT_DIR }} && mv simdesk-web/build/libs/*.jar ${{ env.ARTIFACT_DIR }}/
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: jar
-          path: build/libs/*.jar
+          path: ${{ env.ARTIFACT_DIR }}
           retention-days: 1
 
   build-image:
@@ -106,12 +109,15 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jar
-          path: build/libs
+          path: ${{ env.ARTIFACT_DIR }}
+      - name: Move artifacts
+        run: mkdir -p build/libs && mv ${{ env.ARTIFACT_DIR }}/* build/libs/
+        working-directory: simdesk-web
       - name: Login to container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
       - name: Build images
         run: docker build --pull -t $IMAGE_ID:latest -t "$IMAGE_ID:${{ needs.variables.outputs.version }}" -t "$IMAGE_ID:${{ needs.variables.outputs.version-major }}" -t "$IMAGE_ID:${{ needs.variables.outputs.version-major }}.${{ needs.variables.outputs.version-minor }}" .
-        working-directory: web-app
+        working-directory: simdesk-web
       - name: Push images
         run: docker push $IMAGE_ID --all-tags
 
