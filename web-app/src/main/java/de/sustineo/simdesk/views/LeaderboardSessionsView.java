@@ -35,6 +35,7 @@ import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.EnumUtils;
@@ -52,9 +53,9 @@ import java.util.logging.Level;
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions")
-@PageTitle("Leaderboard - Sessions")
 @AnonymousAllowed
-public class LeaderboardSessionsView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+@RequiredArgsConstructor
+public class LeaderboardSessionsView extends BaseView {
     private final SessionService sessionService;
     private final SecurityService securityService;
     private final SessionFileService sessionFileService;
@@ -65,21 +66,10 @@ public class LeaderboardSessionsView extends BaseView implements BeforeEnterObse
 
     private Grid<Session> sessionGrid;
     private TimeRange timeRange = TimeRange.LAST_MONTH;
-    private RouteParameters routeParameters;
-    private QueryParameters queryParameters;
 
-    public LeaderboardSessionsView(SessionService sessionService,
-                                   SecurityService securityService,
-                                   SessionFileService sessionFileService,
-                                   NotificationService notificationService,
-                                   ButtonComponentFactory buttonComponentFactory,
-                                   SessionComponentFactory sessionComponentFactory) {
-        this.sessionService = sessionService;
-        this.securityService = securityService;
-        this.sessionFileService = sessionFileService;
-        this.notificationService = notificationService;
-        this.buttonComponentFactory = buttonComponentFactory;
-        this.sessionComponentFactory = sessionComponentFactory;
+    @Override
+    public String getPageTitle() {
+        return "Leaderboard - Sessions";
     }
 
     @Override

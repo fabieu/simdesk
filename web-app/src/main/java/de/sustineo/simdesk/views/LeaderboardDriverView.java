@@ -23,6 +23,7 @@ import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.LapsByCarCarGroupPartNameGenerator;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
@@ -34,27 +35,22 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/drivers/:driverId")
-@PageTitle("Leaderboard - Driver")
 @AnonymousAllowed
-public class LeaderboardDriverView extends BaseView implements BeforeEnterObserver {
+@RequiredArgsConstructor
+public class LeaderboardDriverView extends BaseView {
     private final DriverService driverService;
     private final LapService lapService;
     private final SessionService sessionService;
     private final SessionComponentFactory sessionComponentFactory;
 
-    public LeaderboardDriverView(DriverService driverService,
-                                 LapService lapService,
-                                 SessionService sessionService,
-                                 SessionComponentFactory sessionComponentFactory) {
-        this.driverService = driverService;
-        this.lapService = lapService;
-        this.sessionService = sessionService;
-        this.sessionComponentFactory = sessionComponentFactory;
+    @Override
+    public String getPageTitle() {
+        return "Leaderboard - Driver";
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
 
         String driverId = routeParameters.get(ROUTE_PARAMETER_DRIVER_ID).orElseThrow();
 

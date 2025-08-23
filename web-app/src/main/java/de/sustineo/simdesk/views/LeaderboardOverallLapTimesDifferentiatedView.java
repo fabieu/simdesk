@@ -33,13 +33,9 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-records/:carGroup/:trackId")
-@PageTitle("Leaderboard - All lap records")
 @AnonymousAllowed
-public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
     private final RankingService rankingService;
-
-    private RouteParameters routeParameters;
-    private QueryParameters queryParameters;
 
     private Grid<DriverRanking> rankingGrid;
 
@@ -50,6 +46,11 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
     public LeaderboardOverallLapTimesDifferentiatedView(RankingService rankingService) {
         this.rankingService = rankingService;
+    }
+
+    @Override
+    public String getPageTitle() {
+        return String.format("Leaderboard - %s (%s)", this.track.getName(), this.carGroup.name());
     }
 
     @Override
@@ -90,7 +91,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
 
         removeAll();
 
-        add(createViewHeader(String.format("%s on %s (%s)", getAnnotatedPageTitle(), Track.getTrackNameByAccId(trackId), carGroup.toUpperCase())));
+        add(createViewHeader());
         add(createSelectHeader());
         addAndExpand(this.rankingGrid);
     }
@@ -218,12 +219,12 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView imple
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<DriverRanking>, DriverRanking> singleSelect = grid.asSingleSelect();
         singleSelect.addValueChangeListener(e -> {
-            DriverRanking selectedGroupRanking = e.getValue();
+            DriverRanking selectedDriverRanking = e.getValue();
 
-            if (selectedGroupRanking != null && selectedGroupRanking.getSession() != null) {
+            if (selectedDriverRanking != null && selectedDriverRanking.getSession() != null) {
                 getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
                         new RouteParameters(
-                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedGroupRanking.getSession().getFileChecksum())
+                                new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedDriverRanking.getSession().getFileChecksum())
                         )
                 ));
             }

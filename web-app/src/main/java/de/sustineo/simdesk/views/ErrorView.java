@@ -6,7 +6,8 @@ import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.Reference;
 import lombok.extern.java.Log;
@@ -16,9 +17,8 @@ import java.util.stream.Collectors;
 
 @Log
 @Route
-@PageTitle("Error")
 @AnonymousAllowed
-public class ErrorView extends BaseView implements BeforeEnterObserver {
+public class ErrorView extends BaseView {
     public static final String QUERY_PARAMETER_HTTP_STATUS = "httpStatus";
     public static final String QUERY_PARAMETER_ERROR_MESSAGE = "errorMessage";
 
@@ -27,6 +27,11 @@ public class ErrorView extends BaseView implements BeforeEnterObserver {
         setSizeFull();
         setJustifyContentMode(JustifyContentMode.CENTER);
         setAlignItems(Alignment.CENTER);
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Error";
     }
 
     public Component createStatusCode(String httpStatus) {
@@ -56,7 +61,7 @@ public class ErrorView extends BaseView implements BeforeEnterObserver {
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        QueryParameters queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
+        queryParameters = beforeEnterEvent.getLocation().getQueryParameters();
         Map<String, String> parametersMap = queryParameters.getParameters().entrySet().stream()
                 .collect(Collectors.toMap(
                         Map.Entry::getKey,

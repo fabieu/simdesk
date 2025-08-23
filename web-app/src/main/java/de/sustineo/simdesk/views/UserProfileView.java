@@ -8,7 +8,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -18,7 +17,6 @@ import org.springframework.security.core.GrantedAuthority;
 import java.util.Optional;
 
 @Route(value = "/profile")
-@PageTitle("Profile")
 @PermitAll
 public class UserProfileView extends BaseView {
     private final SecurityService securityService;
@@ -37,6 +35,11 @@ public class UserProfileView extends BaseView {
         setAlignItems(Alignment.CENTER);
 
         addAndExpand(createUserHeader());
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Profile";
     }
 
     private Component createUserHeader() {

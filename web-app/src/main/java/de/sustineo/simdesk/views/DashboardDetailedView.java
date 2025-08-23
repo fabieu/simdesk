@@ -2,7 +2,9 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.NotFoundException;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.livetiming.Dashboard;
@@ -13,19 +15,25 @@ import org.springframework.context.annotation.Profile;
 
 @Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Route(value = "/dashboards/:dashboardId")
-@PageTitle("Dashboards")
 @AnonymousAllowed
 @RequiredArgsConstructor
-public class DashboardDetailedView extends BaseView implements BeforeEnterObserver {
+public class DashboardDetailedView extends BaseView {
     private final DashboardService dashboardService;
     private final BadgeComponentFactory badgeComponentFactory;
+
+    private Dashboard dashboard;
+
+    @Override
+    public String getPageTitle() {
+        return "Dashboard - " + dashboard.getName();
+    }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         String dashboardId = beforeEnterEvent.getRouteParameters().get(ROUTE_PARAMETER_DASHBOARD_ID).orElseThrow();
 
         try {
-            Dashboard dashboard = dashboardService.getByDashboardId(dashboardId);
+            dashboard = dashboardService.getByDashboardId(dashboardId);
             if (dashboard == null) {
                 throw new IllegalArgumentException("Dashboard with dashboard id " + dashboardId + " does not exist.");
             }

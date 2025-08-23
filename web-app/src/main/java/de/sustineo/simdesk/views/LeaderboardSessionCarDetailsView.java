@@ -16,7 +16,9 @@ import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.data.renderer.LitRenderer;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.NotFoundException;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -34,6 +36,7 @@ import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.InvalidLapPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LapRenderer;
 import de.sustineo.simdesk.views.renderers.SessionDetailsRenderer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
@@ -47,9 +50,9 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId")
-@PageTitle("Leaderboard - Session Car Details")
 @AnonymousAllowed
-public class LeaderboardSessionCarDetailsView extends BaseView implements BeforeEnterObserver {
+@RequiredArgsConstructor
+public class LeaderboardSessionCarDetailsView extends BaseView {
     private final SessionService sessionService;
     private final LapService lapService;
     private final PenaltyService penaltyService;
@@ -61,23 +64,14 @@ public class LeaderboardSessionCarDetailsView extends BaseView implements Before
     private List<Lap> laps = new ArrayList<>();
     private List<Penalty> penalties = new ArrayList<>();
 
-    public LeaderboardSessionCarDetailsView(SessionService sessionService,
-                                            LapService lapService,
-                                            PenaltyService penaltyService,
-                                            SecurityService securityService,
-                                            DriverService driverService,
-                                            SessionComponentFactory sessionComponentFactory) {
-        this.sessionService = sessionService;
-        this.lapService = lapService;
-        this.penaltyService = penaltyService;
-        this.securityService = securityService;
-        this.driverService = driverService;
-        this.sessionComponentFactory = sessionComponentFactory;
+    @Override
+    public String getPageTitle() {
+        return "Leaderboard - Session Car Details";
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
 
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
         int carId = Integer.parseInt(routeParameters.get(ROUTE_PARAMETER_CAR_ID).orElseThrow());

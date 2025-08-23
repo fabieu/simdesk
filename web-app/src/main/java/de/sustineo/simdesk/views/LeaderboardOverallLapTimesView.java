@@ -21,6 +21,7 @@ import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.GroupRankingRenderer;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
@@ -30,18 +31,17 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-records")
-@PageTitle("Leaderboard - Lap records")
 @AnonymousAllowed
-public class LeaderboardOverallLapTimesView extends BaseView implements BeforeEnterObserver, AfterNavigationObserver {
+@RequiredArgsConstructor
+public class LeaderboardOverallLapTimesView extends BaseView {
     private final RankingService rankingService;
 
     private Grid<GroupRanking> rankingGrid;
     private TimeRange timeRange = TimeRange.ALL_TIME;
-    private RouteParameters routeParameters;
-    private QueryParameters queryParameters;
 
-    public LeaderboardOverallLapTimesView(RankingService rankingService) {
-        this.rankingService = rankingService;
+    @Override
+    public String getPageTitle() {
+        return "Leaderboard - Lap records";
     }
 
     @Override

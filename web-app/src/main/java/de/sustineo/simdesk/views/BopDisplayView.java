@@ -13,7 +13,9 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.router.*;
+import com.vaadin.flow.router.BeforeEnterEvent;
+import com.vaadin.flow.router.QueryParameters;
+import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -43,15 +45,11 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/overview")
-@PageTitle("Balance of Performance - Overview")
 @AnonymousAllowed
-public class BopDisplayView extends BaseView implements BeforeEnterObserver {
+public class BopDisplayView extends BaseView {
     private final BopService bopService;
     private final NotificationService notificationService;
     private final ComponentFactory componentFactory;
-
-    private RouteParameters routeParameters;
-    private QueryParameters queryParameters;
 
     private final Select<String> trackSelect = new Select<>();
     private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
@@ -66,6 +64,11 @@ public class BopDisplayView extends BaseView implements BeforeEnterObserver {
         setSizeFull();
         setPadding(false);
         setSpacing(false);
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Balance of Performance - Overview";
     }
 
     @Override

@@ -18,7 +18,6 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.SerializablePredicate;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
@@ -49,7 +48,6 @@ import java.util.Map;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Route(value = "/bop/management")
-@PageTitle("Balance of Performance - Management")
 @RolesAllowed({"ADMIN"})
 public class BopManagementView extends BaseView {
     private final static String GRID_FILTER_TRACK = "TRACK";
@@ -85,6 +83,11 @@ public class BopManagementView extends BaseView {
         addAndExpand(createBopGrid());
 
         initializeBopList();
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Balance of Performance - Management";
     }
 
     private void initializeBopList() {

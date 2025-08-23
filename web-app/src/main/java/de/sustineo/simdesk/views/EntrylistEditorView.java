@@ -38,7 +38,6 @@ import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
@@ -94,7 +93,6 @@ import java.util.concurrent.atomic.AtomicReference;
 @Log
 @CssImport("flag-icons/css/flag-icons.min.css")
 @Route(value = "/entrylist/editor")
-@PageTitle("Entrylist - Editor")
 @AnonymousAllowed
 public class EntrylistEditorView extends BaseView {
     private static final Set<UserRoleEnum> ADVANCED_PERMISSION_ROLES = Set.of(UserRoleEnum.ROLE_ADMIN);
@@ -180,6 +178,11 @@ public class EntrylistEditorView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createEntrylistContainer());
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Entrylist - Editor";
     }
 
     private void resetEntities() {
