@@ -13,7 +13,7 @@ concurrency:
   cancel-in-progress: true
 
 env:
-  ARTIFACT_DIR: /artifacts
+  ARTIFACT_DIR: artifacts
 
 jobs:
   variables:
@@ -78,7 +78,7 @@ jobs:
         run: chmod +x gradlew && sh gradlew :simdesk-web:vaadinBuildFrontend :simdesk-web:bootJar
       - name: Move artifacts
         run: mkdir -p ${{ env.ARTIFACT_DIR }} && mv simdesk-web/build/libs/*.jar ${{ env.ARTIFACT_DIR }}/
-      - name: Upload artifact
+      - name: Upload artifacts
         uses: actions/upload-artifact@v4
         with:
           name: jar
@@ -105,7 +105,7 @@ jobs:
     steps:
       - name: Checkout
         uses: actions/checkout@v4
-      - name: Download artifact
+      - name: Download artifacts
         uses: actions/download-artifact@v4
         with:
           name: jar
