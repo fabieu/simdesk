@@ -73,11 +73,13 @@ jobs:
         uses: gradle/actions/setup-gradle@v4
       - name: Build jar
         run: chmod +x gradlew && sh gradlew :simdesk-web:vaadinBuildFrontend :simdesk-web:bootJar
+      - name: Move artifacts
+        run: mkdir -p build/libs && mv web-app/build/libs/* build/libs/
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: jar
-          path: web-app/build/libs/*.jar
+          path: build/libs/*.jar
           retention-days: 1
 
   build-image:
@@ -104,7 +106,7 @@ jobs:
         uses: actions/download-artifact@v4
         with:
           name: jar
-          path: web-app/build/libs
+          path: build/libs
       - name: Login to container registry
         run: echo "${{ secrets.GITHUB_TOKEN }}" | docker login ${{ vars.CONTAINER_REGISTRY }} -u ${{ github.actor }} --password-stdin
       - name: Build images

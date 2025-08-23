@@ -10,7 +10,7 @@ WORKDIR /app
 RUN mkdir -p data results
 
 # Copy the application JAR file into the container
-COPY build/libs/web-app.jar /app/simdesk.jar
+COPY build/libs/simdesk-web.jar /app/simdesk.jar
 
 # Expose the application port
 EXPOSE 8080
