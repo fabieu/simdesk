@@ -52,8 +52,8 @@ public class RankingService {
                         rankings.stream()
                                 .sorted(new DriverRankingComparator())
                                 .peek(driverRanking -> {
-                                    driverRanking.setBestSectors(bestSectors.get(driverRanking.getDriver().getId()));
                                     driverRanking.setRanking(ranking.getAndIncrement());
+                                    driverRanking.setBestSectors(bestSectors.get(driverRanking.getDriver().getId()));
                                 })
                                 .toList())
                 .join(); // Propagates unchecked exceptions if any

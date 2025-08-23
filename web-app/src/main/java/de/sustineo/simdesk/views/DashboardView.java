@@ -14,7 +14,6 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -37,7 +36,6 @@ import java.util.List;
 
 @Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Route(value = "/dashboards")
-@PageTitle("Dashboards")
 @AnonymousAllowed
 public class DashboardView extends BaseView {
     private final DashboardService dashboardService;
@@ -66,6 +64,11 @@ public class DashboardView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createDashboardLayout());
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Dashboards";
     }
 
     private boolean hasManagementAccess() {

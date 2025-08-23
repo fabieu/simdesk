@@ -4,7 +4,6 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -35,7 +34,6 @@ import java.util.Optional;
 
 @Profile(ProfileManager.PROFILE_MAP)
 @Route(value = "/map")
-@PageTitle("Map")
 @AnonymousAllowed
 public class MapView extends BaseView {
     private static final int MINIMUM_ZOOM_LEVEL = 3;
@@ -60,6 +58,11 @@ public class MapView extends BaseView {
         addAndExpand(createMap());
 
         updateWeatherMarkers(DEFAULT_RACE_HOURS);
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Map";
     }
 
     private Component createMapHeader() {

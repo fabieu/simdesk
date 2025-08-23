@@ -19,6 +19,7 @@ import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.generators.LeaderboardLinePartNameGenerator;
 import de.sustineo.simdesk.views.generators.LeaderboardLinePodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.LeaderboardLineRenderer;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
@@ -28,25 +29,22 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:fileChecksum")
-@PageTitle("Leaderboard - Session Details")
 @AnonymousAllowed
-public class LeaderboardSessionDetailsView extends BaseView implements BeforeEnterObserver {
+@RequiredArgsConstructor
+public class LeaderboardSessionDetailsView extends BaseView {
     private final SessionService sessionService;
     private final LeaderboardService leaderboardService;
 
     private final SessionComponentFactory sessionComponentFactory;
 
-    public LeaderboardSessionDetailsView(SessionService sessionService,
-                                         LeaderboardService leaderboardService,
-                                         SessionComponentFactory sessionComponentFactory) {
-        this.sessionService = sessionService;
-        this.leaderboardService = leaderboardService;
-        this.sessionComponentFactory = sessionComponentFactory;
+    @Override
+    public String getPageTitle() {
+        return "Leaderboard - Session Details";
     }
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-        final RouteParameters routeParameters = beforeEnterEvent.getRouteParameters();
+         routeParameters = beforeEnterEvent.getRouteParameters();
 
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 

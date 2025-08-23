@@ -16,7 +16,6 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.data.binder.ValidationException;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.UploadHandler;
@@ -46,7 +45,6 @@ import java.util.Set;
 @Profile(ProfileManager.PROFILE_BOP)
 @Log
 @Route(value = "/bop/editor")
-@PageTitle("Balance of Performance - Editor")
 @AnonymousAllowed
 public class BopEditorView extends BaseView {
     private final ValidationService validationService;
@@ -76,6 +74,11 @@ public class BopEditorView extends BaseView {
         addAndExpand(createFormLayout());
 
         reloadComponents();
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Balance of Performance - Editor";
     }
 
     private Component createFormLayout() {

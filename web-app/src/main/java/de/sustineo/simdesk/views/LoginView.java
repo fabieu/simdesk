@@ -9,17 +9,14 @@ import com.vaadin.flow.component.login.LoginForm;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
-import com.vaadin.flow.router.BeforeEnterObserver;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.services.NotificationService;
 
 @Route(value = "login")
-@PageTitle("Login")
 @AnonymousAllowed
-public class LoginView extends BaseView implements BeforeEnterObserver {
+public class LoginView extends BaseView {
     private final NotificationService notificationService;
     private final LoginForm login = new LoginForm();
     private Button loginButton = new Button();
@@ -37,6 +34,11 @@ public class LoginView extends BaseView implements BeforeEnterObserver {
         login.setVisible(false);
 
         add(createLoginButtonLayout(), login);
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Login";
     }
 
     private Component createLoginButtonLayout() {

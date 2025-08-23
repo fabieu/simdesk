@@ -18,7 +18,6 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
-import com.vaadin.flow.router.PageTitle;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
@@ -47,7 +46,6 @@ import java.util.Optional;
 
 @Log
 @Route(value = "/settings", layout = MainLayout.class)
-@PageTitle("Settings")
 @RolesAllowed({"ADMIN"})
 public class SettingsView extends BaseView {
     private final UserService userService;
@@ -79,6 +77,11 @@ public class SettingsView extends BaseView {
 
         add(createViewHeader());
         addAndExpand(createFormLayout());
+    }
+
+    @Override
+    public String getPageTitle() {
+        return "Settings";
     }
 
     private Component createFormLayout() {

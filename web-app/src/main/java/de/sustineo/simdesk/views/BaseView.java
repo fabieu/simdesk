@@ -6,16 +6,11 @@ import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.dom.Style;
-import com.vaadin.flow.router.PageTitle;
-import com.vaadin.flow.router.QueryParameters;
-import com.vaadin.flow.router.RouteConfiguration;
-import com.vaadin.flow.router.RouteParameters;
+import com.vaadin.flow.router.*;
 import org.springframework.util.LinkedMultiValueMap;
 import org.springframework.web.util.UriComponentsBuilder;
 
-import java.util.Objects;
-
-public abstract class BaseView extends VerticalLayout {
+public abstract class BaseView extends VerticalLayout implements BeforeEnterObserver, AfterNavigationObserver, HasDynamicTitle {
     public static final String QUERY_PARAMETER_TIME_RANGE = "timeRange";
     public static final String QUERY_PARAMETER_TRACK_ID = "track";
     public static final String QUERY_PARAMETER_CAR_ID = "carId";
@@ -29,18 +24,31 @@ public abstract class BaseView extends VerticalLayout {
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";
 
-    private final ScrollOptions defaultScrollOptions = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
+    private static final ScrollOptions DEFAULT_SCROLL_OPTIONS = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
-    protected void scrollToComponent(Component component) {
-        component.scrollIntoView(defaultScrollOptions);
+    protected RouteParameters routeParameters;
+    protected QueryParameters queryParameters;
+
+    @Override
+    public void afterNavigation(AfterNavigationEvent event) {
+        // This method is called after navigation to the view.
+        // No default behavior, can be overridden by subclasses
     }
 
-    protected String getAnnotatedPageTitle() {
-        return Objects.requireNonNull(this.getClass().getAnnotation(PageTitle.class)).value();
+    @Override
+    public void beforeEnter(BeforeEnterEvent event) {
+        // This method is called before entering the view.
+        // No default behavior, can be overridden by subclasses
+    }
+
+    @Override
+    public String getPageTitle() {
+        // Default title, can be overridden by subclasses
+        return "SimDesk";
     }
 
     protected Component createViewHeader() {
-        return createViewHeader(getAnnotatedPageTitle());
+        return createViewHeader(getPageTitle());
     }
 
     protected Component createViewHeader(String heading, Component... components) {
@@ -69,5 +77,9 @@ public abstract class BaseView extends VerticalLayout {
                 .queryParams(new LinkedMultiValueMap<>(queryParameters.getParameters()))
                 .toUriString();
         getUI().ifPresent(ui -> ui.getPage().getHistory().replaceState(null, deepLinkingUrlWithParam));
+    }
+
+    protected void scrollToComponent(Component component) {
+        component.scrollIntoView(DEFAULT_SCROLL_OPTIONS);
     }
 }
