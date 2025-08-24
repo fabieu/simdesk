@@ -30,30 +30,30 @@ public class MenuService {
         List<MenuEntity> items = new ArrayList<>();
 
         if (ProfileManager.isLeaderboardProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.TROPHY, LeaderboardOverallLapTimesView.class));
-            items.add(MenuEntity.of(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.TROPHY, LeaderboardOverallLapTimesView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
         }
 
         if (ProfileManager.isLiveTimingProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.LIVE_TIMING, "Dashboards", VaadinIcon.CLOCK, DashboardView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.LIVE_TIMING, "Dashboards", VaadinIcon.CLOCK, DashboardView.class));
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
         if (ProfileManager.isBopProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
 
             if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
-                items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
+                items.add(MenuEntity.ofInternal(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Management", VaadinIcon.COG, BopManagementView.class));
             }
 
-            items.add(MenuEntity.of(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
         }
 
         if (ProfileManager.isMapProfileEnabled()) {
-            items.add(MenuEntity.of(MenuEntityCategory.MAP, "Map", VaadinIcon.MAP_MARKER, MapView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.MAP, "Map", VaadinIcon.MAP_MARKER, MapView.class));
         }
 
         return items;

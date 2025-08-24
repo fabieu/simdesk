@@ -14,7 +14,6 @@ import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.icon.FontIcon;
-import com.vaadin.flow.component.icon.Icon;
 import com.vaadin.flow.component.menubar.MenuBar;
 import com.vaadin.flow.component.menubar.MenuBarVariant;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
@@ -30,8 +29,7 @@ import com.vaadin.flow.theme.lumo.Lumo;
 import de.sustineo.simdesk.configuration.Reference;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
-import de.sustineo.simdesk.entities.menu.MenuEntity;
-import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
+import de.sustineo.simdesk.entities.menu.*;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -85,16 +83,18 @@ public class MainLayout extends AppLayout {
             tabs.setOrientation(Tabs.Orientation.VERTICAL);
 
             for (MenuEntity item : entry.getValue()) {
-                switch (item.getType()) {
-                    case INTERNAL -> {
-                        Tab tab = createTab(item.getName(), item.getIcon(), item.getNavigationTarget());
-                        tabs.add(tab);
-                    }
-                    case EXTERNAL -> {
-                        Tab tab = createExternalTab(item.getName(), item.getIcon(), item.getHref());
-                        tabs.add(tab);
-                    }
+                NavigationTarget navigationTarget = item.getNavigationTarget();
+
+                Tab tab = new Tab();
+                tab.add(item.getIcon(), navigationTarget.asComponent(item.getName()));
+
+                if (navigationTarget instanceof InternalLink(Class<? extends Component> target)) {
+                    ComponentUtil.setData(tab, Class.class, target); // important for setting selected tab
+                } else if (navigationTarget instanceof ExternalLink) {
+                    tab.setSelected(false);
                 }
+
+                tabs.add(tab);
             }
 
             menuMap.put(entry.getKey(), tabs);
@@ -306,27 +306,6 @@ public class MainLayout extends AppLayout {
                 .set("font-weight", "bold");
 
         return span;
-    }
-
-    private static Tab createTab(String text, Icon icon, Class<? extends Component> navigationTarget) {
-        final Tab tab = new Tab();
-        tab.add(icon, new RouterLink(text, navigationTarget));
-        tab.setId("tab-" + text.toLowerCase());
-        ComponentUtil.setData(tab, Class.class, navigationTarget); // important for setting selected tab
-
-        return tab;
-    }
-
-    private static Tab createExternalTab(String text, Icon icon, String navigationTarget) {
-        Anchor link = new Anchor(navigationTarget, text);
-        link.setTarget("_blank");
-
-        final Tab tab = new Tab();
-        tab.add(icon, link);
-        tab.setId("tab-" + text.toLowerCase());
-        tab.setSelected(false);
-
-        return tab;
     }
 
     @Override

@@ -54,23 +54,21 @@ public class LeaderboardDriverView extends BaseView {
 
         String driverId = routeParameters.get(ROUTE_PARAMETER_DRIVER_ID).orElseThrow();
 
-        try {
-            Driver driver = driverService.getDriverById(driverId);
-            if (driver == null) {
-                throw new IllegalArgumentException("Driver with driver id " + driverId + " does not exist.");
-            }
-
-            setSizeFull();
-            setSpacing(false);
-            setPadding(false);
-
-            removeAll();
-
-            add(createViewHeader(driver.getFullName()));
-            addAndExpand(createDriverLayout(driver));
-        } catch (IllegalArgumentException e) {
+        Driver driver = driverService.getDriverById(driverId);
+        if (driver == null) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
+            return;
         }
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
+        removeAll();
+
+        add(createViewHeader(driver.getFullName()));
+        addAndExpand(createDriverLayout(driver));
+
     }
 
     private Component createDriverLayout(Driver driver) {
