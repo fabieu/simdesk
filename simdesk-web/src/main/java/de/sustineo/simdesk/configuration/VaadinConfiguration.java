@@ -1,11 +1,9 @@
 package de.sustineo.simdesk.configuration;
 
-import com.vaadin.flow.component.page.AppShellConfigurator;
-import com.vaadin.flow.component.page.Inline;
-import com.vaadin.flow.component.page.Meta;
-import com.vaadin.flow.component.page.Viewport;
+import com.vaadin.flow.component.page.*;
 import com.vaadin.flow.server.AppShellSettings;
 import com.vaadin.flow.server.PWA;
+import com.vaadin.flow.shared.communication.PushMode;
 import com.vaadin.flow.theme.Theme;
 
 import java.util.Map;
@@ -20,6 +18,7 @@ import java.util.Map;
 @Meta(name = "theme-color", content = "#1a1a1a")
 @PWA(name = "SimDesk", shortName = "SimDesk", description = "SimDesk - Sim Racing Utilities")
 @Theme(value = "default")
+@Push(PushMode.MANUAL)
 public class VaadinConfiguration implements AppShellConfigurator {
     @Override
     public void configurePage(AppShellSettings settings) {

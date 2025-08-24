@@ -44,28 +44,26 @@ public class LeaderboardSessionDetailsView extends BaseView {
 
     @Override
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
-         routeParameters = beforeEnterEvent.getRouteParameters();
+        routeParameters = beforeEnterEvent.getRouteParameters();
 
         String fileChecksum = routeParameters.get(ROUTE_PARAMETER_FILE_CHECKSUM).orElseThrow();
 
-        try {
-            Session session = sessionService.getByFileChecksum(fileChecksum);
-            if (session == null) {
-                throw new IllegalArgumentException("Session with file checksum " + fileChecksum + " does not exist.");
-            }
-
-            setSizeFull();
-            setSpacing(false);
-            setPadding(false);
-
-            removeAll();
-
-            add(createViewHeader());
-            add(sessionComponentFactory.createSessionInformation(session));
-            addAndExpand(createLeaderboardGrid(session));
-        } catch (IllegalArgumentException e) {
+        Session session = sessionService.getByFileChecksum(fileChecksum);
+        if (session == null) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
+            return;
         }
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
+        removeAll();
+
+        add(createViewHeader());
+        add(sessionComponentFactory.createSessionInformation(session));
+        addAndExpand(createLeaderboardGrid(session));
+
     }
 
     private Component createLeaderboardGrid(Session session) {

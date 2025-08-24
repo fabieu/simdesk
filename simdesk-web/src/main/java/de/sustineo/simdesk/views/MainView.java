@@ -61,16 +61,8 @@ public class MainView extends BaseView {
             for (MenuEntity menuEntity : entry.getValue()) {
                 Button button = new Button(menuEntity.getName(), menuEntity.getIcon());
                 button.addClassName("home-menu-button");
-                button.addClickListener(event -> {
-                    switch (menuEntity.getType()) {
-                        case INTERNAL:
-                            getUI().ifPresent(ui -> ui.navigate(menuEntity.getNavigationTarget()));
-                            break;
-                        case EXTERNAL:
-                            //TODO: Implement external link handling
-                            break;
-                    }
-                });
+
+                menuEntity.getNavigationTarget().applyTo(button);
 
                 menuCategory.add(button);
             }
