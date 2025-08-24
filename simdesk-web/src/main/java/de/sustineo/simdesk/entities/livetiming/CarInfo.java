@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCupCategory;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccNationality;
 import lombok.*;
 
+import java.time.Instant;
 import java.util.List;
 
 @Data
@@ -14,7 +15,7 @@ import java.util.List;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class CarInfo {
     private int id;
-    private long lastUpdate;
+    private Instant lastUpdate;
     private boolean connected;
     private AccCar car;
     private String teamName;
@@ -84,5 +85,9 @@ public class CarInfo {
         } else {
             return new DriverInfo();
         }
+    }
+
+    public String getCarNumberString() {
+        return String.format("#%-3d", carNumber);
     }
 }

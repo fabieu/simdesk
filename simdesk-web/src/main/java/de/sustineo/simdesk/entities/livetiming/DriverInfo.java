@@ -15,5 +15,9 @@ public class DriverInfo {
     private String shortName;
     private AccDriverCategory category;
     private AccNationality driverNationality;
+
+    public String getFullName() {
+        return firstName + " " + lastName;
+    }
 }
 
