@@ -27,12 +27,16 @@ public class Driver {
     private Instant lastActivity;
 
     public String getFullName() {
-        if (firstName == null || lastName == null) {
-            return UNKNOWN_DRIVER;
-        }
-
         if (visibility == Visibility.PRIVATE) {
             return HIDDEN_FULL_NAME;
+        }
+
+        return getRealName();
+    }
+
+    public String getRealName() {
+        if (firstName == null || lastName == null) {
+            return UNKNOWN_DRIVER;
         }
 
         return String.format("%s %s", firstName, lastName);

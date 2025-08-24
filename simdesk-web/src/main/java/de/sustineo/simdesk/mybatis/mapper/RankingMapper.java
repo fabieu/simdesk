@@ -37,7 +37,9 @@ public interface RankingMapper {
                     SELECT lap.car_model_id, lap.driver_id, session.track_id, lap.car_group, MIN(lap.lap_time_millis) AS min_lap_time_millis
                         FROM lap
                             INNER JOIN session ON lap.session_id = session.id
+                            INNER JOIN driver ON lap.driver_id = driver.driver_id
                         WHERE lap.valid IS TRUE
+                          AND driver.visibility = 'PUBLIC'
                           AND session.session_datetime >= #{from}
                           AND session.session_datetime <= #{to}
                         GROUP BY session.track_id, lap.car_group
@@ -48,6 +50,7 @@ public interface RankingMapper {
                        AND lap.car_group = fastest_laps.car_group
                        AND lap.lap_time_millis = fastest_laps.min_lap_time_millis
                     WHERE lap.valid IS TRUE
+                      AND driver.visibility = 'PUBLIC'
                       AND session.session_datetime >= #{from}
                       AND session.session_datetime <= #{to}
             ORDER BY lap.car_group, session.track_id;
@@ -63,6 +66,7 @@ public interface RankingMapper {
                      INNER JOIN session ON lap.session_id = session.id
                      INNER JOIN driver ON lap.driver_id = driver.driver_id
             WHERE lap.valid IS TRUE
+              AND driver.visibility = 'PUBLIC'
               AND session.session_datetime >= #{from}
               AND session.session_datetime <= #{to}
             ORDER BY lap.car_group, session.track_id, lap.lap_time_millis;
@@ -95,12 +99,14 @@ public interface RankingMapper {
                      INNER JOIN (SELECT lap.driver_id, MIN(lap.lap_time_millis) AS lap_time_millis
                                  FROM lap
                                     INNER JOIN session ON lap.session_id = session.id
+                                    INNER JOIN driver ON lap.driver_id = driver.driver_id
                                  WHERE lap.valid = TRUE
                                    AND lap.car_group = #{carGroup}
                                    <if test='car != null'>
                                    AND lap.car_model_id = #{car.id}
                                    </if>
                                    AND session.track_id = #{trackId}
+                                   AND driver.visibility = 'PUBLIC'
                                    AND session.session_datetime <![CDATA[>=]]> #{from}
                                    AND session.session_datetime <![CDATA[<=]]> #{to}
                                  GROUP BY lap.driver_id) fastest_laps
@@ -109,6 +115,7 @@ public interface RankingMapper {
             WHERE lap.valid = TRUE
               AND lap.car_group = #{carGroup}
               AND session.track_id = #{trackId}
+              AND driver.visibility = 'PUBLIC'
               AND session.session_datetime <![CDATA[>=]]> #{from}
               AND session.session_datetime <![CDATA[<=]]> #{to}
             </script>
@@ -128,6 +135,7 @@ public interface RankingMapper {
               AND lap.car_model_id = #{car.id}
               </if>
               AND session.track_id = #{trackId}
+              AND driver.visibility = 'PUBLIC'
               AND session.session_datetime <![CDATA[>=]]> #{from}
               AND session.session_datetime <![CDATA[<=]]> #{to}
             ORDER BY lap.driver_id, lap.lap_time_millis;

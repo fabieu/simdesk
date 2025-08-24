@@ -7,7 +7,7 @@ public class DriverFilter extends GridFilter {
     private final GridListDataView<Driver> dataView;
 
     private String driverId;
-    private String fullName;
+    private String realName;
     private String visibility;
 
     public DriverFilter(GridListDataView<Driver> dataView) {
@@ -20,8 +20,8 @@ public class DriverFilter extends GridFilter {
         this.dataView.refreshAll();
     }
 
-    public void setFullName(String fullName) {
-        this.fullName = fullName;
+    public void setRealName(String realName) {
+        this.realName = realName;
         this.dataView.refreshAll();
     }
 
@@ -32,9 +32,9 @@ public class DriverFilter extends GridFilter {
 
     public boolean test(Driver driver) {
         boolean matchesServerName = matches(driver.getId(), driverId);
-        boolean matchesFullName = matches(driver.getFullName(), fullName);
+        boolean matchesRealName = matches(driver.getRealName(), realName);
         boolean matchesVisibility = matches(driver.getVisibility().name(), visibility);
 
-        return matchesServerName && matchesFullName && matchesVisibility;
+        return matchesServerName && matchesRealName && matchesVisibility;
     }
 }

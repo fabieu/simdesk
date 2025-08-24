@@ -144,9 +144,9 @@ public class SettingsView extends BaseView {
             Driver driver = event.getItem();
             try {
                 driverService.updateDriverVisibility(driver);
-                notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getFullName()));
+                notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getRealName()));
             } catch (Exception e) {
-                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getFullName(), e.getMessage()));
+                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getRealName(), e.getMessage()));
             }
         });
 
@@ -154,9 +154,9 @@ public class SettingsView extends BaseView {
                 .setHeader("Steam ID")
                 .setAutoWidth(true)
                 .setFlexGrow(0);
-        Grid.Column<Driver> fullNameColumn = grid.addColumn(Driver::getFullName)
+        Grid.Column<Driver> realNameColumn = grid.addColumn(Driver::getRealName)
                 .setHeader("Name")
-                .setTooltipGenerator(Driver::getFullName);
+                .setTooltipGenerator(Driver::getRealName);
         Grid.Column<Driver> visibilityColumn = grid.addColumn(driver -> driver.getVisibility().name())
                 .setHeader("Visibility")
                 .setWidth("10rem")
@@ -199,7 +199,7 @@ public class SettingsView extends BaseView {
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverIdColumn).setComponent(GridFilter.createHeader(driverFilter::setDriverId));
-        headerRow.getCell(fullNameColumn).setComponent(GridFilter.createHeader(driverFilter::setFullName));
+        headerRow.getCell(realNameColumn).setComponent(GridFilter.createHeader(driverFilter::setRealName));
         headerRow.getCell(visibilityColumn).setComponent(GridFilter.createHeader(driverFilter::setVisibility));
 
         HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
