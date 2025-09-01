@@ -16,13 +16,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 @Log
 @Service
 public class SecurityService {
-    public static final String DISCORD_CDN_AVATARS_URL = "https://cdn.discordapp.com/avatars";
-
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final transient AuthenticationContext authenticationContext;
@@ -51,13 +52,13 @@ public class SecurityService {
         userService.insertSystemUser(SecurityConfiguration.USER_ID_ADMIN, adminUsername, passwordEncoder.encode(adminPassword));
     }
 
-    private static Optional<Authentication> getAuthentication() {
+    private Optional<Authentication> getAuthentication() {
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(auth -> !(auth instanceof AnonymousAuthenticationToken));
     }
 
-    public Optional<UserPrincipal> getAuthenticatedUserPrincipal() {
+    public Optional<UserPrincipal> getAuthenticatedUser() {
         Object principal = getAuthentication()
                 .map(Authentication::getPrincipal)
                 .orElse(null);
@@ -71,10 +72,6 @@ public class SecurityService {
         }
 
         return Optional.empty();
-    }
-
-    public Optional<String> getPrincipalName() {
-        return authenticationContext.getPrincipalName();
     }
 
     public boolean hasAnyAuthority(Collection<UserRoleEnum> userRoles) {
@@ -92,22 +89,5 @@ public class SecurityService {
 
     public void logout() {
         authenticationContext.logout();
-    }
-
-    public Optional<String> getAvatarUrl() {
-        Optional<UserPrincipal> userPrincipal = getAuthenticatedUserPrincipal();
-        if (userPrincipal.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Map<String, Object> userAttributes = userPrincipal.get().getAttributes();
-        String avatarId = (String) userAttributes.get("avatar");
-        String userId = (String) userAttributes.get("id");
-
-        if (avatarId == null || userId == null) {
-            return Optional.empty();
-        }
-
-        return Optional.of(DISCORD_CDN_AVATARS_URL + "/" + userId + "/" + avatarId);
     }
 }

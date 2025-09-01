@@ -64,6 +64,7 @@ public class BopManagementView extends BaseView {
     private final Grid<Bop> grid = new Grid<>(Bop.class, false);
     private final GridListDataView<Bop> gridDataView = grid.setItems(bopList);
     private final Map<String, SerializablePredicate<Bop>> gridFilters = new HashMap<>();
+    private final String authenticatedUserGlobalName;
 
     public BopManagementView(BopService bopService,
                              SecurityService securityService,
@@ -73,6 +74,9 @@ public class BopManagementView extends BaseView {
         this.securityService = securityService;
         this.notificationService = notificationService;
         this.buttonComponentFactory = buttonComponentFactory;
+        this.authenticatedUserGlobalName = securityService.getAuthenticatedUser()
+                .map(user -> user.getGlobalName().orElse(user.getUsername()))
+                .orElse(null);
 
         setSizeFull();
         setPadding(false);
@@ -233,7 +237,7 @@ public class BopManagementView extends BaseView {
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<Bop>) event -> {
             Bop bop = event.getItem();
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
             bopService.update(bop);
         });
@@ -344,7 +348,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(true);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -363,7 +367,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(false);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -383,7 +387,7 @@ public class BopManagementView extends BaseView {
 
             bop.setRestrictor(0);
             bop.setBallastKg(0);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);

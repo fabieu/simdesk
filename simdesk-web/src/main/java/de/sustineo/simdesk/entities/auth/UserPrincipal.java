@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @Data
 public class UserPrincipal implements UserDetails {
@@ -42,5 +43,25 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    public Optional<String> getGlobalName() {
+        Object globalNameFromAttributes = attributes.get("global_name");
+        if (globalNameFromAttributes instanceof String globalName) {
+            return Optional.of(globalName);
+        }
+
+        return Optional.empty();
+    }
+
+    public Optional<String> getAvatarUrl() {
+        Object avatarIdObject = attributes.get("avatar");
+        Object userIdObject = attributes.get("id");
+
+        if (avatarIdObject instanceof String avatarId && userIdObject instanceof String userId) {
+            return Optional.of(String.format("https://cdn.discordapp.com/avatars/%s/%s", userId, avatarId));
+        }
+
+        return Optional.empty();
     }
 }
