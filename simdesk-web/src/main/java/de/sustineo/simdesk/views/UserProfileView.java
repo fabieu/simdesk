@@ -53,9 +53,7 @@ public class UserProfileView extends BaseView {
         layout.add(avatar);
 
         user.ifPresent(userPrincipal -> avatar.setName(userPrincipal.getUsername()));
-
-        Optional<String> avatarImageUrl = securityService.getAvatarUrl();
-        avatarImageUrl.ifPresent(avatar::setImage);
+        user.flatMap(UserPrincipal::getAvatarUrl).ifPresent(avatar::setImage);
 
         /* Name */
         user.ifPresent(userPrincipal -> layout.add(createNameLayout(userPrincipal)));

@@ -190,8 +190,7 @@ public class MainLayout extends AppLayout {
         if (user.isPresent()) {
             avatar.setName(user.get().getUsername());
 
-            Optional<String> avatarUrl = securityService.getAvatarUrl();
-            avatarUrl.ifPresent(avatar::setImage);
+            user.flatMap(UserPrincipal::getAvatarUrl).ifPresent(avatar::setImage);
 
             MenuItem profileMenuItem = userSubMenu.addItem("Profile");
             profileMenuItem.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(UserProfileView.class)));

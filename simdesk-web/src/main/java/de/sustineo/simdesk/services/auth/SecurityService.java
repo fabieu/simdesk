@@ -16,13 +16,14 @@ import org.springframework.security.crypto.password.PasswordEncoder;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.stereotype.Service;
 
-import java.util.*;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Optional;
+import java.util.UUID;
 
 @Log
 @Service
 public class SecurityService {
-    public static final String DISCORD_CDN_AVATARS_URL = "https://cdn.discordapp.com/avatars";
-
     private final UserService userService;
     private final PasswordEncoder passwordEncoder;
     private final transient AuthenticationContext authenticationContext;
@@ -88,22 +89,5 @@ public class SecurityService {
 
     public void logout() {
         authenticationContext.logout();
-    }
-
-    public Optional<String> getAvatarUrl() {
-        Optional<UserPrincipal> user = getAuthenticatedUser();
-        if (user.isEmpty()) {
-            return Optional.empty();
-        }
-
-        Map<String, Object> userAttributes = user.get().getAttributes();
-        Object avatarIdObject = userAttributes.get("avatar");
-        Object userIdObject = userAttributes.get("id");
-
-        if (avatarIdObject instanceof String avatarId && userIdObject instanceof String userId) {
-            return Optional.of(DISCORD_CDN_AVATARS_URL + "/" + userId + "/" + avatarId);
-        }
-
-        return Optional.empty();
     }
 }
