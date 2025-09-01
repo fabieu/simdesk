@@ -42,7 +42,7 @@ dependencies {
 
     // Vaadin
     implementation "com.vaadin:vaadin-spring-boot-starter"
-    implementation "software.xdev:vaadin-maps-leaflet-flow:4.6.3"
+    implementation "software.xdev:vaadin-maps-leaflet-flow:5.0.0"
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
