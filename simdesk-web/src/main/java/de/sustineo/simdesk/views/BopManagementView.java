@@ -23,7 +23,6 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
-import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
@@ -76,7 +75,7 @@ public class BopManagementView extends BaseView {
         this.notificationService = notificationService;
         this.buttonComponentFactory = buttonComponentFactory;
         this.authenticatedUserGlobalName = securityService.getAuthenticatedUser()
-                .flatMap(UserPrincipal::getGlobalName)
+                .map(user -> user.getGlobalName().orElse(user.getUsername()))
                 .orElse(null);
 
         setSizeFull();
