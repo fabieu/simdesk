@@ -20,11 +20,12 @@ import java.util.Optional;
 @PermitAll
 public class UserProfileView extends BaseView {
     private final SecurityService securityService;
+    private final Optional<UserPrincipal> user;
 
     public UserProfileView(SecurityService securityService) {
         this.securityService = securityService;
+        this.user = securityService.getAuthenticatedUser();
 
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
         if (user.isEmpty()) {
             add(new Text("No user found"));
             return;
@@ -45,8 +46,6 @@ public class UserProfileView extends BaseView {
     private Component createUserHeader() {
         VerticalLayout layout = new VerticalLayout();
         layout.setAlignItems(Alignment.CENTER);
-
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
 
         /* Avatar */
         Avatar avatar = new Avatar();
@@ -73,15 +72,13 @@ public class UserProfileView extends BaseView {
         nameLayout.setPadding(false);
         nameLayout.setSpacing(false);
 
-        Optional<String> detailedName = Optional.of(userPrincipal)
-                .map(UserPrincipal::getAttributes)
-                .map(attributes -> attributes.get("global_name"))
-                .map(String.class::cast);
+        Optional<String> globalName = Optional.of(userPrincipal)
+                .flatMap(UserPrincipal::getGlobalName);
 
-        if (detailedName.isPresent()) {
-            H3 detailedNameHeader = new H3(detailedName.get());
+        if (globalName.isPresent()) {
+            H3 globalNameHeader = new H3(globalName.get());
             Text usernameHeader = new Text(userPrincipal.getUsername());
-            nameLayout.add(detailedNameHeader, usernameHeader);
+            nameLayout.add(globalNameHeader, usernameHeader);
         } else {
             H3 usernameHeader = new H3(userPrincipal.getUsername());
             nameLayout.add(usernameHeader);

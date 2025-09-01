@@ -51,13 +51,13 @@ public class SecurityService {
         userService.insertSystemUser(SecurityConfiguration.USER_ID_ADMIN, adminUsername, passwordEncoder.encode(adminPassword));
     }
 
-    private static Optional<Authentication> getAuthentication() {
+    private Optional<Authentication> getAuthentication() {
         return Optional.of(SecurityContextHolder.getContext())
                 .map(SecurityContext::getAuthentication)
                 .filter(auth -> !(auth instanceof AnonymousAuthenticationToken));
     }
 
-    public Optional<UserPrincipal> getAuthenticatedUserPrincipal() {
+    public Optional<UserPrincipal> getAuthenticatedUser() {
         Object principal = getAuthentication()
                 .map(Authentication::getPrincipal)
                 .orElse(null);
@@ -71,10 +71,6 @@ public class SecurityService {
         }
 
         return Optional.empty();
-    }
-
-    public Optional<String> getPrincipalName() {
-        return authenticationContext.getPrincipalName();
     }
 
     public boolean hasAnyAuthority(Collection<UserRoleEnum> userRoles) {
@@ -95,19 +91,19 @@ public class SecurityService {
     }
 
     public Optional<String> getAvatarUrl() {
-        Optional<UserPrincipal> userPrincipal = getAuthenticatedUserPrincipal();
-        if (userPrincipal.isEmpty()) {
+        Optional<UserPrincipal> user = getAuthenticatedUser();
+        if (user.isEmpty()) {
             return Optional.empty();
         }
 
-        Map<String, Object> userAttributes = userPrincipal.get().getAttributes();
-        String avatarId = (String) userAttributes.get("avatar");
-        String userId = (String) userAttributes.get("id");
+        Map<String, Object> userAttributes = user.get().getAttributes();
+        Object avatarIdObject = userAttributes.get("avatar");
+        Object userIdObject = userAttributes.get("id");
 
-        if (avatarId == null || userId == null) {
-            return Optional.empty();
+        if (avatarIdObject instanceof String avatarId && userIdObject instanceof String userId) {
+            return Optional.of(DISCORD_CDN_AVATARS_URL + "/" + userId + "/" + avatarId);
         }
 
-        return Optional.of(DISCORD_CDN_AVATARS_URL + "/" + userId + "/" + avatarId);
+        return Optional.empty();
     }
 }

@@ -7,6 +7,7 @@ import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 
 import java.util.Collection;
 import java.util.Map;
+import java.util.Optional;
 
 @Data
 public class UserPrincipal implements UserDetails {
@@ -42,5 +43,14 @@ public class UserPrincipal implements UserDetails {
     @Override
     public String getUsername() {
         return this.username;
+    }
+
+    public Optional<String> getGlobalName() {
+        Object globalNameFromAttributes = this.attributes.get("global_name");
+        if (globalNameFromAttributes instanceof String globalName) {
+            return Optional.of(globalName);
+        }
+
+        return Optional.empty();
     }
 }

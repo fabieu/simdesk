@@ -23,6 +23,7 @@ import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.auth.UserPrincipal;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
@@ -64,6 +65,7 @@ public class BopManagementView extends BaseView {
     private final Grid<Bop> grid = new Grid<>(Bop.class, false);
     private final GridListDataView<Bop> gridDataView = grid.setItems(bopList);
     private final Map<String, SerializablePredicate<Bop>> gridFilters = new HashMap<>();
+    private final String authenticatedUserGlobalName;
 
     public BopManagementView(BopService bopService,
                              SecurityService securityService,
@@ -73,6 +75,9 @@ public class BopManagementView extends BaseView {
         this.securityService = securityService;
         this.notificationService = notificationService;
         this.buttonComponentFactory = buttonComponentFactory;
+        this.authenticatedUserGlobalName = securityService.getAuthenticatedUser()
+                .flatMap(UserPrincipal::getGlobalName)
+                .orElse(null);
 
         setSizeFull();
         setPadding(false);
@@ -233,7 +238,7 @@ public class BopManagementView extends BaseView {
         editor.setBuffered(true);
         editor.addSaveListener((EditorSaveListener<Bop>) event -> {
             Bop bop = event.getItem();
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
             bopService.update(bop);
         });
@@ -344,7 +349,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(true);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -363,7 +368,7 @@ public class BopManagementView extends BaseView {
             }
 
             bop.setActive(false);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);
@@ -383,7 +388,7 @@ public class BopManagementView extends BaseView {
 
             bop.setRestrictor(0);
             bop.setBallastKg(0);
-            bop.setUsername(securityService.getPrincipalName().orElseThrow());
+            bop.setUsername(authenticatedUserGlobalName);
             bop.setUpdateDatetime(Instant.now());
 
             bopService.update(bop);

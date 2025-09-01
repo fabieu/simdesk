@@ -179,7 +179,7 @@ public class MainLayout extends AppLayout {
     }
 
     private void addUserMenu(MenuBar menuBar) {
-        Optional<UserPrincipal> user = securityService.getAuthenticatedUserPrincipal();
+        Optional<UserPrincipal> user = securityService.getAuthenticatedUser();
 
         Avatar avatar = new Avatar();
         avatar.setTooltipEnabled(true);
