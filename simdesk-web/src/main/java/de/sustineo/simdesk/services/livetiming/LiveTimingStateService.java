@@ -38,21 +38,14 @@ public class LiveTimingStateService {
     public void handleRegistrationResult(String sessionId, String dashboardId, int connectionID, boolean connectionSuccess, boolean readOnly, String errorMessage) {
         log.info("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Read-only: " + readOnly + " Error Message: " + errorMessage);
 
-        boolean requestEntrylist;
-
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
-            requestEntrylist = dashboardState.shouldRequestEntrylist();
-
             dashboardState.getConnections().put(sessionId, connectionID);
 
             updateDashboardState(dashboardState);
         }
 
-        if (requestEntrylist) {
-            liveTimingRequestService.sendEntrylistRequest(sessionId, connectionID);
-        }
-
+        liveTimingRequestService.sendEntrylistRequest(sessionId, connectionID);
         liveTimingRequestService.sendTrackDataRequest(sessionId, connectionID);
     }
 
