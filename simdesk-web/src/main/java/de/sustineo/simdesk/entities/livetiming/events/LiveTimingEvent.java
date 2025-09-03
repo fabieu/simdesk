@@ -7,7 +7,7 @@ import org.springframework.context.ApplicationEvent;
 public class LiveTimingEvent<T> extends ApplicationEvent {
     private final String dashboardId;
 
-    protected LiveTimingEvent(T source, String dashboardId) {
+    protected LiveTimingEvent(String dashboardId, T source) {
         super(source);
 
         this.dashboardId = dashboardId;

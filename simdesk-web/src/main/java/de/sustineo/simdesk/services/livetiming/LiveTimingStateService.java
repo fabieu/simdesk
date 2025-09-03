@@ -62,7 +62,7 @@ public class LiveTimingStateService {
             updateDashboardState(dashboardState);
         }
 
-        eventPublisher.publishEvent(new SessionEvent(sessionInfo, dashboardId));
+        eventPublisher.publishEvent(new SessionEvent(dashboardId, sessionInfo));
     }
 
     private void checkForDisconnect(String dashboardId, Collection<CarInfo> carInfos) {
@@ -76,7 +76,7 @@ public class LiveTimingStateService {
                     carInfo.setConnected(false);
 
                     log.info(String.format("Car %s with driver %s disconnected.", carInfo.getCarNumberString(), carInfo.getDriver().getFullName()));
-                    eventPublisher.publishEvent(new CarDisconnectedEvent(carInfo, dashboardId));
+                    eventPublisher.publishEvent(new CarDisconnectedEvent(dashboardId, carInfo));
                 }
             }
         }
@@ -129,7 +129,7 @@ public class LiveTimingStateService {
         }
 
         if (currentCarInfo != null) {
-            eventPublisher.publishEvent(new CarEvent(currentCarInfo, dashboardId));
+            eventPublisher.publishEvent(new CarEvent(dashboardId, currentCarInfo));
         }
     }
 
@@ -166,10 +166,10 @@ public class LiveTimingStateService {
 
         if (newConnection) {
             log.info(String.format("Car connected: %s \t %s", carInfo.getCarNumberString(), carInfo.getDriver().getFullName()));
-            eventPublisher.publishEvent(new CarConnectedEvent(carInfo, dashboardId));
+            eventPublisher.publishEvent(new CarConnectedEvent(dashboardId, carInfo));
         }
 
-        eventPublisher.publishEvent(new CarEvent(carInfo, dashboardId));
+        eventPublisher.publishEvent(new CarEvent(dashboardId, carInfo));
     }
 
     public void handleBroadcastingEvent(String sessionId, String dashboardId, BroadcastingInfo broadcastingInfo) {
@@ -181,7 +181,7 @@ public class LiveTimingStateService {
             updateDashboardState(dashboardState);
         }
 
-        eventPublisher.publishEvent(new BroadcastingEvent(broadcastingInfo, dashboardId));
+        eventPublisher.publishEvent(new BroadcastingEvent(dashboardId, broadcastingInfo));
     }
 
     public void handleTrackData(String sessionId, String dashboardId, TrackInfo trackInfo) {
@@ -193,6 +193,6 @@ public class LiveTimingStateService {
             updateDashboardState(dashboardState);
         }
 
-        eventPublisher.publishEvent(new TrackEvent(trackInfo, dashboardId));
+        eventPublisher.publishEvent(new TrackEvent(dashboardId, trackInfo));
     }
 }
