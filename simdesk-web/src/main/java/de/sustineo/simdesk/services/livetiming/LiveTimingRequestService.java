@@ -1,6 +1,7 @@
 package de.sustineo.simdesk.services.livetiming;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
+import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
@@ -12,6 +13,8 @@ import org.springframework.stereotype.Service;
 import org.springframework.util.MimeTypeUtils;
 
 import java.io.ByteArrayOutputStream;
+import java.nio.ByteBuffer;
+import java.nio.ByteOrder;
 
 @Profile(ProfileManager.PROFILE_LIVE_TIMING)
 @Log
@@ -22,17 +25,25 @@ public class LiveTimingRequestService {
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
-    public void sendEntrylistRequest(String sessionId, Integer connectionId) {
+    public void sendEntrylistRequest(@Nullable String sessionId, @Nullable Integer connectionId) {
+        if (sessionId == null || connectionId == null) {
+            return;
+        }
+
         byte[] message = buildEntryListRequest(connectionId);
         simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_QUEUE_ACC_REQUEST, message, createHeaders(sessionId));
     }
 
-    public void sendTrackDataRequest(String sessionId, Integer connectionId) {
+    public void sendTrackDataRequest(@Nullable String sessionId, @Nullable Integer connectionId) {
+        if (sessionId == null || connectionId == null) {
+            return;
+        }
+
         byte[] message = buildTrackDataRequest(connectionId);
         simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_QUEUE_ACC_REQUEST, message, createHeaders(sessionId));
     }
 
-    private MessageHeaders createHeaders(String sessionId) {
+    private MessageHeaders createHeaders(@Nullable String sessionId) {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
         accessor.setContentType(MimeTypeUtils.APPLICATION_OCTET_STREAM);
         accessor.setSessionId(sessionId);
@@ -43,31 +54,26 @@ public class LiveTimingRequestService {
     private byte[] buildEntryListRequest(int connectionId) {
         ByteArrayOutputStream message = new ByteArrayOutputStream();
         message.write(OutboundMessageTypes.REQUEST_ENTRY_LIST);
-        message.write(toByteArray(connectionId, 4), 0, 4);
+        message.writeBytes(toByteArray(connectionId));
         return message.toByteArray();
     }
 
     private byte[] buildTrackDataRequest(int connectionId) {
         ByteArrayOutputStream message = new ByteArrayOutputStream();
         message.write(OutboundMessageTypes.REQUEST_TRACK_DATA);
-        message.write(toByteArray(connectionId, 4), 0, 4);
+        message.writeBytes(toByteArray(connectionId));
         return message.toByteArray();
     }
 
-    private byte[] toByteArray(int n, int length) {
-        byte[] result = new byte[length];
-        for (int i = 0; i < length; i++) {
-            result[i] = (byte) (n & 0xFF);
-            n = n >> 8;
-        }
-        return result;
+    private byte[] toByteArray(int value) {
+        return ByteBuffer.allocate(4) // 4 bytes = size of an int (32 bits)
+                .order(ByteOrder.LITTLE_ENDIAN)
+                .putInt(value)
+                .array();
     }
 
     private interface OutboundMessageTypes {
-        byte REGISTER_COMMAND_APPLICATION = 0x01;
-        byte UNREGISTER_COMMAND_APPLICATION = 0x09;
         byte REQUEST_ENTRY_LIST = 0x0A;
         byte REQUEST_TRACK_DATA = 0x0B;
-        byte CHANGE_FOCUS = 0x32;
     }
 }

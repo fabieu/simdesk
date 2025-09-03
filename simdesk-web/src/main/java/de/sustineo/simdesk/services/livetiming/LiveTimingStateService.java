@@ -123,7 +123,7 @@ public class LiveTimingStateService {
             }
         }
 
-        if (requestEntrylist && connectionId != null) {
+        if (requestEntrylist) {
             log.info(String.format("Received update for unknown car %s, requesting entry list for dashboard %s", realtimeInfo.getCarId(), dashboardId));
             liveTimingRequestService.sendEntrylistRequest(sessionId, connectionId);
         }
