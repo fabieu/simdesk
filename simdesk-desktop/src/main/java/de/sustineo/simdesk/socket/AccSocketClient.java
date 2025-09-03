@@ -21,10 +21,16 @@ public class AccSocketClient {
     private AccSocketThread thread;
 
     /**
-     * Connects to the game client with automatic settings.
-     * The settings are read from the broadcasting.json file in the user's Documents folder.
+     * Attempts to establish a connection to the ACC (Assetto Corsa Competizione) socket server
+     * using the default configuration file located at:
+     * <pre>
+     *   ${user.home}/Documents/Assetto Corsa Competizione/Config/broadcasting.json
+     * </pre>
+     * <p>
+     * If the configuration file cannot be found or read, an {@link IllegalArgumentException} is thrown.
      *
-     * @throws SocketException if there is an error creating the socket.
+     * @throws SocketException          if an error occurs while attempting to establish the socket connection
+     * @throws IllegalArgumentException if the configuration file does not exist or cannot be parsed
      */
     public void connectAutomatically() throws SocketException {
         String filename = System.getProperty("user.home") + "/Documents/Assetto Corsa Competizione/Config/broadcasting.json";
@@ -45,12 +51,19 @@ public class AccSocketClient {
     }
 
     /**
-     * Connects to the game client.
+     * Establishes a new connection to an ACC (Assetto Corsa Competizione) socket server.
+     * <p>
+     * This method initializes a new {@link AccSocketState} with the provided connection details,
+     * logs the connection attempt, and starts an {@link AccSocketThread} to handle communication.
+     * <p>
+     * The method is synchronized to ensure only one thread can attempt a connection at a time.
+     * If a connection thread is already running, the method returns immediately without creating a new connection.
      *
-     * @param connectionPassword The password for this connection.
-     * @param commandPassword    The command password.
-     * @param hostAddress        Host address of the server.
-     * @param hostPort           Host port of the server.
+     * @param connectionPassword the password required for establishing the connection (must not be {@code null})
+     * @param commandPassword    the password required for issuing commands (must not be {@code null})
+     * @param hostAddress        the target host's {@link InetAddress} (must not be {@code null})
+     * @param hostPort           the target host port
+     * @throws SocketException if there is a socket-related error while starting the connection
      */
     public synchronized void connect(@NonNull String connectionPassword, @NonNull String commandPassword, @NonNull InetAddress hostAddress, int hostPort) throws SocketException {
         if (thread != null) {
@@ -78,7 +91,10 @@ public class AccSocketClient {
     }
 
     /**
-     * Disconnects from the game client.
+     * Closes the active connection to the ACC (Assetto Corsa Competizione) socket server, if any.
+     * <p>
+     * This method is synchronized to prevent concurrent disconnect attempts. If no connection
+     * thread is running, the method returns immediately.
      */
     public synchronized void disconnect() {
         if (thread == null) {
@@ -89,14 +105,31 @@ public class AccSocketClient {
         thread = null;
     }
 
+    /**
+     * Sends a request to the ACC (Assetto Corsa Competizione) socket server over the active connection.
+     * <p>
+     * This method is synchronized to ensure thread-safe access to the underlying socket thread.
+     * If no connection is currently active, the request is ignored.
+     * Otherwise, the given byte array is forwarded to {@link AccSocketThread#sendRequest(byte[])}
+     * for transmission.
+     *
+     * @param requestBytes the request payload to send
+     */
     public synchronized void sendRequest(byte[] requestBytes) {
-        if (thread == null) {
+        if (thread == null || requestBytes == null) {
             return;
         }
 
         thread.sendRequest(requestBytes);
     }
 
+    /**
+     * Sends a register request to the ACC (Assetto Corsa Competizione) socket server
+     * over the active connection.
+     * <p>
+     * This method is synchronized to ensure thread-safe access to the underlying socket thread.
+     * If no connection is currently active, the request is ignored.
+     */
     public synchronized void sendRegisterRequest() {
         if (thread == null) {
             return;
