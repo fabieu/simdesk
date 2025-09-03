@@ -85,7 +85,7 @@ public class LiveTimingStateService {
     public void handleRealtimeCarUpdate(String sessionId, String dashboardId, RealtimeInfo realtimeInfo) {
         log.fine(String.format("Received realtime car update for dashboard %s: %s", dashboardId, realtimeInfo));
 
-        boolean requestEntrylist = false;
+        boolean mayRequestEntryList = false;
         CarInfo currentCarInfo = null;
         Integer connectionId;
 
@@ -116,14 +116,14 @@ public class LiveTimingStateService {
                 currentCarInfo.setLastLap(realtimeInfo.getLastLap());
                 currentCarInfo.setCurrentLap(realtimeInfo.getCurrentLap());
 
-                dashboardState.setCarInfo(carInfo.get().getId(), currentCarInfo);
+                dashboardState.setCarInfo(currentCarInfo.getId(), currentCarInfo);
                 updateDashboardState(dashboardState);
             } else {
-                requestEntrylist = dashboardState.shouldRequestEntrylist();
+                mayRequestEntryList = dashboardState.mayRequestEntrylist();
             }
         }
 
-        if (requestEntrylist) {
+        if (mayRequestEntryList) {
             log.info(String.format("Received update for unknown car %s, requesting entry list for dashboard %s", realtimeInfo.getCarId(), dashboardId));
             liveTimingRequestService.sendEntrylistRequest(sessionId, connectionId);
         }

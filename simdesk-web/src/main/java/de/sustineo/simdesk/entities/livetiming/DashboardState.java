@@ -30,19 +30,19 @@ public class DashboardState {
      * If more than 5 seconds have passed since the last update, it returns true.
      * Otherwise, it returns false.
      *
-     * @return true if an entry list request should be made, false otherwise
+     * @return true if an entry list request may be made, false otherwise
      */
-    public boolean shouldRequestEntrylist() {
+    public boolean mayRequestEntrylist() {
         Instant now = Instant.now();
 
         // Request entry list if it has been more than 5 seconds since the last update
-        boolean requestEntrylist = now.minusSeconds(5).isAfter(lastEntryListUpdate);
+        boolean mayRequestEntrylist = now.minusSeconds(5).isAfter(lastEntryListUpdate);
 
-        if (requestEntrylist) {
+        if (mayRequestEntrylist) {
             lastEntryListUpdate = now;
         }
 
-        return requestEntrylist;
+        return mayRequestEntrylist;
     }
 
     public Optional<CarInfo> getCarInfo(int carId) {
