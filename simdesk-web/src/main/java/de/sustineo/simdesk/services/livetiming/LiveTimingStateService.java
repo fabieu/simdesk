@@ -36,7 +36,7 @@ public class LiveTimingStateService {
     }
 
     public void handleRegistrationResult(String sessionId, String dashboardId, int connectionID, boolean connectionSuccess, boolean readOnly, String errorMessage) {
-        log.info("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Read-only: " + readOnly + " Error Message: " + errorMessage);
+        log.fine("Connection ID: " + connectionID + " Connection Success: " + connectionSuccess + " Read-only: " + readOnly + " Error Message: " + errorMessage);
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
@@ -50,7 +50,7 @@ public class LiveTimingStateService {
     }
 
     public void handleRealtimeUpdate(String sessionId, String dashboardId, SessionInfo sessionInfo) {
-        log.info(String.format("Received realtime update for dashboard %s: %s", dashboardId, sessionInfo));
+        log.fine(String.format("Received realtime update for dashboard %s: %s", dashboardId, sessionInfo));
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
@@ -69,7 +69,7 @@ public class LiveTimingStateService {
         Instant now = Instant.now();
 
         for (CarInfo carInfo : carInfos) {
-            log.fine(String.format("Car %s received last update %sms ago.", carInfo.getCarNumberString(), Duration.between(now, carInfo.getLastUpdate()).toMillis()));
+            log.finest(String.format("Car %s received last update %sms ago.", carInfo.getCarNumberString(), Duration.between(now, carInfo.getLastUpdate()).toMillis()));
 
             if (carInfo.isConnected()) {
                 if (Duration.between(carInfo.getLastUpdate(), now).compareTo(Duration.ofSeconds(10)) > 0) {
@@ -83,7 +83,7 @@ public class LiveTimingStateService {
     }
 
     public void handleRealtimeCarUpdate(String sessionId, String dashboardId, RealtimeInfo realtimeInfo) {
-        log.info(String.format("Received realtime car update for dashboard %s: %s", dashboardId, realtimeInfo));
+        log.fine(String.format("Received realtime car update for dashboard %s: %s", dashboardId, realtimeInfo));
 
         boolean requestEntrylist = false;
         CarInfo currentCarInfo = null;
@@ -134,11 +134,11 @@ public class LiveTimingStateService {
     }
 
     public void handleEntryListUpdate(String sessionId, String dashboardId, List<Integer> cars) {
-        log.info(String.format("Received entry list update for dashboard %s: %s", dashboardId, cars));
+        log.fine(String.format("Received entry list update for dashboard %s: %s", dashboardId, cars));
     }
 
     public void handleEntrylistCarUpdate(String sessionId, String dashboardId, CarInfo carInfo) {
-        log.info(String.format("Received entrylist car update for dashboard %s: %s", dashboardId, carInfo));
+        log.fine(String.format("Received entrylist car update for dashboard %s: %s", dashboardId, carInfo));
 
         boolean newConnection;
 
@@ -173,7 +173,7 @@ public class LiveTimingStateService {
     }
 
     public void handleBroadcastingEvent(String sessionId, String dashboardId, BroadcastingInfo broadcastingInfo) {
-        log.info(String.format("Received broadcasting event for dashboard %s: %s", dashboardId, broadcastingInfo));
+        log.fine(String.format("Received broadcasting event for dashboard %s: %s", dashboardId, broadcastingInfo));
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {
@@ -185,7 +185,7 @@ public class LiveTimingStateService {
     }
 
     public void handleTrackData(String sessionId, String dashboardId, TrackInfo trackInfo) {
-        log.info(String.format("Received track info for dashboard %s: %s", dashboardId, trackInfo));
+        log.fine(String.format("Received track info for dashboard %s: %s", dashboardId, trackInfo));
 
         DashboardState dashboardState = getDashboardState(dashboardId);
         synchronized (dashboardState) {

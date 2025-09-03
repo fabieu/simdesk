@@ -85,29 +85,23 @@ public class AccSocketClient {
             return;
         }
 
-        thread.sendUnregisterRequest();
         thread.close();
         thread = null;
     }
 
-    /**
-     * Checks if the client is connected to the game.
-     *
-     * @return true if connected, false otherwise.
-     */
-    public synchronized boolean isConnected() {
-        if (thread != null) {
-            return thread.isConnected();
-        }
-
-        return false;
-    }
-
     public synchronized void sendRequest(byte[] requestBytes) {
-        if (!isConnected()) {
+        if (thread == null) {
             return;
         }
 
         thread.sendRequest(requestBytes);
+    }
+
+    public synchronized void sendRegisterRequest() {
+        if (thread == null) {
+            return;
+        }
+
+        thread.sendRegisterRequest();
     }
 }

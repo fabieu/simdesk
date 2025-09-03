@@ -9,6 +9,7 @@ import org.springframework.messaging.simp.SimpMessageHeaderAccessor;
 import org.springframework.messaging.simp.SimpMessageType;
 import org.springframework.messaging.simp.SimpMessagingTemplate;
 import org.springframework.stereotype.Service;
+import org.springframework.util.MimeTypeUtils;
 
 import java.io.ByteArrayOutputStream;
 
@@ -17,22 +18,23 @@ import java.io.ByteArrayOutputStream;
 @Service
 @RequiredArgsConstructor
 public class LiveTimingRequestService {
-    private static final String SOCKET_USER_ACC_REQUEST = "/user/queue/acc/request";
+    private static final String SOCKET_QUEUE_ACC_REQUEST = "/queue/acc/request";
 
     private final SimpMessagingTemplate simpMessagingTemplate;
 
     public void sendEntrylistRequest(String sessionId, Integer connectionId) {
         byte[] message = buildEntryListRequest(connectionId);
-        simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_USER_ACC_REQUEST, message, createHeaders(sessionId));
+        simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_QUEUE_ACC_REQUEST, message, createHeaders(sessionId));
     }
 
     public void sendTrackDataRequest(String sessionId, Integer connectionId) {
         byte[] message = buildTrackDataRequest(connectionId);
-        simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_USER_ACC_REQUEST, message, createHeaders(sessionId));
+        simpMessagingTemplate.convertAndSendToUser(sessionId, SOCKET_QUEUE_ACC_REQUEST, message, createHeaders(sessionId));
     }
 
     private MessageHeaders createHeaders(String sessionId) {
         SimpMessageHeaderAccessor accessor = SimpMessageHeaderAccessor.create(SimpMessageType.MESSAGE);
+        accessor.setContentType(MimeTypeUtils.APPLICATION_OCTET_STREAM);
         accessor.setSessionId(sessionId);
         accessor.setLeaveMutable(true);
         return accessor.getMessageHeaders();
