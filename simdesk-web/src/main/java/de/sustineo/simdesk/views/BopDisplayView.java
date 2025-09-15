@@ -7,6 +7,7 @@ import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -79,13 +80,20 @@ public class BopDisplayView extends BaseView {
         removeAll();
 
         add(createViewHeader());
-        add(createTrackSelectionLayout());
-        addAndExpand(createBopGrid());
+        addAndExpand(createContainer());
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.existsInAcc(trackIdParameter.get())) {
             Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(this::scrollToComponent);
         }
+    }
+
+    private Component createContainer() {
+        Div layout = new Div();
+        layout.addClassNames("container", "bg-light");
+        layout.add(createTrackSelectionLayout());
+        layout.add(createBopGrid());
+        return layout;
     }
 
     private Component createTrackSelectionLayout() {
@@ -98,6 +106,7 @@ public class BopDisplayView extends BaseView {
 
         trackSelect.setWidthFull();
         trackSelect.setPlaceholder("Jump to track");
+        trackSelect.setNoVerticalOverlap(true);
         trackSelect.setItemLabelGenerator(Track::getTrackNameByAccId);
         trackSelect.addValueChangeListener(event -> {
             String trackId = event.getValue();
@@ -141,7 +150,6 @@ public class BopDisplayView extends BaseView {
             scrollTargets.put(trackId, trackTitle);
 
             Anchor downloadAnchor = new Anchor(downloadHandler, "");
-            downloadAnchor.getElement().setAttribute("download", true);
             downloadAnchor.removeAll();
             Button downloadButton = new Button(componentFactory.getDownloadIcon());
             downloadButton.setTooltipText("Download");
@@ -203,7 +211,7 @@ public class BopDisplayView extends BaseView {
             layout.add(trackLayout);
         }
 
-        trackSelect.setItems(new ArrayList<>(scrollTargets.keySet()));
+        trackSelect.setItems(scrollTargets.keySet());
 
         return layout;
     }
