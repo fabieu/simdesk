@@ -40,10 +40,7 @@ import org.springframework.context.annotation.Profile;
 
 import javax.annotation.Nullable;
 import java.time.Instant;
-import java.util.ArrayList;
-import java.util.HashMap;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
@@ -55,7 +52,6 @@ public class BopManagementView extends BaseView {
     private final static String GRID_FILTER_ACTIVE = "ACTIVE";
 
     private final BopService bopService;
-    private final SecurityService securityService;
     private final NotificationService notificationService;
 
     private final ButtonComponentFactory buttonComponentFactory;
@@ -71,7 +67,6 @@ public class BopManagementView extends BaseView {
                              NotificationService notificationService,
                              ButtonComponentFactory buttonComponentFactory) {
         this.bopService = bopService;
-        this.securityService = securityService;
         this.notificationService = notificationService;
         this.buttonComponentFactory = buttonComponentFactory;
         this.authenticatedUserGlobalName = securityService.getAuthenticatedUser()
@@ -111,60 +106,12 @@ public class BopManagementView extends BaseView {
     }
 
     private Component createActionsLayout() {
-        ComboBox<Track> trackComboBox = new ComboBox<>("Track");
-
-        Button enableTrackButton = new Button("Enable");
-        enableTrackButton.setEnabled(false);
-        enableTrackButton.addClickListener(e -> {
-            Track track = trackComboBox.getValue();
-            if (track != null) {
-                enableAllForTrack(track.getAccId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been enabled", track.getName()));
-            }
-        });
-
-        Button disableTrackButton = new Button("Disable");
-        disableTrackButton.setEnabled(false);
-        disableTrackButton.addClickListener(e -> {
-            Track track = trackComboBox.getValue();
-            if (track != null) {
-                disableAllForTrack(track.getAccId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been disabled", track.getName()));
-            }
-        });
-
-        Button resetAllForTrackButton = new Button("Reset");
-        resetAllForTrackButton.setEnabled(false);
-        resetAllForTrackButton.addClickListener(e -> {
-            Track track = trackComboBox.getValue();
-            if (track != null) {
-                resetAllForTrack(track.getAccId());
-                notificationService.showSuccessNotification(String.format("BOPs for track %s have been reset", track.getName()));
-            }
-        });
-
-        trackComboBox.setItems(Track.getAllSortedByNameForAcc());
-        trackComboBox.setItemLabelGenerator(Track::getName);
-        trackComboBox.setClearButtonVisible(true);
-        trackComboBox.setPlaceholder("Select track");
-        trackComboBox.addValueChangeListener(e -> {
-            Track track = e.getValue();
-            if (track != null) {
-                enableTrackButton.setEnabled(true);
-                disableTrackButton.setEnabled(true);
-                resetAllForTrackButton.setEnabled(true);
-            } else {
-                enableTrackButton.setEnabled(false);
-                disableTrackButton.setEnabled(false);
-                resetAllForTrackButton.setEnabled(false);
-            }
-        });
-
         ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
-        trackFilterComboxBox.setLabel("Track");
         trackFilterComboxBox.setItems(Track.getAllSortedByNameForAcc());
         trackFilterComboxBox.setItemLabelGenerator(Track::getName);
+        trackFilterComboxBox.setPlaceholder("Select track");
         trackFilterComboxBox.setClearButtonVisible(true);
+        trackFilterComboxBox.setMinWidth("300px");
         trackFilterComboxBox.addValueChangeListener(e -> {
             Track track = e.getValue();
             if (track != null) {
@@ -176,9 +123,9 @@ public class BopManagementView extends BaseView {
         });
 
         ComboBox<CarGroup> carGroupFilterComboBox = new ComboBox<>();
-        carGroupFilterComboBox.setLabel("Car Group");
-        carGroupFilterComboBox.setItems(CarGroup.values());
+        carGroupFilterComboBox.setItems(CarGroup.getValid());
         carGroupFilterComboBox.setItemLabelGenerator(CarGroup::name);
+        carGroupFilterComboBox.setPlaceholder("Select car group");
         carGroupFilterComboBox.setClearButtonVisible(true);
         carGroupFilterComboBox.addValueChangeListener(e -> {
             CarGroup carGroup = e.getValue();
@@ -191,8 +138,8 @@ public class BopManagementView extends BaseView {
         });
 
         ComboBox<Boolean> activeFilterComboBox = new ComboBox<>();
-        activeFilterComboBox.setLabel("Active");
         activeFilterComboBox.setItems(true, false);
+        activeFilterComboBox.setPlaceholder("Select active state");
         activeFilterComboBox.setClearButtonVisible(true);
         activeFilterComboBox.addValueChangeListener(e -> {
             Boolean active = e.getValue();
@@ -204,13 +151,43 @@ public class BopManagementView extends BaseView {
             refreshFilters();
         });
 
-        HorizontalLayout trackActionLayout = new HorizontalLayout(enableTrackButton, disableTrackButton, resetAllForTrackButton);
-        trackActionLayout.getStyle()
-                .setMarginRight("auto");
+        Button enableTrackButton = new Button("Enable");
+        enableTrackButton.addClickListener(e -> {
+            String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
+                    .map(Track::getAccId)
+                    .orElse(null);
+            CarGroup carGroup = carGroupFilterComboBox.getValue();
+            Boolean active = activeFilterComboBox.getValue();
 
-        FlexLayout bopActionLayout = new FlexLayout(trackComboBox, trackActionLayout, trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
+            enableAllByFilter(trackId, carGroup, active);
+        });
+
+        Button disableTrackButton = new Button("Disable");
+        disableTrackButton.addClickListener(e -> {
+            String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
+                    .map(Track::getAccId)
+                    .orElse(null);
+            CarGroup carGroup = carGroupFilterComboBox.getValue();
+            Boolean active = activeFilterComboBox.getValue();
+
+            disableAllByFilter(trackId, carGroup, active);
+        });
+
+        Button resetAllForTrackButton = new Button("Reset");
+        resetAllForTrackButton.addClickListener(e -> {
+            String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
+                    .map(Track::getAccId)
+                    .orElse(null);
+            CarGroup carGroup = carGroupFilterComboBox.getValue();
+            Boolean active = activeFilterComboBox.getValue();
+
+            resetAllByFilter(trackId, carGroup, active);
+        });
+
+        FlexLayout bopActionLayout = new FlexLayout(enableTrackButton, disableTrackButton, resetAllForTrackButton, ComponentUtils.createVerticalSpacer(), trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
         bopActionLayout.setWidthFull();
         bopActionLayout.setAlignItems(Alignment.END);
+        bopActionLayout.setJustifyContentMode(JustifyContentMode.END);
         bopActionLayout.getStyle()
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-m)");
@@ -337,13 +314,22 @@ public class BopManagementView extends BaseView {
         return layout;
     }
 
-    private void enableAllForTrack(@Nullable String trackId) {
-        if (trackId == null) {
+    private void enableAllByFilter(@Nullable String trackId, @Nullable CarGroup carGroup, @Nullable Boolean active) {
+        if (trackId == null && carGroup == null && active == null) {
+            notificationService.showWarningNotification("No filters provided — nothing to reset.");
             return;
         }
 
         for (Bop bop : bopList) {
-            if (!trackId.equals(bop.getTrackId())) {
+            if (trackId != null && !trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            if (carGroup != null && !carGroup.equals(AccCar.getGroupById(bop.getCarId()))) {
+                continue;
+            }
+
+            if (active != null && active != bop.getActive()) {
                 continue;
             }
 
@@ -354,15 +340,30 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
             gridDataView.refreshItem(bop);
         }
+
+        refreshFilters();
+
+        String filterDescription = getFilterDescription(trackId, carGroup, active);
+        String message = "Enabled BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        notificationService.showSuccessNotification(message);
     }
 
-    private void disableAllForTrack(@Nullable String trackId) {
-        if (trackId == null) {
+    private void disableAllByFilter(@Nullable String trackId, @Nullable CarGroup carGroup, @Nullable Boolean active) {
+        if (trackId == null && carGroup == null && active == null) {
+            notificationService.showWarningNotification("No filters provided — nothing to reset.");
             return;
         }
 
         for (Bop bop : bopList) {
-            if (!trackId.equals(bop.getTrackId())) {
+            if (trackId != null && !trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            if (carGroup != null && !carGroup.equals(AccCar.getGroupById(bop.getCarId()))) {
+                continue;
+            }
+
+            if (active != null && active != bop.getActive()) {
                 continue;
             }
 
@@ -373,15 +374,30 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
             gridDataView.refreshItem(bop);
         }
+
+        refreshFilters();
+
+        String filterDescription = getFilterDescription(trackId, carGroup, active);
+        String message = "Disabled BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        notificationService.showSuccessNotification(message);
     }
 
-    private void resetAllForTrack(@Nullable String trackId) {
-        if (trackId == null) {
+    private void resetAllByFilter(@Nullable String trackId, @Nullable CarGroup carGroup, @Nullable Boolean active) {
+        if (trackId == null && carGroup == null && active == null) {
+            notificationService.showWarningNotification("No filters provided — nothing to reset.");
             return;
         }
 
         for (Bop bop : bopList) {
-            if (!trackId.equals(bop.getTrackId())) {
+            if (trackId != null && !trackId.equals(bop.getTrackId())) {
+                continue;
+            }
+
+            if (carGroup != null && !carGroup.equals(AccCar.getGroupById(bop.getCarId()))) {
+                continue;
+            }
+
+            if (active != null && active != bop.getActive()) {
                 continue;
             }
 
@@ -393,5 +409,30 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
             gridDataView.refreshItem(bop);
         }
+
+        refreshFilters();
+
+        String filterDescription = getFilterDescription(trackId, carGroup, active);
+        String message = "Reset BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        notificationService.showSuccessNotification(message);
+    }
+
+    private String getFilterDescription(@Nullable String trackId, @Nullable CarGroup carGroup, @Nullable Boolean active) {
+        List<String> parts = new ArrayList<>();
+
+        if (trackId != null) {
+            String trackName = Track.getTrackNameByAccId(trackId);
+            parts.add("track " + trackName);
+        }
+
+        if (carGroup != null) {
+            parts.add("car group " + carGroup);
+        }
+
+        if (active != null) {
+            parts.add(active ? "state active" : "state inactive");
+        }
+
+        return String.join(" and ", parts);
     }
 }
