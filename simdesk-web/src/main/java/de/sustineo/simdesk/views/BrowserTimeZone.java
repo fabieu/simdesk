@@ -10,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.concurrent.atomic.AtomicReference;
 
 public final class BrowserTimeZone {
     /**
@@ -27,11 +28,32 @@ public final class BrowserTimeZone {
      * otherwise this will return null.
      */
     private static ExtendedClientDetails getExtendedClientDetails() {
-        return VaadinSession.getCurrent().getAttribute(ExtendedClientDetails.class);
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) {
+            return null;
+        }
+
+        if (session.hasLock()) {
+            return session.getAttribute(ExtendedClientDetails.class);
+        }
+
+        AtomicReference<ExtendedClientDetails> ref = new AtomicReference<>();
+        session.accessSynchronously(() -> ref.set(session.getAttribute(ExtendedClientDetails.class)));
+        return ref.get();
     }
 
-    private static void setExtendedClientDetails(ExtendedClientDetails extendedClientDetails) {
-        VaadinSession.getCurrent().setAttribute(ExtendedClientDetails.class, extendedClientDetails);
+    private static void setExtendedClientDetails(ExtendedClientDetails details) {
+        VaadinSession session = VaadinSession.getCurrent();
+        if (session == null) {
+            return;
+        }
+
+        if (session.hasLock()) {
+            session.setAttribute(ExtendedClientDetails.class, details);
+            return;
+        }
+
+        session.accessSynchronously(() -> session.setAttribute(ExtendedClientDetails.class, details));
     }
 
     /**

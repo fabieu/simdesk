@@ -8,12 +8,13 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.Div;
-import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.page.Page;
-import com.vaadin.flow.component.select.Select;
+import com.vaadin.flow.component.tabs.Tab;
+import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.tabs.TabSheetVariant;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
@@ -52,8 +53,8 @@ public class BopDisplayView extends BaseView {
     private final NotificationService notificationService;
     private final ComponentFactory componentFactory;
 
-    private final Select<String> trackSelect = new Select<>();
-    private final Map<String, Component> scrollTargets = new LinkedHashMap<>();
+    private final TabSheet tabSheet = new TabSheet();
+    private final Map<String, Tab> tabsByTrackId = new LinkedHashMap<>();
 
     public BopDisplayView(BopService bopService,
                           NotificationService notificationService,
@@ -84,56 +85,40 @@ public class BopDisplayView extends BaseView {
 
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
         if (trackIdParameter.isPresent() && Track.existsInAcc(trackIdParameter.get())) {
-            Optional.ofNullable(scrollTargets.get(trackIdParameter.get())).ifPresent(this::scrollToComponent);
+            tabSheet.setSelectedTab(tabsByTrackId.get(trackIdParameter.get()));
         }
     }
 
     private Component createContainer() {
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
-        layout.add(createTrackSelectionLayout());
-        layout.add(createBopGrid());
+        layout.add(createTabSheetLayout());
         return layout;
     }
 
-    private Component createTrackSelectionLayout() {
-        // Track selection
-        HorizontalLayout trackSelectionLayout = new HorizontalLayout();
-        trackSelectionLayout.setWidthFull();
-        trackSelectionLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        trackSelectionLayout.getStyle()
-                .setPadding("0 var(--lumo-space-m)");
+    private Component createTabSheetLayout() {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setPadding(false);
 
-        trackSelect.setWidthFull();
-        trackSelect.setPlaceholder("Jump to track");
-        trackSelect.setNoVerticalOverlap(true);
-        trackSelect.setItemLabelGenerator(Track::getTrackNameByAccId);
-        trackSelect.addValueChangeListener(event -> {
-            String trackId = event.getValue();
-            if (trackId != null) {
-                Optional.ofNullable(scrollTargets.get(trackId)).ifPresent(component -> {
-                    updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, trackId));
-                    scrollToComponent(component);
-                });
+        tabSheet.setWidthFull();
+        tabSheet.addThemeVariants(TabSheetVariant.LUMO_TABS_CENTERED);
+        tabSheet.addSelectedChangeListener(event -> {
+            for (Map.Entry<String, Tab> entry : tabsByTrackId.entrySet()) {
+                if (entry.getValue() == event.getSelectedTab()) {
+                    updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, entry.getKey()));
+                }
             }
         });
-        trackSelectionLayout.add(trackSelect);
 
-        return trackSelectionLayout;
-    }
-
-    private Component createBopGrid() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(true);
-
-        Map<String, Set<Bop>> bopsByTrack = bopService.getActive().stream()
+        Map<String, Set<Bop>> bopsByTrackId = bopService.getActive().stream()
                 .sorted(new BopComparator())
                 .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
-        for (Map.Entry<String, Set<Bop>> entry : bopsByTrack.entrySet()) {
+        for (Map.Entry<String, Set<Bop>> entry : bopsByTrackId.entrySet()) {
             String trackId = entry.getKey();
-            VerticalLayout trackLayout = new VerticalLayout();
-            trackLayout.setPadding(false);
+            String trackName = Track.getTrackNameByAccId(trackId);
+
+            VerticalLayout tabLayout = new VerticalLayout();
 
             DownloadHandler downloadHandler = (event) -> {
                 List<AccBopEntry> accBopEntries = entry.getValue().stream()
@@ -146,16 +131,13 @@ public class BopDisplayView extends BaseView {
             };
 
             // Header
-            H2 trackTitle = new H2(Track.getTrackNameByAccId(trackId));
-            scrollTargets.put(trackId, trackTitle);
-
             Anchor downloadAnchor = new Anchor(downloadHandler, "");
             downloadAnchor.removeAll();
-            Button downloadButton = new Button(componentFactory.getDownloadIcon());
+            Button downloadButton = new Button("Download", componentFactory.getDownloadIcon());
             downloadButton.setTooltipText("Download");
             downloadAnchor.add(downloadButton);
 
-            Button shareButton = new Button(componentFactory.getShareIcon());
+            Button shareButton = new Button("Share", componentFactory.getShareIcon());
             shareButton.setTooltipText("Share");
             shareButton.addClickListener(event -> {
                         Page page = UI.getCurrent().getPage();
@@ -169,9 +151,11 @@ public class BopDisplayView extends BaseView {
                     }
             );
 
-            HorizontalLayout header = new HorizontalLayout();
-            header.setAlignItems(FlexComponent.Alignment.CENTER);
-            header.add(trackTitle, downloadAnchor, shareButton);
+            HorizontalLayout headerLayout = new HorizontalLayout();
+            headerLayout.setWidthFull();
+            headerLayout.setAlignItems(FlexComponent.Alignment.CENTER);
+            headerLayout.setJustifyContentMode(JustifyContentMode.END);
+            headerLayout.add(downloadAnchor, shareButton);
 
             // Grid
             Grid<Bop> grid = new Grid<>(Bop.class, false);
@@ -207,12 +191,14 @@ public class BopDisplayView extends BaseView {
                     .setSortable(true)
                     .setComparator(Bop::getUpdateDatetime);
 
-            trackLayout.add(header, grid, ComponentUtils.createSpacer());
-            layout.add(trackLayout);
+            tabLayout.add(headerLayout, grid);
+
+            Tab tab = new Tab(trackName);
+            tabsByTrackId.put(trackId, tab);
+            tabSheet.add(tab, tabLayout);
         }
 
-        trackSelect.setItems(scrollTargets.keySet());
-
+        layout.add(tabSheet);
         return layout;
     }
 }
