@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.views.generators;
 
 import com.vaadin.flow.function.SerializableFunction;
-import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.CarGroup;
+import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
 public class BopCarGroupPartNameGenerator extends CarGroupPartNameGenerator implements SerializableFunction<Bop, String> {

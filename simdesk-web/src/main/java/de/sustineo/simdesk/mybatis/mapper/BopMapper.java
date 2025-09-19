@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.mybatis.mapper;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Bop;
+import de.sustineo.simdesk.entities.bop.Bop;
 import org.apache.ibatis.annotations.*;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Component;

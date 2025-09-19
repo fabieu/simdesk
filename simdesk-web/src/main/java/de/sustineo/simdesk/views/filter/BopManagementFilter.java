@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
-import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
 public class BopManagementFilter extends GridFilter {

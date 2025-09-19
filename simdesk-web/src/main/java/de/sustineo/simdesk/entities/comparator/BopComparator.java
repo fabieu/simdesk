@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.entities.comparator;
 
-import de.sustineo.simdesk.entities.Bop;
+import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
 import java.util.ArrayList;

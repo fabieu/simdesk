@@ -7,8 +7,6 @@ import org.springframework.context.ApplicationContext;
 import org.springframework.context.ApplicationContextAware;
 import org.springframework.stereotype.Component;
 
-import java.io.InputStream;
-
 @Component
 public final class JsonClient implements ApplicationContextAware {
     private static ObjectMapper objectMapper;
@@ -30,12 +28,11 @@ public final class JsonClient implements ApplicationContextAware {
 
     @SneakyThrows
     public static <T> T fromJson(String json, Class<T> valueType) {
-        return objectMapper.readValue(json, valueType);
-    }
+        if (json == null) {
+            return null;
+        }
 
-    @SneakyThrows
-    public static <T> T fromJson(InputStream inputStream, Class<T> valueType) {
-        return objectMapper.readValue(inputStream, valueType);
+        return objectMapper.readValue(json, valueType);
     }
 
     public static boolean isValid(String json) {

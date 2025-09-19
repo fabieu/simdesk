@@ -2,7 +2,7 @@ package de.sustineo.simdesk.views.renderers;
 
 import com.vaadin.flow.data.renderer.LitRenderer;
 import com.vaadin.flow.data.renderer.Renderer;
-import de.sustineo.simdesk.entities.Bop;
+import de.sustineo.simdesk.entities.bop.Bop;
 
 public class BopRenderer extends GridRenderer {
     public static Renderer<Bop> createBallastKgRenderer() {

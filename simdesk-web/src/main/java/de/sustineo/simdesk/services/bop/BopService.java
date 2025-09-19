@@ -1,11 +1,15 @@
 package de.sustineo.simdesk.services.bop;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Bop;
+import de.sustineo.simdesk.entities.Setting;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.bop.Bop;
+import de.sustineo.simdesk.entities.bop.BopProvider;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.mybatis.mapper.BopMapper;
+import de.sustineo.simdesk.services.SettingService;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.tuple.Pair;
 import org.springframework.boot.context.event.ApplicationReadyEvent;
@@ -16,6 +20,8 @@ import org.springframework.context.event.EventListener;
 import org.springframework.stereotype.Service;
 
 import java.time.Instant;
+import java.util.Collection;
+import java.util.Collections;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -23,12 +29,10 @@ import java.util.stream.Collectors;
 @Log
 @Profile(ProfileManager.PROFILE_BOP)
 @Service
+@RequiredArgsConstructor
 public class BopService {
     private final BopMapper bopMapper;
-
-    public BopService(BopMapper bopMapper) {
-        this.bopMapper = bopMapper;
-    }
+    private final SettingService settingService;
 
     @EventListener(ApplicationReadyEvent.class)
     protected void initializeBopTable() {
@@ -87,5 +91,20 @@ public class BopService {
                 .ballastKg(bop.getBallastKg())
                 .restrictor(bop.getRestrictor())
                 .build();
+    }
+
+    @Cacheable("bop-providers")
+    public Set<BopProvider> getBopProviders() {
+        BopProvider[] bopProviders = settingService.getJson(Setting.BOP_PROVIDERS, BopProvider[].class);
+        if (bopProviders == null) {
+            return Collections.emptySet();
+        }
+
+        return Set.of(bopProviders);
+    }
+
+    @CacheEvict(value = "bop-providers", allEntries = true)
+    public void setBopProviders(Collection<BopProvider> bopProviders) {
+        settingService.setJson(Setting.BOP_PROVIDERS, bopProviders.toArray(BopProvider[]::new));
     }
 }
