@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -20,9 +21,10 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.bop.Bop;
+import de.sustineo.simdesk.entities.bop.BopProvider;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
@@ -184,12 +186,22 @@ public class BopManagementView extends BaseView {
             resetAllByFilter(trackId, carGroup, active);
         });
 
+        MultiSelectComboBox<BopProvider> bopProviderComboBox = new MultiSelectComboBox<>();
+        bopProviderComboBox.setItems(BopProvider.values());
+        bopProviderComboBox.setItemLabelGenerator(BopProvider::getName);
+        bopProviderComboBox.setPlaceholder("Select BoP providers");
+        bopProviderComboBox.setClearButtonVisible(true);
+        bopProviderComboBox.setAllowCustomValue(true);
+        bopProviderComboBox.setMinWidth("250px");
+        bopProviderComboBox.addValueChangeListener(e -> {
+        });
+
         Button bopDisplayViewButton = new Button("Go to overview");
         bopDisplayViewButton.addClickListener(e -> {
             getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class));
         });
 
-        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton);
+        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, bopProviderComboBox);
         navigationLayout.getStyle()
                 .setMarginRight("auto");
 

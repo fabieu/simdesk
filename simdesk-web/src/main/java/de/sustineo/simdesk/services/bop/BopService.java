@@ -1,8 +1,8 @@
 package de.sustineo.simdesk.services.bop;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Bop;
 import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.mybatis.mapper.BopMapper;
