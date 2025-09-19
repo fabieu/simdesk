@@ -30,6 +30,7 @@ import de.sustineo.simdesk.services.leaderboard.SessionFileService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
@@ -61,6 +62,7 @@ public class LeaderboardSessionsView extends BaseView {
     private final SessionFileService sessionFileService;
     private final NotificationService notificationService;
 
+    private final ComponentFactory componentFactory;
     private final ButtonComponentFactory buttonComponentFactory;
     private final SessionComponentFactory sessionComponentFactory;
 
@@ -111,7 +113,7 @@ public class LeaderboardSessionsView extends BaseView {
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
         timeRangeSelect.setValue(timeRange);
-        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
+        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, componentFactory.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             replaceSessionGrid(event.getValue());

@@ -18,11 +18,13 @@ import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.simdesk.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.DriverRankingRenderer;
+import lombok.RequiredArgsConstructor;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 
@@ -34,8 +36,11 @@ import java.util.Optional;
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
 @Route(value = "/leaderboard/lap-records/:carGroup/:trackId")
 @AnonymousAllowed
+@RequiredArgsConstructor
 public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
     private final RankingService rankingService;
+
+    private final ComponentFactory componentFactory;
 
     private Grid<DriverRanking> rankingGrid;
 
@@ -43,10 +48,6 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
     private Track track;
     private TimeRange timeRange = TimeRange.ALL_TIME;
     private AccCar car;
-
-    public LeaderboardOverallLapTimesDifferentiatedView(RankingService rankingService) {
-        this.rankingService = rankingService;
-    }
 
     @Override
     public String getPageTitle() {
@@ -128,7 +129,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
         timeRangeSelect.setValue(timeRange);
-        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
+        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, componentFactory.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             this.timeRange = event.getValue();

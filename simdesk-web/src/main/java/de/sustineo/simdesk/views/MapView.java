@@ -14,6 +14,7 @@ import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.VaadinUtils;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import org.springframework.context.annotation.Profile;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
 import software.xdev.vaadin.maps.leaflet.basictypes.LLatLng;
@@ -45,9 +46,12 @@ public class MapView extends BaseView {
     // Note: You normally don't need to invoke any methods of the registry and just hand it over to the components
     private final LComponentManagementRegistry registry = new LDefaultComponentManagementRegistry(this);
     private final HashMap<Track, LMarker> trackMarkers = new HashMap<>();
+    private final ComponentFactory componentFactory;
 
-    public MapView(WeatherService weatherService) {
+    public MapView(WeatherService weatherService,
+                   ComponentFactory componentFactory) {
         this.weatherService = weatherService;
+        this.componentFactory = componentFactory;
 
         setSizeFull();
         setPadding(false);
@@ -152,7 +156,7 @@ public class MapView extends BaseView {
             Track track = entry.getKey();
             LMarker trackMarker = entry.getValue();
 
-            String spacerHtml = ComponentUtils.createSpacer().getElement().getOuterHTML();
+            String spacerHtml = componentFactory.createSpacer().getElement().getOuterHTML();
 
             StringBuilder trackMarkerTooltip = new StringBuilder("""
                     <h3 style="color: var(--lumo-header-text-color)">%s</h3>
@@ -182,13 +186,13 @@ public class MapView extends BaseView {
 
                 AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);
                 trackMarkerTooltip.append("""
-                    %s
-                    <h5 style="color: var(--lumo-header-text-color)">ACC Weather Settings - %s hour(s)</h5>
-                    <b>Temperature:</b> %d°C <br>
-                    <b>Cloud Level:</b> %.2f <br>
-                    <b>Rain Level:</b> %.2f <br>
-                    <b>Randomness:</b> %d <br>
-                    """
+                        %s
+                        <h5 style="color: var(--lumo-header-text-color)">ACC Weather Settings - %s hour(s)</h5>
+                        <b>Temperature:</b> %d°C <br>
+                        <b>Cloud Level:</b> %.2f <br>
+                        <b>Rain Level:</b> %.2f <br>
+                        <b>Randomness:</b> %d <br>
+                        """
                         .formatted(
                                 spacerHtml,
                                 raceHours,

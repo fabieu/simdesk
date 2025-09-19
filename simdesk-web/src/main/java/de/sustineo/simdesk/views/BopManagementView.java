@@ -184,16 +184,24 @@ public class BopManagementView extends BaseView {
             resetAllByFilter(trackId, carGroup, active);
         });
 
-        FlexLayout bopActionLayout = new FlexLayout(enableTrackButton, disableTrackButton, resetAllForTrackButton, ComponentUtils.createVerticalSpacer(), trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
-        bopActionLayout.setWidthFull();
-        bopActionLayout.setAlignItems(Alignment.END);
-        bopActionLayout.setJustifyContentMode(JustifyContentMode.END);
-        bopActionLayout.getStyle()
+        Button bopDisplayViewButton = new Button("Go to overview");
+        bopDisplayViewButton.addClickListener(e -> {
+            getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class));
+        });
+
+        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton);
+        navigationLayout.getStyle()
+                .setMarginRight("auto");
+
+        FlexLayout actionLayout = new FlexLayout(navigationLayout, enableTrackButton, disableTrackButton, resetAllForTrackButton, trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
+        actionLayout.setWidthFull();
+        actionLayout.setAlignItems(Alignment.END);
+        actionLayout.getStyle()
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-m)");
 
         VerticalLayout layout = new VerticalLayout();
-        layout.add(bopActionLayout);
+        layout.add(actionLayout);
 
         return layout;
     }

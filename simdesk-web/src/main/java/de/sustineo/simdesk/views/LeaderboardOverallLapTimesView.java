@@ -16,6 +16,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
@@ -35,6 +36,8 @@ import java.util.Optional;
 @RequiredArgsConstructor
 public class LeaderboardOverallLapTimesView extends BaseView {
     private final RankingService rankingService;
+
+    private final ComponentFactory componentFactory;
 
     private Grid<GroupRanking> rankingGrid;
     private TimeRange timeRange = TimeRange.ALL_TIME;
@@ -84,7 +87,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
         Select<TimeRange> timeRangeSelect = new Select<>();
         timeRangeSelect.setItems(TimeRange.values());
         timeRangeSelect.setValue(timeRange);
-        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, ComponentUtils.createSpacer());
+        timeRangeSelect.addComponents(TimeRange.LAST_WEEK, componentFactory.createSpacer());
         timeRangeSelect.setItemLabelGenerator(TimeRange::getDescription);
         timeRangeSelect.addValueChangeListener(event -> {
             this.timeRange = event.getValue();

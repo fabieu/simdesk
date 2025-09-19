@@ -33,7 +33,11 @@ import de.sustineo.simdesk.entities.menu.*;
 import de.sustineo.simdesk.services.MenuService;
 import de.sustineo.simdesk.services.ThemeService;
 import de.sustineo.simdesk.services.auth.SecurityService;
-import de.sustineo.simdesk.views.*;
+import de.sustineo.simdesk.views.LoginView;
+import de.sustineo.simdesk.views.MainView;
+import de.sustineo.simdesk.views.SettingsView;
+import de.sustineo.simdesk.views.UserProfileView;
+import de.sustineo.simdesk.views.components.ComponentFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
@@ -47,6 +51,8 @@ public class MainLayout extends AppLayout {
     private final MenuService menuService;
     private final BuildProperties buildProperties;
 
+    private final ComponentFactory componentFactory;
+
     private final String privacyUrl;
     private final String impressumUrl;
     private final LinkedHashMap<MenuEntityCategory, Tabs> menuMap = new LinkedHashMap<>();
@@ -55,12 +61,14 @@ public class MainLayout extends AppLayout {
                       SecurityService securityService,
                       MenuService menuService,
                       BuildProperties buildProperties,
+                      ComponentFactory componentFactory,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
         this.menuService = menuService;
         this.themeService = themeService;
         this.buildProperties = buildProperties;
+        this.componentFactory = componentFactory;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
@@ -230,7 +238,7 @@ public class MainLayout extends AppLayout {
             menuLayout.add(entry.getValue());
 
             if (menuMapCounter < menuMap.size() - 1) {
-                menuLayout.add(ComponentUtils.createSpacer());
+                menuLayout.add(componentFactory.createSpacer());
             }
 
             menuMapCounter++;
