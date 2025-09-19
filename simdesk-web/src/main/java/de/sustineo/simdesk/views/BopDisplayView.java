@@ -1,13 +1,16 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.Text;
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Anchor;
+import com.vaadin.flow.component.html.AnchorTarget;
 import com.vaadin.flow.component.html.Div;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -15,6 +18,7 @@ import com.vaadin.flow.component.page.Page;
 import com.vaadin.flow.component.tabs.Tab;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.tabs.TabSheetVariant;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
@@ -23,6 +27,7 @@ import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
+import de.sustineo.simdesk.entities.bop.BopProvider;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
@@ -92,7 +97,46 @@ public class BopDisplayView extends BaseView {
     private Component createContainer() {
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
-        layout.add(createTabSheetLayout());
+        layout.add(createDisclaimerLayout(), createTabSheetLayout());
+        return layout;
+    }
+
+    private Component createDisclaimerLayout() {
+        Set<BopProvider> bopProviders = bopService.getBopProviders();
+        if (bopProviders == null || bopProviders.isEmpty()) {
+            return new Div(); // Empty component
+        }
+
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.setAlignItems(Alignment.CENTER);
+
+        List<Anchor> anchors = bopProviders.stream()
+                .sorted()
+                .map(bopProvider -> new Anchor(bopProvider.getReference(), bopProvider.getName(), AnchorTarget.BLANK))
+                .toList();
+
+        Span disclaimerSpan = new Span();
+
+        Span title = new Span("Disclaimer: ");
+        title.getStyle()
+                .setFontWeight(Style.FontWeight.BOLD);
+        disclaimerSpan.add(title);
+
+        disclaimerSpan.add("The values presented may incorporate Balance of Performance (BoP) data provided by ");
+
+        for (int i = 0; i < anchors.size(); i++) {
+            disclaimerSpan.add(anchors.get(i));
+
+            if (i < anchors.size() - 2) {
+                disclaimerSpan.add(new Text(", "));
+            } else if (i == anchors.size() - 2) {
+                disclaimerSpan.add(new Text(" and "));
+            }
+        }
+
+        layout.add(disclaimerSpan);
         return layout;
     }
 

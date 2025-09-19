@@ -53,7 +53,7 @@ public interface DashboardMapper {
     @Update("""
             UPDATE dashboard
             SET state = (#{state}),
-                state_datetime = NOW(),
+                state_datetime = CURRENT_TIMESTAMP,
             WHERE id = #{id}
             """)
     void updateState(String id, DashboardState state);

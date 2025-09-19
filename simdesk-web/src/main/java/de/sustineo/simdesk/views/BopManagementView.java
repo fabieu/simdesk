@@ -190,10 +190,12 @@ public class BopManagementView extends BaseView {
         bopProviderComboBox.setItems(BopProvider.values());
         bopProviderComboBox.setItemLabelGenerator(BopProvider::getName);
         bopProviderComboBox.setPlaceholder("Select BoP providers");
+        bopProviderComboBox.setValue(bopService.getBopProviders());
         bopProviderComboBox.setClearButtonVisible(true);
         bopProviderComboBox.setAllowCustomValue(true);
         bopProviderComboBox.setMinWidth("250px");
         bopProviderComboBox.addValueChangeListener(e -> {
+            bopService.setBopProviders(e.getValue());
         });
 
         Button bopDisplayViewButton = new Button("Go to overview");
