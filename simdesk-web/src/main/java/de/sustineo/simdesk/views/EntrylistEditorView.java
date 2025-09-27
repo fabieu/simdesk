@@ -45,10 +45,7 @@ import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.CustomCar;
-import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.SortingDirection;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
@@ -1143,7 +1140,8 @@ public class EntrylistEditorView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
+                .setRenderer(new ComponentRenderer<>(session -> new Span(session.getSessionType().getLabel())))
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -1172,9 +1170,9 @@ public class EntrylistEditorView extends BaseView {
 
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createHeader(sessionFilter::setSessionDescription));
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setTrackName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         return grid;
     }

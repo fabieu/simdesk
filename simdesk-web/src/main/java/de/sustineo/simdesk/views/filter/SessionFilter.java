@@ -2,13 +2,14 @@ package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.SessionType;
 
 public class SessionFilter extends GridFilter {
     private final GridListDataView<Session> dataView;
 
     private String serverName;
     private String trackName;
-    private String sessionDescription;
+    private SessionType sessionType;
 
     public SessionFilter(GridListDataView<Session> dataView) {
         this.dataView = dataView;
@@ -25,16 +26,16 @@ public class SessionFilter extends GridFilter {
         this.dataView.refreshAll();
     }
 
-    public void setSessionDescription(String sessionDescription) {
-        this.sessionDescription = sessionDescription;
+    public void setSessionType(SessionType sessionType) {
+        this.sessionType = sessionType;
         this.dataView.refreshAll();
     }
 
     public boolean test(Session session) {
         boolean matchesServerName = matches(session.getServerName(), serverName);
         boolean matchesTrackName = matches(session.getTrackName(), trackName);
-        boolean matchesSessionDescription = matches(session.getSessionType().getDescription(), sessionDescription);
+        boolean matchesSessionType = matches(session.getSessionType(), sessionType);
 
-        return matchesServerName && matchesTrackName && matchesSessionDescription;
+        return matchesServerName && matchesTrackName && matchesSessionType;
     }
 }

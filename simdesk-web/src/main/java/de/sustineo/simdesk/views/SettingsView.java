@@ -198,9 +198,9 @@ public class SettingsView extends BaseView {
         GridListDataView<Driver> dataView = grid.setItems(driverService.getAllDrivers());
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverIdColumn).setComponent(GridFilter.createHeader(driverFilter::setDriverId));
-        headerRow.getCell(realNameColumn).setComponent(GridFilter.createHeader(driverFilter::setRealName));
-        headerRow.getCell(visibilityColumn).setComponent(GridFilter.createHeader(driverFilter::setVisibility));
+        headerRow.getCell(driverIdColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setDriverId));
+        headerRow.getCell(realNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setRealName));
+        headerRow.getCell(visibilityColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setVisibility));
 
         HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
         editActions.setPadding(false);

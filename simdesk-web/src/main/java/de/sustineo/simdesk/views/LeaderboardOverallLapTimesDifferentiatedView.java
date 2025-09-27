@@ -233,8 +233,8 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
 
         OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setDriverName));
-        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
+        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesDifferentiatedFilter::setDriverName));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
 
         return grid;
     }

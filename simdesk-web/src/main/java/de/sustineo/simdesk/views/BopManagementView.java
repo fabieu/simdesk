@@ -327,10 +327,10 @@ public class BopManagementView extends BaseView {
 
         BopManagementFilter filter = new BopManagementFilter(gridDataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(filter::setTrackName));
-        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(filter::setCarModel));
-        headerRow.getCell(activeColumn).setComponent(GridFilter.createHeader(filter::setActive));
-        headerRow.getCell(usernameColumn).setComponent(GridFilter.createHeader(filter::setUsername));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(filter::setTrackName));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createTextFieldHeader(filter::setCarModel));
+        headerRow.getCell(activeColumn).setComponent(GridFilter.createTextFieldHeader(filter::setActive));
+        headerRow.getCell(usernameColumn).setComponent(GridFilter.createTextFieldHeader(filter::setUsername));
 
         layout.add(grid);
         return layout;
