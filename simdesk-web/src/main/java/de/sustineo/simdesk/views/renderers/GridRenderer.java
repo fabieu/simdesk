@@ -20,10 +20,10 @@ public class GridRenderer {
 
     static final String SESSION_REFERENCE_TEMPLATE = """
             <vaadin-button
-            title="Show session"
-            @click="${clickHandler}"
-            theme="tertiary-inline small link">
-            ${item.session.description}
+                title="Show session"
+                @click="${clickHandler}"
+                theme="tertiary-inline small link">
+                ${item.session.description}
             </vaadin-button>
             """;
     static final String SESSION_REFERENCE_TEMPLATE_SESSION = "session";
@@ -31,10 +31,10 @@ public class GridRenderer {
 
     static final String DRIVER_REFERENCE_TEMPLATE = """
             <vaadin-button
-            title="Show profile"
-            @click="${clickHandler}"
-            theme="tertiary-inline small link">
-            ${item.driver.fullName}
+                title="Show profile"
+                @click="${clickHandler}"
+                theme="tertiary-inline small link">
+                ${item.driver.fullName}
             </vaadin-button>
             """;
     static final String DRIVER_REFERENCE_TEMPLATE_DRIVER = "driver";
@@ -44,7 +44,12 @@ public class GridRenderer {
             <div style="display: flex; flex-wrap: wrap; gap: var(--lumo-space-s); align-items: center;">
                 ${item.drivers.map(driver => html`
                     <div style="display: inline-block">
-                        <span>${driver.fullName}</span>
+                        <vaadin-button
+                            title="Show profile"
+                            @click="${() => clickHandler(driver.id)}"
+                            theme="tertiary-inline small link">
+                            ${driver.fullName}
+                        </vaadin-button>
                         <span theme="badge contrast pill" title="Valid laps/Invalid laps - Driving Time">
                             ${driver.validLapsCount || 0}/${driver.invalidLapsCount || 0}
                             ${driver.driveTimeMillis ? `- ${driver.prettyDriveTime}` : ""}
@@ -54,6 +59,7 @@ public class GridRenderer {
             </div>
             """;
     static final String DRIVERS_TEMPLATE_DRIVERS = "drivers";
+    static final String DRIVERS_TEMPLATE_CLICK_HANDLER = "clickHandler";
 
     static final String TIMING_TEMPLATE = """
                 <vaadin-vertical-layout style="align-items: end;">

@@ -11,6 +11,7 @@ import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
@@ -18,8 +19,8 @@ import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.GroupRankingRenderer;
 import lombok.RequiredArgsConstructor;
@@ -135,10 +136,10 @@ public class LeaderboardOverallLapTimesView extends BaseView {
 
         OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setCarGroup));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setTrackName));
-        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setDriverName));
-        headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createHeader(overallLapTimesFilter::setCarModelName));
+        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setCarGroup, CarGroup::getValid));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setTrackName));
+        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setDriverName));
+        headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setCarModelName));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<GroupRanking>, GroupRanking> singleSelect = grid.asSingleSelect();

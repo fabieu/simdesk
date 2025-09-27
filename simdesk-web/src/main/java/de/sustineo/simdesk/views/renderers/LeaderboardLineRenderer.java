@@ -16,7 +16,17 @@ public class LeaderboardLineRenderer extends GridRenderer {
 
     public static Renderer<LeaderboardLine> createDriversRenderer() {
         return LitRenderer.<LeaderboardLine>of(DRIVERS_TEMPLATE)
-                .withProperty(DRIVERS_TEMPLATE_DRIVERS, LeaderboardLine::getDrivers);
+                .withProperty(DRIVERS_TEMPLATE_DRIVERS, LeaderboardLine::getDrivers)
+                .withFunction(DRIVERS_TEMPLATE_CLICK_HANDLER, (leaderboardLine, args) -> {
+                    if (args == null || args.length() == 0) {
+                        return;
+                    }
+
+                    leaderboardLine.getDrivers().stream()
+                            .filter(driver -> driver.getId() != null && driver.getId().equals(args.getString(0)))
+                            .findFirst()
+                            .ifPresent(GridRenderer::redirectToDriverProfile);
+                });
     }
 
     public static Renderer<LeaderboardLine> createLapTimeRenderer(LeaderboardLine leaderboardLineWithBestLapTime) {

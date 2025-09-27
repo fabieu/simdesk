@@ -23,11 +23,11 @@ public class Session {
     private String fileContent;
     private Instant insertDatetime;
 
-    public String getTrackName() {
-        return Track.getTrackNameByAccId(trackId);
+    public Track getTrack() {
+        return Track.getByAccId(trackId);
     }
 
-    public String getDescription() {
-        return String.format("%s - %s - %s", sessionType.getDescription(), getTrackName(), serverName);
+    public String getTrackName() {
+        return Track.getTrackNameByAccId(trackId);
     }
 }

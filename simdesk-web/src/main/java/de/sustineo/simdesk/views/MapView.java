@@ -114,7 +114,7 @@ public class MapView extends BaseView {
 
         // Add a layer for all race track markers
         LLayerGroup trackLayerGroup = new LLayerGroup(registry);
-        for (Track track : Track.getAllSortedByNameForAcc()) {
+        for (Track track : Track.getAll()) {
             // Create a new marker for each track and add it to the map
             LMarker trackMarker = new LMarker(registry, new LLatLng(registry, track.getLatitude(), track.getLongitude()));
 

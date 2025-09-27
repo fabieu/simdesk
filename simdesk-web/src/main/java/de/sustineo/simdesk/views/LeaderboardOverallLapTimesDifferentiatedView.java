@@ -20,8 +20,8 @@ import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.OverallLapTimesDifferentiatedFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.OverallLapTimesDifferentiatedFilter;
 import de.sustineo.simdesk.views.generators.DriverRankingPodiumPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.DriverRankingRenderer;
 import lombok.RequiredArgsConstructor;
@@ -233,8 +233,8 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
 
         OverallLapTimesDifferentiatedFilter overallLapTimesDifferentiatedFilter = new OverallLapTimesDifferentiatedFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setDriverName));
-        headerRow.getCell(carModelColumn).setComponent(GridFilter.createHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
+        headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesDifferentiatedFilter::setDriverName));
+        headerRow.getCell(carModelColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesDifferentiatedFilter::setCarModelName));
 
         return grid;
     }

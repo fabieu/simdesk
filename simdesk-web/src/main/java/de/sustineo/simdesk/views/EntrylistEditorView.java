@@ -45,10 +45,7 @@ import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoIcon;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.CustomCar;
-import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.SortingDirection;
+import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
 import de.sustineo.simdesk.entities.entrylist.EntrylistMetadata;
@@ -74,8 +71,9 @@ import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.SessionFilter;
+import de.sustineo.simdesk.views.filter.combobox.CarFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -593,8 +591,7 @@ public class EntrylistEditorView extends BaseView {
         });
 
         ComboBox<AccCar> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
-        forcedCarModelComboBox.setItems(carFilter, AccCar.getAll());
+        forcedCarModelComboBox.setItems(CarFilter.getInstance(), AccCar.getAll());
         forcedCarModelComboBox.setItemLabelGenerator(AccCar::getModel);
         forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
         forcedCarModelComboBox.setValue(AccCar.getCarById(entry.getForcedCarModel()));
@@ -1143,12 +1140,12 @@ public class EntrylistEditorView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
-        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
                 .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -1172,9 +1169,9 @@ public class EntrylistEditorView extends BaseView {
 
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createHeader(sessionFilter::setSessionDescription));
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         return grid;
     }

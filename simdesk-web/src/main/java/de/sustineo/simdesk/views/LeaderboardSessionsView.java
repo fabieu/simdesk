@@ -23,6 +23,8 @@ import com.vaadin.flow.server.streams.TemporaryFileFactory;
 import com.vaadin.flow.server.streams.UploadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -33,8 +35,8 @@ import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.SessionFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -208,7 +210,7 @@ public class LeaderboardSessionsView extends BaseView {
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.END)
                 .setSortable(true);
-        Grid.Column<Session> sessionTypeColumn = grid.addColumn(session -> session.getSessionType().getDescription())
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -237,9 +239,9 @@ public class LeaderboardSessionsView extends BaseView {
 
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createHeader(sessionFilter::setTrackName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createHeader(sessionFilter::setSessionDescription));
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();

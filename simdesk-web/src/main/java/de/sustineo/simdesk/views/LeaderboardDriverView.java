@@ -4,6 +4,8 @@ import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.grid.HeaderRow;
+import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
@@ -22,6 +24,8 @@ import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.generators.LapsByCarCarGroupPartNameGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -77,8 +81,10 @@ public class LeaderboardDriverView extends BaseView {
 
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
+
         layout.add(createBadgeLayout(driver, lapsByDriver));
-        layout.add(createLatestRacesLayout(sessionsByDriver));
+
+        layout.add(createSessionsLayout(sessionsByDriver));
         layout.add(createFavoriteCarLayout(lapsByDriver));
         layout.add(createFavoriteTrackLayout(lapsByDriver, sessionsByDriver));
 
@@ -90,7 +96,7 @@ public class LeaderboardDriverView extends BaseView {
         layout.setJustifyContentMode(JustifyContentMode.CENTER);
         layout.setWidthFull();
 
-        Span lastSeenBadge = new Span("Last seen: " + FormatUtils.formatDate(driver.getLastActivity()));
+        Span lastSeenBadge = new Span("Last seen: " + FormatUtils.formatDatetime(driver.getLastActivity()));
         lastSeenBadge.getElement().getThemeList().add("badge");
 
         long validLapCount = laps.stream().filter(Lap::isValid).count();
@@ -105,16 +111,11 @@ public class LeaderboardDriverView extends BaseView {
         return layout;
     }
 
-    private Component createLatestRacesLayout(List<Session> sessions) {
-        List<Session> raceSessions = sessions.stream()
-                .filter(session -> SessionType.R.equals(session.getSessionType()))
-                .limit(10)
-                .toList();
-
+    private Component createSessionsLayout(List<Session> sessions) {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
 
-        H3 header = new H3("Latest Races");
+        H3 header = new H3("Last sessions");
 
         Grid<Session> grid = new Grid<>(Session.class, false);
         grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
@@ -127,25 +128,30 @@ public class LeaderboardDriverView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true)
                 .setComparator(Session::getSessionDatetime);
-        grid.addColumn(Session::getServerName)
+        Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
+                .setHeader("Session")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        Grid.Column<Session> serverNameColumn = grid.addColumn(Session::getServerName)
                 .setHeader("Server Name")
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
-        grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
                 .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        grid.addColumn(Session::getCarCount)
-                .setHeader("Cars")
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
 
-        grid.setItems(raceSessions);
-        grid.setAllRowsVisible(true);
+        GridListDataView<Session> dataView = grid.setItems(sessions);
         grid.setMultiSort(true, true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
+        SessionFilter sessionFilter = new SessionFilter(dataView);
+        HeaderRow headerRow = grid.appendHeaderRow();
+        headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();
@@ -217,12 +223,12 @@ public class LeaderboardDriverView extends BaseView {
         Map<Integer, Session> sessionByIdMap = sessions.stream()
                 .collect(Collectors.toMap(Session::getId, session -> session));
 
-        Map<String, List<Lap>> lapsByTrackId = laps.stream()
+        Map<Track, List<Lap>> lapsByTrackMap = laps.stream()
                 .filter(lap -> lap.getSessionId() != null)
-                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrackId()));
+                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrack()));
 
-        List<LapsByTrack> lapsByTrack = lapsByTrackId.entrySet().stream()
-                .map(entry -> LapsByTrack.of(Track.getByAccId(entry.getKey()), entry.getValue()))
+        List<LapsByTrack> lapsByTrack = lapsByTrackMap.entrySet().stream()
+                .map(entry -> LapsByTrack.of(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
                 .toList();
 

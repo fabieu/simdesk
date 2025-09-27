@@ -3,10 +3,7 @@ package de.sustineo.simdesk.entities;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
-import java.util.Optional;
+import java.util.*;
 import java.util.stream.Collectors;
 import java.util.stream.Stream;
 
@@ -44,39 +41,36 @@ public enum Track {
     private final double longitude;
     private final String accId;
 
-    private static final Map<String, Track> ACC_TRACKS = Stream.of(values())
+    private static final Map<String, Track> TRACKS_ACC = Stream.of(values())
+            .filter(track -> track.getAccId() != null)
             .collect(Collectors.toMap(Track::getAccId, track -> track));
 
-    /**
-     * Checks if a track exists by its ACC identifier.
-     */
+    public static Set<Track> getAll() {
+        return EnumSet.allOf(Track.class);
+    }
+
+    public static Set<Track> getAllOfAccSortedByName() {
+        return TRACKS_ACC.values().stream()
+                .sorted(Comparator.comparing(Track::getName))
+                .collect(Collectors.toCollection(LinkedHashSet::new));
+    }
+
     public static boolean existsInAcc(String trackId) {
-        return ACC_TRACKS.containsKey(trackId);
+        return TRACKS_ACC.containsKey(trackId);
     }
 
-    /**
-     * Retrieves a Track enum by its ACC identifier.
-     * Returns null if not found.
-     */
     public static Track getByAccId(String accId) {
-        return ACC_TRACKS.get(accId);
+        return TRACKS_ACC.get(accId);
     }
 
-    /**
-     * Retrieves the track name by ACC identifier or returns a default.
-     */
     public static String getTrackNameByAccId(String accId) {
         return Optional.ofNullable(getByAccId(accId))
                 .map(Track::getName)
                 .orElse(Constants.UNKNOWN);
     }
 
-    /**
-     * Returns all tracks sorted by their display name.
-     */
-    public static List<Track> getAllSortedByNameForAcc() {
-        return Stream.of(values())
-                .sorted(Comparator.comparing(Track::getName))
-                .collect(Collectors.toList());
+    @Override
+    public String toString() {
+        return name;
     }
 }
