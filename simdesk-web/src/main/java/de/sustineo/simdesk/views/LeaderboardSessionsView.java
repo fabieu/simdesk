@@ -35,8 +35,8 @@ import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.SessionFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -240,8 +240,8 @@ public class LeaderboardSessionsView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();

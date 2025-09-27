@@ -1,38 +1,35 @@
-package de.sustineo.simdesk.views.filter;
+package de.sustineo.simdesk.views.filter.grid;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
 import de.sustineo.simdesk.entities.Track;
 
-public class SessionFilter extends GridFilter {
-    private final GridListDataView<Session> dataView;
-
+public class SessionFilter extends GridFilter<Session> {
     private String serverName;
     private Track track;
     private SessionType sessionType;
 
     public SessionFilter(GridListDataView<Session> dataView) {
-        this.dataView = dataView;
-        this.dataView.addFilter(this::test);
+        super(dataView);
     }
 
     public void setServerName(String serverName) {
         this.serverName = serverName;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setTrack(Track track) {
         this.track = track;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setSessionType(SessionType sessionType) {
         this.sessionType = sessionType;
-        this.dataView.refreshAll();
+        refresh();
     }
 
-    public boolean test(Session session) {
+    protected boolean test(Session session) {
         boolean matchesServerName = matches(session.getServerName(), serverName);
         boolean matchesTrackName = matches(session.getTrack(), track);
         boolean matchesSessionType = matches(session.getSessionType(), sessionType);

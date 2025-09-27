@@ -21,6 +21,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.leaderboard.LeaderboardService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.stereotype.Service;
 
@@ -32,15 +33,10 @@ import java.util.Optional;
 
 @Log
 @Service
+@RequiredArgsConstructor
 public class SessionComponentFactory extends ComponentFactory {
     private final SecurityService securityService;
     private final Optional<LeaderboardService> leaderboardService;
-
-    public SessionComponentFactory(SecurityService securityService,
-                                   Optional<LeaderboardService> leaderboardService) {
-        this.securityService = securityService;
-        this.leaderboardService = leaderboardService;
-    }
 
     public Icon getWeatherIcon(Session session) {
         return getWeatherIcon(session.getWetSession());
@@ -64,6 +60,23 @@ public class SessionComponentFactory extends ComponentFactory {
         return icon;
     }
 
+    public Component createSessionInformation(AccSession accSession) {
+        HorizontalLayout layout = new HorizontalLayout();
+        layout.setPadding(true);
+        layout.setWidthFull();
+        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
+
+        H3 heading = new H3();
+        heading.setText(String.format("%s - %s - %s", accSession.getSessionType(), Track.getTrackNameByAccId(accSession.getTrackName()), accSession.getServerName()));
+
+        Icon weatherIcon = getWeatherIcon(accSession);
+
+        layout.add(weatherIcon, heading);
+
+        return layout;
+    }
+
     public Component createSessionInformation(Session session) {
         HorizontalLayout layout = new HorizontalLayout();
         layout.setPadding(true);
@@ -72,7 +85,7 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(session.getDescription());
+        heading.setText(String.format("%s - %s - %s", session.getSessionType(), session.getTrackName(), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 
@@ -134,22 +147,5 @@ public class SessionComponentFactory extends ComponentFactory {
             log.severe("An error occurred during creation of CSV resource: " + e.getMessage());
             return null;
         }
-    }
-
-    public Component createSessionInformation(AccSession accSession) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setPadding(true);
-        layout.setWidthFull();
-        layout.setJustifyContentMode(FlexComponent.JustifyContentMode.CENTER);
-        layout.setAlignItems(FlexComponent.Alignment.CENTER);
-
-        H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", accSession.getSessionType().getDescription(), Track.getTrackNameByAccId(accSession.getTrackName()), accSession.getServerName()));
-
-        Icon weatherIcon = getWeatherIcon(accSession);
-
-        layout.add(weatherIcon, heading);
-
-        return layout;
     }
 }

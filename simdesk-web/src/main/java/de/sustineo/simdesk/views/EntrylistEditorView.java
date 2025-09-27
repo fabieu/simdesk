@@ -71,9 +71,9 @@ import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.SessionFilter;
 import de.sustineo.simdesk.views.filter.combobox.CarFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -590,9 +590,8 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistPreview();
         });
 
-        CarFilter carFilter = new CarFilter();
         ComboBox<AccCar> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        forcedCarModelComboBox.setItems(carFilter, AccCar.getAll());
+        forcedCarModelComboBox.setItems(CarFilter.getInstance(), AccCar.getAll());
         forcedCarModelComboBox.setItemLabelGenerator(AccCar::getModel);
         forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
         forcedCarModelComboBox.setValue(AccCar.getCarById(entry.getForcedCarModel()));
@@ -1171,8 +1170,8 @@ public class EntrylistEditorView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         return grid;
     }

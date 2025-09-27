@@ -1,36 +1,33 @@
-package de.sustineo.simdesk.views.filter;
+package de.sustineo.simdesk.views.filter.grid;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Driver;
 
-public class DriverFilter extends GridFilter {
-    private final GridListDataView<Driver> dataView;
-
+public class DriverFilter extends GridFilter<Driver> {
     private String driverId;
     private String realName;
     private String visibility;
 
     public DriverFilter(GridListDataView<Driver> dataView) {
-        this.dataView = dataView;
-        this.dataView.addFilter(this::test);
+        super(dataView);
     }
 
     public void setDriverId(String driverId) {
         this.driverId = driverId;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setRealName(String realName) {
         this.realName = realName;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setVisibility(String visibility) {
         this.visibility = visibility;
-        this.dataView.refreshAll();
+        refresh();
     }
 
-    public boolean test(Driver driver) {
+    protected boolean test(Driver driver) {
         boolean matchesServerName = matches(driver.getId(), driverId);
         boolean matchesRealName = matches(driver.getRealName(), realName);
         boolean matchesVisibility = matches(driver.getVisibility().name(), visibility);

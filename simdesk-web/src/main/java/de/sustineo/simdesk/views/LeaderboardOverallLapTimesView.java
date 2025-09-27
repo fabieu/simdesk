@@ -19,8 +19,8 @@ import de.sustineo.simdesk.services.leaderboard.RankingService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.OverallLapTimesFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.OverallLapTimesFilter;
 import de.sustineo.simdesk.views.generators.GroupRankingCarGroupPartNameGenerator;
 import de.sustineo.simdesk.views.renderers.GroupRankingRenderer;
 import lombok.RequiredArgsConstructor;
@@ -136,7 +136,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
 
         OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createSelectHeader(overallLapTimesFilter::setCarGroup, CarGroup::getValid));
+        headerRow.getCell(carGroupColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setCarGroup, CarGroup::getValid));
         headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setTrackName));
         headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setDriverName));
         headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setCarModelName));

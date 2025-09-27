@@ -34,8 +34,8 @@ import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
-import de.sustineo.simdesk.views.filter.DriverFilter;
-import de.sustineo.simdesk.views.filter.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.DriverFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 

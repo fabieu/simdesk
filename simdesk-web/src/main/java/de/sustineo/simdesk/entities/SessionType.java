@@ -14,7 +14,7 @@ public enum SessionType {
     R("Race"),
     UNKNOWN("Unknown");
 
-    private final String description;
+    private final String name;
 
     public static Set<SessionType> getValid() {
         EnumSet<SessionType> set = EnumSet.allOf(SessionType.class);
@@ -24,6 +24,6 @@ public enum SessionType {
 
     @Override
     public String toString() {
-        return description;
+        return name;
     }
 }

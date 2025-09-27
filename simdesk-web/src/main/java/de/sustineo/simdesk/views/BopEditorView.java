@@ -186,12 +186,11 @@ public class BopEditorView extends BaseView {
             }
         });
 
-        CarFilter carFilter = new CarFilter();
-        carsComboBox.setItems(carFilter, AccCar.getAll());
+        carsComboBox.setItems(CarFilter.getInstance(), AccCar.getAll());
         carsComboBox.setItemLabelGenerator(AccCar::getModel);
         carsComboBox.setClassNameGenerator(car -> car.getGroup().name());
         carsComboBox.setPlaceholder("Select cars...");
-        carsComboBox.setHelperText(carFilter.getHelperText());
+        carsComboBox.setHelperText(CarFilter.getInstance().getHelperText());
         carsComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 if (trackComboBox.isEmpty() && !carsComboBox.isEmpty()) {

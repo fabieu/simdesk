@@ -24,8 +24,8 @@ import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.SessionComponentFactory;
-import de.sustineo.simdesk.views.filter.GridFilter;
-import de.sustineo.simdesk.views.filter.SessionFilter;
+import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.generators.LapsByCarCarGroupPartNameGenerator;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -150,8 +150,8 @@ public class LeaderboardDriverView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
-        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
         SingleSelect<Grid<Session>, Session> singleSelect = grid.asSingleSelect();

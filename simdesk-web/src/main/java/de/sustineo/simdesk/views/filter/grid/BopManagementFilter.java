@@ -1,44 +1,41 @@
-package de.sustineo.simdesk.views.filter;
+package de.sustineo.simdesk.views.filter.grid;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
-public class BopManagementFilter extends GridFilter {
-    private final GridListDataView<Bop> dataView;
-
+public class BopManagementFilter extends GridFilter<Bop> {
     private String trackName;
     private String carModel;
     private String active;
     private String username;
 
     public BopManagementFilter(GridListDataView<Bop> dataView) {
-        this.dataView = dataView;
-        this.dataView.addFilter(this::test);
+        super(dataView);
     }
 
     public void setTrackName(String trackName) {
         this.trackName = trackName;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setCarModel(String carModel) {
         this.carModel = carModel;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setActive(String active) {
         this.active = active;
-        this.dataView.refreshAll();
+        refresh();
     }
 
     public void setUsername(String username) {
         this.username = username;
-        this.dataView.refreshAll();
+        refresh();
     }
 
-    private boolean test(Bop bop) {
+    protected boolean test(Bop bop) {
         boolean matchesTrackName = matches(Track.getTrackNameByAccId(bop.getTrackId()), trackName);
         boolean matchesCarModel = matches(AccCar.getModelById(bop.getCarId()), carModel);
         boolean matchesActive = matches(String.valueOf(bop.getActive()), active);
