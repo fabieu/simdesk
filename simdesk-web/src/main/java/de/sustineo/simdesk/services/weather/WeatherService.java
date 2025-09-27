@@ -349,7 +349,7 @@ public class WeatherService {
         }
 
         // Fetch current weather data from OpenWeatherMap API
-        for (Track track : Track.getAllSortedByNameForAcc()) {
+        for (Track track : Track.getAll()) {
             // Only fetch weather data for Kyalami Circuit in debug mode
             if (ProfileManager.isDebug() && !track.getAccId().equals("kyalami")) {
                 continue;

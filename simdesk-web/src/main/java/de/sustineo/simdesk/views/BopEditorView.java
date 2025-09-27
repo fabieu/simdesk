@@ -21,7 +21,6 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
@@ -31,6 +30,7 @@ import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.fields.BopEditField;
+import de.sustineo.simdesk.views.filter.combobox.CarFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
@@ -175,7 +175,7 @@ public class BopEditorView extends BaseView {
     private Component createEditingForm() {
         VerticalLayout verticalLayout = new VerticalLayout();
 
-        trackComboBox.setItems(Track.getAllSortedByNameForAcc());
+        trackComboBox.setItems(Track.getAllOfAccSortedByName());
         trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setPlaceholder("Select track...");
         trackComboBox.setHelperText("Available filters: Track Name");
@@ -186,12 +186,12 @@ public class BopEditorView extends BaseView {
             }
         });
 
-        ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
+        CarFilter carFilter = new CarFilter();
         carsComboBox.setItems(carFilter, AccCar.getAll());
         carsComboBox.setItemLabelGenerator(AccCar::getModel);
         carsComboBox.setClassNameGenerator(car -> car.getGroup().name());
         carsComboBox.setPlaceholder("Select cars...");
-        carsComboBox.setHelperText(String.format("Available filters: Car Name, Car Group (%s)", String.join(", ", CarGroup.getValidNames())));
+        carsComboBox.setHelperText(carFilter.getHelperText());
         carsComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 if (trackComboBox.isEmpty() && !carsComboBox.isEmpty()) {

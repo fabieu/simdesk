@@ -1,10 +1,10 @@
 package de.sustineo.simdesk.views.filter;
 
 import com.vaadin.flow.component.Component;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.combobox.ComboBoxVariant;
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
-import com.vaadin.flow.component.select.SelectVariant;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.textfield.TextFieldVariant;
 import com.vaadin.flow.data.value.ValueChangeMode;
@@ -18,33 +18,31 @@ public class GridFilter {
         VerticalLayout layout = createHeaderLayout();
 
         TextField textField = new TextField();
-        textField.setValueChangeMode(ValueChangeMode.EAGER);
-        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
         textField.setWidthFull();
+        textField.setValueChangeMode(ValueChangeMode.EAGER);
         textField.addThemeVariants(TextFieldVariant.LUMO_SMALL);
-        textField.setClearButtonVisible(true);
-        textField.setPlaceholder("Search");
         textField.setPrefixComponent(VaadinIcon.SEARCH.create());
-        layout.add(textField);
+        textField.setPlaceholder("Search");
+        textField.setClearButtonVisible(true);
+        textField.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
 
+        layout.add(textField);
         return layout;
     }
 
-    public static <T extends Enum<T> & GridEnum> Component createSelectHeader(Consumer<T> filterChangeConsumer, Supplier<? extends Collection<T>> itemsSupplier) {
+    public static <T extends Enum<T>> Component createSelectHeader(Consumer<T> filterChangeConsumer, Supplier<? extends Collection<T>> itemsSupplier) {
         VerticalLayout layout = createHeaderLayout();
 
-        Select<T> select = new Select<>();
-        select.setWidthFull();
-        select.setItems(itemsSupplier.get());
-        select.setItemLabelGenerator(item -> item == null ? "" : item.getLabel());
-        select.setEmptySelectionAllowed(true);
-        select.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
-        select.addThemeVariants(SelectVariant.LUMO_SMALL);
-        select.setPlaceholder("Select");
-        select.setPrefixComponent(VaadinIcon.SEARCH.create());
+        ComboBox<T> comboBox = new ComboBox<>();
+        comboBox.setWidthFull();
+        comboBox.setItems(itemsSupplier.get());
+        comboBox.addThemeVariants(ComboBoxVariant.LUMO_SMALL);
+        comboBox.setPrefixComponent(VaadinIcon.SEARCH.create());
+        comboBox.setPlaceholder("Search");
+        comboBox.setClearButtonVisible(true);
+        comboBox.addValueChangeListener(e -> filterChangeConsumer.accept(e.getValue()));
 
-        layout.add(select);
-
+        layout.add(comboBox);
         return layout;
     }
 

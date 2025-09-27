@@ -73,6 +73,7 @@ import de.sustineo.simdesk.views.components.SessionComponentFactory;
 import de.sustineo.simdesk.views.enums.TimeRange;
 import de.sustineo.simdesk.views.filter.GridFilter;
 import de.sustineo.simdesk.views.filter.SessionFilter;
+import de.sustineo.simdesk.views.filter.combobox.CarFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
@@ -589,8 +590,8 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistPreview();
         });
 
+        CarFilter carFilter = new CarFilter();
         ComboBox<AccCar> forcedCarModelComboBox = new ComboBox<>("Car Model");
-        ComboBox.ItemFilter<AccCar> carFilter = (car, filterString) -> car.getModel().toLowerCase().contains(filterString.toLowerCase()) || car.getGroup().name().equalsIgnoreCase(filterString);
         forcedCarModelComboBox.setItems(carFilter, AccCar.getAll());
         forcedCarModelComboBox.setItemLabelGenerator(AccCar::getModel);
         forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
@@ -1141,12 +1142,11 @@ public class EntrylistEditorView extends BaseView {
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
         Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
-                .setRenderer(new ComponentRenderer<>(session -> new Span(session.getSessionType().getLabel())))
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
                 .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -1171,7 +1171,7 @@ public class EntrylistEditorView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setTrackName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         return grid;

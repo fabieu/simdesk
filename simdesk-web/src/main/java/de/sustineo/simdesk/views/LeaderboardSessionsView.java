@@ -12,12 +12,10 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.component.upload.UploadI18N;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -26,6 +24,7 @@ import com.vaadin.flow.server.streams.UploadHandler;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -212,7 +211,6 @@ public class LeaderboardSessionsView extends BaseView {
                 .setTextAlign(ColumnTextAlign.END)
                 .setSortable(true);
         Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
-                .setRenderer(new ComponentRenderer<>(session -> new Span(session.getSessionType().getLabel())))
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -242,7 +240,7 @@ public class LeaderboardSessionsView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setTrackName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);

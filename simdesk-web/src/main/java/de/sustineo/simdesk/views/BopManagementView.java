@@ -109,7 +109,7 @@ public class BopManagementView extends BaseView {
 
     private Component createActionsLayout() {
         ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
-        trackFilterComboxBox.setItems(Track.getAllSortedByNameForAcc());
+        trackFilterComboxBox.setItems(Track.getAllOfAccSortedByName());
         trackFilterComboxBox.setItemLabelGenerator(Track::getName);
         trackFilterComboxBox.setPlaceholder("Select track");
         trackFilterComboxBox.setClearButtonVisible(true);

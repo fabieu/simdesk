@@ -11,7 +11,6 @@ import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
@@ -85,9 +84,9 @@ public class LeaderboardDriverView extends BaseView {
 
         layout.add(createBadgeLayout(driver, lapsByDriver));
 
+        layout.add(createSessionsLayout(sessionsByDriver));
         layout.add(createFavoriteCarLayout(lapsByDriver));
         layout.add(createFavoriteTrackLayout(lapsByDriver, sessionsByDriver));
-        layout.add(createLatestSessionsLayout(sessionsByDriver));
 
         return layout;
     }
@@ -112,7 +111,7 @@ public class LeaderboardDriverView extends BaseView {
         return layout;
     }
 
-    private Component createLatestSessionsLayout(List<Session> sessions) {
+    private Component createSessionsLayout(List<Session> sessions) {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
 
@@ -130,7 +129,6 @@ public class LeaderboardDriverView extends BaseView {
                 .setSortable(true)
                 .setComparator(Session::getSessionDatetime);
         Grid.Column<Session> sessionTypeColumn = grid.addColumn(Session::getSessionType)
-                .setRenderer(new ComponentRenderer<>(session -> new Span(session.getSessionType().getLabel())))
                 .setHeader("Session")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -139,7 +137,7 @@ public class LeaderboardDriverView extends BaseView {
                 .setHeader("Server Name")
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
                 .setHeader("Track Name")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -152,7 +150,7 @@ public class LeaderboardDriverView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setTrackName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createSelectHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -225,12 +223,12 @@ public class LeaderboardDriverView extends BaseView {
         Map<Integer, Session> sessionByIdMap = sessions.stream()
                 .collect(Collectors.toMap(Session::getId, session -> session));
 
-        Map<String, List<Lap>> lapsByTrackId = laps.stream()
+        Map<Track, List<Lap>> lapsByTrackMap = laps.stream()
                 .filter(lap -> lap.getSessionId() != null)
-                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrackId()));
+                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrack()));
 
-        List<LapsByTrack> lapsByTrack = lapsByTrackId.entrySet().stream()
-                .map(entry -> LapsByTrack.of(Track.getByAccId(entry.getKey()), entry.getValue()))
+        List<LapsByTrack> lapsByTrack = lapsByTrackMap.entrySet().stream()
+                .map(entry -> LapsByTrack.of(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
                 .toList();
 

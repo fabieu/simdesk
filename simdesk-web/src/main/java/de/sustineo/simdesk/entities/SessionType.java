@@ -1,6 +1,5 @@
 package de.sustineo.simdesk.entities;
 
-import de.sustineo.simdesk.views.filter.GridEnum;
 import lombok.Getter;
 import lombok.RequiredArgsConstructor;
 
@@ -9,7 +8,7 @@ import java.util.Set;
 
 @Getter
 @RequiredArgsConstructor
-public enum SessionType implements GridEnum {
+public enum SessionType {
     FP("Free Practice"),
     Q("Qualifying"),
     R("Race"),
@@ -24,7 +23,7 @@ public enum SessionType implements GridEnum {
     }
 
     @Override
-    public String getLabel() {
+    public String toString() {
         return description;
     }
 }
