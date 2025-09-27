@@ -32,6 +32,7 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
 import java.util.Comparator;
+import java.util.EnumMap;
 import java.util.List;
 import java.util.Map;
 import java.util.stream.Collectors;
@@ -76,17 +77,17 @@ public class LeaderboardDriverView extends BaseView {
     }
 
     private Component createDriverLayout(Driver driver) {
-        List<Lap> lapsByDriver = lapService.getByDriverId(driver.getId());
-        List<Session> sessionsByDriver = sessionService.getAllByDriverId(driver.getId());
+        List<Lap> laps = lapService.getByDriverId(driver.getId());
+        List<Session> sessions = sessionService.getAllByDriverId(driver.getId());
 
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
 
-        layout.add(createBadgeLayout(driver, lapsByDriver));
+        layout.add(createBadgeLayout(driver, laps));
 
-        layout.add(createSessionsLayout(sessionsByDriver));
-        layout.add(createFavoriteCarLayout(lapsByDriver));
-        layout.add(createFavoriteTrackLayout(lapsByDriver, sessionsByDriver));
+        layout.add(createSessionsLayout(sessions));
+        layout.add(createFavoriteCarLayout(laps));
+        layout.add(createFavoriteTrackLayout(laps, sessions));
 
         return layout;
     }
@@ -115,7 +116,23 @@ public class LeaderboardDriverView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
 
-        H3 header = new H3("Last sessions");
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setWidthFull();
+        headerLayout.setAlignItems(Alignment.CENTER);
+        headerLayout.getStyle().set("gap", "0.5rem");
+
+        headerLayout.add(new H3("Sessions"));
+
+        sessions.stream().collect(Collectors.groupingBy(
+                        Session::getSessionType,
+                        () -> new EnumMap<>(SessionType.class),
+                        Collectors.toList())
+                )
+                .forEach((sessionType, sessionList) -> {
+                    Span badge = new Span(sessionType + ": " + sessionList.size());
+                    badge.getElement().getThemeList().add("badge contrast small");
+                    headerLayout.add(badge);
+                });
 
         Grid<Session> grid = new Grid<>(Session.class, false);
         grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
@@ -167,7 +184,7 @@ public class LeaderboardDriverView extends BaseView {
             }
         });
 
-        layout.add(header, grid);
+        layout.add(headerLayout, grid);
 
         return layout;
     }
