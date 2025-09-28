@@ -17,6 +17,7 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
+import de.sustineo.simdesk.entities.record.LapByTrack;
 import de.sustineo.simdesk.entities.record.LapsByAccCar;
 import de.sustineo.simdesk.entities.record.LapsByTrack;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
@@ -31,9 +32,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
-import java.util.Comparator;
-import java.util.List;
-import java.util.Map;
+import java.util.*;
 import java.util.stream.Collectors;
 
 @Log
@@ -76,17 +75,25 @@ public class LeaderboardDriverView extends BaseView {
     }
 
     private Component createDriverLayout(Driver driver) {
-        List<Lap> lapsByDriver = lapService.getByDriverId(driver.getId());
-        List<Session> sessionsByDriver = sessionService.getAllByDriverId(driver.getId());
+        List<Lap> laps = lapService.getByDriverId(driver.getId());
+        List<Session> sessions = sessionService.getAllByDriverId(driver.getId());
+
+        Map<Integer, Session> sessionByIdMap = sessions.stream()
+                .collect(Collectors.toMap(Session::getId, session -> session));
+
+        Map<Track, List<Lap>> lapsByTrackMap = laps.stream()
+                .filter(lap -> lap.getSessionId() != null)
+                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrack()));
 
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
 
-        layout.add(createBadgeLayout(driver, lapsByDriver));
+        layout.add(createBadgeLayout(driver, laps));
 
-        layout.add(createSessionsLayout(sessionsByDriver));
-        layout.add(createFavoriteCarLayout(lapsByDriver));
-        layout.add(createFavoriteTrackLayout(lapsByDriver, sessionsByDriver));
+        layout.add(createSessionsLayout(sessions));
+        layout.add(createFastestLapsLayout(lapsByTrackMap));
+        layout.add(createFavoriteCarsLayout(laps));
+        layout.add(createFavoriteTrackLayout(lapsByTrackMap));
 
         return layout;
     }
@@ -115,7 +122,23 @@ public class LeaderboardDriverView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
 
-        H3 header = new H3("Last sessions");
+        HorizontalLayout headerLayout = new HorizontalLayout();
+        headerLayout.setWidthFull();
+        headerLayout.setAlignItems(Alignment.CENTER);
+        headerLayout.getStyle().set("gap", "0.5rem");
+
+        headerLayout.add(new H3("Sessions"));
+
+        sessions.stream().collect(Collectors.groupingBy(
+                        Session::getSessionType,
+                        () -> new EnumMap<>(SessionType.class),
+                        Collectors.toList())
+                )
+                .forEach((sessionType, sessionList) -> {
+                    Span badge = new Span(sessionType + ": " + sessionList.size());
+                    badge.getElement().getThemeList().add("badge contrast small");
+                    headerLayout.add(badge);
+                });
 
         Grid<Session> grid = new Grid<>(Session.class, false);
         grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
@@ -138,7 +161,7 @@ public class LeaderboardDriverView extends BaseView {
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
         Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
-                .setHeader("Track Name")
+                .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
@@ -167,12 +190,68 @@ public class LeaderboardDriverView extends BaseView {
             }
         });
 
+        layout.add(headerLayout, grid);
+
+        return layout;
+    }
+
+    private Component createFastestLapsLayout(Map<Track, List<Lap>> lapsByTrackMap) {
+        List<LapByTrack> fastestLapByTrack = lapsByTrackMap.entrySet().stream()
+                .map(entry -> entry.getValue().stream()
+                        .filter(Lap::isValid)
+                        .filter(lap -> lap.getLapTimeMillis() != null)
+                        .min(Comparator.comparing(Lap::getLapTimeMillis))
+                        .map(fastest -> LapByTrack.of(entry.getKey(), fastest))
+                )
+                .flatMap(Optional::stream)   // drop tracks with no valid laps
+                .sorted(Comparator.comparing(LapByTrack::track))
+                .toList();
+
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+
+        H3 header = new H3("Fastest laps");
+
+        Grid<LapByTrack> grid = new Grid<>(LapByTrack.class, false);
+        grid.addColumn(item -> item.track().getName())
+                .setHeader("Track")
+                .setSortable(true);
+        grid.addColumn(lapByTrack -> AccCar.getCarById(lapByTrack.lap().getCarModelId()).getModel())
+                .setHeader("Car Model")
+                .setSortable(true);
+        grid.addColumn(lapByTrack -> FormatUtils.formatLapTime(lapByTrack.lap().getLapTimeMillis()))
+                .setHeader("Lap time")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(lapByTrack -> FormatUtils.formatLapTime(lapByTrack.lap().getSector1Millis()))
+                .setHeader("Sector 1")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(lapByTrack -> FormatUtils.formatLapTime(lapByTrack.lap().getSector2Millis()))
+                .setHeader("Sector 2")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+        grid.addColumn(lapByTrack -> FormatUtils.formatLapTime(lapByTrack.lap().getSector3Millis()))
+                .setHeader("Sector 3")
+                .setAutoWidth(true)
+                .setFlexGrow(0)
+                .setSortable(true);
+
+        grid.setItems(fastestLapByTrack);
+        grid.setAllRowsVisible(true);
+        grid.setMultiSort(true, true);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+
         layout.add(header, grid);
 
         return layout;
     }
 
-    private Component createFavoriteCarLayout(List<Lap> laps) {
+    private Component createFavoriteCarsLayout(List<Lap> laps) {
         Map<Integer, List<Lap>> lapsByCarId = laps.stream()
                 .filter(lap -> lap.getCarModelId() != null)
                 .collect(Collectors.groupingBy(Lap::getCarModelId));
@@ -219,14 +298,7 @@ public class LeaderboardDriverView extends BaseView {
         return layout;
     }
 
-    private Component createFavoriteTrackLayout(List<Lap> laps, List<Session> sessions) {
-        Map<Integer, Session> sessionByIdMap = sessions.stream()
-                .collect(Collectors.toMap(Session::getId, session -> session));
-
-        Map<Track, List<Lap>> lapsByTrackMap = laps.stream()
-                .filter(lap -> lap.getSessionId() != null)
-                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrack()));
-
+    private Component createFavoriteTrackLayout(Map<Track, List<Lap>> lapsByTrackMap) {
         List<LapsByTrack> lapsByTrack = lapsByTrackMap.entrySet().stream()
                 .map(entry -> LapsByTrack.of(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
@@ -239,7 +311,7 @@ public class LeaderboardDriverView extends BaseView {
 
         Grid<LapsByTrack> grid = new Grid<>(LapsByTrack.class, false);
         grid.addColumn(item -> item.track().getName())
-                .setHeader("Track Name")
+                .setHeader("Track")
                 .setSortable(true);
         grid.addColumn(item -> item.laps().stream().filter(Lap::isValid).count())
                 .setHeader("Valid Laps")

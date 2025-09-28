@@ -216,7 +216,7 @@ public class LeaderboardSessionsView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
-                .setHeader("Track Name")
+                .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
