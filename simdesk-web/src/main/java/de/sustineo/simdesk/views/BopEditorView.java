@@ -178,7 +178,7 @@ public class BopEditorView extends BaseView {
         trackComboBox.setItems(Track.getAllOfAccSortedByName());
         trackComboBox.setItemLabelGenerator(Track::getName);
         trackComboBox.setPlaceholder("Select track...");
-        trackComboBox.setHelperText("Available filters: Track Name");
+        trackComboBox.setHelperText("Available filters: Track");
         trackComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getAccId()));

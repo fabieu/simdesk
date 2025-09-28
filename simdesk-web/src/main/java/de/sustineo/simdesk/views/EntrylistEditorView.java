@@ -1146,7 +1146,7 @@ public class EntrylistEditorView extends BaseView {
                 .setFlexGrow(0)
                 .setSortable(true);
         Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
-                .setHeader("Track Name")
+                .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
