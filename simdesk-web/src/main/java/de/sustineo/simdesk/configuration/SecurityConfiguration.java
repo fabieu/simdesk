@@ -1,7 +1,8 @@
 package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
-import com.vaadin.flow.spring.security.VaadinWebSecurity;
+import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyConfiguration;
+import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
@@ -10,6 +11,7 @@ import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
+import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -25,6 +27,7 @@ import org.springframework.security.oauth2.core.OAuth2AuthenticationException;
 import org.springframework.security.oauth2.core.OAuth2Error;
 import org.springframework.security.oauth2.core.user.DefaultOAuth2User;
 import org.springframework.security.oauth2.core.user.OAuth2User;
+import org.springframework.security.web.SecurityFilterChain;
 import org.springframework.security.web.authentication.HttpStatusEntryPoint;
 import org.springframework.security.web.authentication.UsernamePasswordAuthenticationFilter;
 import org.springframework.security.web.servlet.util.matcher.PathPatternRequestMatcher;
@@ -36,8 +39,9 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
+@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
 @RequiredArgsConstructor
-public class SecurityConfiguration extends VaadinWebSecurity {
+public class SecurityConfiguration {
     private final String[] PUBLIC_PATHS = {
             "/public/**",
             "/assets/**",
@@ -60,23 +64,16 @@ public class SecurityConfiguration extends VaadinWebSecurity {
     private final Optional<DiscordService> discordService;
     private final UserService userService;
 
-    @Override
-    protected void configure(HttpSecurity http) throws Exception {
+    @Bean
+    SecurityFilterChain securityFilterChain(HttpSecurity http) throws Exception {
         PathPatternRequestMatcher.Builder pathPatternBuilder = PathPatternRequestMatcher.withDefaults();
 
-        // Delegating the responsibility of general configurations
-        // of http security to the super class. It's configuring
-        // the followings: Vaadin's CSRF protection by ignoring
-        // framework's internal requests, default request cache,
-        // ignoring public views annotated with @AnonymousAllowed,
-        // restricting access to other views/endpoints, and enabling
-        // NavigationAccessControl authorization.
-
-        // Configure your static resources with public access before calling
-        // super.configure(HttpSecurity) as it adds final anyRequest matcher
         http
+                .with(VaadinSecurityConfigurer.vaadin(), configurer -> {
+                    configurer.loginView(LoginView.class);
+                })
                 .authorizeHttpRequests(auth -> auth
-                        .requestMatchers(pathMatchers(PUBLIC_PATHS)).permitAll()
+                        .requestMatchers(PUBLIC_PATHS).permitAll()
                 )
                 .addFilterAfter(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
@@ -100,26 +97,23 @@ public class SecurityConfiguration extends VaadinWebSecurity {
                             )
                     );
         }
-        super.configure(http);
 
-        // This is important to register your login view to the
-        // navigation access control mechanism:
-        setLoginView(http, LoginView.class);
+        return http.build();
     }
 
     @Bean
-    public static NavigationAccessControlConfigurer navigationAccessControlConfigurer() {
+    NavigationAccessControlConfigurer navigationAccessControlConfigurer() {
         return new NavigationAccessControlConfigurer()
                 .withAnnotatedViewAccessChecker();
     }
 
     @Bean
-    public PasswordEncoder encoder() {
+    PasswordEncoder encoder() {
         return new BCryptPasswordEncoder();
     }
 
     @Bean
-    public OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
+    OAuth2UserService<OAuth2UserRequest, OAuth2User> oauth2UserService() {
         OAuth2UserService<OAuth2UserRequest, OAuth2User> delegate = new DefaultOAuth2UserService();
 
         return (request -> {
