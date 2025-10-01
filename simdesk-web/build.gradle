@@ -1,9 +1,9 @@
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
-    id "org.springframework.boot" version "3.5.5"
-    id 'com.vaadin' version "24.8.7"
-    id "org.flywaydb.flyway" version "11.11.2"
+    id "org.springframework.boot" version "3.5.6"
+    id 'com.vaadin' version "24.9.1"
+    id "org.flywaydb.flyway" version "11.13.2"
 }
 
 group = "de.sustineo.simdesk"
@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:24.8.7"
+        mavenBom "com.vaadin:vaadin-bom:24.9.1"
     }
 }
 
@@ -46,7 +46,7 @@ dependencies {
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
-    implementation "org.postgresql:postgresql:42.7.7"
+    implementation "org.postgresql:postgresql:42.7.8"
     runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
     implementation "org.flywaydb:flyway-database-postgresql"
 
@@ -54,7 +54,7 @@ dependencies {
     implementation "io.logz.logback:logzio-logback-appender:2.4.0"
 
     // Apache Commons
-    implementation "org.apache.commons:commons-lang3:3.18.0"
+    implementation "org.apache.commons:commons-lang3:3.19.0"
     implementation "commons-codec:commons-codec:1.19.0"
     implementation "commons-io:commons-io:2.20.0"
 
@@ -63,7 +63,7 @@ dependencies {
     implementation "com.opencsv:opencsv:5.12.0"
 
     // OpenAPI documentation
-    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.11"
+    implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13"
     implementation "org.webjars:webjars-locator-lite:1.1.0"
 
     // Development
@@ -72,8 +72,8 @@ dependencies {
     testImplementation 'org.testcontainers:junit-jupiter:1.21.3'
     testImplementation 'org.testcontainers:postgresql:1.21.3'
 
-    compileOnly "org.projectlombok:lombok:1.18.38"
-    annotationProcessor "org.projectlombok:lombok:1.18.38"
+    compileOnly "org.projectlombok:lombok:1.18.42"
+    annotationProcessor "org.projectlombok:lombok:1.18.42"
 }
 
 tasks {
