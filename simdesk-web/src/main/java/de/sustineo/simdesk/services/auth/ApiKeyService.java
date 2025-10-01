@@ -1,12 +1,12 @@
 package de.sustineo.simdesk.services.auth;
 
+import de.sustineo.simdesk.configuration.CacheNames;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.mybatis.mapper.UserApiKeyMapper;
 import de.sustineo.simdesk.mybatis.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
-import org.springframework.cache.Cache;
-import org.springframework.cache.CacheManager;
+import org.springframework.cache.annotation.CacheEvict;
 import org.springframework.cache.annotation.Cacheable;
 import org.springframework.stereotype.Service;
 
@@ -16,53 +16,37 @@ import java.util.Optional;
 @Service
 @RequiredArgsConstructor
 public class ApiKeyService {
-    private static final String CACHE_ACTIVE_API_KEYS = "activeApiKeys";
-
     private final UserApiKeyMapper apiKeyMapper;
     private final UserPermissionMapper userPermissionMapper;
-    private final CacheManager cacheManager;
     private final IdGenerator idGenerator;
 
     public List<ApiKey> getByUserId(Integer userId) {
         return apiKeyMapper.findByUserId(userId);
     }
 
-    @Cacheable(cacheNames = CACHE_ACTIVE_API_KEYS)
-    public Optional<ApiKey> getActiveByApiKey(String apiKeyString) {
-        if (apiKeyString == null || apiKeyString.isBlank()) {
+    @Cacheable(cacheNames = CacheNames.API_KEY, key = "#apiKey")
+    public Optional<ApiKey> getActiveByApiKey(String apiKey) {
+        if (apiKey == null || apiKey.isBlank()) {
             return Optional.empty();
         }
 
-        ApiKey apiKey = apiKeyMapper.findActiveByApiKey(apiKeyString);
-        if (apiKey == null) {
+        ApiKey detailedApiKey = apiKeyMapper.findActiveByApiKey(apiKey);
+        if (detailedApiKey == null) {
             return Optional.empty();
         }
 
-        apiKey.setRoles(userPermissionMapper.findRolesByUserId(apiKey.getUserId()));
+        detailedApiKey.setRoles(userPermissionMapper.findRolesByUserId(detailedApiKey.getUserId()));
 
-        return Optional.of(apiKey);
+        return Optional.of(detailedApiKey);
     }
 
     public void create(Integer userId, String name) {
         apiKeyMapper.insert(userId, generateKey(), name);
     }
 
-    public void deleteApiKey(ApiKey apiKey) {
-        removeActiveApiKeyFromCache(apiKey);
-        apiKeyMapper.deleteById(apiKey);
-    }
-
-    public void removeActiveApiKeysFromCache(Integer userId) {
-        getByUserId(userId).forEach(this::removeActiveApiKeyFromCache);
-    }
-
-    private void removeActiveApiKeyFromCache(ApiKey apiKey) {
-        Cache cache = cacheManager.getCache(CACHE_ACTIVE_API_KEYS);
-        if (cache == null) {
-            return;
-        }
-
-        cache.evict(apiKey.getApiKey());
+    @CacheEvict(cacheNames = CacheNames.API_KEY, key = "#detailedApiKey.apiKey")
+    public void deleteApiKey(ApiKey detailedApiKey) {
+        apiKeyMapper.deleteById(detailedApiKey);
     }
 
     private String generateKey() {

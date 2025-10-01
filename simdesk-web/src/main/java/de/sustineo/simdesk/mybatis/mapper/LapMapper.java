@@ -26,21 +26,6 @@ public interface LapMapper {
             @Result(property = "valid", column = "valid"),
     })
     @Select("""
-            <script>
-            SELECT lap.*, driver.first_name, driver.last_name, driver.short_name, driver.visibility FROM lap
-            LEFT JOIN driver ON lap.driver_id = driver.driver_id
-            WHERE lap.session_id = #{sessionId} AND lap.driver_id IN
-                <foreach item="item" index="index" collection="driverIds"
-                    open="(" separator="," close=")">
-                      #{item}
-                </foreach>
-            ORDER BY id ASC;
-            </script>
-            """)
-    List<Lap> findBySessionIdAndDriverIds(int sessionId, List<String> driverIds);
-
-    @ResultMap("lapResultMap")
-    @Select("""
             SELECT lap.*, driver.first_name, driver.last_name, driver.short_name, driver.visibility FROM lap
             LEFT JOIN driver ON lap.driver_id = driver.driver_id
             WHERE session_id = #{sessionId}
