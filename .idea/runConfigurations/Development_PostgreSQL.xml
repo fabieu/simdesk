@@ -11,7 +11,7 @@
       <env name="SIMDESK_DB_USERNAME" value="postgres" />
       <env name="SIMDESK_IMPRESSUM_URL" value="https://example.com" />
       <env name="SIMDESK_PRIVACY_URL" value="https://example.com" />
-      <env name="SIMDESK_THEME" value="default" />
+      <env name="SIMDESK_THEME" value="BLACK_AND_WHITE" />
     </envs>
     <option name="HIDE_BANNER" value="true" />
     <module name="simdesk.simdesk-web.main" />

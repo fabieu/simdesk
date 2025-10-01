@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.services.bop;
 
+import de.sustineo.simdesk.configuration.CacheNames;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Setting;
 import de.sustineo.simdesk.entities.Track;
@@ -60,22 +61,22 @@ public class BopService {
         });
     }
 
-    @Cacheable("bops")
+    @Cacheable(cacheNames = CacheNames.BOPS, key = "'all'")
     public List<Bop> getAll() {
         return bopMapper.findAll();
     }
 
-    @Cacheable("bops-active")
+    @Cacheable(cacheNames = CacheNames.BOPS, key = "'active'")
     public List<Bop> getActive() {
         return bopMapper.findActive();
     }
 
-    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
+    @CacheEvict(cacheNames = CacheNames.BOPS, allEntries = true)
     public void insert(Bop bop) {
         bopMapper.insert(bop);
     }
 
-    @CacheEvict(value = {"bops", "bops-active"}, allEntries = true)
+    @CacheEvict(cacheNames = CacheNames.BOPS, allEntries = true)
     public void update(Bop bop) {
         if (bop.getTrackId() == null || bop.getCarId() == null) {
             return;
@@ -93,7 +94,7 @@ public class BopService {
                 .build();
     }
 
-    @Cacheable("bop-providers")
+    @Cacheable(cacheNames = CacheNames.BOP_PROVIDERS)
     public Set<BopProvider> getBopProviders() {
         BopProvider[] bopProviders = settingService.getJson(Setting.BOP_PROVIDERS, BopProvider[].class);
         if (bopProviders == null) {
@@ -103,7 +104,7 @@ public class BopService {
         return Set.of(bopProviders);
     }
 
-    @CacheEvict(value = "bop-providers", allEntries = true)
+    @CacheEvict(cacheNames = CacheNames.BOP_PROVIDERS, allEntries = true)
     public void setBopProviders(Collection<BopProvider> bopProviders) {
         settingService.setJson(Setting.BOP_PROVIDERS, bopProviders.toArray(BopProvider[]::new));
     }

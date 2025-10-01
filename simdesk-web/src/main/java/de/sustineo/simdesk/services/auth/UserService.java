@@ -1,9 +1,6 @@
 package de.sustineo.simdesk.services.auth;
 
-import de.sustineo.simdesk.entities.auth.User;
-import de.sustineo.simdesk.entities.auth.UserPermission;
-import de.sustineo.simdesk.entities.auth.UserRole;
-import de.sustineo.simdesk.entities.auth.UserType;
+import de.sustineo.simdesk.entities.auth.*;
 import de.sustineo.simdesk.mybatis.mapper.UserMapper;
 import de.sustineo.simdesk.mybatis.mapper.UserPermissionMapper;
 import de.sustineo.simdesk.mybatis.mapper.UserRoleMapper;
@@ -65,7 +62,9 @@ public class UserService {
             userPermissionMapper.insert(userPermission);
         }
 
-        apiKeyService.removeActiveApiKeysFromCache(user.getId());
+        // Delete existing API keys of the user
+        List<ApiKey> apiKeys = apiKeyService.getByUserId(user.getId());
+        apiKeys.forEach(apiKeyService::deleteApiKey);
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Integer userId) {

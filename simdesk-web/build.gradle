@@ -50,8 +50,14 @@ dependencies {
     runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
     implementation "org.flywaydb:flyway-database-postgresql"
 
+    // Caching
+    implementation "com.github.ben-manes.caffeine:caffeine"
+
     // Logging
     implementation "io.logz.logback:logzio-logback-appender:2.4.0"
+
+    // Metrics
+    runtimeOnly "io.micrometer:micrometer-registry-prometheus"
 
     // Apache Commons
     implementation "org.apache.commons:commons-lang3:3.19.0"
