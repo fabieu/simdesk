@@ -22,6 +22,8 @@ spring:
       write-dates-as-timestamps: false
     mapper:
       propagate-transient-marker: true
+  cache:
+    type: caffeine
   servlet:
     multipart:
       max-file-size: 10MB
@@ -37,16 +39,13 @@ management:
   endpoints:
     web:
       exposure:
-        include: "info,health,prometheus"
+        include: info, health, caches, metrics, prometheus
     access:
-      default: none
-  endpoint:
-    health:
-      access: read_only
-    info:
-      access: read_only
-    prometheus:
-      access: read_only
+      default: read_only
+  metrics:
+    enable:
+      spring.security: false
+      http.server.requests: false
 logging:
   level:
     root: INFO

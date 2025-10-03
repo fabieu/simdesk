@@ -3,6 +3,7 @@ package de.sustineo.simdesk.configuration;
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
 import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyConfiguration;
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
+import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
 import de.sustineo.simdesk.services.auth.UserService;
 import de.sustineo.simdesk.services.discord.DiscordService;
@@ -43,13 +44,14 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final String[] PUBLIC_PATHS = {
-            "/public/**",
-            "/assets/**",
-            "/icons/**",
-            "/swagger-ui/**",
-            "/openapi/**",
-            "/ws/**",
-            "/*.png" // Leaflet images
+            "/actuator/health", // Actuator
+            "/public/**",       // Vaadin
+            "/assets/**",       // Vaadin
+            "/icons/**",        // Icons
+            "/swagger-ui/**",   // SpringDoc
+            "/openapi/**",      // SpringDoc
+            "/ws/**",           // WebSockets
+            "/*.png"            // Leaflet images
     };
     private static final String LOGIN_URL = "/login";
     private static final String LOGIN_SUCCESS_URL = "/";
@@ -74,6 +76,7 @@ public class SecurityConfiguration {
                 })
                 .authorizeHttpRequests(auth -> auth
                         .requestMatchers(PUBLIC_PATHS).permitAll()
+                        .requestMatchers("/actuator/**").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())
                 )
                 .addFilterAfter(apiKeyAuthenticationFilter, UsernamePasswordAuthenticationFilter.class)
                 .exceptionHandling(exceptionHandling -> exceptionHandling
