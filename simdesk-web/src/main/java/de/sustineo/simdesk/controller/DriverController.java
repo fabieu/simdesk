@@ -65,7 +65,7 @@ public class DriverController {
                 .toList();
 
         if (withLaps) {
-            sessionResponse.forEach(session -> session.setLaps(lapService.getBySessionIdAndDriverId(session.getId(), driverId)));
+            sessionResponse.forEach(session -> session.setLaps(lapService.getBySessionIdAndDriverIds(session.getId(), List.of(driverId))));
         }
 
         return new ServiceResponse<>(HttpStatus.OK, sessionResponse).toResponseEntity();

@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.services;
 
+import de.sustineo.simdesk.configuration.CacheNames;
 import de.sustineo.simdesk.entities.Setting;
 import de.sustineo.simdesk.mybatis.mapper.SettingMapper;
 import de.sustineo.simdesk.utils.json.JsonClient;
@@ -13,7 +14,7 @@ import org.springframework.stereotype.Service;
 public class SettingService {
     private final SettingMapper settingMapper;
 
-    @Cacheable(value = "settings", key = "#key")
+    @Cacheable(cacheNames = CacheNames.SETTINGS, key = "#key")
     public String get(String key) {
         Setting property = settingMapper.findActive(key);
         if (property == null) {
@@ -23,7 +24,7 @@ public class SettingService {
         return property.getValue();
     }
 
-    @Cacheable(value = "properties", key = "#key")
+    @Cacheable(cacheNames = CacheNames.SETTINGS, key = "#key")
     public <T> T getJson(String key, Class<T> clazz) {
         String value = get(key);
         if (value == null) {
@@ -33,12 +34,12 @@ public class SettingService {
         return JsonClient.fromJson(value, clazz);
     }
 
-    @CacheEvict(value = "settings", key = "#key")
+    @CacheEvict(cacheNames = CacheNames.SETTINGS, key = "#key")
     public void set(String key, String value) {
         settingMapper.update(key, value);
     }
 
-    @CacheEvict(value = "properties", key = "#key")
+    @CacheEvict(cacheNames = CacheNames.SETTINGS, key = "#key")
     public void setJson(String key, Object value) {
         set(key, JsonClient.toJson(value));
     }

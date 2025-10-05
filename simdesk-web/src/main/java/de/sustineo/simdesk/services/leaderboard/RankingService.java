@@ -1,5 +1,6 @@
 package de.sustineo.simdesk.services.leaderboard;
 
+import de.sustineo.simdesk.configuration.CacheNames;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
@@ -13,6 +14,7 @@ import de.sustineo.simdesk.views.enums.TimeRange;
 import jakarta.annotation.Nonnull;
 import jakarta.annotation.Nullable;
 import lombok.RequiredArgsConstructor;
+import org.springframework.cache.annotation.Cacheable;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
@@ -31,12 +33,14 @@ public class RankingService {
     private final RankingMapper rankingMapper;
     private final Executor taskExecutor;
 
+    @Cacheable(cacheNames = CacheNames.RANKINGS)
     public List<GroupRanking> getAllTimeGroupRanking(TimeRange timeRange) {
         return rankingMapper.findAllTimeFastestLaps(timeRange.from(), timeRange.to()).stream()
                 .sorted(new GroupRankingComparator())
                 .toList();
     }
 
+    @Cacheable(cacheNames = CacheNames.RANKINGS)
     public List<DriverRanking> getAllTimeDriverRanking(@Nonnull CarGroup carGroup, @Nonnull String trackId, @Nonnull TimeRange timeRange, @Nullable AccCar car) {
         AtomicInteger ranking = new AtomicInteger(1);
 
