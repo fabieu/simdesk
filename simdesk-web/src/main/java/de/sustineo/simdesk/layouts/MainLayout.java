@@ -38,6 +38,7 @@ import de.sustineo.simdesk.views.MainView;
 import de.sustineo.simdesk.views.SettingsView;
 import de.sustineo.simdesk.views.UserProfileView;
 import de.sustineo.simdesk.views.components.ComponentFactory;
+import de.sustineo.simdesk.views.components.SearchComponentFactory;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.boot.info.BuildProperties;
 
@@ -52,6 +53,7 @@ public class MainLayout extends AppLayout {
     private final BuildProperties buildProperties;
 
     private final ComponentFactory componentFactory;
+    private final Optional<SearchComponentFactory> searchComponentFactory;
 
     private final String privacyUrl;
     private final String impressumUrl;
@@ -62,6 +64,7 @@ public class MainLayout extends AppLayout {
                       MenuService menuService,
                       BuildProperties buildProperties,
                       ComponentFactory componentFactory,
+                      Optional<SearchComponentFactory> searchComponentFactory,
                       @Value("${simdesk.links.privacy}") String privacyUrl,
                       @Value("${simdesk.links.impressum}") String impressumUrl) {
         this.securityService = securityService;
@@ -69,6 +72,7 @@ public class MainLayout extends AppLayout {
         this.themeService = themeService;
         this.buildProperties = buildProperties;
         this.componentFactory = componentFactory;
+        this.searchComponentFactory = searchComponentFactory;
         this.privacyUrl = privacyUrl;
         this.impressumUrl = impressumUrl;
 
@@ -121,6 +125,7 @@ public class MainLayout extends AppLayout {
 
     private Component createNavbarNavigation() {
         HorizontalLayout layout = new HorizontalLayout();
+        layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         Div logo = new Div();
         logo.setId("navbar-logo");
@@ -129,6 +134,8 @@ public class MainLayout extends AppLayout {
         logoRouter.add(logo);
 
         layout.add(new DrawerToggle(), logoRouter);
+        searchComponentFactory.ifPresent(factory -> layout.add(factory.createSearchField()));
+
         return layout;
     }
 
