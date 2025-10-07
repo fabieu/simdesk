@@ -8,7 +8,7 @@ import de.sustineo.simdesk.entities.ranking.GroupRanking;
 
 public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
     private CarGroup carGroup;
-    private String trackName;
+    private Track track;
     private String driverName;
     private String carModelName;
 
@@ -21,8 +21,8 @@ public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
         refresh();
     }
 
-    public void setTrackName(String trackName) {
-        this.trackName = trackName;
+    public void setTrack(Track track) {
+        this.track = track;
         refresh();
     }
 
@@ -38,10 +38,10 @@ public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
 
     protected boolean test(GroupRanking groupRanking) {
         boolean matchesCarGroup = matches(groupRanking.getCarGroup(), carGroup);
-        boolean matchesTrackName = matches(Track.getTrackNameByAccId(groupRanking.getTrackId()), trackName);
+        boolean matchesTrack = matches(Track.getByAccId(groupRanking.getTrackId()), track);
         boolean matchesDriverName = matches(groupRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(AccCar.getModelById(groupRanking.getCarModelId()), carModelName);
 
-        return matchesCarGroup && matchesTrackName && matchesDriverName && matchesCarModelName;
+        return matchesCarGroup && matchesTrack && matchesDriverName && matchesCarModelName;
     }
 }

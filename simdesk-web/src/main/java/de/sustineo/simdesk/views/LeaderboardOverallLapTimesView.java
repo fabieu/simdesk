@@ -109,7 +109,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<GroupRanking> trackNameColumn = grid.addColumn(groupRanking -> Track.getTrackNameByAccId(groupRanking.getTrackId()))
+        Grid.Column<GroupRanking> trackColumn = grid.addColumn(groupRanking -> Track.getByAccId(groupRanking.getTrackId()))
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -137,7 +137,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
         OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(carGroupColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setCarGroup, CarGroup::getValid));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setTrackName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setTrack, Track::getAllOfAccSortedByName));
         headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setDriverName));
         headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setCarModelName));
 
