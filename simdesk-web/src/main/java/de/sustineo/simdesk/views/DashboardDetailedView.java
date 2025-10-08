@@ -2,13 +2,16 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.livetiming.Dashboard;
+import de.sustineo.simdesk.entities.livetiming.DashboardState;
 import de.sustineo.simdesk.services.dashboard.DashboardService;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.BadgeComponentFactory;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
@@ -32,28 +35,38 @@ public class DashboardDetailedView extends BaseView {
     public void beforeEnter(BeforeEnterEvent beforeEnterEvent) {
         String dashboardId = beforeEnterEvent.getRouteParameters().get(ROUTE_PARAMETER_DASHBOARD_ID).orElseThrow();
 
-        try {
-            dashboard = dashboardService.getByDashboardId(dashboardId);
-            if (dashboard == null) {
-                throw new IllegalArgumentException("Dashboard with dashboard id " + dashboardId + " does not exist.");
-            }
-
-            setSizeFull();
-            setSpacing(false);
-            setPadding(false);
-
-            removeAll();
-
-            add(createViewHeader(dashboard.getName(), badgeComponentFactory.getLiveBadge(dashboard)));
-            addAndExpand(createDashboardLayout(dashboard));
-        } catch (IllegalArgumentException e) {
+        dashboard = dashboardService.getByDashboardId(dashboardId);
+        if (dashboard == null) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
+            return;
         }
+
+        setSizeFull();
+        setSpacing(false);
+        setPadding(false);
+
+        removeAll();
+
+        add(createViewHeader(dashboard.getName(), badgeComponentFactory.getLiveBadge(dashboard)));
+        addAndExpand(createDashboardLayout(dashboard));
     }
 
     private Component createDashboardLayout(Dashboard dashboard) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
+
+        TextArea stateTextArea = new TextArea("Dashboard State");
+        stateTextArea.setWidthFull();
+        stateTextArea.setReadOnly(true);
+
+        DashboardState dashboardState = dashboardService.getDashboardState(dashboard.getId());
+        if (dashboardState != null) {
+            stateTextArea.setValue(JsonClient.toJsonPretty(dashboardState));
+        } else {
+            stateTextArea.setValue("No state available");
+        }
+
+        layout.add(stateTextArea);
 
         return layout;
     }
