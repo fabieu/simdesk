@@ -2,8 +2,11 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
+import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.CheckboxGroup;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
@@ -11,33 +14,44 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
+import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.component.upload.UploadI18N;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.server.streams.UploadHandler;
+import com.vaadin.flow.server.streams.UploadMetadata;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
 import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
+import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
+import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
 import de.sustineo.simdesk.utils.FormatUtils;
+import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.filter.grid.BopManagementFilter;
 import de.sustineo.simdesk.views.filter.grid.GridFilter;
 import de.sustineo.simdesk.views.generators.BopCarGroupPartNameGenerator;
+import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.BopRenderer;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
+import org.apache.commons.io.FileUtils;
 import org.springframework.context.annotation.Profile;
 
 import javax.annotation.Nullable;
@@ -54,6 +68,7 @@ public class BopManagementView extends BaseView {
     private final static String GRID_FILTER_ACTIVE = "ACTIVE";
 
     private final BopService bopService;
+    private final ValidationService validationService;
     private final NotificationService notificationService;
 
     private final ButtonComponentFactory buttonComponentFactory;
@@ -65,10 +80,12 @@ public class BopManagementView extends BaseView {
     private final String authenticatedUserGlobalName;
 
     public BopManagementView(BopService bopService,
+                             ValidationService validationService,
                              SecurityService securityService,
                              NotificationService notificationService,
                              ButtonComponentFactory buttonComponentFactory) {
         this.bopService = bopService;
+        this.validationService = validationService;
         this.notificationService = notificationService;
         this.buttonComponentFactory = buttonComponentFactory;
         this.authenticatedUserGlobalName = securityService.getAuthenticatedUser()
@@ -203,7 +220,11 @@ public class BopManagementView extends BaseView {
             getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class));
         });
 
-        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, bopProviderComboBox);
+        Button importBopButton = new Button("Import BOP");
+        importBopButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        importBopButton.addClickListener(e -> createImportBopDialog().open());
+
+        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, importBopButton, bopProviderComboBox);
         navigationLayout.getStyle()
                 .setMarginRight("auto");
 
@@ -456,5 +477,148 @@ public class BopManagementView extends BaseView {
         }
 
         return String.join(" and ", parts);
+    }
+
+    private Dialog createImportBopDialog() {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Import BOP from bop.json");
+        dialog.setResizable(true);
+        dialog.setWidth("800px");
+
+        VerticalLayout dialogLayout = new VerticalLayout();
+        dialogLayout.setSpacing(true);
+        dialogLayout.setPadding(false);
+
+        Paragraph uploadHint = new Paragraph("Upload a bop.json file to import BOP settings. You can select which providers to enable and which tracks to import.");
+        uploadHint.getStyle()
+                .setFontSize("var(--lumo-font-size-s)")
+                .setColor("var(--lumo-secondary-text-color)");
+
+        Upload fileUpload = new Upload();
+        fileUpload.setWidthFull();
+        fileUpload.setDropAllowed(true);
+        fileUpload.setAcceptedFileTypes("application/json", ".json");
+        fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        fileUpload.setI18n(configureUploadI18N());
+        fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
+
+        MultiSelectComboBox<BopProvider> providerSelector = new MultiSelectComboBox<>("BOP Providers to enable");
+        providerSelector.setItems(BopProvider.values());
+        providerSelector.setItemLabelGenerator(BopProvider::getName);
+        providerSelector.setWidthFull();
+        providerSelector.setHelperText("Select which BOP providers should be enabled after import");
+
+        CheckboxGroup<String> trackSelector = new CheckboxGroup<>();
+        trackSelector.setLabel("Select tracks to import");
+        trackSelector.setWidthFull();
+        trackSelector.setVisible(false);
+
+        Button importButton = buttonComponentFactory.createPrimarySuccessButton("Import");
+        importButton.setEnabled(false);
+
+        final AccBop[] uploadedBop = {null};
+
+        fileUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+            try {
+                AccBop bop = JsonClient.fromJson(new String(data), AccBop.class);
+                validationService.validate(bop);
+
+                uploadedBop[0] = bop;
+
+                Map<String, String> trackMap = new LinkedHashMap<>();
+                for (AccBopEntry entry : bop.getEntries()) {
+                    String trackId = entry.getTrackId();
+                    Track track = Track.getByAccId(trackId);
+                    if (track != null && !trackMap.containsKey(trackId)) {
+                        trackMap.put(trackId, track.getName());
+                    }
+                }
+
+                if (trackMap.isEmpty()) {
+                    notificationService.showErrorNotification("No valid tracks found in the uploaded file");
+                    trackSelector.setVisible(false);
+                    importButton.setEnabled(false);
+                    return;
+                }
+
+                trackSelector.setItems(trackMap.keySet());
+                trackSelector.setItemLabelGenerator(trackMap::get);
+                trackSelector.select(trackMap.keySet());
+                trackSelector.setVisible(true);
+                importButton.setEnabled(true);
+
+                notificationService.showSuccessNotification("File uploaded successfully. Select tracks to import.");
+            } catch (Exception e) {
+                notificationService.showErrorNotification(metadata.fileName() + " - " + e.getLocalizedMessage());
+                trackSelector.setVisible(false);
+                importButton.setEnabled(false);
+                uploadedBop[0] = null;
+            }
+        }));
+
+        importButton.addClickListener(event -> {
+            if (uploadedBop[0] == null) {
+                notificationService.showErrorNotification("Please upload a file first");
+                return;
+            }
+
+            Set<String> selectedTracks = trackSelector.getSelectedItems();
+            if (selectedTracks.isEmpty()) {
+                notificationService.showWarningNotification("Please select at least one track to import");
+                return;
+            }
+
+            Set<BopProvider> selectedProviders = providerSelector.getSelectedItems();
+
+            int importedCount = 0;
+            for (AccBopEntry entry : uploadedBop[0].getEntries()) {
+                if (selectedTracks.contains(entry.getTrackId())) {
+                    Bop existingBop = bopList.stream()
+                            .filter(b -> b.getTrackId().equals(entry.getTrackId()) && b.getCarId().equals(entry.getCarId()))
+                            .findFirst()
+                            .orElse(null);
+
+                    if (existingBop != null) {
+                        existingBop.setBallastKg(entry.getBallastKg());
+                        existingBop.setRestrictor(entry.getRestrictor());
+                        existingBop.setActive(true);
+                        existingBop.setUsername(authenticatedUserGlobalName);
+                        existingBop.setUpdateDatetime(Instant.now());
+                        bopService.update(existingBop);
+                        gridDataView.refreshItem(existingBop);
+                        importedCount++;
+                    }
+                }
+            }
+
+            if (!selectedProviders.isEmpty()) {
+                bopService.setBopProviders(selectedProviders);
+            }
+
+            refreshFilters();
+            dialog.close();
+            notificationService.showSuccessNotification("Successfully imported " + importedCount + " BOP entries");
+        });
+
+        Button cancelButton = buttonComponentFactory.createDialogCancelButton(dialog);
+
+        dialogLayout.add(uploadHint, fileUpload, providerSelector, trackSelector);
+        dialog.add(dialogLayout);
+        dialog.getFooter().add(cancelButton, importButton);
+
+        return dialog;
+    }
+
+    private UploadI18N configureUploadI18N() {
+        UploadI18NDefaults i18n = new UploadI18NDefaults();
+
+        i18n.getAddFiles().setOne("Upload bop.json file...");
+        i18n.getAddFiles().setMany("Upload bop.json files...");
+        i18n.getDropFiles().setOne("Drop bop.json file here");
+        i18n.getDropFiles().setMany("Drop bop.json files here");
+        i18n.getError().setIncorrectFileType("The provided file does not have the correct format (JSON).");
+        i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB.");
+
+        return i18n;
     }
 }
