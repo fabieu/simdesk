@@ -44,15 +44,15 @@ public class SearchComponentFactory {
         searchComboBox.setRenderer(new ComponentRenderer<>(searchResult -> {
             HorizontalLayout container = new HorizontalLayout();
             container.setAlignItems(FlexComponent.Alignment.CENTER);
+            container.getStyle()
+                    .setGap("var(--lumo-space-s)");
 
             Span label = new Span(searchResult.getLabel());
             label.getStyle()
                     .setFontWeight("bold");
 
             Span type = new Span(searchResult.getType().getLabel());
-            type.getStyle()
-                    .setFontSize("var(--lumo-font-size-s)")
-                    .setColor("var(--lumo-secondary-text-color)");
+            type.getElement().getThemeList().add("badge contrast");
 
             container.add(label, type);
             return container;
