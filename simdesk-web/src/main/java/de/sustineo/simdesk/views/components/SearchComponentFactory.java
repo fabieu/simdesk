@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(ProfileManager.PROFILE_LEADERBOARD + " & " + ProfileManager.PROFILE_INSIGHTS)
 @Service
 @RequiredArgsConstructor
 public class SearchComponentFactory {

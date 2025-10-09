@@ -13,7 +13,9 @@ public class ProfileManager {
     public static final String PROFILE_MAP = "map";
     public static final String PROFILE_LIVE_TIMING = "acc-live-timing";
     public static final String PROFILE_DISCORD = "discord";
+    public static final String PROFILE_INSIGHTS = "insights";
     public static final String PROFILE_DEBUG = "debug";
+
     private static Environment environment;
 
     public ProfileManager(Environment environment) {

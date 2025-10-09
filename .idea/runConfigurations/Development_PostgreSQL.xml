@@ -1,6 +1,6 @@
 <component name="ProjectRunConfigurationManager">
   <configuration default="false" name="Development PostgreSQL" type="SpringBootApplicationConfigurationType" factoryName="Spring Boot">
-    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, acc-live-timing, map, debug, discord" />
+    <option name="ACTIVE_PROFILES" value="development, acc-leaderboard, acc-entrylist, acc-bop, acc-live-timing, map, debug, discord, insights" />
     <envs>
       <env name="debug" value="false" />
       <env name="SIMDESK_ACC_RESULTS_FOLDERS" value="development/results" />
