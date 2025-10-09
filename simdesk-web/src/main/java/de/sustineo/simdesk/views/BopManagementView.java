@@ -127,10 +127,6 @@ public class BopManagementView extends BaseView {
         gridDataView.setFilter(filters);
     }
 
-    private void refreshBopProviderComboBox() {
-        bopProviderComboBox.setValue(bopService.getBopProviders());
-    }
-
     private Component createActionsLayout() {
         ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
         trackFilterComboxBox.setItems(Track.getAllOfAccSortedByName());
@@ -211,25 +207,24 @@ public class BopManagementView extends BaseView {
         });
 
         Button bopDisplayViewButton = new Button("Go to overview");
-        bopDisplayViewButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class)));
+        bopDisplayViewButton.addClickListener(event -> getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class)));
 
         Button importBopButton = new Button("Import from file");
-        importBopButton.addClickListener(e -> createImportBopDialog().open());
+        importBopButton.addClickListener(event -> createImportBopDialog().open());
 
         bopProviderComboBox.setItems(BopProvider.values());
         bopProviderComboBox.setItemLabelGenerator(BopProvider::getName);
         bopProviderComboBox.setPlaceholder("Select BoP providers");
         bopProviderComboBox.setClearButtonVisible(true);
-        bopProviderComboBox.setAllowCustomValue(true);
         bopProviderComboBox.setMinWidth("250px");
         bopProviderComboBox.addValueChangeListener(event -> bopService.setBopProviders(event.getValue()));
-        refreshBopProviderComboBox();
+        bopProviderComboBox.setValue(bopService.getBopProviders());
 
-        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, importBopButton, bopProviderComboBox);
+        HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, bopProviderComboBox);
         navigationLayout.getStyle()
                 .setMarginRight("auto");
 
-        FlexLayout actionLayout = new FlexLayout(navigationLayout, enableTrackButton, disableTrackButton, resetAllForTrackButton, trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
+        FlexLayout actionLayout = new FlexLayout(navigationLayout, importBopButton, enableTrackButton, disableTrackButton, resetAllForTrackButton, trackFilterComboxBox, carGroupFilterComboBox, activeFilterComboBox);
         actionLayout.setWidthFull();
         actionLayout.setAlignItems(Alignment.END);
         actionLayout.getStyle()
@@ -388,7 +383,7 @@ public class BopManagementView extends BaseView {
         refreshFilters();
 
         String filterDescription = getFilterDescription(trackId, carGroup, active);
-        String message = "Enabled BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        String message = "Enabled BoP" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
         notificationService.showSuccessNotification(message);
     }
 
@@ -422,7 +417,7 @@ public class BopManagementView extends BaseView {
         refreshFilters();
 
         String filterDescription = getFilterDescription(trackId, carGroup, active);
-        String message = "Disabled BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        String message = "Disabled BoP" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
         notificationService.showSuccessNotification(message);
     }
 
@@ -458,7 +453,7 @@ public class BopManagementView extends BaseView {
         refreshFilters();
 
         String filterDescription = getFilterDescription(trackId, carGroup, active);
-        String message = "Reset BOPs" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
+        String message = "Reset BoP" + (filterDescription.isEmpty() ? "" : " for " + filterDescription);
         notificationService.showSuccessNotification(message);
     }
 
@@ -482,8 +477,7 @@ public class BopManagementView extends BaseView {
     }
 
     private Dialog createImportBopDialog() {
-        Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Import Balance of Performance (BoP) Entries");
+        Dialog dialog = new Dialog("Import BoP entries");
 
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.setPadding(false);
@@ -507,7 +501,6 @@ public class BopManagementView extends BaseView {
         providerSelector.setVisible(false);
         providerSelector.setItems(BopProvider.values());
         providerSelector.setItemLabelGenerator(BopProvider::getName);
-        providerSelector.setValue(bopService.getBopProviders());
         providerSelector.setPlaceholder("None");
         providerSelector.setClearButtonVisible(true);
 
@@ -525,15 +518,15 @@ public class BopManagementView extends BaseView {
         Button importButton = buttonComponentFactory.createPrimarySuccessButton("Import");
         importButton.setEnabled(false);
 
-        AtomicReference<AccBop> uploadedBop = new AtomicReference<>();
+        AtomicReference<AccBop> uploadedAccBop = new AtomicReference<>();
 
         fileUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccBop bop = JsonClient.fromJson(new String(data), AccBop.class);
-                validationService.validate(bop);
-                uploadedBop.set(bop);
+                AccBop accBop = JsonClient.fromJson(new String(data), AccBop.class);
+                validationService.validate(accBop);
+                uploadedAccBop.set(accBop);
 
-                Set<Track> tracks = bop.getEntries().stream()
+                Set<Track> tracks = accBop.getEntries().stream()
                         .map(AccBopEntry::getTrackId)
                         .filter(Objects::nonNull)
                         .map(Track::getByAccId)
@@ -571,8 +564,8 @@ public class BopManagementView extends BaseView {
                     }
                 });
 
-                trackSelectorAll.setVisible(true);
                 trackSelector.setVisible(true);
+                trackSelectorAll.setVisible(true);
                 providerSelector.setVisible(true);
                 importButton.setEnabled(true);
             } catch (Exception e) {
@@ -581,12 +574,12 @@ public class BopManagementView extends BaseView {
                 trackSelector.setVisible(false);
                 providerSelector.setVisible(false);
                 importButton.setEnabled(false);
-                uploadedBop.set(null);
+                uploadedAccBop.set(null);
             }
         }));
 
         importButton.addClickListener(event -> {
-            if (uploadedBop.get() == null) {
+            if (uploadedAccBop.get() == null) {
                 notificationService.showErrorNotification("Please upload a file first");
                 return;
             }
@@ -598,7 +591,7 @@ public class BopManagementView extends BaseView {
             }
 
             int importCount = 0;
-            for (AccBopEntry entry : uploadedBop.get().getEntries()) {
+            for (AccBopEntry entry : uploadedAccBop.get().getEntries()) {
                 Track track = Track.getByAccId(entry.getTrackId());
                 if (selectedTracks.contains(track)) {
                     Bop existingBop = bopList.stream()
@@ -623,8 +616,11 @@ public class BopManagementView extends BaseView {
 
             Set<BopProvider> selectedProviders = providerSelector.getSelectedItems();
             if (!selectedProviders.isEmpty()) {
-                bopService.setBopProviders(selectedProviders);
-                refreshBopProviderComboBox();
+                Set<BopProvider> bopProviders = new HashSet<>(bopService.getBopProviders());
+                bopProviders.addAll(selectedProviders);
+
+                bopService.setBopProviders(bopProviders);
+                bopProviderComboBox.setValue(bopProviders);
             }
 
             refreshFilters();
