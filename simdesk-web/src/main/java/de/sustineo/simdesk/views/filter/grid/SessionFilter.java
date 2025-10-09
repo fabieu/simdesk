@@ -31,9 +31,9 @@ public class SessionFilter extends GridFilter<Session> {
 
     protected boolean test(Session session) {
         boolean matchesServerName = matches(session.getServerName(), serverName);
-        boolean matchesTrackName = matches(session.getTrack(), track);
+        boolean matchesTrack = matches(session.getTrack(), track);
         boolean matchesSessionType = matches(session.getSessionType(), sessionType);
 
-        return matchesServerName && matchesTrackName && matchesSessionType;
+        return matchesServerName && matchesTrack && matchesSessionType;
     }
 }
