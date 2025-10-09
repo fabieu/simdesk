@@ -211,9 +211,7 @@ public class BopManagementView extends BaseView {
         });
 
         Button bopDisplayViewButton = new Button("Go to overview");
-        bopDisplayViewButton.addClickListener(e -> {
-            getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class));
-        });
+        bopDisplayViewButton.addClickListener(e -> getUI().ifPresent(ui -> ui.navigate(BopDisplayView.class)));
 
         Button importBopButton = new Button("Import from file");
         importBopButton.addClickListener(e -> createImportBopDialog().open());
@@ -224,9 +222,7 @@ public class BopManagementView extends BaseView {
         bopProviderComboBox.setClearButtonVisible(true);
         bopProviderComboBox.setAllowCustomValue(true);
         bopProviderComboBox.setMinWidth("250px");
-        bopProviderComboBox.addValueChangeListener(e -> {
-            bopService.setBopProviders(e.getValue());
-        });
+        bopProviderComboBox.addValueChangeListener(event -> bopService.setBopProviders(event.getValue()));
         refreshBopProviderComboBox();
 
         HorizontalLayout navigationLayout = new HorizontalLayout(bopDisplayViewButton, importBopButton, bopProviderComboBox);
@@ -297,7 +293,7 @@ public class BopManagementView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Bop> updateDatetimeColumn = grid.addColumn(bop -> FormatUtils.formatDatetime(bop.getUpdateDatetime()))
+        grid.addColumn(bop -> FormatUtils.formatDatetime(bop.getUpdateDatetime()))
                 .setHeader("Last change")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -487,12 +483,12 @@ public class BopManagementView extends BaseView {
 
     private Dialog createImportBopDialog() {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("Import entries from BoP file");
+        dialog.setHeaderTitle("Import Balance of Performance (BoP) Entries");
 
         VerticalLayout dialogLayout = new VerticalLayout();
         dialogLayout.setPadding(false);
 
-        Paragraph uploadHint = new Paragraph("Upload a bop.json file to import BoP entries. You can select which providers to enable and which tracks to import afterwards.");
+        Paragraph uploadHint = new Paragraph("Upload your BoP file to add new entries. After uploading, choose which providers and tracks you’d like to import.");
         uploadHint.getStyle()
                 .setFontSize("var(--lumo-font-size-s)")
                 .setColor("var(--lumo-secondary-text-color)");
@@ -506,11 +502,12 @@ public class BopManagementView extends BaseView {
         fileUpload.setI18n(configureUploadI18N());
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
 
-        MultiSelectComboBox<BopProvider> providerSelector = new MultiSelectComboBox<>("BoP Providers to enable after import");
+        MultiSelectComboBox<BopProvider> providerSelector = new MultiSelectComboBox<>("Select providers to enable");
         providerSelector.setWidthFull();
         providerSelector.setVisible(false);
         providerSelector.setItems(BopProvider.values());
         providerSelector.setItemLabelGenerator(BopProvider::getName);
+        providerSelector.setValue(bopService.getBopProviders());
         providerSelector.setPlaceholder("None");
         providerSelector.setClearButtonVisible(true);
 
@@ -520,7 +517,7 @@ public class BopManagementView extends BaseView {
         trackSelector.setRequiredIndicatorVisible(true);
         trackSelector.addThemeVariants(CheckboxGroupVariant.LUMO_VERTICAL);
 
-        Checkbox trackSelectorAll = new Checkbox("Select all tracks");
+        Checkbox trackSelectorAll = new Checkbox("Select all");
         trackSelectorAll.setWidthFull();
         trackSelectorAll.setVisible(false);
 
