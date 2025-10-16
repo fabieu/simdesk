@@ -1250,7 +1250,7 @@ public class EntrylistEditorView extends BaseView {
 
     private Grid<Session> createSessionGrid() {
         List<Session> sessions = sessionService
-                .map(service -> service.getAllBySessionTimeRange(TimeRange.ALL_TIME))
+                .map(service -> service.getAllBySessionTimeRange(TimeRange.LAST_MONTH))
                 .orElse(Collections.emptyList());
 
         Grid<Session> grid = new Grid<>(Session.class, false);
