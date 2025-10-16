@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
 import de.sustineo.simdesk.entities.validation.ValidationError;
 import de.sustineo.simdesk.entities.validation.ValidationRule;
+import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Profile;
@@ -21,9 +22,59 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_ENTRYLIST)
 @Log
 @Service
+@RequiredArgsConstructor
 public class EntrylistService {
     public AccEntrylist createFromSession(AccSession accSession) {
-        return AccEntrylist.create();
+        AccEntrylist entrylist = AccEntrylist.create();
+
+        List<AccEntrylistEntry> entrylistEntries = entrylist.getEntries();
+        entrylistEntries.clear();
+
+        int gridPosition = 1;
+
+        List<AccLeaderboardLine> leaderboardLines = accSession.getSessionResult().getLeaderboardLines();
+
+        Map<Integer, AccTeam> teamById = leaderboardLines.stream()
+                .collect(Collectors.toMap(leaderboardLine -> leaderboardLine.getTeam().getTeamId(), AccLeaderboardLine::getTeam));
+
+        Map<AccDriver, AccLap> lastLapByDriver = new HashMap<>();
+        for (AccLap lap : accSession.getLaps()) {
+            teamById.get(lap.getTeamId())
+                    .getDriverByIndex(lap.getDriverIndex())
+                    .ifPresent(accDriver -> lastLapByDriver.put(accDriver, lap));
+        }
+
+        for (AccLeaderboardLine leaderboardLine : leaderboardLines) {
+            AccTeam team = leaderboardLine.getTeam();
+
+            // Skip entries where the drivers last lap is not from this team
+            List<AccDriver> drivers = team.getDrivers().stream()
+                    .filter(driver -> {
+                        AccLap lastLap = lastLapByDriver.get(driver);
+                        if (lastLap == null) {
+                            return true;
+                        }
+
+                        return team.getTeamId().equals(lastLap.getTeamId());
+                    })
+                    .toList();
+
+            // Skip entries that would end up empty
+            if (drivers.isEmpty()) {
+                continue;
+            }
+
+            AccEntrylistEntry entry = AccEntrylistEntry.create();
+            entry.setDrivers(drivers);
+            entry.setRaceNumber(team.getRaceNumber());
+            entry.setForcedCarModel(team.getCarModelId());
+            entry.setDefaultGridPosition(gridPosition++);
+            entry.setBallastKg(team.getBallastKg());
+
+            entrylistEntries.add(entry);
+        }
+
+        return entrylist;
     }
 
     public void updateFromSession(AccEntrylist entrylist, AccSession accSession, int initialGridPosition) {

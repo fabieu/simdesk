@@ -24,6 +24,7 @@ public class AccTeam {
     private List<AccDriver> drivers;
 
     public Optional<AccDriver> getDriverByIndex(int index) {
-        return Optional.ofNullable(drivers.get(index));
+        return Optional.ofNullable(drivers)
+                .map(accDrivers -> accDrivers.get(index));
     }
 }
