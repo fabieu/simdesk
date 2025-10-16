@@ -11,10 +11,11 @@ import lombok.Data;
 import lombok.NoArgsConstructor;
 
 import javax.annotation.Nonnull;
+import java.util.Objects;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccDriver {
+public final class AccDriver {
     private String firstName;
     private String lastName;
     private String shortName;
@@ -47,5 +48,17 @@ public class AccDriver {
         accDriver.shortName = driver.getShortName();
         accDriver.playerId = "S" + driver.getId();
         return accDriver;
+    }
+
+    @Override
+    public final boolean equals(Object o) {
+        if (!(o instanceof AccDriver accDriver)) return false;
+
+        return Objects.equals(playerId, accDriver.playerId);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hashCode(playerId);
     }
 }

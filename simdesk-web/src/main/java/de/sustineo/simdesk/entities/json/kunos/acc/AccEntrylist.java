@@ -12,7 +12,7 @@ import java.util.List;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccEntrylist {
+public final class AccEntrylist {
     @NotEmpty
     private List<@Valid AccEntrylistEntry> entries;
     @NotNull

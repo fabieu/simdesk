@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AccLeaderboardLine {
+public final class AccLeaderboardLine {
     @JsonProperty("car")
     private AccTeam team;
     private AccDriver currentDriver;

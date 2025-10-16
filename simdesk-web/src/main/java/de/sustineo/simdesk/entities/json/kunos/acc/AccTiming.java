@@ -5,7 +5,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AccTiming {
+public final class AccTiming {
     private Long lastLap;
     private List<Long> lastSplits;
     private Long bestLap;

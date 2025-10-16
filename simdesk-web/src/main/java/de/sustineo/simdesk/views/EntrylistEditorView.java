@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.HasText;
 import com.vaadin.flow.component.Text;
+import com.vaadin.flow.component.Unit;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.checkbox.Checkbox;
@@ -77,7 +78,6 @@ import de.sustineo.simdesk.views.filter.grid.SessionFilter;
 import de.sustineo.simdesk.views.i18n.UploadI18NDefaults;
 import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
-import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
@@ -93,6 +93,7 @@ import java.util.concurrent.atomic.AtomicReference;
 @Route(value = "/entrylist/editor")
 @AnonymousAllowed
 public class EntrylistEditorView extends BaseView {
+    private static final int MAX_FILE_SIZE_BYTES = 10485760; // 10 MB
     private static final Set<UserRoleEnum> ADVANCED_PERMISSION_ROLES = Set.of(UserRoleEnum.ROLE_ADMIN);
     private static final String WEB_STORAGE_KEY_SORTING_MODE = "vaadin.custom.entrylist.sorting.mode";
     private static final String WEB_STORAGE_KEY_SORTING_DIRECTION = "vaadin.custom.entrylist.sorting.direction";
@@ -132,10 +133,11 @@ public class EntrylistEditorView extends BaseView {
             entry -> entry.getKey().getIsServerAdmin(), Comparator.nullsLast(Comparator.reverseOrder())
     );
 
-    private final ConfirmDialog resetDialog;
-    private final Dialog validationDialog;
-    private final Dialog resultsUploadDialog;
+    private final Dialog createFromSessionDialog;
+    private final Dialog sessionUploadDialog;
     private final Dialog customCarsUploadDialog;
+    private final Dialog validationDialog;
+    private final ConfirmDialog resetDialog;
 
     public EntrylistEditorView(EntrylistService entrylistService,
                                DriverService driverService,
@@ -154,10 +156,11 @@ public class EntrylistEditorView extends BaseView {
         this.sessionComponentFactory = sessionComponentFactory;
         this.buttonComponentFactory = buttonComponentFactory;
 
-        this.resetDialog = createResetDialog();
-        this.validationDialog = createValidationDialog();
-        this.resultsUploadDialog = createResultsUploadDialog();
+        this.createFromSessionDialog = createEntrylistFromSessionDialog();
+        this.sessionUploadDialog = createSessionUploadDialog();
         this.customCarsUploadDialog = createCustomCarsUploadDialog();
+        this.validationDialog = createValidationDialog();
+        this.resetDialog = createResetDialog();
 
         this.entrylistPreview.setWidthFull();
         this.entrylistPreview.setReadOnly(true);
@@ -218,39 +221,18 @@ public class EntrylistEditorView extends BaseView {
     }
 
     private Component createPopulateEntrylistLayout() {
-        FlexLayout layout = new FlexLayout(createFileUpload(), createNewEntrylistButton());
+        FlexLayout layout = new FlexLayout();
         layout.setWidthFull();
         layout.getStyle()
                 .setAlignItems(Style.AlignItems.CENTER)
                 .set("gap", "var(--lumo-space-m)");
+        layout.add(createFileUpload(), createNewEntrylistButton());
+
+        if (sessionService.isPresent()) {
+            layout.add(createEntrylistFromSessionButton());
+        }
 
         return layout;
-    }
-
-    private Component createNewEntrylistButton() {
-        ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
-        createNewEntrylistConfirmDialog.addConfirmListener(event -> {
-            createNewEntrylist(AccEntrylist.create(), new EntrylistMetadata());
-            entrylistUpload.clearFileList();
-        });
-
-        Button createEntrylistButton = new Button("Create new entrylist");
-        createEntrylistButton.addClassNames("break-word");
-        createEntrylistButton.setWidth("25%");
-        createEntrylistButton.setHeightFull();
-        createEntrylistButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-        createEntrylistButton.addClickListener(event -> {
-            if (this.entrylist != null) {
-                createNewEntrylistConfirmDialog.open();
-            } else {
-                createNewEntrylist(AccEntrylist.create(), new EntrylistMetadata());
-                entrylistUpload.clearFileList();
-            }
-        });
-        createEntrylistButton.getStyle()
-                .setMargin("0");
-
-        return createEntrylistButton;
     }
 
     private Component createFileUpload() {
@@ -261,7 +243,8 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.setUploadButton(uploadButton);
         entrylistUpload.setDropAllowed(true);
         entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
-        entrylistUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        entrylistUpload.setMaxFiles(1);
+        entrylistUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         entrylistUpload.setI18n(configureUploadI18N("entrylist.json"));
         entrylistUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
         entrylistUpload.addFileRemovedListener(event -> resetDialog.open());
@@ -283,30 +266,160 @@ public class EntrylistEditorView extends BaseView {
             // Validate entrylist file against syntax and semantic rules
             validationService.validate(entrylist);
 
-            if (this.entrylist != null) {
-                ConfirmDialog createNewEntrylistConfirmDialog = createNewEntrylistConfirmDialog();
-                createNewEntrylistConfirmDialog.addConfirmListener(dialogEvent -> {
-                    createNewEntrylist(entrylist, entrylistMetadata);
-                    createSuccessNotification(entrylistMetadata.getFileName(), "Entrylist loaded successfully");
-                });
-                createNewEntrylistConfirmDialog.addCancelListener(dialogEvent -> entrylistUpload.clearFileList());
-                createNewEntrylistConfirmDialog.open();
-            } else {
-                createNewEntrylist(entrylist, entrylistMetadata);
-                createSuccessNotification(entrylistMetadata.getFileName(), "Entrylist loaded successfully");
-            }
+            loadNewEntrylist(entrylist, entrylistMetadata);
+            createSuccessNotification(entrylistMetadata.getFileName(), "Entrylist loaded successfully");
         } catch (Exception e) {
             notificationService.showErrorNotification(e.getLocalizedMessage());
         }
     }
 
-    private UploadI18N configureUploadI18N(String fileName) {
-        UploadI18NDefaults i18n = new UploadI18NDefaults();
-        i18n.getAddFiles().setOne(String.format("Upload %s...", fileName));
-        i18n.getDropFiles().setOne(String.format("Drop %s here", fileName));
-        i18n.getError().setIncorrectFileType("The provided file does not have the correct format (.json)");
-        i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 1 MB");
-        return i18n;
+    private Component createNewEntrylistButton() {
+        Button button = new Button("Create new");
+        button.addClassNames("break-word");
+        button.setWidth("15%");
+        button.setHeightFull();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.addClickListener(event ->
+                loadNewEntrylist(AccEntrylist.create(), new EntrylistMetadata())
+        );
+        button.getStyle()
+                .setMargin("0");
+
+        return button;
+    }
+
+    private Component createEntrylistFromSessionButton() {
+        Button button = new Button("Create from session");
+        button.addClassNames("break-word");
+        button.setWidth("15%");
+        button.setHeightFull();
+        button.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+        button.addClickListener(event ->
+                createFromSessionDialog.open()
+        );
+        button.getStyle()
+                .setMargin("0");
+
+        return button;
+    }
+
+    private Dialog createEntrylistFromSessionDialog() {
+        AtomicReference<AccSession> session = new AtomicReference<>();
+
+        Dialog dialog = new Dialog("Upload session result");
+        dialog.setMinWidth(50, Unit.VW);
+
+        Upload sessionResultUpload = new Upload();
+
+        HorizontalLayout sessionInformationLayout = new HorizontalLayout();
+        sessionInformationLayout.setWidthFull();
+        sessionInformationLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
+        sessionInformationLayout.setAlignItems(Alignment.CENTER);
+
+        Button loadButton = new Button("Create");
+        loadButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
+        loadButton.setEnabled(false);
+        loadButton.addClickListener(event -> {
+            AccEntrylist entrylist = entrylistService.createFromSession(session.get());
+            loadNewEntrylist(entrylist, new EntrylistMetadata());
+
+            dialog.close();
+        });
+
+        Button unselectSessionResultButton = buttonComponentFactory.createCancelIconButton();
+        unselectSessionResultButton.setTooltipText("Unselect session result");
+        unselectSessionResultButton.addClickListener(event -> {
+            session.set(null);
+            loadButton.setEnabled(false);
+            sessionResultUpload.clearFileList();
+            sessionInformationLayout.removeAll();
+        });
+
+        FlexLayout sessionResultUploadLayout = new FlexLayout();
+        sessionResultUploadLayout.setWidthFull();
+        sessionResultUploadLayout.getStyle()
+                .setAlignItems(Style.AlignItems.CENTER)
+                .set("gap", "var(--lumo-space-m)");
+
+        sessionResultUpload.setDropAllowed(true);
+        sessionResultUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        sessionResultUpload.setMaxFiles(1);
+        sessionResultUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
+        sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
+        sessionResultUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+            try {
+                AccSession accSession = JsonClient.fromJson(new String(data), AccSession.class);
+                validationService.validate(accSession);
+
+                session.set(accSession);
+                loadButton.setEnabled(true);
+                sessionInformationLayout.removeAll();
+                sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(accSession), unselectSessionResultButton);
+            } catch (Exception e) {
+                notificationService.showErrorNotification(Duration.ZERO, e.getLocalizedMessage());
+            }
+        }));
+        sessionResultUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        sessionResultUpload.addFileRemovedListener(event -> {
+            session.set(null);
+            loadButton.setEnabled(false);
+            sessionInformationLayout.removeAll();
+        });
+        sessionResultUpload.getStyle()
+                .setFlexGrow("1");
+        sessionResultUploadLayout.add(sessionResultUpload);
+
+        if (sessionService.isPresent()) {
+            Button selectSessionResultButton = new Button("Select session result");
+            selectSessionResultButton.addClassNames("break-word");
+            selectSessionResultButton.setWidth("25%");
+            selectSessionResultButton.setHeightFull();
+            selectSessionResultButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            selectSessionResultButton.getStyle()
+                    .setMargin("0");
+            selectSessionResultButton.addClickListener(event -> {
+                Dialog sessionGridDialog = new Dialog("Select session result");
+                sessionGridDialog.setSizeFull();
+
+                Grid<Session> sessionGrid = createSessionGrid();
+                sessionGrid.asSingleSelect().addValueChangeListener(singeValueChangeEvent -> {
+                    Session selectedSession = singeValueChangeEvent.getValue();
+
+                    if (selectedSession != null) {
+                        session.set(JsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
+                        loadButton.setEnabled(true);
+                        sessionInformationLayout.removeAll();
+                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session.get()), unselectSessionResultButton);
+                    }
+
+                    sessionGridDialog.close();
+                });
+
+                sessionGridDialog.add(sessionGrid);
+                sessionGridDialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(sessionGridDialog));
+                sessionGridDialog.addOpenedChangeListener(openedChangeEvent -> {
+                    if (openedChangeEvent.isOpened()) {
+                        // Ensures the grid's column widths are recalculated 50ms after the dialog is opened,
+                        // allowing the layout to adjust properly once the DOM is fully rendered.
+                        sessionGrid.getElement().executeJs("setTimeout(() => this.recalculateColumnWidths(), 50);");
+                    }
+                });
+
+                sessionGridDialog.open();
+            });
+
+            sessionResultUploadLayout.add(selectSessionResultButton);
+        }
+
+        VerticalLayout layout = new VerticalLayout(sessionInformationLayout, sessionResultUploadLayout);
+        layout.setSizeFull();
+        layout.setSpacing(false);
+        layout.setPadding(false);
+
+        dialog.add(layout);
+        dialog.getFooter().add(buttonComponentFactory.createDialogCancelButton(dialog), loadButton);
+
+        return dialog;
     }
 
     private Component createActionLayout() {
@@ -367,8 +480,8 @@ public class EntrylistEditorView extends BaseView {
             refreshEntrylistEntriesFromMap();
         });
 
-        Button importResultsButton = new Button("Import results", buttonComponentFactory.getUploadIcon());
-        importResultsButton.addClickListener(event -> resultsUploadDialog.open());
+        Button loadSessionResultButton = new Button("Load session result", buttonComponentFactory.getUploadIcon());
+        loadSessionResultButton.addClickListener(event -> sessionUploadDialog.open());
 
         Button loadDefaultCustomCarsButton = new Button("Load custom cars", new Icon(VaadinIcon.CAR));
         loadDefaultCustomCarsButton.addClickListener(event -> customCarsUploadDialog.open());
@@ -378,7 +491,7 @@ public class EntrylistEditorView extends BaseView {
         reverseGridButton.getStyle()
                 .setMarginRight("auto");
 
-        FlexLayout entrylistHeaderLayout = new FlexLayout(importResultsButton, loadDefaultCustomCarsButton, reverseGridButton, sortingModeSelect, sortdirectionSelect);
+        FlexLayout entrylistHeaderLayout = new FlexLayout(loadSessionResultButton, loadDefaultCustomCarsButton, reverseGridButton, sortingModeSelect, sortdirectionSelect);
         entrylistHeaderLayout.setWidthFull();
         entrylistHeaderLayout.setAlignItems(Alignment.END);
         entrylistHeaderLayout.setFlexWrap(FlexLayout.FlexWrap.WRAP);
@@ -471,18 +584,18 @@ public class EntrylistEditorView extends BaseView {
         notificationService.showSuccessNotification("Grid positions reversed successfully");
     }
 
-    private void updateEntrylistFromResults(AccSession accSession, int initialGridPosition) {
+    private void updateEntrylistFromSession(AccSession accSession, int initialGridPosition) {
         if (entrylist == null || entrylist.getEntries() == null) {
-            notificationService.showErrorNotification("Results import failed - Entrylist is missing");
+            notificationService.showErrorNotification("Session import failed - Entrylist is missing");
             return;
         }
 
         if (accSession == null || accSession.getSessionResult() == null || accSession.getSessionResult().getLeaderboardLines() == null) {
-            notificationService.showErrorNotification("Results import failed - No results found");
+            notificationService.showErrorNotification("Session import failed - No results found");
             return;
         }
 
-        entrylistService.updateFromResults(entrylist, accSession, initialGridPosition);
+        entrylistService.updateFromSession(entrylist, accSession, initialGridPosition);
         refreshEntrylistEditor();
 
         notificationService.showSuccessNotification("Entrylist updated successfully");
@@ -1001,15 +1114,18 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private Dialog createResultsUploadDialog() {
-        AtomicReference<AccSession> uploadedSession = new AtomicReference<>();
+    private Dialog createSessionUploadDialog() {
+        AtomicReference<AccSession> session = new AtomicReference<>();
+
+        Dialog dialog = new Dialog("Upload session result");
+        dialog.setMinWidth(50, Unit.VW);
+
+        Upload sessionResultUpload = new Upload();
+
         HorizontalLayout sessionInformationLayout = new HorizontalLayout();
         sessionInformationLayout.setWidthFull();
         sessionInformationLayout.setJustifyContentMode(JustifyContentMode.BETWEEN);
         sessionInformationLayout.setAlignItems(Alignment.CENTER);
-
-        Dialog dialog = new Dialog("Upload results");
-        Upload resultsUpload = new Upload();
 
         IntegerField initialGridPositionField = new IntegerField("Grid start position");
         initialGridPositionField.setWidthFull();
@@ -1023,76 +1139,74 @@ public class EntrylistEditorView extends BaseView {
         updateButton.setEnabled(false);
         updateButton.addClickListener(event -> {
             int initialGridPosition = Optional.ofNullable(initialGridPositionField.getValue()).orElse(1);
-            updateEntrylistFromResults(uploadedSession.get(), initialGridPosition);
+            updateEntrylistFromSession(session.get(), initialGridPosition);
             dialog.close();
         });
 
-        Button removeSessionButton = buttonComponentFactory.createCancelIconButton();
-        removeSessionButton.setTooltipText("Unselect session");
-        removeSessionButton.addClickListener(event -> {
-            uploadedSession.set(null);
-            resultsUpload.clearFileList();
+        Button unselectSessionResultButton = buttonComponentFactory.createCancelIconButton();
+        unselectSessionResultButton.setTooltipText("Unselect session result");
+        unselectSessionResultButton.addClickListener(event -> {
+            session.set(null);
+            updateButton.setEnabled(false);
+            sessionResultUpload.clearFileList();
             sessionInformationLayout.removeAll();
         });
 
-        FlexLayout resultsUploadLayout = new FlexLayout();
-        resultsUploadLayout.setWidthFull();
-        resultsUploadLayout.getStyle()
+        FlexLayout sessionResultUploadLayout = new FlexLayout();
+        sessionResultUploadLayout.setWidthFull();
+        sessionResultUploadLayout.getStyle()
                 .setAlignItems(Style.AlignItems.CENTER)
                 .set("gap", "var(--lumo-space-m)");
 
-        resultsUpload.setDropAllowed(true);
-        resultsUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
-        resultsUpload.setMaxFileSize((int) FileUtils.ONE_MB * 10);
-        resultsUpload.setI18n(configureUploadI18N("results.json"));
-        resultsUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+        sessionResultUpload.setDropAllowed(true);
+        sessionResultUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        sessionResultUpload.setMaxFiles(1);
+        sessionResultUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
+        sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
+        sessionResultUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccSession session = JsonClient.fromJson(new String(data), AccSession.class);
+                AccSession accSession = JsonClient.fromJson(new String(data), AccSession.class);
+                validationService.validate(accSession);
 
-                // Validate results file against syntax and semantic rules
-                validationService.validate(session);
-
-                uploadedSession.set(session);
+                session.set(accSession);
                 updateButton.setEnabled(true);
                 sessionInformationLayout.removeAll();
-                sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session), removeSessionButton);
+                sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(accSession), unselectSessionResultButton);
             } catch (Exception e) {
                 notificationService.showErrorNotification(Duration.ZERO, e.getLocalizedMessage());
             }
         }));
-        resultsUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
-        resultsUpload.addFileRemovedListener(event -> {
-            uploadedSession.set(null);
+        sessionResultUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(Duration.ZERO, event.getErrorMessage()));
+        sessionResultUpload.addFileRemovedListener(event -> {
+            session.set(null);
             updateButton.setEnabled(false);
             sessionInformationLayout.removeAll();
         });
-        resultsUpload.getStyle()
+        sessionResultUpload.getStyle()
                 .setFlexGrow("1");
-        resultsUploadLayout.add(resultsUpload);
+        sessionResultUploadLayout.add(sessionResultUpload);
 
-        if (securityService.hasAnyAuthority(ADVANCED_PERMISSION_ROLES) && sessionService.isPresent()) {
-            List<Session> sessions = sessionService.get().getAllBySessionTimeRange(TimeRange.LAST_MONTH);
-
-            Button existingResultsButton = new Button("Select existing results");
-            existingResultsButton.addClassNames("break-word");
-            existingResultsButton.setWidth("25%");
-            existingResultsButton.setHeightFull();
-            existingResultsButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            existingResultsButton.getStyle()
+        if (sessionService.isPresent()) {
+            Button selectSessionResultButton = new Button("Select session result");
+            selectSessionResultButton.addClassNames("break-word");
+            selectSessionResultButton.setWidth("25%");
+            selectSessionResultButton.setHeightFull();
+            selectSessionResultButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            selectSessionResultButton.getStyle()
                     .setMargin("0");
-            existingResultsButton.addClickListener(event -> {
-                Dialog sessionGridDialog = new Dialog("Select existing results");
+            selectSessionResultButton.addClickListener(event -> {
+                Dialog sessionGridDialog = new Dialog("Select session result");
                 sessionGridDialog.setSizeFull();
 
-                Grid<Session> sessionGrid = createSessionGrid(sessions);
+                Grid<Session> sessionGrid = createSessionGrid();
                 sessionGrid.asSingleSelect().addValueChangeListener(singeValueChangeEvent -> {
                     Session selectedSession = singeValueChangeEvent.getValue();
 
                     if (selectedSession != null) {
-                        uploadedSession.set(JsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
+                        session.set(JsonClient.fromJson(selectedSession.getFileContent(), AccSession.class));
                         updateButton.setEnabled(true);
                         sessionInformationLayout.removeAll();
-                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(uploadedSession.get()), removeSessionButton);
+                        sessionInformationLayout.add(sessionComponentFactory.createSessionInformation(session.get()), unselectSessionResultButton);
                     }
 
                     sessionGridDialog.close();
@@ -1111,7 +1225,7 @@ public class EntrylistEditorView extends BaseView {
                 sessionGridDialog.open();
             });
 
-            resultsUploadLayout.add(existingResultsButton);
+            sessionResultUploadLayout.add(selectSessionResultButton);
         }
 
         Paragraph importantNote = new Paragraph("IMPORTANT: The car number (raceNumber) will be used to match the results with the entrylist entries. Make sure that the car numbers are matching.");
@@ -1123,7 +1237,7 @@ public class EntrylistEditorView extends BaseView {
         UnorderedList updatedAttributesList = new UnorderedList();
         updatedAttributesList.add(new ListItem("Default grid position"));
 
-        VerticalLayout layout = new VerticalLayout(sessionInformationLayout, resultsUploadLayout, initialGridPositionField, importantNote, updateAttributesText, updatedAttributesList);
+        VerticalLayout layout = new VerticalLayout(sessionInformationLayout, sessionResultUploadLayout, initialGridPositionField, importantNote, updateAttributesText, updatedAttributesList);
         layout.setSizeFull();
         layout.setSpacing(false);
         layout.setPadding(false);
@@ -1134,9 +1248,13 @@ public class EntrylistEditorView extends BaseView {
         return dialog;
     }
 
-    private Grid<Session> createSessionGrid(List<Session> sessions) {
+    private Grid<Session> createSessionGrid() {
+        List<Session> sessions = sessionService
+                .map(service -> service.getAllBySessionTimeRange(TimeRange.LAST_MONTH))
+                .orElse(Collections.emptyList());
+
         Grid<Session> grid = new Grid<>(Session.class, false);
-        Grid.Column<Session> weatherColumn = grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
+        grid.addComponentColumn(sessionComponentFactory::getWeatherIcon)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setTextAlign(ColumnTextAlign.CENTER);
@@ -1154,7 +1272,7 @@ public class EntrylistEditorView extends BaseView {
                 .setHeader("Server Name")
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> sessionDatetimeColumn = grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
+        grid.addColumn(session -> FormatUtils.formatDatetime(session.getSessionDatetime()))
                 .setHeader("Session Time")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -1180,6 +1298,7 @@ public class EntrylistEditorView extends BaseView {
         AtomicReference<CustomCar[]> uploadedCustomCars = new AtomicReference<>();
 
         Dialog dialog = new Dialog("Upload default custom cars");
+        dialog.setMinWidth(50, Unit.VW);
 
         Button validateButton = new Button("Update");
         validateButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY, ButtonVariant.LUMO_SUCCESS);
@@ -1192,13 +1311,12 @@ public class EntrylistEditorView extends BaseView {
         Upload defaultCustomCarUpload = new Upload();
         defaultCustomCarUpload.setDropAllowed(true);
         defaultCustomCarUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
-        defaultCustomCarUpload.setMaxFileSize((int) FileUtils.ONE_MB);
+        defaultCustomCarUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
         defaultCustomCarUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
                 CustomCar[] customCars = JsonClient.fromJson(new String(data), CustomCar[].class);
 
-                // Validate results file against syntax and semantic rules
                 for (CustomCar customCar : customCars) {
                     validationService.validate(customCar);
                 }
@@ -1289,24 +1407,23 @@ public class EntrylistEditorView extends BaseView {
         }
     }
 
-    private void createNewEntrylist(AccEntrylist entrylist, EntrylistMetadata entrylistMetadata) {
+    private UploadI18N configureUploadI18N(String fileName) {
+        UploadI18NDefaults i18n = new UploadI18NDefaults();
+        i18n.getAddFiles().setOne(String.format("Upload %s...", fileName));
+        i18n.getDropFiles().setOne(String.format("Drop %s here", fileName));
+        i18n.getError().setIncorrectFileType("The provided file does not have the correct format (.json)");
+        i18n.getError().setFileIsTooBig("The provided file is too big. Maximum file size is 10 MB");
+        return i18n;
+    }
+
+    private void loadNewEntrylist(AccEntrylist entrylist, EntrylistMetadata entrylistMetadata) {
         resetEntities();
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
         this.downloadAnchor.setHref(getEntrylistDownloadHandler());
+        entrylistUpload.clearFileList();
         refreshEntrylistEditor();
         refreshEntrylistPreview();
-    }
-
-    private ConfirmDialog createNewEntrylistConfirmDialog() {
-        ConfirmDialog confirmDialog = new ConfirmDialog();
-        confirmDialog.setHeader("Create new entrylist");
-        confirmDialog.setText("Your current entrylist will be discarded. Do you want to proceed?");
-        confirmDialog.setConfirmText("Continue");
-        confirmDialog.setCancelable(true);
-        confirmDialog.setCancelButtonTheme("tertiary error");
-        confirmDialog.setConfirmButtonTheme("primary error");
-        return confirmDialog;
     }
 
     private ConfirmDialog createResetDialog() {

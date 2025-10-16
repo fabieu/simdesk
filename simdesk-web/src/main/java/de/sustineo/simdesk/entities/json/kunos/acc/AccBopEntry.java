@@ -10,7 +10,7 @@ import lombok.Data;
 
 @Data
 @Builder
-public class AccBopEntry {
+public final class AccBopEntry {
     @NotEmpty
     @JsonProperty("track")
     private String trackId;
