@@ -22,7 +22,11 @@ import java.util.stream.Collectors;
 @Log
 @Service
 public class EntrylistService {
-    public void updateFromResults(AccEntrylist entrylist, AccSession accSession, int initialGridPosition) {
+    public AccEntrylist createFromSession(AccSession accSession) {
+        return AccEntrylist.create();
+    }
+
+    public void updateFromSession(AccEntrylist entrylist, AccSession accSession, int initialGridPosition) {
         Map<Integer, AccEntrylistEntry> raceNumberToEntryMap = entrylist.getEntries().stream()
                 .filter(entry -> entry.getRaceNumber() != null)
                 .collect(Collectors.toMap(AccEntrylistEntry::getRaceNumber, Function.identity()));
