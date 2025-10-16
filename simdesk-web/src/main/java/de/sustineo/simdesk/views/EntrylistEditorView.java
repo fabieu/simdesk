@@ -190,10 +190,10 @@ public class EntrylistEditorView extends BaseView {
         entrylist = null;
         entrylistMetadata = null;
         entrylistEntriesMap.clear();
-        entrylistUpload.clearFileList();
     }
 
     private void reset() {
+        entrylistUpload.clearFileList();
         resetEntities();
         refreshEntrylistEditor();
         refreshEntrylistPreview();
@@ -1421,6 +1421,7 @@ public class EntrylistEditorView extends BaseView {
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
         this.downloadAnchor.setHref(getEntrylistDownloadHandler());
+        entrylistUpload.clearFileList();
         refreshEntrylistEditor();
         refreshEntrylistPreview();
     }

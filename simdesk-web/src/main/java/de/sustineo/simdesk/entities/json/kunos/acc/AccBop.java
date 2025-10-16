@@ -14,7 +14,7 @@ import java.util.stream.Collectors;
 
 @Data
 @NoArgsConstructor
-public class AccBop {
+public final class AccBop {
     @NotNull
     private int configVersion = 0;
     @NotNull

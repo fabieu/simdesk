@@ -7,7 +7,7 @@ import lombok.Setter;
 @Getter
 @Setter
 @Builder
-public class AccWeatherSettings {
+public final class AccWeatherSettings {
     public static final int MIN_TEMPERATURE = 10;
     public static final int MAX_TEMPERATURE = 35;
     public static final int MIN_CLOUD_LEVEL = 0;

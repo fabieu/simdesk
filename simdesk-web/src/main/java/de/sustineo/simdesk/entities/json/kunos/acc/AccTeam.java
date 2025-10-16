@@ -8,7 +8,7 @@ import java.util.List;
 import java.util.Optional;
 
 @Data
-public class AccTeam {
+public final class AccTeam {
     @JsonProperty("carId")
     private Integer teamId;
     private Integer raceNumber;

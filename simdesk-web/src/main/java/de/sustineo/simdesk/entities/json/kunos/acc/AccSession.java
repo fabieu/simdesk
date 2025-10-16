@@ -10,7 +10,7 @@ import java.util.Optional;
 
 @Data
 @ToString
-public class AccSession {
+public final class AccSession {
     private String sessionType;
     private String trackName;
     private Integer sessionIndex;

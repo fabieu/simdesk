@@ -13,7 +13,7 @@ import java.util.UUID;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccEntrylistEntry {
+public final class AccEntrylistEntry {
     public static final int DEFAULT_RACE_NUMBER = -1;
     public static final int DEFAULT_FORCED_CAR_MODEL = -1;
     public static final int DEFAULT_OVERRIDE_DRIVER_INFO = 0;

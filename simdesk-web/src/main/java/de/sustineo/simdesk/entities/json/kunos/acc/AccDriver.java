@@ -15,7 +15,7 @@ import java.util.Objects;
 
 @Data
 @NoArgsConstructor(access = AccessLevel.PRIVATE)
-public class AccDriver {
+public final class AccDriver {
     private String firstName;
     private String lastName;
     private String shortName;

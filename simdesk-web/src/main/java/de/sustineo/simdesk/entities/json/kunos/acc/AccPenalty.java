@@ -3,7 +3,7 @@ package de.sustineo.simdesk.entities.json.kunos.acc;
 import lombok.Data;
 
 @Data
-public class AccPenalty {
+public final class AccPenalty {
     private Integer carId;
     private Integer driverIndex;
     private String reason;

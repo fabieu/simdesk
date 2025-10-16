@@ -39,15 +39,16 @@ public class EntrylistService {
 
         Map<AccDriver, AccLap> lastLapByDriver = new HashMap<>();
         for (AccLap lap : accSession.getLaps()) {
-            teamById.get(lap.getTeamId())
-                    .getDriverByIndex(lap.getDriverIndex())
-                    .ifPresent(accDriver -> lastLapByDriver.put(accDriver, lap));
+            AccTeam team = teamById.get(lap.getTeamId());
+            if (team != null) {
+                team.getDriverByIndex(lap.getDriverIndex()).ifPresent(accDriver -> lastLapByDriver.put(accDriver, lap));
+            }
         }
 
         for (AccLeaderboardLine leaderboardLine : leaderboardLines) {
             AccTeam team = leaderboardLine.getTeam();
 
-            // Skip entries where the drivers last lap is not from this team
+            // Only include drivers whose last lap was with this team
             List<AccDriver> drivers = team.getDrivers().stream()
                     .filter(driver -> {
                         AccLap lastLap = lastLapByDriver.get(driver);
@@ -59,7 +60,7 @@ public class EntrylistService {
                     })
                     .toList();
 
-            // Skip entries that would end up empty
+            // Skip entries that would end up without any drivers
             if (drivers.isEmpty()) {
                 continue;
             }

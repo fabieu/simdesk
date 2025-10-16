@@ -6,7 +6,7 @@ import lombok.Data;
 import java.util.List;
 
 @Data
-public class AccSessionResult {
+public final class AccSessionResult {
     @JsonProperty("bestlap")
     private Long bestLap;
     private List<Long> bestSplits;
