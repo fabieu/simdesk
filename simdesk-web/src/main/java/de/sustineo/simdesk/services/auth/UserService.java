@@ -62,9 +62,9 @@ public class UserService {
             userPermissionMapper.insert(userPermission);
         }
 
-        // Delete existing API keys of the user
+        // Refresh API keys of the user
         List<ApiKey> apiKeys = apiKeyService.getByUserId(user.getId());
-        apiKeys.forEach(apiKeyService::deleteApiKey);
+        apiKeys.forEach(apiKeyService::removeApiKeyFromCache);
     }
 
     public Set<? extends GrantedAuthority> getAuthoritiesByUserId(Integer userId) {

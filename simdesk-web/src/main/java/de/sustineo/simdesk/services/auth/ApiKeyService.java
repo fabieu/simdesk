@@ -50,4 +50,8 @@ public class ApiKeyService {
     public void deleteApiKey(ApiKey fullApiKey) {
         apiKeyMapper.deleteById(fullApiKey);
     }
+
+    @CacheEvict(cacheNames = CacheNames.API_KEY, key = "#fullApiKey.apiKey")
+    public void removeApiKeyFromCache(ApiKey fullApiKey) {
+    }
 }
