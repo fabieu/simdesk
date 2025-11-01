@@ -1,9 +1,9 @@
 plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
-    id "org.springframework.boot" version "3.5.6"
-    id 'com.vaadin' version "24.9.1"
-    id "org.flywaydb.flyway" version "11.13.2"
+    id "org.springframework.boot" version "3.5.7"
+    id 'com.vaadin' version "24.9.4"
+    id "org.flywaydb.flyway" version "11.15.0"
 }
 
 group = "de.sustineo.simdesk"
@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:24.9.1"
+        mavenBom "com.vaadin:vaadin-bom:24.9.4"
     }
 }
 
@@ -42,7 +42,7 @@ dependencies {
 
     // Vaadin
     implementation "com.vaadin:vaadin-spring-boot-starter"
-    implementation "software.xdev.vaadin.maps-leaflet:flow:5.0.0"
+    implementation "software.xdev.vaadin.maps-leaflet:flow:5.0.1"
 
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
@@ -65,12 +65,12 @@ dependencies {
     implementation "commons-io:commons-io:2.20.0"
 
     // Misc
-    implementation "com.discord4j:discord4j-core:3.2.9"
+    implementation "com.discord4j:discord4j-core:3.3.0"
     implementation "com.opencsv:opencsv:5.12.0"
 
     // OpenAPI documentation
     implementation "org.springdoc:springdoc-openapi-starter-webmvc-ui:2.8.13"
-    implementation "org.webjars:webjars-locator-lite:1.1.0"
+    implementation "org.webjars:webjars-locator-lite:1.1.2"
 
     // Development
     runtimeOnly "org.springframework.boot:spring-boot-devtools"
