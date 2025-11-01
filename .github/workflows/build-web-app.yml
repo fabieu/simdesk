@@ -51,7 +51,7 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Run tests
         run: chmod +x gradlew && sh gradlew :simdesk-web:test
 
@@ -70,11 +70,11 @@ jobs:
           java-version: '21'
           distribution: 'temurin'
       - name: Setup Gradle
-        uses: gradle/actions/setup-gradle@v4
+        uses: gradle/actions/setup-gradle@v5
       - name: Build jar
         run: chmod +x gradlew && sh gradlew :simdesk-web:vaadinBuildFrontend :simdesk-web:bootJar
       - name: Upload artifacts
-        uses: actions/upload-artifact@v4
+        uses: actions/upload-artifact@v5
         with:
           name: simdesk-web-jar
           path: simdesk-web/build/libs/*.jar
@@ -101,7 +101,7 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
       - name: Download artifacts
-        uses: actions/download-artifact@v5
+        uses: actions/download-artifact@v6
         with:
           name: simdesk-web-jar
           path: simdesk-web/build/libs
