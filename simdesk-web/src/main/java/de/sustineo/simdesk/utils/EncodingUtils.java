@@ -25,7 +25,7 @@ public class EncodingUtils {
      *
      * @param data the byte array to convert
      * @return the string representation of the data
-     * @throws IOException if the data cannot be decoded with any supported charset
+     * @throws IOException if the data cannot be decoded (e.g., malformed input for detected charset)
      */
     public static String bytesToString(byte[] data) throws IOException {
         if (data == null || data.length == 0) {
@@ -35,12 +35,17 @@ public class EncodingUtils {
         // Detect BOM and choose appropriate charset
         Charset charset = detectCharset(data);
         
-        String content = new String(data, charset);
-        content = removeBOM(content);
-        content = removeControlCharacters(content);
-        
-        log.fine(String.format("Successfully parsed data with charset %s", charset));
-        return content;
+        try {
+            String content = new String(data, charset);
+            content = removeBOM(content);
+            content = removeControlCharacters(content);
+            
+            log.fine(String.format("Successfully parsed data with charset %s", charset));
+            return content;
+        } catch (Exception e) {
+            // Handle malformed input or other decoding errors
+            throw new IOException(String.format("Failed to decode data with charset %s: %s", charset, e.getMessage()), e);
+        }
     }
 
     /**
@@ -87,6 +92,9 @@ public class EncodingUtils {
     /**
      * Heuristic to detect if data looks like UTF-16LE encoded text.
      * UTF-16LE has null bytes in odd positions for ASCII characters.
+     * 
+     * Note: This heuristic may produce false positives for binary data with regular null byte patterns.
+     * It is only used as a fallback when no BOM is present. The caller should validate the decoded result.
      */
     private static boolean looksLikeUTF16LE(byte[] data) {
         int nullInOddPositions = 0;
@@ -107,6 +115,9 @@ public class EncodingUtils {
     /**
      * Heuristic to detect if data looks like UTF-16BE encoded text.
      * UTF-16BE has null bytes in even positions for ASCII characters.
+     * 
+     * Note: This heuristic may produce false positives for binary data with regular null byte patterns.
+     * It is only used as a fallback when no BOM is present. The caller should validate the decoded result.
      */
     private static boolean looksLikeUTF16BE(byte[] data) {
         int nullInEvenPositions = 0;
