@@ -5,7 +5,7 @@ import lombok.extern.java.Log;
 import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
-import java.util.List;
+import java.util.regex.Pattern;
 
 /**
  * Utility class for handling different character encodings when reading file data.
@@ -13,6 +13,8 @@ import java.util.List;
  */
 @Log
 public class EncodingUtils {
+    private static final Pattern CONTROL_CHARS_PATTERN = Pattern.compile("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]");
+    
     private EncodingUtils() {
         // Utility class, prevent instantiation
     }
@@ -158,6 +160,6 @@ public class EncodingUtils {
         if (content == null) {
             return null;
         }
-        return content.replaceAll("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]", "");
+        return CONTROL_CHARS_PATTERN.matcher(content).replaceAll("");
     }
 }
