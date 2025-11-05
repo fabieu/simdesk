@@ -41,6 +41,7 @@ import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.bop.BopService;
+import de.sustineo.simdesk.utils.EncodingUtils;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
@@ -522,7 +523,8 @@ public class BopManagementView extends BaseView {
 
         fileUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccBop accBop = JsonClient.fromJson(new String(data), AccBop.class);
+                String content = EncodingUtils.bytesToString(data);
+                AccBop accBop = JsonClient.fromJson(content, AccBop.class);
                 validationService.validate(accBop);
                 uploadedAccBop.set(accBop);
 

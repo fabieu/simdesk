@@ -67,6 +67,7 @@ import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.entrylist.EntrylistService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
+import de.sustineo.simdesk.utils.EncodingUtils;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
@@ -256,7 +257,8 @@ public class EntrylistEditorView extends BaseView {
 
     private void handleEntrylistUpload(UploadMetadata metadata, byte[] data) {
         try {
-            AccEntrylist entrylist = JsonClient.fromJson(new String(data), AccEntrylist.class);
+            String content = EncodingUtils.bytesToString(data);
+            AccEntrylist entrylist = JsonClient.fromJson(content, AccEntrylist.class);
             EntrylistMetadata entrylistMetadata = EntrylistMetadata.builder()
                     .fileName(metadata.fileName())
                     .type(metadata.contentType())
@@ -348,7 +350,8 @@ public class EntrylistEditorView extends BaseView {
         sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
         sessionResultUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccSession accSession = JsonClient.fromJson(new String(data), AccSession.class);
+                String content = EncodingUtils.bytesToString(data);
+                AccSession accSession = JsonClient.fromJson(content, AccSession.class);
                 validationService.validate(accSession);
 
                 session.set(accSession);
@@ -1165,7 +1168,8 @@ public class EntrylistEditorView extends BaseView {
         sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
         sessionResultUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                AccSession accSession = JsonClient.fromJson(new String(data), AccSession.class);
+                String content = EncodingUtils.bytesToString(data);
+                AccSession accSession = JsonClient.fromJson(content, AccSession.class);
                 validationService.validate(accSession);
 
                 session.set(accSession);
@@ -1315,7 +1319,8 @@ public class EntrylistEditorView extends BaseView {
         defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
         defaultCustomCarUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
             try {
-                CustomCar[] customCars = JsonClient.fromJson(new String(data), CustomCar[].class);
+                String content = EncodingUtils.bytesToString(data);
+                CustomCar[] customCars = JsonClient.fromJson(content, CustomCar[].class);
 
                 for (CustomCar customCar : customCars) {
                     validationService.validate(customCar);
