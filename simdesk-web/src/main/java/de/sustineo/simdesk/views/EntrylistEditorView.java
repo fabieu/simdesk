@@ -707,7 +707,7 @@ public class EntrylistEditorView extends BaseView {
         forcedCarModelComboBox.setItems(CarFilter.getInstance(), AccCar.getAll());
         forcedCarModelComboBox.setItemLabelGenerator(AccCar::getModel);
         forcedCarModelComboBox.setClassNameGenerator(car -> car.getGroup().name());
-        forcedCarModelComboBox.setValue(AccCar.getCarById(entry.getForcedCarModel()));
+        forcedCarModelComboBox.setValue(entry.getForcedCarModel() == null ? null : AccCar.getCarById(entry.getForcedCarModel()));
         forcedCarModelComboBox.addValueChangeListener(event -> {
             Integer carId = Optional.of(event)
                     .map(ComboBox.ValueChangeEvent::getValue)
