@@ -27,7 +27,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
-import de.sustineo.simdesk.utils.EncodingUtils;
+import de.sustineo.simdesk.utils.encoding.EncodingUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.fields.BopEditField;

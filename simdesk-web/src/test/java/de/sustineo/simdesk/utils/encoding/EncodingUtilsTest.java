@@ -1,4 +1,4 @@
-package de.sustineo.simdesk.utils;
+package de.sustineo.simdesk.utils.encoding;
 
 import org.junit.jupiter.api.Test;
 
