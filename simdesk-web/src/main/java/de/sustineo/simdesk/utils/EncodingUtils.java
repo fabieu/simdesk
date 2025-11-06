@@ -1,5 +1,7 @@
 package de.sustineo.simdesk.utils;
 
+import lombok.AccessLevel;
+import lombok.NoArgsConstructor;
 import lombok.extern.java.Log;
 
 import java.io.IOException;
@@ -12,12 +14,9 @@ import java.util.regex.Pattern;
  * Supports UTF-8 and UTF-16 (with BOM detection).
  */
 @Log
+@NoArgsConstructor(access = AccessLevel.PRIVATE)
 public class EncodingUtils {
-    private static final Pattern CONTROL_CHARS_PATTERN = Pattern.compile("[\\x00-\\x08\\x0B\\x0C\\x0E-\\x1F\\x7F]");
-    
-    private EncodingUtils() {
-        // Utility class, prevent instantiation
-    }
+    private static final Pattern CONTROL_CHARS_PATTERN = Pattern.compile("[\\p{Cc}&&[^\\r\\n\\t]]");
 
     /**
      * Converts a byte array to a string by trying multiple character encodings.
@@ -34,12 +33,12 @@ public class EncodingUtils {
 
         // Detect BOM and choose appropriate charset
         Charset charset = detectCharset(data);
-        
+
         try {
             String content = new String(data, charset);
             content = removeBOM(content);
             content = removeControlCharacters(content);
-            
+
             log.fine(String.format("Successfully parsed data with charset %s", charset));
             return content;
         } catch (Exception e) {
@@ -50,7 +49,7 @@ public class EncodingUtils {
 
     /**
      * Detects the character encoding of the data by checking for BOM markers.
-     * 
+     *
      * @param data the byte array to analyze
      * @return the detected charset, defaults to UTF-8 if no BOM is found
      */
@@ -64,27 +63,27 @@ public class EncodingUtils {
         if (data[0] == (byte) 0xFF && data[1] == (byte) 0xFE) {
             return StandardCharsets.UTF_16LE;
         }
-        
+
         // UTF-16BE BOM: FE FF
         if (data[0] == (byte) 0xFE && data[1] == (byte) 0xFF) {
             return StandardCharsets.UTF_16BE;
         }
-        
+
         // Check for UTF-8 BOM: EF BB BF
         if (data.length >= 3 && data[0] == (byte) 0xEF && data[1] == (byte) 0xBB && data[2] == (byte) 0xBF) {
             return StandardCharsets.UTF_8;
         }
-        
+
         // No BOM detected, try to infer from content
         // Check if data looks like UTF-16 (many null bytes in even positions for ASCII-like text)
         if (data.length >= 4 && looksLikeUTF16LE(data)) {
             return StandardCharsets.UTF_16LE;
         }
-        
+
         if (data.length >= 4 && looksLikeUTF16BE(data)) {
             return StandardCharsets.UTF_16BE;
         }
-        
+
         // Default to UTF-8
         return StandardCharsets.UTF_8;
     }
@@ -92,14 +91,14 @@ public class EncodingUtils {
     /**
      * Heuristic to detect if data looks like UTF-16LE encoded text.
      * UTF-16LE has null bytes in odd positions for ASCII characters.
-     * 
+     * <p>
      * Note: This heuristic may produce false positives for binary data with regular null byte patterns.
      * It is only used as a fallback when no BOM is present. The caller should validate the decoded result.
      */
     private static boolean looksLikeUTF16LE(byte[] data) {
         int nullInOddPositions = 0;
         int samplesChecked = 0;
-        
+
         // Check first 100 bytes or less
         for (int i = 1; i < Math.min(100, data.length); i += 2) {
             if (data[i] == 0) {
@@ -107,7 +106,7 @@ public class EncodingUtils {
             }
             samplesChecked++;
         }
-        
+
         // If more than 70% of odd positions are null, likely UTF-16LE
         return samplesChecked > 0 && ((double) nullInOddPositions / samplesChecked) > 0.7;
     }
@@ -115,14 +114,14 @@ public class EncodingUtils {
     /**
      * Heuristic to detect if data looks like UTF-16BE encoded text.
      * UTF-16BE has null bytes in even positions for ASCII characters.
-     * 
+     * <p>
      * Note: This heuristic may produce false positives for binary data with regular null byte patterns.
      * It is only used as a fallback when no BOM is present. The caller should validate the decoded result.
      */
     private static boolean looksLikeUTF16BE(byte[] data) {
         int nullInEvenPositions = 0;
         int samplesChecked = 0;
-        
+
         // Check first 100 bytes or less
         for (int i = 0; i < Math.min(100, data.length); i += 2) {
             if (data[i] == 0) {
@@ -130,7 +129,7 @@ public class EncodingUtils {
             }
             samplesChecked++;
         }
-        
+
         // If more than 70% of even positions are null, likely UTF-16BE
         return samplesChecked > 0 && ((double) nullInEvenPositions / samplesChecked) > 0.7;
     }
@@ -162,7 +161,7 @@ public class EncodingUtils {
     /**
      * Removes control characters from a string, except for common whitespace characters.
      * Keeps: \n (0x0A), \r (0x0D), \t (0x09)
-     * Removes: 0x00-0x08, 0x0B, 0x0C, 0x0E-0x1F, 0x7F
+     * Removes: everything in Unicode category Cc (includes ASCII control range and U+0080–U+009F, plus DEL)
      *
      * @param content the string to process
      * @return the string without control characters
