@@ -27,6 +27,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.ValidationService;
+import de.sustineo.simdesk.utils.encoding.EncodingUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import de.sustineo.simdesk.views.fields.BopEditField;
@@ -128,7 +129,8 @@ public class BopEditorView extends BaseView {
 
     private void handleBopFileUpload(UploadMetadata metadata, byte[] data) {
         try {
-            currentBop = JsonClient.fromJson(new String(data), AccBop.class);
+            String content = EncodingUtils.bytesToString(data);
+            currentBop = JsonClient.fromJson(content, AccBop.class);
             validationService.validate(currentBop);
 
             if (currentBop.isMultiTrack()) {
