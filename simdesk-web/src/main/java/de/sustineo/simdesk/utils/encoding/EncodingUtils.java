@@ -137,11 +137,11 @@ public class EncodingUtils {
             return UTF16Guess.NONE;
         }
 
-        if (zerosEven >= ZERO_EVEN_ODD_RATIO * Math.max(1, zerosOdd)) {
+        if (zerosOdd >= ZERO_EVEN_ODD_RATIO * Math.max(1, zerosEven)) {
             return UTF16Guess.LE;
         }
 
-        if (zerosOdd >= ZERO_EVEN_ODD_RATIO * Math.max(1, zerosEven)) {
+        if (zerosEven >= ZERO_EVEN_ODD_RATIO * Math.max(1, zerosOdd)) {
             return UTF16Guess.BE;
         }
 
@@ -248,4 +248,6 @@ public class EncodingUtils {
         }
         return CONTROL_CHARS_PATTERN.matcher(content).replaceAll("");
     }
+
+    private enum UTF16Guess {NONE, LE, BE}
 }
