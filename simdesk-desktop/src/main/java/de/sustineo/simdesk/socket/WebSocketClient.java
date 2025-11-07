@@ -97,8 +97,6 @@ public class WebSocketClient implements EventListener {
         this.dashboardId = dashboardId;
 
         doConnect();
-
-        log.info(String.format("Connecting to WebSocket [%s] with dashboardId [%s]", websocketUrl, dashboardId));
     }
 
 
@@ -118,10 +116,16 @@ public class WebSocketClient implements EventListener {
 
         synchronized (sessionLock) {
             if (stompSession != null) {
-                stompSession.disconnect();
-                stompSession = null;
+                try {
+                    if (stompSession.isConnected()) {
+                        stompSession.disconnect(); // sends DISCONNECT if still open
+                    }
+                    stompSession = null;
 
-                log.info(String.format("Closed WebSocket to [%s] due to user request", websocketUrl));
+                    log.info(String.format("Closed WebSocket to [%s] due to user request", websocketUrl));
+                } catch (IllegalStateException ignore) {
+                    // "Connection closed" – race between isConnected() and disconnect()
+                }
             }
         }
 
@@ -149,7 +153,11 @@ public class WebSocketClient implements EventListener {
 
                 reconnecting.set(false);
 
+                log.info(String.format("Connected to WebSocket [%s] with dashboardId [%s]", websocketUrl, dashboardId));
+
+                accSocketClient.sendRegisterRequest();
                 subscribeToSocketRequestCallback(session);
+
                 EventBus.register(WebSocketClient.this);
             }
 

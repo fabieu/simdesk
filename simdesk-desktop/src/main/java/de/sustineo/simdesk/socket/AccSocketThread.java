@@ -7,6 +7,7 @@ import lombok.extern.java.Log;
 import java.io.IOException;
 import java.net.*;
 import java.time.Duration;
+import java.util.Arrays;
 import java.util.logging.Level;
 
 @Log
@@ -40,8 +41,6 @@ public class AccSocketThread extends Thread {
 
     @Override
     public void run() {
-        sendRegisterRequest();
-
         while (running) {
             try {
                 DatagramPacket response = new DatagramPacket(new byte[BUFFER_SIZE], BUFFER_SIZE);
@@ -69,23 +68,34 @@ public class AccSocketThread extends Thread {
     }
 
     public void close() {
+        sendUnregisterRequest();
+
         super.interrupt();
         forceExit = true;
+
         socket.close();
     }
 
-    public boolean isConnected() {
+    private boolean isConnected() {
         return socket != null && socket.isConnected() && super.isAlive() && running;
+    }
+
+    public void sendRequest(byte[] requestBytes) {
+        if (isConnected()) {
+            log.info(String.format("Sending message to AccSocket: %s", Arrays.toString(requestBytes)));
+
+            try {
+                socket.send(new DatagramPacket(requestBytes, requestBytes.length));
+            } catch (IOException e) {
+                log.log(Level.SEVERE, String.format("Could not send message to AccSocket: %s", Arrays.toString(requestBytes)), e);
+            }
+        }
     }
 
     /**
      * Send register request.
      */
     public void sendRegisterRequest() {
-        if (!isConnected()) {
-            return;
-        }
-
         sendRequest(AccSocketProtocol.buildRegisterRequest(
                 accSocketState.getDisplayName(),
                 accSocketState.getConnectionPassword(),
@@ -98,20 +108,8 @@ public class AccSocketThread extends Thread {
      * Send unregister request.
      */
     public void sendUnregisterRequest() {
-        if (!isConnected()) {
-            return;
-        }
-
-        sendRequest(AccSocketProtocol.buildUnregisterRequest(accSocketState.getConnectionId()));
-    }
-
-    public void sendRequest(byte[] requestBytes) {
-        if (socket.isConnected()) {
-            try {
-                socket.send(new DatagramPacket(requestBytes, requestBytes.length));
-            } catch (IOException e) {
-                log.log(Level.SEVERE, "Error sending request.", e);
-            }
-        }
+        sendRequest(AccSocketProtocol.buildUnregisterRequest(
+                accSocketState.getConnectionId())
+        );
     }
 }
