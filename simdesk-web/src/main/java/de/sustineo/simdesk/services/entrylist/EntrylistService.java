@@ -108,10 +108,6 @@ public class EntrylistService {
                 .collect(Collectors.toMap(CustomCar::getCarNumber, Function.identity(), (customCar1, customCar2) -> customCar1));
 
         for (AccEntrylistEntry entrylistEntry : entrylist.getEntries()) {
-            if (StringUtils.isNotBlank(entrylistEntry.getCustomCar())) {
-                continue;
-            }
-
             CustomCar customCar = customCarByCarNumberMap.get(entrylistEntry.getRaceNumber());
             if (customCar == null) {
                 continue;
