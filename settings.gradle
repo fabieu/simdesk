@@ -1,4 +1,3 @@
 rootProject.name = 'simdesk'
 
 include 'simdesk-web'
-include 'simdesk-desktop'
