@@ -71,7 +71,6 @@ public class LeaderboardDriverDetailView extends BaseView {
 
         add(createViewHeader(driver.getFullName()));
         addAndExpand(createDriverLayout(driver));
-
     }
 
     private Component createDriverLayout(Driver driver) {
