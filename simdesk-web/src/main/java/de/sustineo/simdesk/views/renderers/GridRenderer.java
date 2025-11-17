@@ -7,8 +7,8 @@ import com.vaadin.flow.router.RouterLink;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.views.BaseView;
-import de.sustineo.simdesk.views.LeaderboardDriverView;
-import de.sustineo.simdesk.views.LeaderboardSessionDetailsView;
+import de.sustineo.simdesk.views.LeaderboardDriverDetailView;
+import de.sustineo.simdesk.views.LeaderboardSessionDetailView;
 
 public class GridRenderer {
     static final String RACE_NUMBER_TEMPLATE = """
@@ -129,7 +129,7 @@ public class GridRenderer {
             return;
         }
 
-        RouterLink link = new RouterLink(LeaderboardDriverView.class, new RouteParameters(
+        RouterLink link = new RouterLink(LeaderboardDriverDetailView.class, new RouteParameters(
                 new RouteParam(BaseView.ROUTE_PARAMETER_DRIVER_ID, driver.getId())
         ));
 
@@ -141,7 +141,7 @@ public class GridRenderer {
             return;
         }
 
-        RouterLink link = new RouterLink(LeaderboardSessionDetailsView.class, new RouteParameters(
+        RouterLink link = new RouterLink(LeaderboardSessionDetailView.class, new RouteParameters(
                 new RouteParam(BaseView.ROUTE_PARAMETER_FILE_CHECKSUM, session.getFileChecksum())
         ));
 

@@ -223,7 +223,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
             DriverRanking selectedDriverRanking = e.getValue();
 
             if (selectedDriverRanking != null && selectedDriverRanking.getSession() != null) {
-                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedDriverRanking.getSession().getFileChecksum())
                         )

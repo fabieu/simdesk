@@ -11,8 +11,8 @@ import com.vaadin.flow.router.RouteParameters;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.search.SearchResult;
 import de.sustineo.simdesk.services.SearchService;
-import de.sustineo.simdesk.views.LeaderboardDriverView;
-import de.sustineo.simdesk.views.LeaderboardSessionDetailsView;
+import de.sustineo.simdesk.views.LeaderboardDriverDetailView;
+import de.sustineo.simdesk.views.LeaderboardSessionDetailView;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -75,10 +75,10 @@ public class SearchComponentFactory {
         source.getUI().ifPresent(ui -> {
             switch (searchResult.getType()) {
                 case DRIVER:
-                    ui.navigate(LeaderboardDriverView.class, new RouteParameters("driverId", searchResult.getId()));
+                    ui.navigate(LeaderboardDriverDetailView.class, new RouteParameters("driverId", searchResult.getId()));
                     break;
                 case SESSION:
-                    ui.navigate(LeaderboardSessionDetailsView.class, new RouteParameters("fileChecksum", searchResult.getId()));
+                    ui.navigate(LeaderboardSessionDetailView.class, new RouteParameters("fileChecksum", searchResult.getId()));
                     break;
             }
         });
