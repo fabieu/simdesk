@@ -34,10 +34,6 @@ public class MenuService {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
         }
 
-        if (ProfileManager.isLiveTimingProfileEnabled()) {
-            items.add(MenuEntity.ofInternal(MenuEntityCategory.LIVE_TIMING, "Dashboards", VaadinIcon.CLOCK, DashboardView.class));
-        }
-
         if (ProfileManager.isEntrylistProfileEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
