@@ -101,6 +101,7 @@ public class EntrylistEditorView extends BaseView {
     private final WebStorage.Storage webStorageType = WebStorage.Storage.SESSION_STORAGE;
 
     private final EntrylistService entrylistService;
+    private final EntrylistExportService entrylistExportService;
     private final DriverService driverService;
     private final ValidationService validationService;
     private final NotificationService notificationService;
@@ -117,6 +118,8 @@ public class EntrylistEditorView extends BaseView {
 
     private final Upload entrylistUpload = new Upload();
     private final Anchor downloadAnchor = new Anchor();
+    private final Anchor exportCsvAnchor = new Anchor();
+    private final Anchor exportMarkdownAnchor = new Anchor();
     private final Select<EntrylistSortingMode> sortingModeSelect = new Select<>();
     private final Select<SortingDirection> sortdirectionSelect = new Select<>();
     private final TextArea entrylistPreview = new TextArea();
@@ -141,6 +144,7 @@ public class EntrylistEditorView extends BaseView {
     private final ConfirmDialog resetDialog;
 
     public EntrylistEditorView(EntrylistService entrylistService,
+                               EntrylistExportService entrylistExportService,
                                DriverService driverService,
                                ValidationService validationService,
                                NotificationService notificationService,
@@ -149,6 +153,7 @@ public class EntrylistEditorView extends BaseView {
                                SessionComponentFactory sessionComponentFactory,
                                ButtonComponentFactory buttonComponentFactory) {
         this.entrylistService = entrylistService;
+        this.entrylistExportService = entrylistExportService;
         this.driverService = driverService;
         this.validationService = validationService;
         this.notificationService = notificationService;
@@ -434,12 +439,26 @@ public class EntrylistEditorView extends BaseView {
                 .setFlexWrap(Style.FlexWrap.WRAP)
                 .set("gap", "var(--lumo-space-m)");
 
-        // Download
+        // Download JSON
         Button downloadButton = new Button("Download", buttonComponentFactory.getDownloadIcon());
         downloadButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
 
         this.downloadAnchor.getElement().setAttribute("download", true);
         this.downloadAnchor.add(downloadButton);
+
+        // Export CSV
+        Button exportCsvButton = new Button("Export CSV", new Icon(VaadinIcon.FILE_TABLE));
+        exportCsvButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
+
+        this.exportCsvAnchor.getElement().setAttribute("download", true);
+        this.exportCsvAnchor.add(exportCsvButton);
+
+        // Export Markdown
+        Button exportMarkdownButton = new Button("Export Markdown", new Icon(VaadinIcon.FILE_TEXT));
+        exportMarkdownButton.addThemeVariants(ButtonVariant.LUMO_SUCCESS, ButtonVariant.LUMO_PRIMARY);
+
+        this.exportMarkdownAnchor.getElement().setAttribute("download", true);
+        this.exportMarkdownAnchor.add(exportMarkdownButton);
 
         // Validation
         Button validateButton = new Button("Validate", buttonComponentFactory.getValidateIcon());
@@ -451,7 +470,7 @@ public class EntrylistEditorView extends BaseView {
         resetButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
         resetButton.addClickListener(e -> resetDialog.open());
 
-        buttonLayout.add(downloadAnchor, validateButton, resetButton);
+        buttonLayout.add(downloadAnchor, exportCsvAnchor, exportMarkdownAnchor, validateButton, resetButton);
         return buttonLayout;
     }
 
@@ -460,6 +479,30 @@ public class EntrylistEditorView extends BaseView {
             if (entrylist != null) {
                 event.setFileName(Objects.requireNonNullElse(entrylistMetadata.getFileName(), "entrylist.json"));
                 event.getOutputStream().write(JsonClient.toJson(entrylist).getBytes(StandardCharsets.UTF_8));
+            } else {
+                event.getResponse().setStatus(404);
+            }
+        };
+    }
+
+    private DownloadHandler getEntrylistCsvDownloadHandler() {
+        return (event) -> {
+            if (entrylist != null) {
+                event.setFileName("entrylist.csv");
+                String csv = entrylistExportService.exportToCsv(entrylist);
+                event.getOutputStream().write(csv.getBytes(StandardCharsets.UTF_8));
+            } else {
+                event.getResponse().setStatus(404);
+            }
+        };
+    }
+
+    private DownloadHandler getEntrylistMarkdownDownloadHandler() {
+        return (event) -> {
+            if (entrylist != null) {
+                event.setFileName("entrylist.md");
+                String markdown = entrylistExportService.exportToMarkdown(entrylist);
+                event.getOutputStream().write(markdown.getBytes(StandardCharsets.UTF_8));
             } else {
                 event.getResponse().setStatus(404);
             }
@@ -1426,6 +1469,8 @@ public class EntrylistEditorView extends BaseView {
         this.entrylist = entrylist;
         this.entrylistMetadata = entrylistMetadata;
         this.downloadAnchor.setHref(getEntrylistDownloadHandler());
+        this.exportCsvAnchor.setHref(getEntrylistCsvDownloadHandler());
+        this.exportMarkdownAnchor.setHref(getEntrylistMarkdownDownloadHandler());
         entrylistUpload.clearFileList();
         refreshEntrylistEditor();
         refreshEntrylistPreview();
