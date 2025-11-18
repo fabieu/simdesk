@@ -142,7 +142,7 @@ public class LeaderboardDriversView extends BaseView {
         headerRow.getCell(firstNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setFirstName));
         headerRow.getCell(lastNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setLastName));
         headerRow.getCell(shortNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setShortName));
-        headerRow.getCell(visibilityColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setVisibility));
+        headerRow.getCell(visibilityColumn).setComponent(GridFilter.createComboBoxHeader(driverFilter::setVisibility, Visibility::getAll));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 

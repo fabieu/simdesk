@@ -2,13 +2,14 @@ package de.sustineo.simdesk.views.filter.grid;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.Visibility;
 
 public class DriverFilter extends GridFilter<Driver> {
     private String driverId;
     private String firstName;
     private String lastName;
     private String shortName;
-    private String visibility;
+    private Visibility visibility;
 
     public DriverFilter(GridListDataView<Driver> dataView) {
         super(dataView);
@@ -34,7 +35,7 @@ public class DriverFilter extends GridFilter<Driver> {
         refresh();
     }
 
-    public void setVisibility(String visibility) {
+    public void setVisibility(Visibility visibility) {
         this.visibility = visibility;
         refresh();
     }
@@ -44,7 +45,7 @@ public class DriverFilter extends GridFilter<Driver> {
         boolean matchesFirstName = matches(driver.getFirstName(), firstName);
         boolean matchesLastName = matches(driver.getLastName(), lastName);
         boolean matchesShortName = matches(driver.getShortName(), shortName);
-        boolean matchesVisibility = matches(driver.getVisibility().name(), visibility);
+        boolean matchesVisibility = matches(driver.getVisibility(), visibility);
 
         return matchesServerName && matchesFirstName && matchesLastName && matchesShortName && matchesVisibility;
     }
