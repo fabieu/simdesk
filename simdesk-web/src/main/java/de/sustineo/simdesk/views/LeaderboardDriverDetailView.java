@@ -40,7 +40,7 @@ import java.util.stream.Collectors;
 @Route(value = "/leaderboard/drivers/:driverId")
 @AnonymousAllowed
 @RequiredArgsConstructor
-public class LeaderboardDriverView extends BaseView {
+public class LeaderboardDriverDetailView extends BaseView {
     private final DriverService driverService;
     private final LapService lapService;
     private final SessionService sessionService;
@@ -71,7 +71,6 @@ public class LeaderboardDriverView extends BaseView {
 
         add(createViewHeader(driver.getFullName()));
         addAndExpand(createDriverLayout(driver));
-
     }
 
     private Component createDriverLayout(Driver driver) {
@@ -182,7 +181,7 @@ public class LeaderboardDriverView extends BaseView {
             Session selectedSession = e.getValue();
 
             if (selectedSession != null) {
-                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )

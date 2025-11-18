@@ -249,7 +249,7 @@ public class LeaderboardSessionsView extends BaseView {
             Session selectedSession = e.getValue();
 
             if (selectedSession != null) {
-                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailsView.class,
+                getUI().ifPresent(ui -> ui.navigate(LeaderboardSessionDetailView.class,
                         new RouteParameters(
                                 new RouteParam(ROUTE_PARAMETER_FILE_CHECKSUM, selectedSession.getFileChecksum())
                         )

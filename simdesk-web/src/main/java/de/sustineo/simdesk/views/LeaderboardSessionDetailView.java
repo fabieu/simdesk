@@ -31,7 +31,7 @@ import java.util.stream.Collectors;
 @Route(value = "/leaderboard/sessions/:fileChecksum")
 @AnonymousAllowed
 @RequiredArgsConstructor
-public class LeaderboardSessionDetailsView extends BaseView {
+public class LeaderboardSessionDetailView extends BaseView {
     private final SessionService sessionService;
     private final LeaderboardService leaderboardService;
 

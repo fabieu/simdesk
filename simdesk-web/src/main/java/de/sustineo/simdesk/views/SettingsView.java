@@ -5,8 +5,6 @@ import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
-import com.vaadin.flow.component.grid.HeaderRow;
-import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
 import com.vaadin.flow.component.html.H3;
@@ -14,14 +12,11 @@ import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
-import de.sustineo.simdesk.entities.Driver;
-import de.sustineo.simdesk.entities.Visibility;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
@@ -31,16 +26,11 @@ import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.ApiKeyService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.auth.UserService;
-import de.sustineo.simdesk.services.leaderboard.DriverService;
-import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
-import de.sustineo.simdesk.views.filter.grid.DriverFilter;
-import de.sustineo.simdesk.views.filter.grid.GridFilter;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 
 import javax.annotation.Nonnull;
-import java.util.Comparator;
 import java.util.Objects;
 import java.util.Optional;
 
@@ -50,7 +40,6 @@ import java.util.Optional;
 public class SettingsView extends BaseView {
     private final UserService userService;
     private final NotificationService notificationService;
-    private final DriverService driverService;
     private final ApiKeyService apiKeyService;
     private final SecurityService securityService;
 
@@ -60,13 +49,11 @@ public class SettingsView extends BaseView {
 
     public SettingsView(NotificationService notificationService,
                         UserService userService,
-                        DriverService driverService,
                         ApiKeyService apiKeyService,
                         SecurityService securityService,
                         ButtonComponentFactory buttonComponentFactory) {
         this.notificationService = notificationService;
         this.userService = userService;
-        this.driverService = driverService;
         this.apiKeyService = apiKeyService;
         this.securityService = securityService;
         this.buttonComponentFactory = buttonComponentFactory;
@@ -95,7 +82,6 @@ public class SettingsView extends BaseView {
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
 
-        tabSheet.add("General", createGeneralTab());
         tabSheet.add("API Keys", createApiKeysTab());
 
         if (ProfileManager.isDiscordProfileEnabled()) {
@@ -103,14 +89,6 @@ public class SettingsView extends BaseView {
         }
 
         return tabSheet;
-    }
-
-    private Component createGeneralTab() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
-
-        layout.add(createDriverVisibilityLayout());
-        return layout;
     }
 
     private Component createApiKeysTab() {
@@ -126,87 +104,6 @@ public class SettingsView extends BaseView {
         layout.setSizeFull();
 
         layout.add(createUserRoleLayout());
-        return layout;
-    }
-
-    private Component createDriverVisibilityLayout() {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setPadding(false);
-
-        Grid<Driver> grid = new Grid<>(Driver.class, false);
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
-
-        Binder<Driver> binder = new Binder<>(Driver.class);
-        Editor<Driver> editor = grid.getEditor();
-        editor.setBinder(binder);
-        editor.setBuffered(true);
-        editor.addSaveListener((EditorSaveListener<Driver>) event -> {
-            Driver driver = event.getItem();
-            try {
-                driverService.updateDriverVisibility(driver);
-                notificationService.showSuccessNotification(String.format("%s updated successfully", driver.getRealName()));
-            } catch (Exception e) {
-                notificationService.showErrorNotification(String.format("Failed to update %s - %s", driver.getRealName(), e.getMessage()));
-            }
-        });
-
-        Grid.Column<Driver> driverIdColumn = grid.addColumn(Driver::getId)
-                .setHeader("Steam ID")
-                .setAutoWidth(true)
-                .setFlexGrow(0);
-        Grid.Column<Driver> realNameColumn = grid.addColumn(Driver::getRealName)
-                .setHeader("Name")
-                .setTooltipGenerator(Driver::getRealName);
-        Grid.Column<Driver> visibilityColumn = grid.addColumn(driver -> driver.getVisibility().name())
-                .setHeader("Visibility")
-                .setWidth("10rem")
-                .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<Driver> lastActivityColumn = grid.addColumn(driver -> FormatUtils.formatDatetime(driver.getLastActivity()))
-                .setHeader("Last Activity")
-                .setComparator(Comparator.comparing(Driver::getLastActivity))
-                .setAutoWidth(true)
-                .setFlexGrow(0)
-                .setSortable(true);
-        Grid.Column<Driver> updateColumn = grid.addComponentColumn(driver -> {
-                    Button updateButton = buttonComponentFactory.createPrimaryButton("Update");
-                    updateButton.addClickListener(e -> {
-                        if (editor.isOpen()) {
-                            editor.cancel();
-                        }
-                        editor.editItem(driver);
-                    });
-                    return updateButton;
-                })
-                .setTextAlign(ColumnTextAlign.END)
-                .setWidth("170px")
-                .setFlexGrow(0);
-
-        Select<Visibility> visibilityField = new Select<>();
-        visibilityField.setWidthFull();
-        visibilityField.setItems(Visibility.PRIVATE, Visibility.PUBLIC);
-        binder.forField(visibilityField)
-                .bind(Driver::getVisibility, Driver::setVisibility);
-        visibilityColumn.setEditorComponent(visibilityField);
-
-        Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
-        saveButton.addClickListener(e -> editor.save());
-
-        Button cancelButton = buttonComponentFactory.createCancelIconButton();
-        cancelButton.addClickListener(e -> editor.cancel());
-
-        GridListDataView<Driver> dataView = grid.setItems(driverService.getAllDrivers());
-        DriverFilter driverFilter = new DriverFilter(dataView);
-        HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(driverIdColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setDriverId));
-        headerRow.getCell(realNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setRealName));
-        headerRow.getCell(visibilityColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setVisibility));
-
-        HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
-        editActions.setPadding(false);
-        updateColumn.setEditorComponent(editActions);
-
-        layout.add(createTitle("Driver Visibility"), grid);
         return layout;
     }
 
