@@ -125,7 +125,7 @@ public class LeaderboardDriversView extends BaseView {
 
         Select<Visibility> visibilityField = new Select<>();
         visibilityField.setWidthFull();
-        visibilityField.setItems(Visibility.PRIVATE, Visibility.PUBLIC);
+        visibilityField.setItems(Visibility.getAll());
         binder.forField(visibilityField)
                 .bind(Driver::getVisibility, Driver::setVisibility);
         visibilityColumn.setEditorComponent(visibilityField);

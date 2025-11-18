@@ -5,8 +5,7 @@ import java.util.Set;
 
 public enum Visibility {
     PRIVATE,
-    PUBLIC,
-    UNLISTED;
+    PUBLIC;
 
     public static Set<Visibility> getAll() {
         return EnumSet.allOf(Visibility.class);
