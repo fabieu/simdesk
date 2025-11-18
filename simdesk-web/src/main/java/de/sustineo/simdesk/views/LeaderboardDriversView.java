@@ -24,6 +24,7 @@ import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import de.sustineo.simdesk.views.filter.grid.DriverFilter;
 import de.sustineo.simdesk.views.filter.grid.GridFilter;
+import de.sustineo.simdesk.views.renderers.DriverRenderer;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -62,7 +63,13 @@ public class LeaderboardDriversView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
 
+        layout.add(createDriverGrid());
+        return layout;
+    }
+
+    private Component createDriverGrid() {
         Grid<Driver> grid = new Grid<>(Driver.class, false);
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         Binder<Driver> binder = new Binder<>(Driver.class);
@@ -83,17 +90,11 @@ public class LeaderboardDriversView extends BaseView {
                 .setHeader("Steam ID")
                 .setAutoWidth(true)
                 .setFlexGrow(0);
-        Grid.Column<Driver> firstNameColumn = grid.addColumn(Driver::getFirstName)
-                .setHeader("First Name")
-                .setTooltipGenerator(Driver::getFirstName)
-                .setSortable(true);
-        Grid.Column<Driver> lastNameColumn = grid.addColumn(Driver::getLastName)
-                .setHeader("Last Name")
-                .setTooltipGenerator(Driver::getLastName)
+        Grid.Column<Driver> realNameColumn = grid.addColumn(DriverRenderer.createRealDriverRenderer())
+                .setHeader("Full Name")
                 .setSortable(true);
         Grid.Column<Driver> shortNameColumn = grid.addColumn(Driver::getShortName)
                 .setHeader("Short Name")
-                .setTooltipGenerator(Driver::getShortName)
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
@@ -139,18 +140,14 @@ public class LeaderboardDriversView extends BaseView {
         DriverFilter driverFilter = new DriverFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(driverIdColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setDriverId));
-        headerRow.getCell(firstNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setFirstName));
-        headerRow.getCell(lastNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setLastName));
+        headerRow.getCell(realNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setRealName));
         headerRow.getCell(shortNameColumn).setComponent(GridFilter.createTextFieldHeader(driverFilter::setShortName));
         headerRow.getCell(visibilityColumn).setComponent(GridFilter.createComboBoxHeader(driverFilter::setVisibility, Visibility::getAll));
-
-        grid.setSelectionMode(Grid.SelectionMode.SINGLE);
 
         HorizontalLayout editActions = new HorizontalLayout(saveButton, cancelButton);
         editActions.setPadding(false);
         updateColumn.setEditorComponent(editActions);
 
-        layout.add(grid);
-        return layout;
+        return grid;
     }
 }

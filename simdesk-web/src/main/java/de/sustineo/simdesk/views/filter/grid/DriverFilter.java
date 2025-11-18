@@ -6,8 +6,7 @@ import de.sustineo.simdesk.entities.Visibility;
 
 public class DriverFilter extends GridFilter<Driver> {
     private String driverId;
-    private String firstName;
-    private String lastName;
+    private String realName;
     private String shortName;
     private Visibility visibility;
 
@@ -20,13 +19,8 @@ public class DriverFilter extends GridFilter<Driver> {
         refresh();
     }
 
-    public void setFirstName(String firstName) {
-        this.firstName = firstName;
-        refresh();
-    }
-
-    public void setLastName(String lastName) {
-        this.lastName = lastName;
+    public void setRealName(String realName) {
+        this.realName = realName;
         refresh();
     }
 
@@ -42,11 +36,10 @@ public class DriverFilter extends GridFilter<Driver> {
 
     protected boolean test(Driver driver) {
         boolean matchesServerName = matches(driver.getId(), driverId);
-        boolean matchesFirstName = matches(driver.getFirstName(), firstName);
-        boolean matchesLastName = matches(driver.getLastName(), lastName);
+        boolean matchesRealName = matches(driver.getRealName(), realName);
         boolean matchesShortName = matches(driver.getShortName(), shortName);
         boolean matchesVisibility = matches(driver.getVisibility(), visibility);
 
-        return matchesServerName && matchesFirstName && matchesLastName && matchesShortName && matchesVisibility;
+        return matchesServerName && matchesRealName && matchesShortName && matchesVisibility;
     }
 }

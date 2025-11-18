@@ -37,6 +37,14 @@ public class GridRenderer {
                 ${item.driver.fullName}
             </vaadin-button>
             """;
+    static final String DRIVER_REALNAME_REFERENCE_TEMPLATE = """
+            <vaadin-button
+                title="Show profile"
+                @click="${clickHandler}"
+                theme="tertiary-inline small link">
+                ${item.driver.realName}
+            </vaadin-button>
+            """;
     static final String DRIVER_REFERENCE_TEMPLATE_DRIVER = "driver";
     static final String DRIVER_REFERENCE_TEMPLATE_CLICK_HANDLER = "clickHandler";
 
