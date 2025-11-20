@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.leaderboard;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
+import de.sustineo.simdesk.utils.encoding.EncodingUtils;
 import de.sustineo.simdesk.utils.json.JsonClient;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -12,7 +13,6 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.io.IOException;
 import java.nio.charset.Charset;
 import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
@@ -50,7 +50,7 @@ public class SessionFileService {
             throw new IllegalArgumentException(errorMessage);
         }
 
-        String fileContent = readFile(path);
+        String fileContent = EncodingUtils.bytesToString(Files.readAllBytes(path));
         if (!JsonClient.isValid(fileContent)) {
             String errorMessage = String.format("File %s is not a valid JSON file", path.getFileName());
             log.warning(errorMessage);
@@ -66,36 +66,5 @@ public class SessionFileService {
         AccSession accSession = JsonClient.fromJson(fileContent, AccSession.class);
 
         sessionService.handleSession(accSession, fileContent, fileMetadata);
-    }
-
-    private String readFile(Path path) throws IOException {
-        for (Charset charset : SUPPORTED_CHARSETS) {
-            try {
-                String fileContent = Files.readString(path, charset);
-                fileContent = removeBOM(fileContent);
-                fileContent = removeControlCharacters(fileContent);
-                log.fine(String.format("Successfully parsed %s with charset %s", path, charset));
-
-                return fileContent;
-            } catch (IOException e) {
-                log.fine(String.format("Unable to parse %s with charset %s", path, charset));
-            }
-        }
-
-        throw new IOException(String.format("Could not parse %s with any the supported charsets: %s", path, SUPPORTED_CHARSETS));
-    }
-
-    private String removeBOM(String content) {
-        final String BOM_MARKER = "\uFEFF";
-
-        if (content.startsWith(BOM_MARKER)) {
-            return content.substring(1);
-        } else {
-            return content;
-        }
-    }
-
-    private String removeControlCharacters(String content) {
-        return content.replaceAll("[\\x00-\\x09\\x11\\x12\\x14-\\x1F\\x7F]", "");
     }
 }
