@@ -32,7 +32,10 @@ public class MenuService {
         if (ProfileManager.isLeaderboardProfileEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.TROPHY, LeaderboardOverallLapTimesView.class));
             items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
-            items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Drivers", LumoIcon.USER, LeaderboardDriversView.class));
+
+            if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+                items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Drivers", LumoIcon.USER, LeaderboardDriversView.class));
+            }
         }
 
         if (ProfileManager.isEntrylistProfileEnabled()) {
