@@ -9,6 +9,7 @@ import com.vaadin.flow.component.grid.HeaderRow;
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.grid.editor.Editor;
 import com.vaadin.flow.component.grid.editor.EditorSaveListener;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.select.Select;
@@ -17,8 +18,10 @@ import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.Driver;
+import de.sustineo.simdesk.entities.DriverAlias;
 import de.sustineo.simdesk.entities.Visibility;
 import de.sustineo.simdesk.services.NotificationService;
+import de.sustineo.simdesk.services.leaderboard.DriverAliasService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.utils.FormatUtils;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
@@ -31,6 +34,8 @@ import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 
 import java.util.Comparator;
+import java.util.List;
+import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -39,6 +44,7 @@ import java.util.Comparator;
 @RequiredArgsConstructor
 public class LeaderboardDriversView extends BaseView {
     private final DriverService driverService;
+    private final DriverAliasService driverAliasService;
     private final ButtonComponentFactory buttonComponentFactory;
     private final NotificationService notificationService;
 
@@ -93,6 +99,23 @@ public class LeaderboardDriversView extends BaseView {
         Grid.Column<Driver> realNameColumn = grid.addColumn(DriverRenderer.createRealDriverRenderer())
                 .setHeader("Full Name")
                 .setSortable(true);
+        Grid.Column<Driver> aliasesColumn = grid.addComponentColumn(driver -> {
+                    List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 5);
+                    if (aliases.isEmpty()) {
+                        return new Span();
+                    }
+                    HorizontalLayout aliasesLayout = new HorizontalLayout();
+                    aliasesLayout.setSpacing(true);
+                    for (DriverAlias alias : aliases) {
+                        Span aliasBadge = new Span(alias.getFullName());
+                        aliasBadge.getElement().getThemeList().add("badge contrast small");
+                        aliasesLayout.add(aliasBadge);
+                    }
+                    return aliasesLayout;
+                })
+                .setHeader("Known Aliases")
+                .setAutoWidth(true)
+                .setFlexGrow(1);
         Grid.Column<Driver> shortNameColumn = grid.addColumn(Driver::getShortName)
                 .setHeader("Short Name")
                 .setAutoWidth(true)

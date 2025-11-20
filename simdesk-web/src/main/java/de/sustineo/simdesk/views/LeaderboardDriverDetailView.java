@@ -20,6 +20,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.record.LapByTrack;
 import de.sustineo.simdesk.entities.record.LapsByAccCar;
 import de.sustineo.simdesk.entities.record.LapsByTrack;
+import de.sustineo.simdesk.services.leaderboard.DriverAliasService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
@@ -42,6 +43,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LeaderboardDriverDetailView extends BaseView {
     private final DriverService driverService;
+    private final DriverAliasService driverAliasService;
     private final LapService lapService;
     private final SessionService sessionService;
     private final SessionComponentFactory sessionComponentFactory;
@@ -88,6 +90,7 @@ public class LeaderboardDriverDetailView extends BaseView {
         layout.addClassNames("container", "bg-light");
 
         layout.add(createBadgeLayout(driver, laps));
+        layout.add(createAliasesLayout(driver));
 
         layout.add(createSessionsLayout(sessions));
         layout.add(createFastestLapsLayout(lapsByTrackMap));
@@ -114,6 +117,32 @@ public class LeaderboardDriverDetailView extends BaseView {
         invalidLapCountBadge.getElement().getThemeList().add("badge error");
 
         layout.add(lastSeenBadge, validLapCountBadge, invalidLapCountBadge);
+        return layout;
+    }
+
+    private Component createAliasesLayout(Driver driver) {
+        List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 5);
+        
+        if (aliases.isEmpty()) {
+            return new Div(); // Return empty div if no aliases
+        }
+        
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+        
+        H3 header = new H3("Known Aliases");
+        
+        HorizontalLayout aliasesLayout = new HorizontalLayout();
+        aliasesLayout.setWidthFull();
+        aliasesLayout.setJustifyContentMode(JustifyContentMode.CENTER);
+        
+        for (DriverAlias alias : aliases) {
+            Span aliasBadge = new Span(alias.getFullName());
+            aliasBadge.getElement().getThemeList().add("badge contrast");
+            aliasesLayout.add(aliasBadge);
+        }
+        
+        layout.add(header, aliasesLayout);
         return layout;
     }
 
