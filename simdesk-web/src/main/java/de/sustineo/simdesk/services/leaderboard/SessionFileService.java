@@ -13,12 +13,9 @@ import org.springframework.stereotype.Service;
 
 import javax.annotation.Nonnull;
 import javax.annotation.Nullable;
-import java.nio.charset.Charset;
-import java.nio.charset.StandardCharsets;
 import java.nio.file.Files;
 import java.nio.file.Path;
 import java.time.Instant;
-import java.util.List;
 import java.util.logging.Level;
 
 @Log
@@ -26,8 +23,6 @@ import java.util.logging.Level;
 @Service
 @RequiredArgsConstructor
 public class SessionFileService {
-    private final List<Charset> SUPPORTED_CHARSETS = List.of(StandardCharsets.UTF_16LE, StandardCharsets.UTF_8);
-
     private final SessionService sessionService;
 
     public void handleSessionFile(@Nonnull Path path) {
