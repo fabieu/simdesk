@@ -9,9 +9,11 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -20,6 +22,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.record.LapByTrack;
 import de.sustineo.simdesk.entities.record.LapsByAccCar;
 import de.sustineo.simdesk.entities.record.LapsByTrack;
+import de.sustineo.simdesk.services.leaderboard.DriverAliasService;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
 import de.sustineo.simdesk.services.leaderboard.LapService;
 import de.sustineo.simdesk.services.leaderboard.SessionService;
@@ -42,6 +45,7 @@ import java.util.stream.Collectors;
 @RequiredArgsConstructor
 public class LeaderboardDriverDetailView extends BaseView {
     private final DriverService driverService;
+    private final DriverAliasService driverAliasService;
     private final LapService lapService;
     private final SessionService sessionService;
     private final SessionComponentFactory sessionComponentFactory;
@@ -88,6 +92,7 @@ public class LeaderboardDriverDetailView extends BaseView {
         layout.addClassNames("container", "bg-light");
 
         layout.add(createBadgeLayout(driver, laps));
+        layout.add(createAliasesLayout(driver));
 
         layout.add(createSessionsLayout(sessions));
         layout.add(createFastestLapsLayout(lapsByTrackMap));
@@ -98,9 +103,12 @@ public class LeaderboardDriverDetailView extends BaseView {
     }
 
     private Component createBadgeLayout(Driver driver, List<Lap> laps) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        FlexLayout layout = new FlexLayout();
         layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-s)");
 
         Span lastSeenBadge = new Span("Last seen: " + FormatUtils.formatDatetime(driver.getLastActivity()));
         lastSeenBadge.getElement().getThemeList().add("badge");
@@ -117,6 +125,34 @@ public class LeaderboardDriverDetailView extends BaseView {
         return layout;
     }
 
+    private Component createAliasesLayout(Driver driver) {
+        VerticalLayout layout = new VerticalLayout();
+        layout.setWidthFull();
+
+        layout.add(new H3("Known Aliases"));
+
+        FlexLayout headerLayout = new FlexLayout();
+        headerLayout.setWidthFull();
+        headerLayout.setAlignItems(Alignment.CENTER);
+        headerLayout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-s)");
+
+        if (driver.getVisibility() == Visibility.PRIVATE) {
+            layout.add(new Span("This driver's aliases are private."));
+        } else {
+            List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 10);
+            aliases.forEach((driverAlias) -> {
+                Span aliasBadge = new Span(driverAlias.getFullName());
+                aliasBadge.getElement().getThemeList().add("badge");
+                headerLayout.add(aliasBadge);
+            });
+            layout.add(new H3("Known Aliases"), headerLayout);
+        }
+
+        return layout;
+    }
+
     private Component createSessionsLayout(List<Session> sessions) {
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
@@ -124,7 +160,8 @@ public class LeaderboardDriverDetailView extends BaseView {
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setWidthFull();
         headerLayout.setAlignItems(Alignment.CENTER);
-        headerLayout.getStyle().set("gap", "0.5rem");
+        headerLayout.getStyle()
+                .set("gap", "var(--lumo-space-s)");
 
         headerLayout.add(new H3("Sessions"));
 

@@ -10,11 +10,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Driver {
-    private static final String UNKNOWN_DRIVER = "Unknown Driver";
-    private static final String HIDDEN_FIRST_NAME = "Hidden";
-    private static final String HIDDEN_LAST_NAME = "Driver";
-    private static final String HIDDEN_SHORT_NAME = "HDR";
-    private static final String HIDDEN_FULL_NAME = HIDDEN_FIRST_NAME + " " + HIDDEN_LAST_NAME;
+    public static final String UNKNOWN_DRIVER = "Unknown Driver";
 
     private String id;
     private String firstName;
@@ -28,7 +24,7 @@ public class Driver {
 
     public String getFullName() {
         if (visibility == Visibility.PRIVATE) {
-            return HIDDEN_FULL_NAME;
+            return UNKNOWN_DRIVER;
         }
 
         return getRealName();
