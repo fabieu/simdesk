@@ -131,23 +131,24 @@ public class LeaderboardDriverDetailView extends BaseView {
 
         layout.add(new H3("Known Aliases"));
 
-        FlexLayout headerLayout = new FlexLayout();
-        headerLayout.setWidthFull();
-        headerLayout.setAlignItems(Alignment.CENTER);
-        headerLayout.getStyle()
-                .setFlexWrap(Style.FlexWrap.WRAP)
-                .set("gap", "var(--lumo-space-s)");
-
         if (driver.getVisibility() == Visibility.PRIVATE) {
             layout.add(new Span("This driver's aliases are private."));
         } else {
+            FlexLayout aliasLayout = new FlexLayout();
+            aliasLayout.setWidthFull();
+            aliasLayout.setAlignItems(Alignment.CENTER);
+            aliasLayout.getStyle()
+                    .setFlexWrap(Style.FlexWrap.WRAP)
+                    .set("gap", "var(--lumo-space-s)");
+
             List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 10);
-            aliases.forEach((driverAlias) -> {
-                Span aliasBadge = new Span(driverAlias.getFullName());
+            aliases.forEach((alias) -> {
+                Span aliasBadge = new Span(alias.getFullName());
                 aliasBadge.getElement().getThemeList().add("badge");
-                headerLayout.add(aliasBadge);
+                aliasLayout.add(aliasBadge);
             });
-            layout.add(new H3("Known Aliases"), headerLayout);
+
+            layout.add(aliasLayout);
         }
 
         return layout;
