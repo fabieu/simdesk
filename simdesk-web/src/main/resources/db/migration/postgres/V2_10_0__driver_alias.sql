@@ -5,7 +5,7 @@ CREATE TABLE IF NOT EXISTS simdesk.driver_alias
     first_name      VARCHAR(64),
     last_name       VARCHAR(64),
     created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (driver_id) REFERENCES simdesk.driver (player_id) ON DELETE CASCADE
+    FOREIGN KEY (driver_id) REFERENCES simdesk.driver (driver_id) ON DELETE CASCADE
 );
 
 CREATE INDEX ix_driver_alias_driver_id ON simdesk.driver_alias (driver_id);
