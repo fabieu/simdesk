@@ -17,8 +17,9 @@ public class DriverAlias {
 
     public String getFullName() {
         if (firstName == null || lastName == null) {
-            return "Unknown Driver";
+            return Driver.UNKNOWN_DRIVER;
         }
+
         return String.format("%s %s", firstName, lastName);
     }
 }

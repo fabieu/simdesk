@@ -9,9 +9,11 @@ import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import com.vaadin.flow.component.html.Div;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
+import com.vaadin.flow.component.orderedlayout.FlexLayout;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.data.selection.SingleSelect;
+import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.ProfileManager;
@@ -101,9 +103,12 @@ public class LeaderboardDriverDetailView extends BaseView {
     }
 
     private Component createBadgeLayout(Driver driver, List<Lap> laps) {
-        HorizontalLayout layout = new HorizontalLayout();
-        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        FlexLayout layout = new FlexLayout();
         layout.setWidthFull();
+        layout.setJustifyContentMode(JustifyContentMode.CENTER);
+        layout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-s)");
 
         Span lastSeenBadge = new Span("Last seen: " + FormatUtils.formatDatetime(driver.getLastActivity()));
         lastSeenBadge.getElement().getThemeList().add("badge");
@@ -121,28 +126,24 @@ public class LeaderboardDriverDetailView extends BaseView {
     }
 
     private Component createAliasesLayout(Driver driver) {
-        List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 5);
-        
-        if (aliases.isEmpty()) {
-            return new Div(); // Return empty div if no aliases
-        }
-        
         VerticalLayout layout = new VerticalLayout();
         layout.setWidthFull();
-        
-        H3 header = new H3("Known Aliases");
-        
-        HorizontalLayout aliasesLayout = new HorizontalLayout();
-        aliasesLayout.setWidthFull();
-        aliasesLayout.setJustifyContentMode(JustifyContentMode.CENTER);
-        
-        for (DriverAlias alias : aliases) {
-            Span aliasBadge = new Span(alias.getFullName());
-            aliasBadge.getElement().getThemeList().add("badge contrast");
-            aliasesLayout.add(aliasBadge);
-        }
-        
-        layout.add(header, aliasesLayout);
+
+        FlexLayout headerLayout = new FlexLayout();
+        headerLayout.setWidthFull();
+        headerLayout.setAlignItems(Alignment.CENTER);
+        headerLayout.getStyle()
+                .setFlexWrap(Style.FlexWrap.WRAP)
+                .set("gap", "var(--lumo-space-s)");
+
+        List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 10);
+        aliases.forEach((driverAlias) -> {
+            Span aliasBadge = new Span(driverAlias.getFullName());
+            aliasBadge.getElement().getThemeList().add("badge");
+            headerLayout.add(aliasBadge);
+        });
+
+        layout.add(new H3("Known Aliases"), headerLayout);
         return layout;
     }
 
@@ -153,7 +154,8 @@ public class LeaderboardDriverDetailView extends BaseView {
         HorizontalLayout headerLayout = new HorizontalLayout();
         headerLayout.setWidthFull();
         headerLayout.setAlignItems(Alignment.CENTER);
-        headerLayout.getStyle().set("gap", "0.5rem");
+        headerLayout.getStyle()
+                .set("gap", "var(--lumo-space-s)");
 
         headerLayout.add(new H3("Sessions"));
 

@@ -35,7 +35,6 @@ import org.springframework.context.annotation.Profile;
 
 import java.util.Comparator;
 import java.util.List;
-import java.util.stream.Collectors;
 
 @Log
 @Profile(ProfileManager.PROFILE_LEADERBOARD)
@@ -100,17 +99,22 @@ public class LeaderboardDriversView extends BaseView {
                 .setHeader("Full Name")
                 .setSortable(true);
         Grid.Column<Driver> aliasesColumn = grid.addComponentColumn(driver -> {
-                    List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 5);
+                    if (driver.getVisibility() == Visibility.PRIVATE) {
+                        return new Span();
+                    }
+
+                    List<DriverAlias> aliases = driverAliasService.getLatestAliasesByDriverId(driver.getId(), 3);
                     if (aliases.isEmpty()) {
                         return new Span();
                     }
+
                     HorizontalLayout aliasesLayout = new HorizontalLayout();
-                    aliasesLayout.setSpacing(true);
                     for (DriverAlias alias : aliases) {
                         Span aliasBadge = new Span(alias.getFullName());
-                        aliasBadge.getElement().getThemeList().add("badge contrast small");
+                        aliasBadge.getElement().getThemeList().add("badge contrast");
                         aliasesLayout.add(aliasBadge);
                     }
+
                     return aliasesLayout;
                 })
                 .setHeader("Known Aliases")
