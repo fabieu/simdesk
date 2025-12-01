@@ -2,8 +2,8 @@ plugins {
     id "java"
     id "io.spring.dependency-management" version "1.1.7"
     id "org.springframework.boot" version "3.5.7"
-    id 'com.vaadin' version "24.9.4"
-    id "org.flywaydb.flyway" version "11.15.0"
+    id 'com.vaadin' version "24.9.6"
+    id "org.flywaydb.flyway" version "11.18.0"
 }
 
 group = "de.sustineo.simdesk"
@@ -22,7 +22,7 @@ repositories {
 
 dependencyManagement {
     imports {
-        mavenBom "com.vaadin:vaadin-bom:24.9.4"
+        mavenBom "com.vaadin:vaadin-bom:24.9.6"
     }
 }
 
@@ -46,7 +46,7 @@ dependencies {
     // Database
     implementation "org.mybatis.spring.boot:mybatis-spring-boot-starter:3.0.5"
     implementation "org.postgresql:postgresql:42.7.8"
-    runtimeOnly "org.xerial:sqlite-jdbc:3.50.3.0"
+    runtimeOnly "org.xerial:sqlite-jdbc:3.51.1.0"
     implementation "org.flywaydb:flyway-database-postgresql"
 
     // Caching
@@ -59,9 +59,9 @@ dependencies {
     runtimeOnly "io.micrometer:micrometer-registry-prometheus"
 
     // Apache Commons
-    implementation "org.apache.commons:commons-lang3:3.19.0"
-    implementation "commons-codec:commons-codec:1.19.0"
-    implementation "commons-io:commons-io:2.20.0"
+    implementation "org.apache.commons:commons-lang3:3.20.0"
+    implementation "commons-codec:commons-codec:1.20.0"
+    implementation "commons-io:commons-io:2.21.0"
 
     // Misc
     implementation "com.discord4j:discord4j-core:3.3.0"
