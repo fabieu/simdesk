@@ -2,11 +2,15 @@ package de.sustineo.simdesk.services.discord;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
 import discord4j.common.util.Snowflake;
+import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
 import discord4j.core.object.entity.Role;
+import discord4j.core.object.presence.ClientPresence;
 import discord4j.discordjson.Id;
 import discord4j.discordjson.json.MemberData;
+import discord4j.gateway.intent.Intent;
+import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.http.client.ClientException;
 import lombok.Getter;
 import lombok.extern.java.Log;
@@ -35,22 +39,27 @@ import java.util.stream.Collectors;
 public class DiscordService {
     private static final String DISCORD_API_BASE_URL = "https://discord.com/api/v10";
 
-    private final GatewayDiscordClient client;
+    private final GatewayDiscordClient discordClient;
     private final Snowflake guildId;
 
     private final RestTemplate restTemplate;
 
-    public DiscordService(GatewayDiscordClient gatewayDiscordClient,
-                          @Value("${simdesk.auth.discord.guild-id}") String guildId,
+    public DiscordService(@Value("${simdesk.auth.discord.guild-id}") String guildId,
+                          @Value("${simdesk.auth.discord.token}") String token,
                           @Qualifier("discord") RestTemplate restTemplate) {
-        this.client = gatewayDiscordClient;
         this.guildId = Snowflake.of(guildId);
+        this.discordClient = DiscordClientBuilder.create(token).build()
+                .gateway()
+                .setInitialPresence(ignore -> ClientPresence.online())
+                .setEnabledIntents(IntentSet.of(Intent.GUILD_MESSAGES))
+                .login()
+                .block();
 
         this.restTemplate = restTemplate;
     }
 
     public List<Role> getGuildRoles() throws ClientException {
-        return client.getGuildById(guildId)
+        return discordClient.getGuildById(guildId)
                 .map(Guild::getRoles)
                 .flatMapMany(Flux::collectList)
                 .blockLast();
