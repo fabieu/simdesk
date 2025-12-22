@@ -74,7 +74,7 @@ public class DiscordService {
 
     // Leverages Discord's REST API to get member data for the user associated with the provided access token
     public MemberData getMemberData(String accessToken) {
-        String url = String.format("%s/users/@me/guilds/%s/member ", DISCORD_API_BASE_URL, guildId);
+        String url = String.format("%s/users/@me/guilds/%s/member", DISCORD_API_BASE_URL, guildId.asString());
         ResponseEntity<MemberData> response = restTemplate.exchange(url, HttpMethod.GET, defaultEntity(accessToken), MemberData.class);
 
         return response.getBody();
