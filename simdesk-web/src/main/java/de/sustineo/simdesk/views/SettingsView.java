@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views;
 import com.vaadin.flow.component.Component;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.grid.ColumnTextAlign;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.editor.Editor;
@@ -16,7 +17,6 @@ import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.Route;
-import de.sustineo.simdesk.configuration.ProfileManager;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.entities.auth.User;
 import de.sustineo.simdesk.entities.auth.UserPrincipal;
@@ -26,12 +26,16 @@ import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.ApiKeyService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.auth.UserService;
+import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
+import discord4j.common.util.Snowflake;
+import discord4j.core.object.entity.Role;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 
 import javax.annotation.Nonnull;
-import java.util.Objects;
+import java.util.Collections;
+import java.util.Map;
 import java.util.Optional;
 
 @Log
@@ -42,6 +46,7 @@ public class SettingsView extends BaseView {
     private final NotificationService notificationService;
     private final ApiKeyService apiKeyService;
     private final SecurityService securityService;
+    private final Optional<DiscordService> discordService;
 
     private final ButtonComponentFactory buttonComponentFactory;
 
@@ -51,11 +56,13 @@ public class SettingsView extends BaseView {
                         UserService userService,
                         ApiKeyService apiKeyService,
                         SecurityService securityService,
+                        Optional<DiscordService> discordService,
                         ButtonComponentFactory buttonComponentFactory) {
         this.notificationService = notificationService;
         this.userService = userService;
         this.apiKeyService = apiKeyService;
         this.securityService = securityService;
+        this.discordService = discordService;
         this.buttonComponentFactory = buttonComponentFactory;
 
         setSizeFull();
@@ -84,7 +91,7 @@ public class SettingsView extends BaseView {
 
         tabSheet.add("API Keys", createApiKeysTab());
 
-        if (ProfileManager.isDiscordProfileEnabled()) {
+        if (discordService.isPresent()) {
             tabSheet.add("Discord", createDiscordTab());
         }
 
@@ -223,12 +230,15 @@ public class SettingsView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
+
         Grid.Column<UserRole> descriptionColumn = grid.addColumn(UserRole::getDescription)
                 .setHeader("Description");
+
         Grid.Column<UserRole> discordRoleIdColumn = grid.addColumn(UserRole::getDiscordRoleId)
                 .setHeader("Discord Role ID")
                 .setWidth("15rem")
                 .setFlexGrow(0);
+
         Grid.Column<UserRole> updateColumn = grid.addComponentColumn(userRole -> {
                     Button updateButton = buttonComponentFactory.createPrimaryButton("Update");
                     updateButton.addClickListener(e -> {
@@ -243,15 +253,20 @@ public class SettingsView extends BaseView {
                 .setWidth("170px")
                 .setFlexGrow(0);
 
-        TextField discordRoleIdField = new TextField();
-        discordRoleIdField.setWidthFull();
-        discordRoleIdField.setClearButtonVisible(true);
-        binder.forField(discordRoleIdField)
-                .withNullRepresentation("")
-                .withConverter(s -> s, s -> Objects.toString(s, ""))
-                .withValidator(discordId -> discordId == null || discordId.matches("[0-9]+"), "Discord Role ID is not a valid")
+        Map<Snowflake, Role> guildRoleMap = discordService
+                .map(DiscordService::getGuildRoleMap)
+                .orElse(Collections.emptyMap());
+
+        ComboBox<Role> discordRoleComboBox = new ComboBox<>();
+        discordRoleComboBox.setWidthFull();
+        discordRoleComboBox.setClearButtonVisible(true);
+        discordRoleComboBox.setItems(guildRoleMap.values());
+        discordRoleComboBox.setItemLabelGenerator(Role::getName);
+        discordRoleComboBox.setClearButtonVisible(true);
+        binder.forField(discordRoleComboBox)
+                .withConverter(role -> role.getId().asString(), string -> guildRoleMap.get(Snowflake.of(string)))
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
-        discordRoleIdColumn.setEditorComponent(discordRoleIdField);
+        discordRoleIdColumn.setEditorComponent(discordRoleComboBox);
 
         Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
