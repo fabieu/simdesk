@@ -122,7 +122,7 @@ public class LeaderboardSessionsView extends BaseView {
             updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TIME_RANGE, event.getValue().name().toLowerCase()));
         });
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_MANAGER)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
             Button uploadSessionButton = new Button("Upload sessions");
             uploadSessionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             uploadSessionButton.addClickListener(event -> createUploadSessionDialog().open());

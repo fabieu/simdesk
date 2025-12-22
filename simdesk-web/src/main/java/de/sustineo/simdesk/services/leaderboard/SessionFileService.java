@@ -33,7 +33,7 @@ public class SessionFileService {
         }
     }
 
-    @PreAuthorize("hasAnyAuthority(T(de.sustineo.simdesk.entities.auth.UserRoleEnum).ROLE_ADMIN, T(de.sustineo.simdesk.entities.auth.UserRoleEnum).ROLE_MANAGER)")
+    @PreAuthorize("hasAnyAuthority(T(de.sustineo.simdesk.entities.auth.UserRoleEnum).ROLE_ADMIN)")
     public void handleSessionFileWithSessionDatetimeOverride(@Nonnull Path path, @Nullable Instant sessionDatetimeOverride) throws Exception {
         handleSessionFile(path, sessionDatetimeOverride);
     }
