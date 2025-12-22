@@ -145,4 +145,5 @@ simdesk:
   auth:
     discord:
       guild-id: ${SIMDESK_DISCORD_GUILD_ID}
+      token: ${SIMDESK_DISCORD_BOT_TOKEN}
 

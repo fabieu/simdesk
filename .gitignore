@@ -60,6 +60,7 @@ replay_pid*
 .idea/**/dynamic.xml
 .idea/**/uiDesigner.xml
 .idea/**/dbnavigator.xml
+.idea/db-forest-config.xml
 
 # Gradle
 .idea/**/gradle.xml
