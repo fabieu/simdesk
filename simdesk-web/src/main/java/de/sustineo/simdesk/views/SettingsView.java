@@ -206,6 +206,10 @@ public class SettingsView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
 
+        Map<Snowflake, Role> guildRoleMap = discordService
+                .map(DiscordService::getGuildRoleMap)
+                .orElse(Collections.emptyMap());
+
         Grid<UserRole> grid = new Grid<>(UserRole.class, false);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setItems(userService.getAllRoles());
@@ -234,8 +238,13 @@ public class SettingsView extends BaseView {
         Grid.Column<UserRole> descriptionColumn = grid.addColumn(UserRole::getDescription)
                 .setHeader("Description");
 
-        Grid.Column<UserRole> discordRoleIdColumn = grid.addColumn(UserRole::getDiscordRoleId)
-                .setHeader("Discord Role ID")
+        Grid.Column<UserRole> discordRoleColumn = grid.addColumn(userRole -> Optional.ofNullable(userRole.getDiscordRoleId())
+                        .map(Snowflake::of)
+                        .map(guildRoleMap::get)
+                        .map(Role::getName)
+                        .orElse(null)
+                )
+                .setHeader("Discord Role")
                 .setWidth("15rem")
                 .setFlexGrow(0);
 
@@ -253,10 +262,6 @@ public class SettingsView extends BaseView {
                 .setWidth("170px")
                 .setFlexGrow(0);
 
-        Map<Snowflake, Role> guildRoleMap = discordService
-                .map(DiscordService::getGuildRoleMap)
-                .orElse(Collections.emptyMap());
-
         ComboBox<Role> discordRoleComboBox = new ComboBox<>();
         discordRoleComboBox.setWidthFull();
         discordRoleComboBox.setClearButtonVisible(true);
@@ -264,9 +269,15 @@ public class SettingsView extends BaseView {
         discordRoleComboBox.setItemLabelGenerator(Role::getName);
         discordRoleComboBox.setClearButtonVisible(true);
         binder.forField(discordRoleComboBox)
-                .withConverter(role -> role.getId().asString(), string -> guildRoleMap.get(Snowflake.of(string)))
+                .withConverter(
+                        role -> role == null ? null : role.getId().asString(),
+                        string -> Optional.ofNullable(string)
+                                .map(Snowflake::of)
+                                .map(guildRoleMap::get)
+                                .orElse(null)
+                )
                 .bind(UserRole::getDiscordRoleId, UserRole::setDiscordRoleId);
-        discordRoleIdColumn.setEditorComponent(discordRoleComboBox);
+        discordRoleColumn.setEditorComponent(discordRoleComboBox);
 
         Button saveButton = buttonComponentFactory.createPrimarySuccessButton("Save");
         saveButton.addClickListener(e -> editor.save());
