@@ -134,15 +134,16 @@ spring:
             scope:
               - identify
               - guilds.members.read
-            redirectUri: "{baseUrl}/login/oauth2/code/discord"
+            redirectUri: "{baseUrl}/login/oauth2/code/{registrationId}"
         provider:
           discord:
-            authorizationUri: https://discordapp.com/api/oauth2/authorize
-            tokenUri: https://discordapp.com/api/oauth2/token
-            userInfoUri: https://discordapp.com/api/users/@me
+            authorizationUri: https://discord.com/oauth2/authorize
+            tokenUri: https://discord.com/api/oauth2/token
+            userInfoUri: https://discord.com/api/users/@me
             user-name-attribute: id
 simdesk:
   auth:
     discord:
       guild-id: ${SIMDESK_DISCORD_GUILD_ID}
+      token: ${SIMDESK_DISCORD_BOT_TOKEN}
 
