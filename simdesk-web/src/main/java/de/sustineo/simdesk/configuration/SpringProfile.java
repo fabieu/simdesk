@@ -3,8 +3,6 @@ package de.sustineo.simdesk.configuration;
 import org.springframework.context.annotation.Configuration;
 import org.springframework.core.env.Environment;
 
-import java.util.List;
-
 @Configuration
 public class SpringProfile {
     public static final String STEWARDING = "stewarding";
@@ -22,36 +20,36 @@ public class SpringProfile {
         SpringProfile.environment = environment;
     }
 
-    private static boolean isActive(String profile) {
-        return List.of(environment.getActiveProfiles()).contains(profile);
+    private static boolean matchesProfiles(String profileExpression) {
+        return environment.matchesProfiles(profileExpression);
     }
 
     public static boolean isDebug() {
-        return isActive(DEBUG);
+        return matchesProfiles(DEBUG);
     }
 
     public static boolean isStewardingEnabled() {
-        return isActive(STEWARDING);
+        return matchesProfiles(STEWARDING);
     }
 
     public static boolean isLeaderboardEnabled() {
-        return isActive(LEADERBOARD);
+        return matchesProfiles(LEADERBOARD);
     }
 
     public static boolean isEntrylistEnabled() {
-        return isActive(ENTRYLIST);
+        return matchesProfiles(ENTRYLIST);
     }
 
     public static boolean isBopEnabled() {
-        return isActive(BOP);
+        return matchesProfiles(BOP);
     }
 
     public static boolean isMapEnabled() {
-        return isActive(MAP);
+        return matchesProfiles(MAP);
     }
 
     public static boolean isDiscordEnabled() {
-        return isActive(DISCORD);
+        return matchesProfiles(DISCORD);
     }
 
     public static boolean isOAuth2Enabled() {
