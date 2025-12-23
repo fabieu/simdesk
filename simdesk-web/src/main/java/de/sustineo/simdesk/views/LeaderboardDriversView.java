@@ -16,7 +16,7 @@ import com.vaadin.flow.component.select.Select;
 import com.vaadin.flow.data.binder.Binder;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.DriverAlias;
 import de.sustineo.simdesk.entities.Visibility;
@@ -37,7 +37,7 @@ import java.util.Comparator;
 import java.util.List;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Route(value = "/leaderboard/drivers")
 @RolesAllowed({"ADMIN"})
 @RequiredArgsConstructor

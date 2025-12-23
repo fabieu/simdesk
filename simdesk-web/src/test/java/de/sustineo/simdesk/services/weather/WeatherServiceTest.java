@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.weather;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -14,10 +14,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles({ProfileManager.PROFILE_MAP})
+@ActiveProfiles({SpringProfile.MAP})
 @SpringBootTest(classes = {
         WeatherService.class,
-        ProfileManager.class,
+        SpringProfile.class,
         Environment.class
 })
 class WeatherServiceTest {
@@ -25,7 +25,7 @@ class WeatherServiceTest {
     private WeatherService weatherService;
 
     @Autowired
-    private ProfileManager profileManager;
+    private SpringProfile springProfile;
 
     @MockitoBean
     private RestTemplate restTemplate;

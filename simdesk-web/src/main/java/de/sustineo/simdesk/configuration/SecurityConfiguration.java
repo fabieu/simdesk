@@ -89,7 +89,7 @@ public class SecurityConfiguration {
                         .defaultSuccessUrl(LOGIN_SUCCESS_URL)
                 );
 
-        if (ProfileManager.isOAuth2ProfileEnabled()) {
+        if (SpringProfile.isOAuth2Enabled()) {
             http
                     .oauth2Login(oauth2 -> oauth2
                             .loginPage("/login/oauth")

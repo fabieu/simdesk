@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.controller;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
@@ -25,7 +25,7 @@ import org.springframework.web.server.ResponseStatusException;
 import java.time.Instant;
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @RestController
 @RequestMapping(value = "/api/v1", produces = "application/json")
 @PreAuthorize("hasAnyRole('ADMIN')")

@@ -18,7 +18,7 @@ public class RestClientConfiguration {
         return RestClient.builder().build();
     }
 
-    @Profile(ProfileManager.PROFILE_DISCORD)
+    @Profile(SpringProfile.DISCORD)
     @Bean
     @Qualifier("discord")
     public RestClient restClientDiscord(@Qualifier("discord") ObjectMapper objectMapper) {

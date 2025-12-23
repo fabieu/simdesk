@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
@@ -25,10 +25,10 @@ import static org.assertj.core.api.Assertions.assertThat;
 import static org.mockito.ArgumentMatchers.any;
 import static org.mockito.Mockito.when;
 
-@ActiveProfiles({ProfileManager.PROFILE_LEADERBOARD})
+@ActiveProfiles({SpringProfile.LEADERBOARD})
 @SpringBootTest(classes = {
         SearchService.class,
-        ProfileManager.class
+        SpringProfile.class
 })
 class SearchServiceTest {
     @Autowired

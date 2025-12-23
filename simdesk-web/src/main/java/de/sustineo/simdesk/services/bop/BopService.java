@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.bop;
 
 import de.sustineo.simdesk.configuration.CacheNames;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Setting;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
@@ -28,7 +28,7 @@ import java.util.Set;
 import java.util.stream.Collectors;
 
 @Log
-@Profile(ProfileManager.PROFILE_BOP)
+@Profile(SpringProfile.BOP)
 @Service
 @RequiredArgsConstructor
 public class BopService {

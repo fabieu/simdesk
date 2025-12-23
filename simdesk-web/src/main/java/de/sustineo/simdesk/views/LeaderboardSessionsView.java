@@ -21,7 +21,7 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.TemporaryFileFactory;
 import com.vaadin.flow.server.streams.UploadHandler;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
 import de.sustineo.simdesk.entities.Track;
@@ -54,7 +54,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Route(value = "/leaderboard/sessions")
 @AnonymousAllowed
 @RequiredArgsConstructor

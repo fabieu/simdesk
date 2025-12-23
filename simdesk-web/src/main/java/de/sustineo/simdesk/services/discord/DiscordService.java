@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.discord;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
@@ -32,7 +32,7 @@ import java.util.stream.Collectors;
 
 @Log
 @Getter
-@Profile(ProfileManager.PROFILE_DISCORD)
+@Profile(SpringProfile.DISCORD)
 @Service
 public class DiscordService {
     private final GatewayDiscordClient client;

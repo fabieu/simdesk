@@ -28,7 +28,7 @@ import com.vaadin.flow.dom.Style;
 import com.vaadin.flow.function.SerializablePredicate;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.UploadHandler;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
@@ -62,7 +62,7 @@ import java.util.concurrent.atomic.AtomicReference;
 import java.util.stream.Collectors;
 
 @Log
-@Profile(ProfileManager.PROFILE_BOP)
+@Profile(SpringProfile.BOP)
 @Route(value = "/bop/management")
 @RolesAllowed({"ADMIN"})
 public class BopManagementView extends BaseView {

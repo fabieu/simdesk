@@ -27,7 +27,7 @@ public class JacksonConfiguration {
         return builder.build();
     }
 
-    @Profile(ProfileManager.PROFILE_DISCORD)
+    @Profile(SpringProfile.DISCORD)
     @Bean
     @Qualifier("discord")
     public ObjectMapper objectMapperDiscord() {

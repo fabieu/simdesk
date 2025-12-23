@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.leaderboard;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.DriverAlias;
 import de.sustineo.simdesk.mybatis.mapper.DriverAliasMapper;
 import lombok.RequiredArgsConstructor;
@@ -9,7 +9,7 @@ import org.springframework.stereotype.Service;
 
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 @RequiredArgsConstructor
 public class DriverAliasService {

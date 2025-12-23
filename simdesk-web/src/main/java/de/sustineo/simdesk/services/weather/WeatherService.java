@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.weather;
 
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Constants;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
@@ -30,7 +30,7 @@ import java.util.Optional;
 import java.util.logging.Level;
 
 @Log
-@Profile(ProfileManager.PROFILE_MAP)
+@Profile(SpringProfile.MAP)
 @Service
 public class WeatherService {
     private static final String OPENWEATHERMAP_ONE_CALL_3_TEMPLATE = "https://api.openweathermap.org/data/3.0/onecall?lat=%s&lon=%s&exclude=minutely,daily,alerts&units=metric&appid=%s";
@@ -351,7 +351,7 @@ public class WeatherService {
         // Fetch current weather data from OpenWeatherMap API
         for (Track track : Track.getAll()) {
             // Only fetch weather data for Kyalami Circuit in debug mode
-            if (ProfileManager.isDebug() && !track.getAccId().equals("kyalami")) {
+            if (SpringProfile.isDebug() && !track.getAccId().equals("kyalami")) {
                 continue;
             }
 

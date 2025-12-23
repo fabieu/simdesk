@@ -2,7 +2,7 @@ package de.sustineo.simdesk.services;
 
 import com.vaadin.flow.component.icon.VaadinIcon;
 import com.vaadin.flow.theme.lumo.LumoIcon;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
@@ -29,7 +29,7 @@ public class MenuService {
     public List<MenuEntity> getItems() {
         List<MenuEntity> items = new ArrayList<>();
 
-        if (ProfileManager.isLeaderboardProfileEnabled()) {
+        if (SpringProfile.isLeaderboardEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Lap Records", VaadinIcon.TROPHY, LeaderboardOverallLapTimesView.class));
             items.add(MenuEntity.ofInternal(MenuEntityCategory.LEADERBOARD, "Sessions", LumoIcon.UNORDERED_LIST, LeaderboardSessionsView.class));
 
@@ -38,11 +38,11 @@ public class MenuService {
             }
         }
 
-        if (ProfileManager.isEntrylistProfileEnabled()) {
+        if (SpringProfile.isEntrylistEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.ENTRYLIST, "Editor", VaadinIcon.CLIPBOARD_CHECK, EntrylistEditorView.class));
         }
 
-        if (ProfileManager.isBopProfileEnabled()) {
+        if (SpringProfile.isBopEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Editor", VaadinIcon.SCALE, BopEditorView.class));
             items.add(MenuEntity.ofInternal(MenuEntityCategory.BALANCE_OF_PERFORMANCE, "Overview", VaadinIcon.CHART_3D, BopDisplayView.class));
 
@@ -51,7 +51,7 @@ public class MenuService {
             }
         }
 
-        if (ProfileManager.isMapProfileEnabled()) {
+        if (SpringProfile.isMapEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.MAP, "Map", VaadinIcon.MAP_MARKER, MapView.class));
         }
 

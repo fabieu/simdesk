@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.leaderboard;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.DriverAlias;
 import de.sustineo.simdesk.mybatis.mapper.DriverMapper;
@@ -12,7 +12,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 @RequiredArgsConstructor
 public class DriverService {
