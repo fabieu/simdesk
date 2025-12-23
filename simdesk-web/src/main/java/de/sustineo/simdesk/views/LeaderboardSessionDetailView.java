@@ -7,7 +7,7 @@ import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.data.selection.SingleSelect;
 import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.LeaderboardLine;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
@@ -27,7 +27,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:fileChecksum")
 @AnonymousAllowed
 @RequiredArgsConstructor

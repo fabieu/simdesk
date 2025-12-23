@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.entrylist;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CustomCar;
 import de.sustineo.simdesk.entities.json.kunos.acc.*;
 import de.sustineo.simdesk.entities.validation.ValidationData;
@@ -19,7 +19,7 @@ import java.util.function.Function;
 import java.util.logging.Level;
 import java.util.stream.Collectors;
 
-@Profile(ProfileManager.PROFILE_ENTRYLIST)
+@Profile(SpringProfile.ENTRYLIST)
 @Log
 @Service
 @RequiredArgsConstructor

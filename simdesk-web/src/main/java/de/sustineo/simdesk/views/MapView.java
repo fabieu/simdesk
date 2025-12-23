@@ -6,7 +6,7 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
@@ -33,7 +33,7 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Optional;
 
-@Profile(ProfileManager.PROFILE_MAP)
+@Profile(SpringProfile.MAP)
 @Route(value = "/map")
 @AnonymousAllowed
 public class MapView extends BaseView {

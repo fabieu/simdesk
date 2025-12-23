@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.leaderboard;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.utils.encoding.EncodingUtils;
@@ -19,7 +19,7 @@ import java.time.Instant;
 import java.util.logging.Level;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 @RequiredArgsConstructor
 public class SessionFileService {

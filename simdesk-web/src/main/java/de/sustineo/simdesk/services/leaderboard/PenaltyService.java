@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.leaderboard;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
@@ -13,7 +13,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Log
 @Service
 public class PenaltyService {

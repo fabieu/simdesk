@@ -11,7 +11,7 @@ import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.services.NotificationService;
 
 @Route(value = "login")
@@ -45,7 +45,7 @@ public class LoginView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setMaxWidth("calc(var(--lumo-size-m) * 10)");
 
-        if (ProfileManager.isDiscordProfileEnabled()) {
+        if (SpringProfile.isDiscordEnabled()) {
             layout.add(createDiscordLoginButton());
         }
 

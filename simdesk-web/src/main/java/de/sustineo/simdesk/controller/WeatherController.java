@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.controller;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
@@ -31,11 +31,11 @@ import java.util.Optional;
  * Controller for handling weather-related API endpoints.
  *
  * <p>This controller is only active when the application is running
- * under the {@link ProfileManager#PROFILE_MAP} profile.</p>
+ * under the {@link SpringProfile#MAP} profile.</p>
  *
  * <p>All endpoints in this controller require the user to have the 'ADMIN' role.</p>
  */
-@Profile(ProfileManager.PROFILE_MAP)
+@Profile(SpringProfile.MAP)
 @RestController
 @RequestMapping(value = "/api/v1/weather", produces = "application/json")
 @PreAuthorize("hasAnyRole('ADMIN')")

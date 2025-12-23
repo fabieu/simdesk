@@ -21,7 +21,7 @@ import com.vaadin.flow.router.NotFoundException;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Penalty;
 import de.sustineo.simdesk.entities.Session;
@@ -48,7 +48,7 @@ import java.util.List;
 import java.util.stream.Collectors;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Route(value = "/leaderboard/sessions/:fileChecksum/details/:carId")
 @AnonymousAllowed
 @RequiredArgsConstructor

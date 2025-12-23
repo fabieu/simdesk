@@ -45,7 +45,7 @@ import com.vaadin.flow.server.streams.DownloadHandler;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import com.vaadin.flow.theme.lumo.LumoIcon;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.*;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.comparator.AccEntrylistEntryDefaultIntegerComparator;
@@ -88,7 +88,7 @@ import java.time.Duration;
 import java.util.*;
 import java.util.concurrent.atomic.AtomicReference;
 
-@Profile(ProfileManager.PROFILE_ENTRYLIST)
+@Profile(SpringProfile.ENTRYLIST)
 @Log
 @CssImport("flag-icons/css/flag-icons.min.css")
 @Route(value = "/entrylist/editor")

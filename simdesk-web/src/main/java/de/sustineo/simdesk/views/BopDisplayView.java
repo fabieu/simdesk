@@ -24,7 +24,7 @@ import com.vaadin.flow.router.QueryParameters;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Track;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
@@ -50,7 +50,7 @@ import java.util.*;
 import java.util.stream.Collectors;
 
 @Log
-@Profile(ProfileManager.PROFILE_BOP)
+@Profile(SpringProfile.BOP)
 @Route(value = "/bop/overview")
 @AnonymousAllowed
 public class BopDisplayView extends BaseView {

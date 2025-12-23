@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.converter;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
@@ -9,7 +9,7 @@ import org.apache.commons.lang3.StringUtils;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 public class DriverConverter extends BaseConverter {
     public Driver convertToDriver(AccDriver accDriver, FileMetadata fileMetadata) {

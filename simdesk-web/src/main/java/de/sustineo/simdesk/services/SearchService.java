@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.search.SearchResult;
@@ -18,7 +18,7 @@ import java.util.Comparator;
 import java.util.List;
 import java.util.stream.Collectors;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 @RequiredArgsConstructor
 public class SearchService {

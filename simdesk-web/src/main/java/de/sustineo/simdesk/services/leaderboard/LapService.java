@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.CacheNames;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Lap;
 import de.sustineo.simdesk.entities.Session;
@@ -20,7 +20,7 @@ import org.springframework.transaction.annotation.Transactional;
 
 import java.util.List;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Log
 @Service
 public class LapService {

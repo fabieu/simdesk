@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.services.entrylist;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CustomCar;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccDriver;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccEntrylist;
@@ -16,10 +16,10 @@ import java.util.List;
 
 import static org.assertj.core.api.Assertions.assertThat;
 
-@ActiveProfiles({ProfileManager.PROFILE_ENTRYLIST})
+@ActiveProfiles({SpringProfile.ENTRYLIST})
 @SpringBootTest(classes = {
         EntrylistService.class,
-        ProfileManager.class
+        SpringProfile.class
 })
 class EntrylistServiceTest {
     @Autowired

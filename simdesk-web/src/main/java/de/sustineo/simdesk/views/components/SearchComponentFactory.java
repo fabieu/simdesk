@@ -8,7 +8,7 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.data.renderer.ComponentRenderer;
 import com.vaadin.flow.router.RouteParameters;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.search.SearchResult;
 import de.sustineo.simdesk.services.SearchService;
 import de.sustineo.simdesk.views.LeaderboardDriverDetailView;
@@ -17,7 +17,7 @@ import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD + " & " + ProfileManager.PROFILE_INSIGHTS)
+@Profile(SpringProfile.LEADERBOARD + " & " + SpringProfile.ANALYTICS)
 @Service
 @RequiredArgsConstructor
 public class SearchComponentFactory {

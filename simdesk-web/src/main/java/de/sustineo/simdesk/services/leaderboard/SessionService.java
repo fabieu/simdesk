@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.CacheNames;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
@@ -22,7 +22,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.regex.Pattern;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Log
 @Service
 public class SessionService {

@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.FileContentConfiguration;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import jakarta.annotation.PreDestroy;
 import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
@@ -23,7 +23,7 @@ import java.util.Set;
 import java.util.logging.Level;
 
 @Log
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 public class SessionFileWatcherService {
     private final SessionFileService sessionFileService;

@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.services.leaderboard;
 
 import de.sustineo.simdesk.configuration.CacheNames;
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CarGroup;
 import de.sustineo.simdesk.entities.comparator.DriverRankingComparator;
 import de.sustineo.simdesk.entities.comparator.GroupRankingComparator;
@@ -26,7 +26,7 @@ import java.util.concurrent.atomic.AtomicInteger;
 import java.util.function.Function;
 import java.util.stream.Collectors;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @Service
 @RequiredArgsConstructor
 public class RankingService {

@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.controller;
 
-import de.sustineo.simdesk.configuration.ProfileManager;
+import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
 import de.sustineo.simdesk.entities.output.SessionResponse;
 import de.sustineo.simdesk.services.leaderboard.LapService;
@@ -23,7 +23,7 @@ import java.time.Instant;
 import java.util.List;
 import java.util.Objects;
 
-@Profile(ProfileManager.PROFILE_LEADERBOARD)
+@Profile(SpringProfile.LEADERBOARD)
 @RestController
 @RequestMapping(value = "/api/v1/drivers", produces = "application/json")
 @PreAuthorize("hasAnyRole('ADMIN')")
