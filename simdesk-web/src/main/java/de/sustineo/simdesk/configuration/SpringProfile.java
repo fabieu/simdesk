@@ -5,14 +5,19 @@ import org.springframework.core.env.Environment;
 
 @Configuration
 public class SpringProfile {
+    // General
+    public static final String DEBUG = "debug";
+
+    // Authentication
+    public static final String DISCORD = "discord";
+
+    // Features
     public static final String STEWARDING = "stewarding";
+    public static final String MAP = "map";
+    public static final String ANALYTICS = "analytics";
     public static final String LEADERBOARD = "acc-leaderboard";
     public static final String ENTRYLIST = "acc-entrylist";
     public static final String BOP = "acc-bop";
-    public static final String MAP = "map";
-    public static final String DISCORD = "discord";
-    public static final String ANALYTICS = "analytics";
-    public static final String DEBUG = "debug";
 
     private static Environment environment;
 
@@ -28,8 +33,24 @@ public class SpringProfile {
         return matchesProfiles(DEBUG);
     }
 
+    public static boolean isDiscordEnabled() {
+        return matchesProfiles(DISCORD);
+    }
+
+    public static boolean isOAuth2Enabled() {
+        return isDiscordEnabled();
+    }
+
     public static boolean isStewardingEnabled() {
         return matchesProfiles(STEWARDING);
+    }
+
+    public static boolean isMapEnabled() {
+        return matchesProfiles(MAP);
+    }
+
+    public static boolean isAnalyticsEnabled() {
+        return matchesProfiles(ANALYTICS);
     }
 
     public static boolean isLeaderboardEnabled() {
@@ -42,17 +63,5 @@ public class SpringProfile {
 
     public static boolean isBopEnabled() {
         return matchesProfiles(BOP);
-    }
-
-    public static boolean isMapEnabled() {
-        return matchesProfiles(MAP);
-    }
-
-    public static boolean isDiscordEnabled() {
-        return matchesProfiles(DISCORD);
-    }
-
-    public static boolean isOAuth2Enabled() {
-        return isDiscordEnabled();
     }
 }
