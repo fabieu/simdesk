@@ -19,8 +19,8 @@ public class RestClientConfiguration {
     }
 
     @Profile(ProfileManager.PROFILE_DISCORD)
-    @Qualifier("discord")
     @Bean
+    @Qualifier("discord")
     public RestClient restClientDiscord(@Qualifier("discord") ObjectMapper objectMapper) {
         MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper);
 

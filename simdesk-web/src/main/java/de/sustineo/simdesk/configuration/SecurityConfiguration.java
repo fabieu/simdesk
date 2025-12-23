@@ -5,9 +5,10 @@ import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyC
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
-import de.sustineo.simdesk.services.auth.DiscordAuthService;
 import de.sustineo.simdesk.services.auth.UserService;
+import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
+import discord4j.common.util.Snowflake;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Bean;
@@ -63,7 +64,7 @@ public class SecurityConfiguration {
     public static final int USER_ID_ADMIN = 1;
 
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
-    private final Optional<DiscordAuthService> discordAuthService;
+    private final Optional<DiscordService> discordService;
     private final UserService userService;
 
     @Bean
@@ -123,14 +124,19 @@ public class SecurityConfiguration {
             String userNameAttributeName = request.getClientRegistration().getProviderDetails().getUserInfoEndpoint().getUserNameAttributeName();
 
             // Delegate to the default implementation for loading a user
-            OAuth2User oAuthUser = delegate.loadUser(request);
+            OAuth2User user = delegate.loadUser(request);
 
-            if (discordAuthService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
+            if (discordService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
                 try {
-                    String accessToken = request.getAccessToken().getTokenValue();
+                    String userId = user.getAttribute(userNameAttributeName);
+                    if (userId == null) {
+                        throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", "Missing user ID", ""));
+                    }
 
                     // Get the roles of the user from the Discord bot installed in the guild
-                    Set<String> memberRoleIds = discordAuthService.get().getMemberRoleIds(accessToken);
+                    Set<String> memberRoleIds = discordService.get().getMember(Snowflake.of(userId)).getRoleIds().stream()
+                            .map(Snowflake::asString)
+                            .collect(Collectors.toSet());
 
                     // Map the guild roles to Spring Security authorities
                     Set<GrantedAuthority> authorities = userService.getAllRoles().stream()
@@ -139,19 +145,19 @@ public class SecurityConfiguration {
                             .map(userRole -> new SimpleGrantedAuthority(userRole.getName().name()))
                             .collect(Collectors.toSet());
 
-                    Map<String, Object> attributes = new LinkedHashMap<>(oAuthUser.getAttributes());
+                    Map<String, Object> attributes = new LinkedHashMap<>(user.getAttributes());
                     attributes.put(ATTRIBUTE_AUTH_PROVIDER, AUTH_PROVIDER_DISCORD);
 
-                    oAuthUser = new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), userNameAttributeName);
+                    user = new DefaultOAuth2User(authorities, Collections.unmodifiableMap(attributes), userNameAttributeName);
 
-                    userService.insertDiscordUser(oAuthUser.getName(), oAuthUser.getAuthorities());
+                    userService.insertDiscordUser(user.getName(), user.getAuthorities());
                 } catch (Exception e) {
-                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", oAuthUser.getName(), e.getMessage()));
+                    log.severe(String.format("Failed to load roles for user: %s, reason: %s", user.getName(), e.getMessage()));
                     throw new OAuth2AuthenticationException(new OAuth2Error("invalid_token", e.getMessage(), ""));
                 }
             }
 
-            return oAuthUser;
+            return user;
         });
     }
 }

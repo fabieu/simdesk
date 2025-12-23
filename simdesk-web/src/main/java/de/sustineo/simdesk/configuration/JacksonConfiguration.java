@@ -28,8 +28,8 @@ public class JacksonConfiguration {
     }
 
     @Profile(ProfileManager.PROFILE_DISCORD)
-    @Qualifier("discord")
     @Bean
+    @Qualifier("discord")
     public ObjectMapper objectMapperDiscord() {
         return JacksonResources.create().getObjectMapper();
     }

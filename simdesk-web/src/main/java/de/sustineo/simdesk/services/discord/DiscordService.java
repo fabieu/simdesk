@@ -5,6 +5,8 @@ import discord4j.common.util.Snowflake;
 import discord4j.core.DiscordClientBuilder;
 import discord4j.core.GatewayDiscordClient;
 import discord4j.core.object.entity.Guild;
+import discord4j.core.object.entity.Member;
+import discord4j.core.object.entity.Message;
 import discord4j.core.object.entity.Role;
 import discord4j.core.object.entity.channel.Channel;
 import discord4j.core.object.entity.channel.GuildChannel;
@@ -49,9 +51,13 @@ public class DiscordService {
 
     @PreDestroy
     public void shutdown() {
-        if (client != null) {
-            client.logout().subscribe();
-        }
+        client.logout().subscribe();
+    }
+
+    public Member getMember(Snowflake userId) {
+        return client.getGuildById(guildId)
+                .flatMap(guild -> guild.getMemberById(userId))
+                .block();
     }
 
     public List<Role> getGuildRoles() throws ClientException {
@@ -59,7 +65,7 @@ public class DiscordService {
                 .map(Guild::getRoles)
                 .flatMapMany(Function.identity())
                 .collectList()
-                .block();
+                .block(Duration.ofSeconds(10));
     }
 
     public Map<Snowflake, Role> getGuildRoleMap() throws ClientException {
@@ -72,7 +78,7 @@ public class DiscordService {
                 .map(Guild::getChannels)
                 .flatMapMany(Function.identity())
                 .collectList()
-                .block();
+                .block(Duration.ofSeconds(10));
     }
 
     public List<GuildChannel> getGuildTextChannels() {
@@ -81,10 +87,10 @@ public class DiscordService {
                 .toList();
     }
 
-    public void sendMessage(Snowflake channelId, MessageCreateSpec messageCreateSpec) {
-        client.getChannelById(channelId)
+    public Message sendMessage(Snowflake channelId, MessageCreateSpec messageCreateSpec) {
+        return client.getChannelById(channelId)
                 .ofType(GuildMessageChannel.class)
                 .flatMap(channel -> channel.createMessage(messageCreateSpec))
-                .subscribe(null, error -> log.severe("Failed to send Discord message: " + error.getMessage()));
+                .block();
     }
 }
