@@ -5,8 +5,8 @@ import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyC
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
+import de.sustineo.simdesk.services.auth.DiscordAuthService;
 import de.sustineo.simdesk.services.auth.UserService;
-import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.LoginView;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
@@ -63,7 +63,7 @@ public class SecurityConfiguration {
     public static final int USER_ID_ADMIN = 1;
 
     private final ApiKeyAuthenticationFilter apiKeyAuthenticationFilter;
-    private final Optional<DiscordService> discordService;
+    private final Optional<DiscordAuthService> discordAuthService;
     private final UserService userService;
 
     @Bean
@@ -125,12 +125,12 @@ public class SecurityConfiguration {
             // Delegate to the default implementation for loading a user
             OAuth2User oAuthUser = delegate.loadUser(request);
 
-            if (discordService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
+            if (discordAuthService.isPresent() && AUTH_PROVIDER_DISCORD.equals(request.getClientRegistration().getRegistrationId())) {
                 try {
                     String accessToken = request.getAccessToken().getTokenValue();
 
                     // Get the roles of the user from the Discord bot installed in the guild
-                    Set<String> memberRoleIds = discordService.get().getMemberRoleIds(accessToken);
+                    Set<String> memberRoleIds = discordAuthService.get().getMemberRoleIds(accessToken);
 
                     // Map the guild roles to Spring Security authorities
                     Set<GrantedAuthority> authorities = userService.getAllRoles().stream()

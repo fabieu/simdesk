@@ -18,7 +18,7 @@ import org.springframework.context.event.EventListener;
 import org.springframework.scheduling.annotation.Scheduled;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.HttpStatusCodeException;
-import org.springframework.web.client.RestTemplate;
+import org.springframework.web.client.RestClient;
 
 import java.math.BigDecimal;
 import java.math.RoundingMode;
@@ -37,16 +37,16 @@ public class WeatherService {
     private static final int OPENWEATHERMAP_FORECAST_HOURS = 48;
     private static final int DEFAULT_RACE_HOURS = 1;
 
-    private final RestTemplate restTemplate;
+    private final RestClient restClient;
 
     private final HashMap<Track, OpenWeatherModel> weatherModelsByTrack = new HashMap<>();
     private final String openweathermapApiKey;
     @Getter
     private Instant lastUpdate;
 
-    public WeatherService(RestTemplate restTemplate,
+    public WeatherService(RestClient restClient,
                           @Value("${simdesk.openweathermap.api-key}") String openweathermapApiKey) {
-        this.restTemplate = restTemplate;
+        this.restClient = restClient;
         this.openweathermapApiKey = openweathermapApiKey;
     }
 
@@ -359,7 +359,10 @@ public class WeatherService {
                 String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, track.getLatitude(), track.getLongitude(), openweathermapApiKey);
                 log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), Strings.CS.replace(url, openweathermapApiKey, Constants.HIDDEN)));
 
-                OpenWeatherModel weatherModel = restTemplate.getForObject(url, OpenWeatherModel.class);
+                OpenWeatherModel weatherModel = restClient.get()
+                        .uri(url)
+                        .retrieve()
+                        .body(OpenWeatherModel.class);
                 weatherModelsByTrack.put(track, weatherModel);
             } catch (HttpStatusCodeException e) {
                 log.log(Level.SEVERE, "Failed to fetch weather data for track " + track.getName() + ": " + e.getMessage(), e);
