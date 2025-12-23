@@ -14,13 +14,15 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.http.client.ClientException;
+import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
-import reactor.core.publisher.Flux;
 
+import java.time.Duration;
 import java.util.List;
 import java.util.Map;
 import java.util.function.Function;
@@ -34,22 +36,30 @@ public class DiscordService {
     private final GatewayDiscordClient client;
     private final Snowflake guildId;
 
-    public DiscordService(@Value("${simdesk.auth.discord.guild-id}") String guildId,
-                          @Value("${simdesk.auth.discord.token}") String token) {
+    public DiscordService(@NonNull @Value("${simdesk.auth.discord.guild-id}") String guildId,
+                          @NonNull @Value("${simdesk.auth.discord.token}") String token) {
         this.guildId = Snowflake.of(guildId);
         this.client = DiscordClientBuilder.create(token).build()
                 .gateway()
                 .setInitialPresence(ignore -> ClientPresence.online())
                 .setEnabledIntents(IntentSet.of(Intent.GUILD_MESSAGES))
                 .login()
-                .block();
+                .block(Duration.ofMinutes(1));
+    }
+
+    @PreDestroy
+    public void shutdown() {
+        if (client != null) {
+            client.logout().subscribe();
+        }
     }
 
     public List<Role> getGuildRoles() throws ClientException {
         return client.getGuildById(guildId)
                 .map(Guild::getRoles)
-                .flatMapMany(Flux::collectList)
-                .blockLast();
+                .flatMapMany(Function.identity())
+                .collectList()
+                .block();
     }
 
     public Map<Snowflake, Role> getGuildRoleMap() throws ClientException {
@@ -60,8 +70,9 @@ public class DiscordService {
     public List<GuildChannel> getGuildChannels() {
         return client.getGuildById(guildId)
                 .map(Guild::getChannels)
-                .flatMapMany(Flux::collectList)
-                .blockLast();
+                .flatMapMany(Function.identity())
+                .collectList()
+                .block();
     }
 
     public List<GuildChannel> getGuildTextChannels() {
@@ -74,6 +85,6 @@ public class DiscordService {
         client.getChannelById(channelId)
                 .ofType(GuildMessageChannel.class)
                 .flatMap(channel -> channel.createMessage(messageCreateSpec))
-                .subscribe();
+                .subscribe(null, error -> log.severe("Failed to send Discord message: " + error.getMessage()));
     }
 }

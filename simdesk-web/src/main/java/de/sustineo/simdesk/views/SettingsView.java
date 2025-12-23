@@ -168,17 +168,17 @@ public class SettingsView extends BaseView {
 
         refreshApiKeyGrid(user);
 
-        Grid.Column<ApiKey> apiKeyColumn = grid.addColumn(ApiKey::getApiKey)
+        grid.addColumn(ApiKey::getApiKey)
                 .setHeader("Key")
                 .setTooltipGenerator(ApiKey::getApiKey);
-        Grid.Column<ApiKey> nameColumn = grid.addColumn(ApiKey::getName)
+        grid.addColumn(ApiKey::getName)
                 .setHeader("Name")
                 .setTooltipGenerator(ApiKey::getName);
-        Grid.Column<ApiKey> activeColumn = grid.addColumn(apiKey -> Boolean.TRUE.equals(apiKey.getActive()) ? "Active" : "Inactive")
+        grid.addColumn(apiKey -> Boolean.TRUE.equals(apiKey.getActive()) ? "Active" : "Inactive")
                 .setHeader("Status")
                 .setAutoWidth(true)
                 .setFlexGrow(0);
-        Grid.Column<ApiKey> actionColumn = grid.addComponentColumn(apiKey -> createApiKeyActionComponent(apiKey, user))
+        grid.addComponentColumn(apiKey -> createApiKeyActionComponent(apiKey, user))
                 .setHeader("Actions")
                 .setTextAlign(ColumnTextAlign.END)
                 .setWidth("170px")
@@ -206,9 +206,7 @@ public class SettingsView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(false);
 
-        Map<Snowflake, Role> guildRoleMap = discordService
-                .map(DiscordService::getGuildRoleMap)
-                .orElse(Collections.emptyMap());
+        Map<Snowflake, Role> guildRoleMap = fetchGuildRoleMap();
 
         Grid<UserRole> grid = new Grid<>(UserRole.class, false);
         grid.setSelectionMode(Grid.SelectionMode.NONE);
@@ -229,13 +227,13 @@ public class SettingsView extends BaseView {
             }
         });
 
-        Grid.Column<UserRole> roleNameColumn = grid.addColumn(UserRole::getName)
+        grid.addColumn(UserRole::getName)
                 .setHeader("Role")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
 
-        Grid.Column<UserRole> descriptionColumn = grid.addColumn(UserRole::getDescription)
+        grid.addColumn(UserRole::getDescription)
                 .setHeader("Description");
 
         Grid.Column<UserRole> discordRoleColumn = grid.addColumn(userRole -> Optional.ofNullable(userRole.getDiscordRoleId())
@@ -264,7 +262,6 @@ public class SettingsView extends BaseView {
 
         ComboBox<Role> discordRoleComboBox = new ComboBox<>();
         discordRoleComboBox.setWidthFull();
-        discordRoleComboBox.setClearButtonVisible(true);
         discordRoleComboBox.setItems(guildRoleMap.values());
         discordRoleComboBox.setItemLabelGenerator(Role::getName);
         discordRoleComboBox.setClearButtonVisible(true);
@@ -291,6 +288,17 @@ public class SettingsView extends BaseView {
 
         layout.add(createTitle("User Roles"), grid);
         return layout;
+    }
+
+    private Map<Snowflake, Role> fetchGuildRoleMap() {
+        try {
+            return discordService
+                    .map(DiscordService::getGuildRoleMap)
+                    .orElse(Collections.emptyMap());
+        } catch (Exception e) {
+            notificationService.showErrorNotification("Failed to fetch Discord roles - " + e.getMessage());
+            return Collections.emptyMap();
+        }
     }
 
     private H3 createTitle(String title) {

@@ -8,11 +8,11 @@ import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Qualifier;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
+import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.Collections;
-import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -26,9 +26,9 @@ public class DiscordAuthService {
     private final String guildId;
     private final RestClient restClient;
 
-    public DiscordAuthService(@Value("${simdesk.auth.discord.guild-id}") String guildId,
+    public DiscordAuthService(@NonNull @Value("${simdesk.auth.discord.guild-id}") String guildId,
                               @Qualifier("discord") RestClient restClient) {
-        this.guildId = Objects.requireNonNull(guildId, "SIMDESK_DISCORD_GUILD_ID must not be null");
+        this.guildId = guildId;
         this.restClient = restClient;
     }
 

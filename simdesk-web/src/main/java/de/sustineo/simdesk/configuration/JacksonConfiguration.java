@@ -23,8 +23,8 @@ public class JacksonConfiguration {
 
     @Primary
     @Bean
-    public ObjectMapper objectMapper() {
-        return new Jackson2ObjectMapperBuilder().build();
+    public ObjectMapper objectMapper(Jackson2ObjectMapperBuilder builder) {
+        return builder.build();
     }
 
     @Profile(ProfileManager.PROFILE_DISCORD)
