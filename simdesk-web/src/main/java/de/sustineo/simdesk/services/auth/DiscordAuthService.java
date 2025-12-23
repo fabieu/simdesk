@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.services.auth;
 
 import de.sustineo.simdesk.configuration.ProfileManager;
-import discord4j.common.util.Snowflake;
 import discord4j.discordjson.Id;
 import discord4j.discordjson.json.MemberData;
 import lombok.Getter;
@@ -13,6 +12,7 @@ import org.springframework.stereotype.Service;
 import org.springframework.web.client.RestClient;
 
 import java.util.Collections;
+import java.util.Objects;
 import java.util.Set;
 import java.util.stream.Collectors;
 
@@ -21,20 +21,20 @@ import java.util.stream.Collectors;
 @Profile(ProfileManager.PROFILE_DISCORD)
 @Service
 public class DiscordAuthService {
-    private static final String DISCORD_API_BASE_URL = "https://discord.com/api";
+    private static final String DISCORD_API_BASE_URL = "https://discord.com/api/v10";
 
-    private final Snowflake guildId;
+    private final String guildId;
     private final RestClient restClient;
 
     public DiscordAuthService(@Value("${simdesk.auth.discord.guild-id}") String guildId,
                               @Qualifier("discord") RestClient restClient) {
-        this.guildId = Snowflake.of(guildId);
+        this.guildId = Objects.requireNonNull(guildId, "SIMDESK_DISCORD_GUILD_ID must not be null");
         this.restClient = restClient;
     }
 
     public MemberData getMemberData(String accessToken) {
         return restClient.get()
-                .uri(String.format("%s/users/@me/guilds/%s/member", DISCORD_API_BASE_URL, guildId.asString()))
+                .uri(String.format("%s/users/@me/guilds/%s/member", DISCORD_API_BASE_URL, guildId))
                 .headers(headers -> headers.setBearerAuth(accessToken))
                 .retrieve()
                 .body(MemberData.class);
