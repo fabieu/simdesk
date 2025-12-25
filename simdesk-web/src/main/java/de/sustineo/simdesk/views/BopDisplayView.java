@@ -92,8 +92,14 @@ public class BopDisplayView extends BaseView {
 
         Optional<String> simulationIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_SIMULATION_ID);
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
-        if (simulationIdParameter.isPresent() && trackIdParameter.isPresent() && RaceTracks.exists(Simulation.getById(simulationIdParameter.get()), trackIdParameter.get())) {
-            tabSheet.setSelectedTab(tabsByTrackId.get(trackIdParameter.get()));
+        if (simulationIdParameter.isPresent() && trackIdParameter.isPresent()) {
+            Simulation simulation = Simulation.getById(simulationIdParameter.get());
+            if (simulation != null && RaceTracks.exists(simulation, trackIdParameter.get())) {
+                Tab selectedTab = tabsByTrackId.get(trackIdParameter.get());
+                if (selectedTab != null) {
+                    tabSheet.setSelectedTab(selectedTab);
+                }
+            }
         }
     }
 
