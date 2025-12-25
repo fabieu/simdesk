@@ -35,7 +35,7 @@ public final class RaceTracks {
     public static final RaceTrack SUZUKA;
     public static final RaceTrack WATKINS_GLEN;
 
-    private static final RaceTrack UNKNOWN_TRACK;
+    public static final RaceTrack UNKNOWN_TRACK;
 
     static {
         BARCELONA = RaceTrack.builder()
@@ -281,7 +281,6 @@ public final class RaceTracks {
                     .computeIfAbsent(simulation, s -> new LinkedHashSet<>())
                     .add(raceTrack);
         }
-
     }
 
     /**

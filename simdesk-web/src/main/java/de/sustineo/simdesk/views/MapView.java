@@ -113,7 +113,7 @@ public class MapView extends BaseView {
         LTileLayer defaultLayer = LTileLayer.createDefaultForOpenStreetMapTileServer(registry);
         map.addLayer(defaultLayer);
 
-        // Add a layer for all racetrack markers
+        // Add a layer for all raceTrack markers
         LLayerGroup trackLayerGroup = new LLayerGroup(registry);
         for (RaceTrack raceTrack : RaceTracks.getAll()) {
             // Create a new marker for each raceTrack and add it to the map

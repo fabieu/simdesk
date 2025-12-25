@@ -99,7 +99,7 @@ public class WeatherController {
         Simulation simulation = Simulation.getById(simulationId);
         RaceTrack raceTrack = RaceTracks.getById(simulation, trackId);
 
-        if (raceTrack == null) {
+        if (RaceTracks.UNKNOWN_TRACK.equals(raceTrack)) {
             throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Racetrack '%s' not found for simulation '%s'", trackId, simulation));
         }
 
