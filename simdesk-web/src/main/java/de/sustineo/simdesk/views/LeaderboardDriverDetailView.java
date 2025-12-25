@@ -84,9 +84,9 @@ public class LeaderboardDriverDetailView extends BaseView {
         Map<Integer, Session> sessionByIdMap = sessions.stream()
                 .collect(Collectors.toMap(Session::getId, session -> session));
 
-        Map<Track, List<Lap>> lapsByTrackMap = laps.stream()
+        Map<RaceTrack, List<Lap>> lapsByTrackMap = laps.stream()
                 .filter(lap -> lap.getSessionId() != null)
-                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getTrack()));
+                .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getRaceTrack()));
 
         Div layout = new Div();
         layout.addClassNames("container", "bg-light");
@@ -197,7 +197,7 @@ public class LeaderboardDriverDetailView extends BaseView {
                 .setHeader("Server Name")
                 .setSortable(true)
                 .setTooltipGenerator(Session::getServerName);
-        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
+        Grid.Column<Session> trackColumn = grid.addColumn(session -> session.getRaceTrack().getDisplayName())
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -210,7 +210,7 @@ public class LeaderboardDriverDetailView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setRaceTrack, () -> RaceTracks.getAllBySimulation(Simulation.ACC)));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);
@@ -232,16 +232,16 @@ public class LeaderboardDriverDetailView extends BaseView {
         return layout;
     }
 
-    private Component createFastestLapsLayout(Map<Track, List<Lap>> lapsByTrackMap) {
+    private Component createFastestLapsLayout(Map<RaceTrack, List<Lap>> lapsByTrackMap) {
         List<LapByTrack> fastestLapByTrack = lapsByTrackMap.entrySet().stream()
                 .map(entry -> entry.getValue().stream()
                         .filter(Lap::isValid)
                         .filter(lap -> lap.getLapTimeMillis() != null)
                         .min(Comparator.comparing(Lap::getLapTimeMillis))
-                        .map(fastest -> LapByTrack.of(entry.getKey(), fastest))
+                        .map(fastest -> new LapByTrack(entry.getKey(), fastest))
                 )
                 .flatMap(Optional::stream)   // drop tracks with no valid laps
-                .sorted(Comparator.comparing(LapByTrack::track))
+                .sorted(Comparator.comparing(lapByTrack -> lapByTrack.raceTrack().getDisplayName()))
                 .toList();
 
         VerticalLayout layout = new VerticalLayout();
@@ -250,7 +250,7 @@ public class LeaderboardDriverDetailView extends BaseView {
         H3 header = new H3("Fastest laps");
 
         Grid<LapByTrack> grid = new Grid<>(LapByTrack.class, false);
-        grid.addColumn(item -> item.track().getName())
+        grid.addColumn(item -> item.raceTrack().getDisplayName())
                 .setHeader("Track")
                 .setSortable(true);
         grid.addColumn(lapByTrack -> AccCar.getCarById(lapByTrack.lap().getCarModelId()).getModel())
@@ -294,7 +294,7 @@ public class LeaderboardDriverDetailView extends BaseView {
                 .collect(Collectors.groupingBy(Lap::getCarModelId));
 
         List<LapsByAccCar> lapsByAccCar = lapsByCarId.entrySet().stream()
-                .map(entry -> LapsByAccCar.of(AccCar.getCarById(entry.getKey()), entry.getValue()))
+                .map(entry -> new LapsByAccCar(AccCar.getCarById(entry.getKey()), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
                 .toList();
 
@@ -335,9 +335,9 @@ public class LeaderboardDriverDetailView extends BaseView {
         return layout;
     }
 
-    private Component createFavoriteTrackLayout(Map<Track, List<Lap>> lapsByTrackMap) {
+    private Component createFavoriteTrackLayout(Map<RaceTrack, List<Lap>> lapsByTrackMap) {
         List<LapsByTrack> lapsByTrack = lapsByTrackMap.entrySet().stream()
-                .map(entry -> LapsByTrack.of(entry.getKey(), entry.getValue()))
+                .map(entry -> new LapsByTrack(entry.getKey(), entry.getValue()))
                 .sorted(Comparator.comparing(item -> item.laps().size(), Comparator.reverseOrder()))
                 .toList();
 
@@ -347,7 +347,7 @@ public class LeaderboardDriverDetailView extends BaseView {
         H3 header = new H3("Favorite tracks");
 
         Grid<LapsByTrack> grid = new Grid<>(LapsByTrack.class, false);
-        grid.addColumn(item -> item.track().getName())
+        grid.addColumn(item -> item.raceTrack().getDisplayName())
                 .setHeader("Track")
                 .setSortable(true);
         grid.addColumn(item -> item.laps().stream().filter(Lap::isValid).count())

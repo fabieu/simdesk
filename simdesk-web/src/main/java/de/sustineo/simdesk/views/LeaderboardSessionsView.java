@@ -22,9 +22,10 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.TemporaryFileFactory;
 import com.vaadin.flow.server.streams.UploadHandler;
 import de.sustineo.simdesk.configuration.SpringProfile;
+import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -215,7 +216,7 @@ public class LeaderboardSessionsView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> trackNameColumn = grid.addColumn(Session::getTrackName)
+        Grid.Column<Session> trackNameColumn = grid.addColumn(session -> session.getRaceTrack().getDisplayName())
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -240,7 +241,7 @@ public class LeaderboardSessionsView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(trackNameColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setRaceTrack, () -> RaceTracks.getAllBySimulation(Simulation.ACC)));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         grid.setSelectionMode(Grid.SelectionMode.SINGLE);

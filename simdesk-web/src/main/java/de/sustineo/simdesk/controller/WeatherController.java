@@ -1,7 +1,9 @@
 package de.sustineo.simdesk.controller;
 
 import de.sustineo.simdesk.configuration.SpringProfile;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
 import de.sustineo.simdesk.entities.output.WeatherSettingsOutput;
@@ -58,11 +60,14 @@ public class WeatherController {
             @Parameter(in = ParameterIn.QUERY, description = "Include weather model details in response", schema = @Schema(type = "boolean", defaultValue = "false"))
             @RequestParam(value = "withWeatherModel", required = false, defaultValue = "false")
             boolean withWeatherModel,
-            @Parameter(in = ParameterIn.QUERY, description = "ACC Track ID")
-            @RequestParam(value = "accTrackId", required = false)
-            String accTrackId
+            @Parameter(in = ParameterIn.QUERY, description = "Simulation ID")
+            @RequestParam(value = "simulationId", required = false)
+            String simulationId,
+            @Parameter(in = ParameterIn.QUERY, description = "Track ID")
+            @RequestParam(value = "trackId", required = false)
+            String trackId
     ) {
-        return getPredictedWeather(-1, withWeatherModel, accTrackId);
+        return getPredictedWeather(-1, withWeatherModel, simulationId, trackId);
     }
 
     @Operation(
@@ -82,24 +87,25 @@ public class WeatherController {
             @Parameter(in = ParameterIn.QUERY, description = "Include weather model details in response", schema = @Schema(type = "boolean", defaultValue = "false"))
             @RequestParam(value = "withWeatherModel", required = false)
             boolean withWeatherModel,
-            @Parameter(in = ParameterIn.QUERY, description = "ACC Track ID")
-            @RequestParam(value = "accTrackId", required = false)
-            String accTrackId
+            @Parameter(in = ParameterIn.QUERY, description = "Simulation ID")
+            @RequestParam(value = "simulation", required = false)
+            String simulationId,
+            @Parameter(in = ParameterIn.QUERY, description = "Track ID")
+            @RequestParam(value = "trackId", required = false)
+            String trackId
     ) {
         WeatherSettingsOutput weatherSettingsOutput = new WeatherSettingsOutput();
 
-        Track track = null;
-        if (accTrackId != null) {
-            track = Track.getByAccId(accTrackId);
+        Simulation simulation = Simulation.getById(simulationId);
+        RaceTrack raceTrack = RaceTracks.getById(simulation, trackId);
+
+        if (raceTrack == null) {
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Racetrack '%s' not found for simulation '%s'", trackId, simulation));
         }
 
-        if (track == null) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, "Track not found: " + track);
-        }
-
-        Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(track);
+        Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(raceTrack);
         if (weatherModel.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for track" + track);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for racetrack" + raceTrack);
         }
 
         AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);

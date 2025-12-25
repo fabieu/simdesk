@@ -21,7 +21,9 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.server.streams.UploadMetadata;
 import de.sustineo.simdesk.configuration.SpringProfile;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
@@ -54,7 +56,7 @@ public class BopEditorView extends BaseView {
 
     private final FormLayout settingsLayout = new FormLayout();
     private final FormLayout carsLayout = new FormLayout();
-    private final ComboBox<Track> trackComboBox = new ComboBox<>("Track");
+    private final ComboBox<RaceTrack> raceTrackComboBox = new ComboBox<>("Racetrack");
     private final MultiSelectComboBox<AccCar> carsComboBox = new MultiSelectComboBox<>("Cars");
     private final TextArea previewTextArea = new TextArea("Preview");
     private final LinkedHashMap<Integer, Component> currentCarComponents = new LinkedHashMap<>();
@@ -134,15 +136,15 @@ public class BopEditorView extends BaseView {
             validationService.validate(currentBop);
 
             if (currentBop.isMultiTrack()) {
-                String errorMessage = String.format("Please upload %s with settings for only one track.", metadata.fileName());
+                String errorMessage = String.format("Please upload %s with settings for only one racetrack.", metadata.fileName());
                 notificationService.showErrorNotification(errorMessage);
                 return;
             }
 
-            Track track = currentBop.getTrack();
+            RaceTrack raceTrack = currentBop.getRaceTrack();
             List<AccCar> cars = currentBop.getCars();
 
-            trackComboBox.setValue(track);
+            raceTrackComboBox.setValue(raceTrack);
             carsComboBox.setValue(cars);
 
             currentBop.getEntries().forEach(entry -> currentCarComponents.put(entry.getCarId(), createBopEditField(entry)));
@@ -177,13 +179,13 @@ public class BopEditorView extends BaseView {
     private Component createEditingForm() {
         VerticalLayout verticalLayout = new VerticalLayout();
 
-        trackComboBox.setItems(Track.getAllOfAccSortedByName());
-        trackComboBox.setItemLabelGenerator(Track::getName);
-        trackComboBox.setPlaceholder("Select track...");
-        trackComboBox.setHelperText("Available filters: Track");
-        trackComboBox.addValueChangeListener(event -> {
+        raceTrackComboBox.setItems(RaceTracks.getAllBySimulation(Simulation.ACC));
+        raceTrackComboBox.setItemLabelGenerator(RaceTrack::getDisplayName);
+        raceTrackComboBox.setPlaceholder("Select racetrack...");
+        raceTrackComboBox.setHelperText("Available filters: Track");
+        raceTrackComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getAccId()));
+                currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getId(Simulation.ACC)));
                 reloadComponents();
             }
         });
@@ -195,8 +197,8 @@ public class BopEditorView extends BaseView {
         carsComboBox.setHelperText(CarFilter.getInstance().getHelperText());
         carsComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
-                if (trackComboBox.isEmpty() && !carsComboBox.isEmpty()) {
-                    notificationService.showErrorNotification("Please select a track first!");
+                if (raceTrackComboBox.isEmpty() && !carsComboBox.isEmpty()) {
+                    notificationService.showErrorNotification("Please select a racetrack first!");
                     carsComboBox.clear();
                     return;
                 }
@@ -205,7 +207,7 @@ public class BopEditorView extends BaseView {
                 event.getValue().forEach(car -> {
                     if (currentBop.getEntries().stream().noneMatch(entry -> entry.getCarId().equals(car.getId()))) {
                         AccBopEntry entry = AccBopEntry.builder()
-                                .trackId(trackComboBox.getValue().getAccId())
+                                .trackId(raceTrackComboBox.getValue().getId(Simulation.ACC))
                                 .carId(car.getId())
                                 .ballastKg(0)
                                 .restrictor(0)
@@ -236,7 +238,7 @@ public class BopEditorView extends BaseView {
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("850px", 2)
         );
-        settingsLayout.add(trackComboBox, carsComboBox);
+        settingsLayout.add(raceTrackComboBox, carsComboBox);
 
         carsLayout.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
@@ -281,7 +283,7 @@ public class BopEditorView extends BaseView {
         currentBop = new AccBop();
         currentCarComponents.clear();
         carsComboBox.clear();
-        trackComboBox.clear();
+        raceTrackComboBox.clear();
         reloadComponents();
     }
 

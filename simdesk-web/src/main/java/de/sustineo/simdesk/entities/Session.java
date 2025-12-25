@@ -23,11 +23,7 @@ public class Session {
     private String fileContent;
     private Instant insertDatetime;
 
-    public Track getTrack() {
-        return Track.getByAccId(trackId);
-    }
-
-    public String getTrackName() {
-        return Track.getTrackNameByAccId(trackId);
+    public RaceTrack getRaceTrack() {
+        return RaceTracks.getById(Simulation.ACC, trackId);
     }
 }

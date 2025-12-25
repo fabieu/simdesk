@@ -14,7 +14,9 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CarGroup;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.DriverRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
@@ -44,14 +46,15 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
 
     private Grid<DriverRanking> rankingGrid;
 
+    private RaceTrack raceTrack;
     private CarGroup carGroup;
-    private Track track;
+
     private TimeRange timeRange = TimeRange.ALL_TIME;
     private AccCar car;
 
     @Override
     public String getPageTitle() {
-        return String.format("Leaderboard - %s (%s)", this.track.getName(), this.carGroup.name());
+        return String.format("Leaderboard - %s (%s)", this.raceTrack.getDisplayName(), this.carGroup.name());
     }
 
     @Override
@@ -61,12 +64,13 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
 
         String carGroup = routeParameters.get(ROUTE_PARAMETER_CAR_GROUP).orElseThrow();
         String trackId = routeParameters.get(ROUTE_PARAMETER_TRACK_ID).orElseThrow();
-        if (!Track.existsInAcc(trackId) || !CarGroup.exists(carGroup)) {
+
+        if (!RaceTracks.exists(Simulation.ACC, trackId) || !CarGroup.exists(carGroup)) {
             beforeEnterEvent.rerouteToError(NotFoundException.class);
             return;
         }
 
-        this.track = EnumUtils.getEnumIgnoreCase(Track.class, trackId);
+        this.raceTrack = RaceTracks.getById(Simulation.ACC, trackId);
         this.carGroup = EnumUtils.getEnumIgnoreCase(CarGroup.class, carGroup);
 
         Optional<String> timeRange = queryParameters.getSingleParameter(QUERY_PARAMETER_TIME_RANGE);
@@ -142,7 +146,7 @@ public class LeaderboardOverallLapTimesDifferentiatedView extends BaseView {
     }
 
     private Grid<DriverRanking> createRankingGrid() {
-        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, track.getAccId(), timeRange, car);
+        List<DriverRanking> driverRankings = rankingService.getAllTimeDriverRanking(carGroup, raceTrack.getId(Simulation.ACC), timeRange, car);
         DriverRanking topDriverRanking = driverRankings.stream().findFirst().orElse(null);
 
         Grid<DriverRanking> grid = new Grid<>(DriverRanking.class, false);
