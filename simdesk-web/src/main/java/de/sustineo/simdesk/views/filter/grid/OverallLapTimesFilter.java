@@ -2,13 +2,15 @@ package de.sustineo.simdesk.views.filter.grid;
 
 import com.vaadin.flow.component.grid.dataview.GridListDataView;
 import de.sustineo.simdesk.entities.CarGroup;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 
 public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
     private CarGroup carGroup;
-    private Track track;
+    private RaceTrack raceTrack;
     private String driverName;
     private String carModelName;
 
@@ -21,8 +23,8 @@ public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
         refresh();
     }
 
-    public void setTrack(Track track) {
-        this.track = track;
+    public void setRaceTrack(RaceTrack raceTrack) {
+        this.raceTrack = raceTrack;
         refresh();
     }
 
@@ -38,10 +40,10 @@ public class OverallLapTimesFilter extends GridFilter<GroupRanking> {
 
     protected boolean test(GroupRanking groupRanking) {
         boolean matchesCarGroup = matches(groupRanking.getCarGroup(), carGroup);
-        boolean matchesTrack = matches(Track.getByAccId(groupRanking.getTrackId()), track);
+        boolean matchesRaceTrack = matches(RaceTracks.getById(Simulation.ACC, groupRanking.getTrackId()), raceTrack);
         boolean matchesDriverName = matches(groupRanking.getDriver().getFullName(), driverName);
         boolean matchesCarModelName = matches(AccCar.getModelById(groupRanking.getCarModelId()), carModelName);
 
-        return matchesCarGroup && matchesTrack && matchesDriverName && matchesCarModelName;
+        return matchesCarGroup && matchesRaceTrack && matchesDriverName && matchesCarModelName;
     }
 }

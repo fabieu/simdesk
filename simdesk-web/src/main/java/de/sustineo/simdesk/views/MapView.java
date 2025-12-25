@@ -7,7 +7,8 @@ import com.vaadin.flow.component.textfield.IntegerField;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
@@ -45,7 +46,7 @@ public class MapView extends BaseView {
     // Create the registry which is needed so that components can be reused and their methods invoked
     // Note: You normally don't need to invoke any methods of the registry and just hand it over to the components
     private final LComponentManagementRegistry registry = new LDefaultComponentManagementRegistry(this);
-    private final HashMap<Track, LMarker> trackMarkers = new HashMap<>();
+    private final HashMap<RaceTrack, LMarker> trackMarkers = new HashMap<>();
     private final ComponentFactory componentFactory;
 
     public MapView(WeatherService weatherService,
@@ -112,19 +113,19 @@ public class MapView extends BaseView {
         LTileLayer defaultLayer = LTileLayer.createDefaultForOpenStreetMapTileServer(registry);
         map.addLayer(defaultLayer);
 
-        // Add a layer for all race track markers
+        // Add a layer for all raceTrack markers
         LLayerGroup trackLayerGroup = new LLayerGroup(registry);
-        for (Track track : Track.getAll()) {
-            // Create a new marker for each track and add it to the map
-            LMarker trackMarker = new LMarker(registry, new LLatLng(registry, track.getLatitude(), track.getLongitude()));
+        for (RaceTrack raceTrack : RaceTracks.getAll()) {
+            // Create a new marker for each raceTrack and add it to the map
+            LMarker trackMarker = new LMarker(registry, new LLatLng(registry, raceTrack.getLatitude(), raceTrack.getLongitude()));
 
             if (!VaadinUtils.isMobileDevice()) {
-                trackMarker.bindTooltip(track.getName());
+                trackMarker.bindTooltip(raceTrack.getDisplayName());
             }
 
-            trackMarker.bindPopup("<h4 style=\"color: var(--lumo-header-text-color)\">%s</h4>".formatted(track.getName()));
+            trackMarker.bindPopup("<h4 style=\"color: var(--lumo-header-text-color)\">%s</h4>".formatted(raceTrack.getDisplayName()));
             trackMarker.addTo(trackLayerGroup);
-            trackMarkers.put(track, trackMarker);
+            trackMarkers.put(raceTrack, trackMarker);
         }
 
         map.addLayer(trackLayerGroup);
@@ -152,8 +153,8 @@ public class MapView extends BaseView {
     }
 
     public void updateWeatherMarkers(int raceHours) {
-        for (Map.Entry<Track, LMarker> entry : trackMarkers.entrySet()) {
-            Track track = entry.getKey();
+        for (Map.Entry<RaceTrack, LMarker> entry : trackMarkers.entrySet()) {
+            RaceTrack track = entry.getKey();
             LMarker trackMarker = entry.getValue();
 
             String spacerHtml = componentFactory.createSpacer().getElement().getOuterHTML();
@@ -162,7 +163,7 @@ public class MapView extends BaseView {
                     <h3 style="color: var(--lumo-header-text-color)">%s</h3>
                     """
                     .formatted(
-                            track.getName()
+                            track.getDisplayName()
                     ));
 
             Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(track);

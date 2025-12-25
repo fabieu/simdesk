@@ -30,10 +30,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.streams.UploadHandler;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CarGroup;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
-import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.comparator.AccBopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
@@ -114,7 +116,7 @@ public class BopManagementView extends BaseView {
 
     private void initializeBopList() {
         List<Bop> sortedBops = bopService.getAll().stream()
-                .sorted(new BopComparator())
+                .sorted(new AccBopComparator())
                 .toList();
         this.bopList.addAll(sortedBops);
 
@@ -129,16 +131,16 @@ public class BopManagementView extends BaseView {
     }
 
     private Component createActionsLayout() {
-        ComboBox<Track> trackFilterComboxBox = new ComboBox<>();
-        trackFilterComboxBox.setItems(Track.getAllOfAccSortedByName());
-        trackFilterComboxBox.setItemLabelGenerator(Track::getName);
-        trackFilterComboxBox.setPlaceholder("Select track");
+        ComboBox<RaceTrack> trackFilterComboxBox = new ComboBox<>();
+        trackFilterComboxBox.setItems(RaceTracks.getAllBySimulation(Simulation.ACC));
+        trackFilterComboxBox.setItemLabelGenerator(RaceTrack::getDisplayName);
+        trackFilterComboxBox.setPlaceholder("Select racetrack");
         trackFilterComboxBox.setClearButtonVisible(true);
         trackFilterComboxBox.setMinWidth("300px");
         trackFilterComboxBox.addValueChangeListener(e -> {
-            Track track = e.getValue();
-            if (track != null) {
-                gridFilters.put(GRID_FILTER_TRACK, bop -> track.getAccId().equals(bop.getTrackId()));
+            RaceTrack raceTrack = e.getValue();
+            if (raceTrack != null) {
+                gridFilters.put(GRID_FILTER_TRACK, bop -> raceTrack.getId(Simulation.ACC).equals(bop.getTrackId()));
             } else {
                 gridFilters.remove(GRID_FILTER_TRACK);
             }
@@ -177,7 +179,7 @@ public class BopManagementView extends BaseView {
         Button enableTrackButton = new Button("Enable");
         enableTrackButton.addClickListener(e -> {
             String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
-                    .map(Track::getAccId)
+                    .map(raceTrack -> raceTrack.getId(Simulation.ACC))
                     .orElse(null);
             CarGroup carGroup = carGroupFilterComboBox.getValue();
             Boolean active = activeFilterComboBox.getValue();
@@ -188,7 +190,7 @@ public class BopManagementView extends BaseView {
         Button disableTrackButton = new Button("Disable");
         disableTrackButton.addClickListener(e -> {
             String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
-                    .map(Track::getAccId)
+                    .map(raceTrack -> raceTrack.getId(Simulation.ACC))
                     .orElse(null);
             CarGroup carGroup = carGroupFilterComboBox.getValue();
             Boolean active = activeFilterComboBox.getValue();
@@ -199,7 +201,7 @@ public class BopManagementView extends BaseView {
         Button resetAllForTrackButton = new Button("Reset");
         resetAllForTrackButton.addClickListener(e -> {
             String trackId = Optional.ofNullable(trackFilterComboxBox.getValue())
-                    .map(Track::getAccId)
+                    .map(raceTrack -> raceTrack.getId(Simulation.ACC))
                     .orElse(null);
             CarGroup carGroup = carGroupFilterComboBox.getValue();
             Boolean active = activeFilterComboBox.getValue();
@@ -259,7 +261,7 @@ public class BopManagementView extends BaseView {
             bopService.update(bop);
         });
 
-        Grid.Column<Bop> trackColumn = grid.addColumn(bop -> Track.getByAccId(bop.getTrackId()))
+        Grid.Column<Bop> trackColumn = grid.addColumn(bop -> RaceTracks.getById(Simulation.ACC, bop.getTrackId()).getDisplayName())
                 .setHeader("Track")
                 .setSortable(true);
         Grid.Column<Bop> carModelColumn = grid.addColumn(bop -> AccCar.getModelById(bop.getCarId()))
@@ -345,7 +347,7 @@ public class BopManagementView extends BaseView {
 
         BopManagementFilter filter = new BopManagementFilter(gridDataView);
         HeaderRow headerRow = grid.appendHeaderRow();
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(filter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(filter::setRaceTrack, () -> RaceTracks.getAllBySimulation(Simulation.ACC)));
         headerRow.getCell(carModelColumn).setComponent(GridFilter.createTextFieldHeader(filter::setCarModel));
         headerRow.getCell(activeColumn).setComponent(GridFilter.createTextFieldHeader(filter::setActive));
         headerRow.getCell(usernameColumn).setComponent(GridFilter.createTextFieldHeader(filter::setUsername));
@@ -462,8 +464,8 @@ public class BopManagementView extends BaseView {
         List<String> parts = new ArrayList<>();
 
         if (trackId != null) {
-            String trackName = Track.getTrackNameByAccId(trackId);
-            parts.add("track " + trackName);
+            RaceTrack raceTrack = RaceTracks.getById(Simulation.ACC, trackId);
+            parts.add("racetrack " + raceTrack.getDisplayName());
         }
 
         if (carGroup != null) {
@@ -505,7 +507,7 @@ public class BopManagementView extends BaseView {
         providerSelector.setPlaceholder("None");
         providerSelector.setClearButtonVisible(true);
 
-        CheckboxGroup<Track> trackSelector = new CheckboxGroup<>("Select tracks to import");
+        CheckboxGroup<RaceTrack> trackSelector = new CheckboxGroup<>("Select racetracks to import");
         trackSelector.setWidthFull();
         trackSelector.setVisible(false);
         trackSelector.setRequiredIndicatorVisible(true);
@@ -528,26 +530,26 @@ public class BopManagementView extends BaseView {
                 validationService.validate(accBop);
                 uploadedAccBop.set(accBop);
 
-                Set<Track> tracks = accBop.getEntries().stream()
+                Set<RaceTrack> raceTracks = accBop.getEntries().stream()
                         .map(AccBopEntry::getTrackId)
                         .filter(Objects::nonNull)
-                        .map(Track::getByAccId)
+                        .map(trackId -> RaceTracks.getById(Simulation.ACC, trackId))
                         .filter(Objects::nonNull)
-                        .sorted(Comparator.comparing(Track::getName))
+                        .sorted(Comparator.comparing(RaceTrack::getDisplayName))
                         .collect(Collectors.toCollection(LinkedHashSet::new));
 
-                if (tracks.isEmpty()) {
+                if (raceTracks.isEmpty()) {
                     notificationService.showErrorNotification("No valid tracks found in the uploaded file");
                     trackSelector.setVisible(false);
                     importButton.setEnabled(false);
                     return;
                 }
 
-                trackSelector.setItems(tracks);
-                trackSelector.setItemLabelGenerator(Track::getName);
-                trackSelector.setValue(tracks);
+                trackSelector.setItems(raceTracks);
+                trackSelector.setItemLabelGenerator(RaceTrack::getDisplayName);
+                trackSelector.setValue(raceTracks);
                 trackSelector.addValueChangeListener(event -> {
-                    if (event.getValue().size() == tracks.size()) {
+                    if (event.getValue().size() == raceTracks.size()) {
                         trackSelectorAll.setValue(true);
                         trackSelectorAll.setIndeterminate(false);
                     } else if (event.getValue().isEmpty()) {
@@ -557,10 +559,10 @@ public class BopManagementView extends BaseView {
                         trackSelectorAll.setIndeterminate(true);
                     }
                 });
-                trackSelectorAll.setValue(trackSelector.getSelectedItems().size() == tracks.size());
+                trackSelectorAll.setValue(trackSelector.getSelectedItems().size() == raceTracks.size());
                 trackSelectorAll.addValueChangeListener(event -> {
                     if (trackSelectorAll.getValue()) {
-                        trackSelector.setValue(tracks);
+                        trackSelector.setValue(raceTracks);
                     } else {
                         trackSelector.deselectAll();
                     }
@@ -586,18 +588,18 @@ public class BopManagementView extends BaseView {
                 return;
             }
 
-            Set<Track> selectedTracks = trackSelector.getSelectedItems();
-            if (selectedTracks.isEmpty()) {
-                notificationService.showWarningNotification("Please select at least one track to import");
+            Set<RaceTrack> selectedRaceTracks = trackSelector.getSelectedItems();
+            if (selectedRaceTracks.isEmpty()) {
+                notificationService.showWarningNotification("Please select at least one racetrack to import");
                 return;
             }
 
             int importCount = 0;
             for (AccBopEntry entry : uploadedAccBop.get().getEntries()) {
-                Track track = Track.getByAccId(entry.getTrackId());
-                if (selectedTracks.contains(track)) {
+                RaceTrack raceTrack = RaceTracks.getById(Simulation.ACC, entry.getTrackId());
+                if (selectedRaceTracks.contains(raceTrack)) {
                     Bop existingBop = bopList.stream()
-                            .filter(bop -> bop.getTrackId().equals(track.getAccId()) && bop.getCarId().equals(entry.getCarId()))
+                            .filter(bop -> bop.getTrackId().equals(raceTrack.getId(Simulation.ACC)) && bop.getCarId().equals(entry.getCarId()))
                             .findFirst()
                             .orElse(null);
 

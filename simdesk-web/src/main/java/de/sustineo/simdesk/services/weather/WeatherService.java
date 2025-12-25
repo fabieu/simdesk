@@ -3,7 +3,8 @@ package de.sustineo.simdesk.services.weather;
 
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Constants;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherHourlyForecast;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
@@ -39,7 +40,7 @@ public class WeatherService {
 
     private final RestClient restClient;
 
-    private final HashMap<Track, OpenWeatherModel> weatherModelsByTrack = new HashMap<>();
+    private final HashMap<RaceTrack, OpenWeatherModel> weatherModelsByRaceTrack = new HashMap<>();
     private final String openweathermapApiKey;
     @Getter
     private Instant lastUpdate;
@@ -74,8 +75,8 @@ public class WeatherService {
         return getOpenWeatherMapUrlTemplate("clouds_new");
     }
 
-    public Optional<OpenWeatherModel> getOpenWeatherModel(Track track) {
-        return Optional.ofNullable(weatherModelsByTrack.get(track));
+    public Optional<OpenWeatherModel> getOpenWeatherModel(RaceTrack raceTrack) {
+        return Optional.ofNullable(weatherModelsByRaceTrack.get(raceTrack));
     }
 
     public AccWeatherSettings getAccWeatherSettings(OpenWeatherModel weatherModel, int raceHours) {
@@ -349,23 +350,23 @@ public class WeatherService {
         }
 
         // Fetch current weather data from OpenWeatherMap API
-        for (Track track : Track.getAll()) {
+        for (RaceTrack raceTrack : RaceTracks.getAll()) {
             // Only fetch weather data for Kyalami Circuit in debug mode
-            if (SpringProfile.isDebug() && !track.getAccId().equals("kyalami")) {
+            if (SpringProfile.isDebug() && !raceTrack.equals(RaceTracks.KYALAMI)) {
                 continue;
             }
 
             try {
-                String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, track.getLatitude(), track.getLongitude(), openweathermapApiKey);
-                log.info(String.format("Fetching weather data for track '%s' from %s", track.getName(), Strings.CS.replace(url, openweathermapApiKey, Constants.HIDDEN)));
+                String url = String.format(OPENWEATHERMAP_ONE_CALL_3_TEMPLATE, raceTrack.getLatitude(), raceTrack.getLongitude(), openweathermapApiKey);
+                log.info(String.format("Fetching weather data for racetrack '%s' from %s", raceTrack.getDisplayName(), Strings.CS.replace(url, openweathermapApiKey, Constants.HIDDEN)));
 
                 OpenWeatherModel weatherModel = restClient.get()
                         .uri(url)
                         .retrieve()
                         .body(OpenWeatherModel.class);
-                weatherModelsByTrack.put(track, weatherModel);
+                weatherModelsByRaceTrack.put(raceTrack, weatherModel);
             } catch (HttpStatusCodeException e) {
-                log.log(Level.SEVERE, "Failed to fetch weather data for track " + track.getName() + ": " + e.getMessage(), e);
+                log.log(Level.SEVERE, "Failed to fetch weather data for racetrack " + raceTrack.getDisplayName() + ": " + e.getMessage(), e);
             }
         }
 

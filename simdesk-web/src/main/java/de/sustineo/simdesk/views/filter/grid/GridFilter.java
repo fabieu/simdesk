@@ -52,7 +52,7 @@ public abstract class GridFilter<T> {
         return layout;
     }
 
-    public static <T extends Enum<T>> Component createComboBoxHeader(Consumer<T> filterChangeConsumer, Supplier<? extends Collection<T>> itemsSupplier) {
+    public static <T> Component createComboBoxHeader(Consumer<T> filterChangeConsumer, Supplier<? extends Collection<T>> itemsSupplier) {
         VerticalLayout layout = createHeaderLayout();
 
         ComboBox<T> comboBox = new ComboBox<>();

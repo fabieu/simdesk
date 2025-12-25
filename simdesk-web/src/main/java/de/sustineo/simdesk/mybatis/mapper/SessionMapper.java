@@ -15,6 +15,7 @@ public interface SessionMapper {
             @Result(property = "sessionType", column = "session_type"),
             @Result(property = "raceWeekendIndex", column = "race_weekend_index"),
             @Result(property = "serverName", column = "server_name"),
+            @Result(property = "simulationId", column = "simulation_id"),
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "wetSession", column = "wet_session"),
             @Result(property = "carCount", column = "car_count"),

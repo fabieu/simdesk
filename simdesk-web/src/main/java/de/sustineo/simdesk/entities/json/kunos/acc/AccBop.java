@@ -1,7 +1,9 @@
 package de.sustineo.simdesk.entities.json.kunos.acc;
 
 import com.fasterxml.jackson.annotation.JsonIgnore;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import jakarta.validation.Valid;
 import jakarta.validation.constraints.NotNull;
@@ -40,9 +42,9 @@ public final class AccBop {
     }
 
     @JsonIgnore
-    public Track getTrack() {
+    public RaceTrack getRaceTrack() {
         return entries.stream()
-                .map(entry -> Track.getByAccId(entry.getTrackId()))
+                .map(entry -> RaceTracks.getById(Simulation.ACC, entry.getTrackId()))
                 .findFirst()
                 .orElse(null);
     }

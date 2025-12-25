@@ -14,8 +14,9 @@ import com.vaadin.flow.component.orderedlayout.FlexComponent;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.entities.LeaderboardLine;
+import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.Session;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import de.sustineo.simdesk.services.auth.SecurityService;
@@ -68,7 +69,7 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", accSession.getSessionType(), Track.getTrackNameByAccId(accSession.getTrackName()), accSession.getServerName()));
+        heading.setText(String.format("%s - %s - %s", accSession.getSessionType(), RaceTracks.getById(Simulation.ACC, accSession.getTrackName()).getDisplayName(), accSession.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(accSession);
 
@@ -85,7 +86,7 @@ public class SessionComponentFactory extends ComponentFactory {
         layout.setAlignItems(FlexComponent.Alignment.CENTER);
 
         H3 heading = new H3();
-        heading.setText(String.format("%s - %s - %s", session.getSessionType(), session.getTrackName(), session.getServerName()));
+        heading.setText(String.format("%s - %s - %s", session.getSessionType(), session.getRaceTrack().getDisplayName(), session.getServerName()));
 
         Icon weatherIcon = getWeatherIcon(session);
 

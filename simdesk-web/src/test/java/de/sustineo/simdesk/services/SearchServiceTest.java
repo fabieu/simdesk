@@ -4,6 +4,7 @@ import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.Session;
 import de.sustineo.simdesk.entities.SessionType;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.search.SearchResult;
 import de.sustineo.simdesk.entities.search.SearchType;
 import de.sustineo.simdesk.services.leaderboard.DriverService;
@@ -61,6 +62,7 @@ class SearchServiceTest {
         Session session1 = Session.builder()
                 .id(1)
                 .serverName("Test Server")
+                .simulationId(Simulation.ACC.getId())
                 .trackId("monza")
                 .sessionType(SessionType.R)
                 .fileChecksum("checksum1")

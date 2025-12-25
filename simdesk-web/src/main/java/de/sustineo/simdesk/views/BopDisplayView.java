@@ -25,10 +25,12 @@ import com.vaadin.flow.router.Route;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import com.vaadin.flow.server.streams.DownloadHandler;
 import de.sustineo.simdesk.configuration.SpringProfile;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTrack;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
-import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.comparator.AccBopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
@@ -88,9 +90,16 @@ public class BopDisplayView extends BaseView {
         add(createViewHeader());
         addAndExpand(createContainer());
 
+        Optional<String> simulationIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_SIMULATION_ID);
         Optional<String> trackIdParameter = queryParameters.getSingleParameter(QUERY_PARAMETER_TRACK_ID);
-        if (trackIdParameter.isPresent() && Track.existsInAcc(trackIdParameter.get())) {
-            tabSheet.setSelectedTab(tabsByTrackId.get(trackIdParameter.get()));
+        if (simulationIdParameter.isPresent() && trackIdParameter.isPresent()) {
+            Simulation simulation = Simulation.getById(simulationIdParameter.get());
+            if (simulation != null && RaceTracks.exists(simulation, trackIdParameter.get())) {
+                Tab selectedTab = tabsByTrackId.get(trackIdParameter.get());
+                if (selectedTab != null) {
+                    tabSheet.setSelectedTab(selectedTab);
+                }
+            }
         }
     }
 
@@ -149,28 +158,31 @@ public class BopDisplayView extends BaseView {
         tabSheet.addSelectedChangeListener(event -> {
             for (Map.Entry<String, Tab> entry : tabsByTrackId.entrySet()) {
                 if (entry.getValue() == event.getSelectedTab()) {
-                    updateQueryParameters(routeParameters, QueryParameters.of(QUERY_PARAMETER_TRACK_ID, entry.getKey()));
+                    updateQueryParameters(routeParameters, QueryParameters.simple(Map.of(
+                            QUERY_PARAMETER_SIMULATION_ID, Simulation.ACC.getId(),
+                            QUERY_PARAMETER_TRACK_ID, entry.getKey()
+                    )));
                 }
             }
         });
 
-        Map<String, Set<Bop>> bopsByTrackId = bopService.getActive().stream()
-                .sorted(new BopComparator())
-                .collect(Collectors.groupingBy(Bop::getTrackId, TreeMap::new, Collectors.toCollection(LinkedHashSet::new)));
+        Map<RaceTrack, Set<Bop>> bopsByRaceTrack = bopService.getActive().stream()
+                .sorted(new AccBopComparator())
+                .collect(Collectors.groupingBy(bop -> RaceTracks.getById(Simulation.ACC, bop.getTrackId()), LinkedHashMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
-        for (Map.Entry<String, Set<Bop>> entry : bopsByTrackId.entrySet()) {
-            String trackId = entry.getKey();
-            String trackName = Track.getTrackNameByAccId(trackId);
+        for (Map.Entry<RaceTrack, Set<Bop>> entry : bopsByRaceTrack.entrySet()) {
+            RaceTrack raceTrack = entry.getKey();
+            Set<Bop> bopEntries = entry.getValue();
 
             VerticalLayout tabLayout = new VerticalLayout();
 
             DownloadHandler downloadHandler = (event) -> {
-                List<AccBopEntry> accBopEntries = entry.getValue().stream()
+                List<AccBopEntry> accBopEntries = bopEntries.stream()
                         .map(bopService::convertToAccBopEntry)
                         .toList();
                 String json = JsonClient.toJson(new AccBop(accBopEntries));
 
-                event.setFileName(String.format("bop_%s_%s.json", entry.getKey(), FormatUtils.formatDatetimeSafe(Instant.now())));
+                event.setFileName(String.format("bop_%s_%s.json", raceTrack.getGlobalId(), FormatUtils.formatDatetimeSafe(Instant.now())));
                 event.getOutputStream().write(json.getBytes(StandardCharsets.UTF_8));
             };
 
@@ -187,7 +199,8 @@ public class BopDisplayView extends BaseView {
                         Page page = UI.getCurrent().getPage();
                         page.fetchCurrentURL(url -> {
                             String shareUrl = UriComponentsBuilder.fromUriString(url.toString())
-                                    .replaceQueryParam(QUERY_PARAMETER_TRACK_ID, entry.getKey())
+                                    .replaceQueryParam(QUERY_PARAMETER_TRACK_ID, raceTrack.getId(Simulation.ACC))
+                                    .replaceQueryParam(QUERY_PARAMETER_SIMULATION_ID, Simulation.ACC.getId())
                                     .toUriString();
                             page.executeJs(String.format("navigator.clipboard.writeText('%s')", shareUrl));
                             notificationService.showSuccessNotification("Copied share link to clipboard");
@@ -203,7 +216,7 @@ public class BopDisplayView extends BaseView {
 
             // Grid
             Grid<Bop> grid = new Grid<>(Bop.class, false);
-            grid.setItems(entry.getValue());
+            grid.setItems(bopEntries);
             grid.setAllRowsVisible(true);
             grid.setWidthFull();
             grid.setPartNameGenerator(new InactiveBopPartNameGenerator());
@@ -237,8 +250,8 @@ public class BopDisplayView extends BaseView {
 
             tabLayout.add(headerLayout, grid);
 
-            Tab tab = new Tab(trackName);
-            tabsByTrackId.put(trackId, tab);
+            Tab tab = new Tab(raceTrack.getDisplayName());
+            tabsByTrackId.put(raceTrack.getId(Simulation.ACC), tab);
             tabSheet.add(tab, tabLayout);
         }
 

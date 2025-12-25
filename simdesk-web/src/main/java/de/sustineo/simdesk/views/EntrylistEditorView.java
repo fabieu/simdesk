@@ -1267,7 +1267,7 @@ public class EntrylistEditorView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<Session> trackColumn = grid.addColumn(Session::getTrack)
+        Grid.Column<Session> trackColumn = grid.addColumn(session -> session.getRaceTrack().getDisplayName())
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -1292,7 +1292,7 @@ public class EntrylistEditorView extends BaseView {
         SessionFilter sessionFilter = new SessionFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(serverNameColumn).setComponent(GridFilter.createTextFieldHeader(sessionFilter::setServerName));
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setRaceTrack, () -> RaceTracks.getAllBySimulation(Simulation.ACC)));
         headerRow.getCell(sessionTypeColumn).setComponent(GridFilter.createComboBoxHeader(sessionFilter::setSessionType, SessionType::getValid));
 
         return grid;

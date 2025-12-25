@@ -12,7 +12,8 @@ import com.vaadin.flow.router.*;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.CarGroup;
-import de.sustineo.simdesk.entities.Track;
+import de.sustineo.simdesk.entities.RaceTracks;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 import de.sustineo.simdesk.entities.ranking.GroupRanking;
 import de.sustineo.simdesk.services.leaderboard.RankingService;
@@ -109,7 +110,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
                 .setAutoWidth(true)
                 .setFlexGrow(0)
                 .setSortable(true);
-        Grid.Column<GroupRanking> trackColumn = grid.addColumn(groupRanking -> Track.getByAccId(groupRanking.getTrackId()))
+        Grid.Column<GroupRanking> trackColumn = grid.addColumn(groupRanking -> RaceTracks.getById(Simulation.ACC, groupRanking.getTrackId()).getDisplayName())
                 .setHeader("Track")
                 .setAutoWidth(true)
                 .setFlexGrow(0)
@@ -137,7 +138,7 @@ public class LeaderboardOverallLapTimesView extends BaseView {
         OverallLapTimesFilter overallLapTimesFilter = new OverallLapTimesFilter(dataView);
         HeaderRow headerRow = grid.appendHeaderRow();
         headerRow.getCell(carGroupColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setCarGroup, CarGroup::getValid));
-        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setTrack, Track::getAllOfAccSortedByName));
+        headerRow.getCell(trackColumn).setComponent(GridFilter.createComboBoxHeader(overallLapTimesFilter::setRaceTrack, () -> RaceTracks.getAllBySimulation(Simulation.ACC)));
         headerRow.getCell(driverNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setDriverName));
         headerRow.getCell(carModelNameColumn).setComponent(GridFilter.createTextFieldHeader(overallLapTimesFilter::setCarModelName));
 
