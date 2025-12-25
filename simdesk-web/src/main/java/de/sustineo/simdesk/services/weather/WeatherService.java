@@ -5,7 +5,6 @@ import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.Constants;
 import de.sustineo.simdesk.entities.RaceTrack;
 import de.sustineo.simdesk.entities.RaceTracks;
-import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.weather.OpenWeatherHourlyForecast;
 import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
@@ -352,8 +351,8 @@ public class WeatherService {
 
         // Fetch current weather data from OpenWeatherMap API
         for (RaceTrack raceTrack : RaceTracks.getAll()) {
-            // Only fetch weather data for Kyalami Circuit in debug mode
-            if (SpringProfile.isDebug() && !raceTrack.getId(Simulation.ACC).equals("kyalami")) {
+            // Disable weather fetching in debug mode to avoid unnecessary API calls
+            if (SpringProfile.isDebug()) {
                 continue;
             }
 

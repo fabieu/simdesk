@@ -13,6 +13,7 @@ public class Session {
     private SessionType sessionType;
     private Integer raceWeekendIndex;
     private String serverName;
+    private String simulationId;
     private String trackId;
     private Boolean wetSession;
     private Integer carCount;

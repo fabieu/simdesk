@@ -13,10 +13,6 @@ public enum Simulation {
     private final String displayName;
 
     public static Simulation getById(String id) {
-        if (id == null) {
-            return null;
-        }
-
         for (Simulation simulation : values()) {
             if (simulation.getId().equals(id)) {
                 return simulation;

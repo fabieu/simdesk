@@ -14,6 +14,7 @@ public class SessionResponse {
     private Instant sessionDatetime;
     private SessionType sessionType;
     private String serverName;
+    private String simulationId;
     private String trackId;
     private Boolean wetSession;
     private Integer carCount;
@@ -27,6 +28,7 @@ public class SessionResponse {
         this.sessionDatetime = session.getSessionDatetime();
         this.sessionType = session.getSessionType();
         this.serverName = session.getServerName();
+        this.simulationId = session.getSimulationId();
         this.trackId = session.getTrackId();
         this.wetSession = session.getWetSession();
         this.carCount = session.getCarCount();

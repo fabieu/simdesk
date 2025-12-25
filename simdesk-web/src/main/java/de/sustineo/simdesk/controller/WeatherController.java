@@ -88,7 +88,7 @@ public class WeatherController {
             @RequestParam(value = "withWeatherModel", required = false)
             boolean withWeatherModel,
             @Parameter(in = ParameterIn.QUERY, description = "Simulation ID")
-            @RequestParam(value = "simulation", required = false)
+            @RequestParam(value = "simulationId", required = false)
             String simulationId,
             @Parameter(in = ParameterIn.QUERY, description = "Track ID")
             @RequestParam(value = "trackId", required = false)
@@ -105,7 +105,7 @@ public class WeatherController {
 
         Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(raceTrack);
         if (weatherModel.isEmpty()) {
-            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for racetrack" + raceTrack);
+            throw new ResponseStatusException(HttpStatus.INTERNAL_SERVER_ERROR, "No weather model found for racetrack " + raceTrack);
         }
 
         AccWeatherSettings accWeatherSettings = weatherService.getAccWeatherSettings(weatherModel.get(), raceHours);

@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.converter;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.FileMetadata;
 import de.sustineo.simdesk.entities.Session;
+import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccSession;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ public class SessionConverter extends BaseConverter {
                 .sessionType(accSession.getSessionType())
                 .raceWeekendIndex(accSession.getRaceWeekendIndex())
                 .serverName(accSession.getServerName())
+                .simulationId(Simulation.ACC.getId())
                 .trackId(accSession.getTrackName())
                 .wetSession(accSession.getSessionResult().getIsWetSession())
                 .carCount(accSession.getSessionResult().getLeaderboardLines().size())

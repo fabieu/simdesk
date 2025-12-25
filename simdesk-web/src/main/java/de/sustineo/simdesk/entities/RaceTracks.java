@@ -39,6 +39,7 @@ public final class RaceTracks {
 
     static {
         BARCELONA = RaceTrack.builder()
+                .globalId("barcelona")
                 .displayName("Circuit de Barcelona-Catalunya")
                 .latitude(41.57)
                 .longitude(2.258056)
@@ -47,6 +48,7 @@ public final class RaceTracks {
         register(BARCELONA);
 
         BRANDS_HATCH = RaceTrack.builder()
+                .globalId("brands_hatch")
                 .displayName("Brands Hatch")
                 .latitude(51.359444)
                 .longitude(0.260556)
@@ -55,6 +57,7 @@ public final class RaceTracks {
         register(BRANDS_HATCH);
 
         COTA = RaceTrack.builder()
+                .globalId("cota")
                 .displayName("Circuit of the Americas")
                 .latitude(30.136611)
                 .longitude(-97.630692)
@@ -63,6 +66,7 @@ public final class RaceTracks {
         register(COTA);
 
         DONINGTON = RaceTrack.builder()
+                .globalId("donington_park")
                 .displayName("Donington Park")
                 .latitude(52.830556)
                 .longitude(-1.375278)
@@ -71,6 +75,7 @@ public final class RaceTracks {
         register(DONINGTON);
 
         HUNGARORING = RaceTrack.builder()
+                .globalId("hungaroring")
                 .displayName("Hungaroring")
                 .latitude(47.583056)
                 .longitude(19.251111)
@@ -79,6 +84,7 @@ public final class RaceTracks {
         register(HUNGARORING);
 
         IMOLA = RaceTrack.builder()
+                .globalId("imola")
                 .displayName("Autodromo Enzo e Dino Ferrari")
                 .latitude(44.340278)
                 .longitude(11.713611)
@@ -87,6 +93,7 @@ public final class RaceTracks {
         register(IMOLA);
 
         INDIANAPOLIS = RaceTrack.builder()
+                .globalId("indianapolis")
                 .displayName("Indianapolis Motor Speedway")
                 .latitude(39.794853)
                 .longitude(-86.234822)
@@ -95,6 +102,7 @@ public final class RaceTracks {
         register(INDIANAPOLIS);
 
         KYALAMI = RaceTrack.builder()
+                .globalId("kyalami")
                 .displayName("Kyalami Grand Prix Circuit")
                 .latitude(-25.998779)
                 .longitude(28.069907)
@@ -103,6 +111,7 @@ public final class RaceTracks {
         register(KYALAMI);
 
         LAGUNA_SECA = RaceTrack.builder()
+                .globalId("laguna_seca")
                 .displayName("Laguna Seca Raceway")
                 .latitude(36.584722)
                 .longitude(-121.752778)
@@ -111,6 +120,7 @@ public final class RaceTracks {
         register(LAGUNA_SECA);
 
         MISANO = RaceTrack.builder()
+                .globalId("misano")
                 .displayName("Misano World Circuit Marco Simoncelli")
                 .latitude(43.96138)
                 .longitude(12.6833339)
@@ -119,6 +129,7 @@ public final class RaceTracks {
         register(MISANO);
 
         MONZA = RaceTrack.builder()
+                .globalId("monza")
                 .displayName("Autodromo Nazionale Monza")
                 .latitude(45.61896)
                 .longitude(9.281216)
@@ -127,6 +138,7 @@ public final class RaceTracks {
         register(MONZA);
 
         MOUNT_PANORAMA = RaceTrack.builder()
+                .globalId("mount_panorama")
                 .displayName("Mount Panorama Circuit")
                 .latitude(-33.4475)
                 .longitude(149.556389)
@@ -135,6 +147,7 @@ public final class RaceTracks {
         register(MOUNT_PANORAMA);
 
         NURBURGRING = RaceTrack.builder()
+                .globalId("nürburgring")
                 .displayName("Nürburgring")
                 .latitude(50.33174)
                 .longitude(6.941024)
@@ -143,6 +156,7 @@ public final class RaceTracks {
         register(NURBURGRING);
 
         NURBURGRING_NORDSCHLEIFE = RaceTrack.builder()
+                .globalId("nürburgring_nordschleife")
                 .displayName("Nürburgring Nordschleife")
                 .latitude(50.353248)
                 .longitude(6.948595)
@@ -151,6 +165,7 @@ public final class RaceTracks {
         register(NURBURGRING_NORDSCHLEIFE);
 
         OULTON_PARK = RaceTrack.builder()
+                .globalId("oulton_park")
                 .displayName("Oulton Park")
                 .latitude(53.177594)
                 .longitude(-2.614378)
@@ -159,6 +174,7 @@ public final class RaceTracks {
         register(OULTON_PARK);
 
         PAUL_RICARD = RaceTrack.builder()
+                .globalId("paul_ricard")
                 .displayName("Circuit Paul Ricard")
                 .latitude(43.250556)
                 .longitude(5.791667)
@@ -167,6 +183,7 @@ public final class RaceTracks {
         register(PAUL_RICARD);
 
         RED_BULL_RING = RaceTrack.builder()
+                .globalId("red_bull_ring")
                 .displayName("Red Bull Ring")
                 .latitude(47.219722)
                 .longitude(14.764722)
@@ -175,6 +192,7 @@ public final class RaceTracks {
         register(RED_BULL_RING);
 
         SILVERSTONE = RaceTrack.builder()
+                .globalId("silverstone")
                 .displayName("Silverstone Circuit")
                 .latitude(52.070278)
                 .longitude(-1.016667)
@@ -183,6 +201,7 @@ public final class RaceTracks {
         register(SILVERSTONE);
 
         SNETTERTON = RaceTrack.builder()
+                .globalId("snetterton")
                 .displayName("Snetterton Motor Racing Circuit")
                 .latitude(52.466389)
                 .longitude(0.945833)
@@ -191,6 +210,7 @@ public final class RaceTracks {
         register(SNETTERTON);
 
         SPA = RaceTrack.builder()
+                .globalId("spa")
                 .displayName("Spa-Francorchamps")
                 .latitude(50.438056)
                 .longitude(5.969722)
@@ -199,6 +219,7 @@ public final class RaceTracks {
         register(SPA);
 
         SUZUKA = RaceTrack.builder()
+                .globalId("suzuka")
                 .displayName("Suzuka International Racing Course")
                 .latitude(34.844444)
                 .longitude(136.533333)
@@ -207,6 +228,7 @@ public final class RaceTracks {
         register(SUZUKA);
 
         VALENCIA = RaceTrack.builder()
+                .globalId("valencia")
                 .displayName("Circuit Ricardo Tormo")
                 .latitude(39.485833)
                 .longitude(-0.628056)
@@ -215,6 +237,7 @@ public final class RaceTracks {
         register(VALENCIA);
 
         WATKINS_GLEN = RaceTrack.builder()
+                .globalId("watkins_glen")
                 .displayName("Watkins Glen International")
                 .latitude(42.336944)
                 .longitude(-76.927222)
@@ -223,6 +246,7 @@ public final class RaceTracks {
         register(WATKINS_GLEN);
 
         ZANDVOORT = RaceTrack.builder()
+                .globalId("zandvoort")
                 .displayName("Circuit Zandvoort")
                 .latitude(52.388056)
                 .longitude(4.544444)
@@ -231,6 +255,7 @@ public final class RaceTracks {
         register(ZANDVOORT);
 
         ZOLDER = RaceTrack.builder()
+                .globalId("zolder")
                 .displayName("Circuit Zolder")
                 .latitude(50.989422)
                 .longitude(5.25705)
@@ -239,19 +264,22 @@ public final class RaceTracks {
         register(ZOLDER);
 
         UNKNOWN_TRACK = RaceTrack.builder()
+                .globalId("unknown_track")
                 .displayName("Unknown track")
+                .latitude(0.0)
+                .longitude(0.0)
                 .build();
     }
 
-    private static void register(RaceTrack track) {
+    private static void register(RaceTrack raceTrack) {
         // Register raceTrack globally
-        RACE_TRACKS.add(track);
+        RACE_TRACKS.add(raceTrack);
 
         // Register raceTrack for each simulationId it is available in
-        for (Simulation simulation : track.getSimulationIds().keySet()) {
+        for (Simulation simulation : raceTrack.getSimulationIds().keySet()) {
             RACE_TRACKS_BY_SIMULATION
                     .computeIfAbsent(simulation, s -> new LinkedHashSet<>())
-                    .add(track);
+                    .add(raceTrack);
         }
 
     }
@@ -262,7 +290,7 @@ public final class RaceTracks {
      * @return an immutable or backing set of all registered tracks
      */
     public static Set<RaceTrack> getAll() {
-        return RACE_TRACKS;
+        return Collections.unmodifiableSet(RACE_TRACKS);
     }
 
     /**
@@ -273,7 +301,7 @@ public final class RaceTracks {
      * or an empty set if none are registered
      */
     public static Set<RaceTrack> getAllBySimulation(@Nullable Simulation simulation) {
-        return RACE_TRACKS_BY_SIMULATION.getOrDefault(simulation, Collections.emptySet());
+        return Collections.unmodifiableSet(RACE_TRACKS_BY_SIMULATION.getOrDefault(simulation, Collections.emptySet()));
     }
 
     /**

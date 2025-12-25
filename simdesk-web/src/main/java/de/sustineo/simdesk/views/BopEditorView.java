@@ -182,7 +182,7 @@ public class BopEditorView extends BaseView {
         raceTrackComboBox.setItems(RaceTracks.getAllBySimulation(Simulation.ACC));
         raceTrackComboBox.setItemLabelGenerator(RaceTrack::getDisplayName);
         raceTrackComboBox.setPlaceholder("Select racetrack...");
-        raceTrackComboBox.setHelperText("Available filters: Track");
+        raceTrackComboBox.setHelperText("Available filters: Racetrack");
         raceTrackComboBox.addValueChangeListener(event -> {
             if (event.getValue() != null) {
                 currentBop.getEntries().forEach(entry -> entry.setTrackId(event.getValue().getId(Simulation.ACC)));
