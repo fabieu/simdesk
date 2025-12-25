@@ -35,7 +35,7 @@ import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
-import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.comparator.AccBopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
@@ -116,7 +116,7 @@ public class BopManagementView extends BaseView {
 
     private void initializeBopList() {
         List<Bop> sortedBops = bopService.getAll().stream()
-                .sorted(new BopComparator())
+                .sorted(new AccBopComparator())
                 .toList();
         this.bopList.addAll(sortedBops);
 

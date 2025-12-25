@@ -7,7 +7,7 @@ import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
 
 import java.util.Comparator;
 
-public class BopComparator implements Comparator<Bop> {
+public class AccBopComparator implements Comparator<Bop> {
     @Override
     public int compare(Bop b1, Bop b2) {
         return Comparator

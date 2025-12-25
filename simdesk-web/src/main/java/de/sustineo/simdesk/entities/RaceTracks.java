@@ -320,6 +320,26 @@ public final class RaceTracks {
     }
 
     /**
+     * Returns the racetrack matching the given global id.
+     *
+     * <p>If no matching track is found, {@link #UNKNOWN_TRACK} is returned.
+     *
+     * @param globalId the global track id
+     * @return the matching {@link RaceTrack} or {@link #UNKNOWN_TRACK} if not found
+     */
+    @Nonnull
+    public static RaceTrack getById(@Nullable String globalId) {
+        if (globalId == null) {
+            return UNKNOWN_TRACK;
+        }
+
+        return RACE_TRACKS.stream()
+                .filter(raceTrack -> globalId.equals(raceTrack.getGlobalId()))
+                .findFirst()
+                .orElse(UNKNOWN_TRACK);
+    }
+
+    /**
      * Returns the racetrack matching the given simulation-specific id.
      *
      * <p>If no matching track is found, {@link #UNKNOWN_TRACK} is returned.

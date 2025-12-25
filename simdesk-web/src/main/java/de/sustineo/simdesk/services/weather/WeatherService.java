@@ -351,8 +351,8 @@ public class WeatherService {
 
         // Fetch current weather data from OpenWeatherMap API
         for (RaceTrack raceTrack : RaceTracks.getAll()) {
-            // Disable weather fetching in debug mode to avoid unnecessary API calls
-            if (SpringProfile.isDebug() && RaceTracks.KYALAMI.equals(raceTrack)) {
+            // Only fetch weather data for Kyalami Circuit in debug mode
+            if (SpringProfile.isDebug() && raceTrack.equals(RaceTracks.KYALAMI)) {
                 continue;
             }
 

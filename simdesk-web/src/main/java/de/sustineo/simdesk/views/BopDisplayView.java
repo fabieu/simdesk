@@ -30,7 +30,7 @@ import de.sustineo.simdesk.entities.RaceTracks;
 import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.bop.Bop;
 import de.sustineo.simdesk.entities.bop.BopProvider;
-import de.sustineo.simdesk.entities.comparator.BopComparator;
+import de.sustineo.simdesk.entities.comparator.AccBopComparator;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBop;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccBopEntry;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccCar;
@@ -161,7 +161,7 @@ public class BopDisplayView extends BaseView {
         });
 
         Map<RaceTrack, Set<Bop>> bopsByRaceTrack = bopService.getActive().stream()
-                .sorted(new BopComparator())
+                .sorted(new AccBopComparator())
                 .collect(Collectors.groupingBy(bop -> RaceTracks.getById(Simulation.ACC, bop.getTrackId()), LinkedHashMap::new, Collectors.toCollection(LinkedHashSet::new)));
 
         for (Map.Entry<RaceTrack, Set<Bop>> entry : bopsByRaceTrack.entrySet()) {

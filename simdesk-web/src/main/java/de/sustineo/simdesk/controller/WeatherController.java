@@ -3,7 +3,6 @@ package de.sustineo.simdesk.controller;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.RaceTrack;
 import de.sustineo.simdesk.entities.RaceTracks;
-import de.sustineo.simdesk.entities.Simulation;
 import de.sustineo.simdesk.entities.json.kunos.acc.AccWeatherSettings;
 import de.sustineo.simdesk.entities.output.ServiceResponse;
 import de.sustineo.simdesk.entities.output.WeatherSettingsOutput;
@@ -60,14 +59,11 @@ public class WeatherController {
             @Parameter(in = ParameterIn.QUERY, description = "Include weather model details in response", schema = @Schema(type = "boolean", defaultValue = "false"))
             @RequestParam(value = "withWeatherModel", required = false, defaultValue = "false")
             boolean withWeatherModel,
-            @Parameter(in = ParameterIn.QUERY, description = "Simulation ID")
-            @RequestParam(value = "simulationId", required = false)
-            String simulationId,
             @Parameter(in = ParameterIn.QUERY, description = "Track ID")
             @RequestParam(value = "trackId", required = false)
             String trackId
     ) {
-        return getPredictedWeather(-1, withWeatherModel, simulationId, trackId);
+        return getPredictedWeather(-1, withWeatherModel, trackId);
     }
 
     @Operation(
@@ -87,20 +83,15 @@ public class WeatherController {
             @Parameter(in = ParameterIn.QUERY, description = "Include weather model details in response", schema = @Schema(type = "boolean", defaultValue = "false"))
             @RequestParam(value = "withWeatherModel", required = false)
             boolean withWeatherModel,
-            @Parameter(in = ParameterIn.QUERY, description = "Simulation ID")
-            @RequestParam(value = "simulationId", required = false)
-            String simulationId,
             @Parameter(in = ParameterIn.QUERY, description = "Track ID")
             @RequestParam(value = "trackId", required = false)
             String trackId
     ) {
         WeatherSettingsOutput weatherSettingsOutput = new WeatherSettingsOutput();
 
-        Simulation simulation = Simulation.getById(simulationId);
-        RaceTrack raceTrack = RaceTracks.getById(simulation, trackId);
-
+        RaceTrack raceTrack = RaceTracks.getById(trackId);
         if (RaceTracks.UNKNOWN_TRACK.equals(raceTrack)) {
-            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Racetrack '%s' not found for simulation '%s'", trackId, simulation));
+            throw new ResponseStatusException(HttpStatus.NOT_FOUND, String.format("Racetrack not found for trackId " + trackId));
         }
 
         Optional<OpenWeatherModel> weatherModel = weatherService.getOpenWeatherModel(raceTrack);
