@@ -30,10 +30,10 @@ import de.sustineo.simdesk.services.discord.DiscordService;
 import de.sustineo.simdesk.views.components.ButtonComponentFactory;
 import discord4j.common.util.Snowflake;
 import discord4j.core.object.entity.Role;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.security.RolesAllowed;
 import lombok.extern.java.Log;
 
-import javax.annotation.Nonnull;
 import java.util.Collections;
 import java.util.Map;
 import java.util.Optional;

@@ -25,9 +25,8 @@ public class RestClientConfiguration {
         MappingJackson2HttpMessageConverter jacksonConverter = new MappingJackson2HttpMessageConverter(objectMapper);
 
         return RestClient.builder()
-                .messageConverters(converters -> {
-                    converters.removeIf(MappingJackson2HttpMessageConverter.class::isInstance);
-                    converters.addFirst(jacksonConverter);
+                .configureMessageConverters(converters -> {
+                    converters.addCustomConverter(jacksonConverter);
                 })
                 .build();
     }

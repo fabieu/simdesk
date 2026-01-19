@@ -5,12 +5,12 @@ import com.fasterxml.jackson.annotation.JsonProperty;
 import de.sustineo.simdesk.entities.Driver;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccDriverCategory;
 import de.sustineo.simdesk.entities.json.kunos.acc.enums.AccNationality;
+import jakarta.annotation.Nonnull;
 import jakarta.validation.constraints.NotNull;
 import lombok.AccessLevel;
 import lombok.Data;
 import lombok.NoArgsConstructor;
 
-import javax.annotation.Nonnull;
 import java.util.Objects;
 
 @Data

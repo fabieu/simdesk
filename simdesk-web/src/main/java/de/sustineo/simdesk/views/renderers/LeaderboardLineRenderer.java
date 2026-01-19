@@ -18,12 +18,12 @@ public class LeaderboardLineRenderer extends GridRenderer {
         return LitRenderer.<LeaderboardLine>of(DRIVERS_TEMPLATE)
                 .withProperty(DRIVERS_TEMPLATE_DRIVERS, LeaderboardLine::getDrivers)
                 .withFunction(DRIVERS_TEMPLATE_CLICK_HANDLER, (leaderboardLine, args) -> {
-                    if (args == null || args.length() == 0) {
+                    if (args == null || args.isEmpty()) {
                         return;
                     }
 
                     leaderboardLine.getDrivers().stream()
-                            .filter(driver -> driver.getId() != null && driver.getId().equals(args.getString(0)))
+                            .filter(driver -> driver.getId() != null && driver.getId().equals(args.get(0).asString()))
                             .findFirst()
                             .ifPresent(GridRenderer::redirectToDriverProfile);
                 });

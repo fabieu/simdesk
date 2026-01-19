@@ -142,8 +142,8 @@ public class LeaderboardSessionsView extends BaseView {
         DateTimePicker dateTimePicker = new DateTimePicker();
         dateTimePicker.setLabel("Session datetime");
         dateTimePicker.setRequiredIndicatorVisible(true);
-        dateTimePicker.setValue(ZonedDateTime.now(BrowserTimeZone.get()).toLocalDateTime());
-        dateTimePicker.setMax(ZonedDateTime.now(BrowserTimeZone.get()).toLocalDateTime());
+        dateTimePicker.setValue(ZonedDateTime.now(BrowserTime.getZoneId()).toLocalDateTime());
+        dateTimePicker.setMax(ZonedDateTime.now(BrowserTime.getZoneId()).toLocalDateTime());
         dateTimePicker.setStep(Duration.ofMinutes(15));
         dateTimePicker.setI18n(new DateTimePicker.DateTimePickerI18n()
                 .setRequiredErrorMessage("Field is required")
@@ -163,7 +163,7 @@ public class LeaderboardSessionsView extends BaseView {
         upload.setUploadHandler(UploadHandler.toFile((metadata, file) -> {
             try {
                 Path path = file.getAbsoluteFile().toPath();
-                Instant sessionDatetime = ZonedDateTime.of(dateTimePicker.getValue(), BrowserTimeZone.get()).toInstant();
+                Instant sessionDatetime = ZonedDateTime.of(dateTimePicker.getValue(), BrowserTime.getZoneId()).toInstant();
 
                 sessionFileService.handleSessionFileWithSessionDatetimeOverride(path, sessionDatetime);
 

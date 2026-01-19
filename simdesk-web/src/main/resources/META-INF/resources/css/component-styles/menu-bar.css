@@ -1,0 +1,11 @@
+vaadin-menu-bar {
+    margin: 0 var(--lumo-space-m);
+}
+
+vaadin-menu-bar-button {
+    cursor: pointer;
+}
+
+vaadin-menu-bar-button::part(label) {
+    color: var(--lumo-header-text-color);
+}

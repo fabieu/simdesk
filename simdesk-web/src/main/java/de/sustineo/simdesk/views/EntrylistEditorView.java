@@ -1476,7 +1476,6 @@ public class EntrylistEditorView extends BaseView {
         // Add dynamic dialog with error references if available
         if (errorReferences != null && !errorReferences.isEmpty()) {
             Dialog dialog = new Dialog(validationRule.getFriendlyName());
-            dialog.setModal(false);
             dialog.setDraggable(true);
             dialog.setResizable(true);
 

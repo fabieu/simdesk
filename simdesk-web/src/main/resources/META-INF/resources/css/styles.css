@@ -1,0 +1,89 @@
+@import "colors.css";
+@import "component-styles/button.css";
+@import "component-styles/combo-box.css";
+@import "component-styles/dialog.css";
+@import "component-styles/grid.css";
+@import "component-styles/menu-bar.css";
+@import "component-styles/tabs.css";
+@import "views/main.css";
+@import "views/error.css";
+@import "views/login.css";
+@import "views/permit.css";
+@import "assets/fontawesome/fontawesome.min.css";
+@import "assets/fontawesome/brands.min.css";
+@import "assets/fontawesome/solid.min.css";
+@import "assets/fontawesome/regular.min.css";
+@import "assets/purecss/pure-min.css";
+@import "assets/purecss/grids-responsive-min.css";
+@import "assets/patterncss/pattern.min.css";
+@import "assets/leaflet/leaflet.css";
+
+@font-face {
+    font-family: Roboto;
+    src: url("../fonts/Roboto-Regular.ttf") format("truetype");
+}
+
+.noselect {
+    -webkit-touch-callout: none; /* iOS Safari */
+    -webkit-user-select: none; /* Safari */
+    -moz-user-select: none; /* Old versions of Firefox */
+    -ms-user-select: none; /* Internet Explorer/Edge */
+    user-select: none; /* Non-prefixed version, currently supported by Chrome, Edge, Opera and Firefox */
+}
+
+hr.spacer {
+    margin: var(--lumo-space-s) calc(var(--lumo-border-radius-m) / 2);
+    border-top: 1px solid var(--lumo-contrast-10pct);
+}
+
+.container {
+    width: 80%;
+    margin-right: auto;
+    margin-left: auto;
+    padding: var(--lumo-space-l);
+    margin-bottom: var(--lumo-space-m);
+}
+
+@media (min-width: 768px) {
+    .container {
+        width: 750px;
+    }
+}
+
+@media (min-width: 992px) {
+    .container {
+        width: 970px;
+    }
+}
+
+@media (min-width: 1200px) {
+    .container {
+        width: 1170px;
+    }
+}
+
+.bg-light {
+    background-color: var(--lumo-contrast-5pct);
+}
+
+#navbar-logo {
+    height: var(--lumo-size-l);
+    padding-right: var(--lumo-space-s);
+}
+
+[theme~="light"] #navbar-logo {
+    content: url("assets/img/logo_full_black.png");
+}
+
+[theme~="dark"] #navbar-logo {
+    content: url("assets/img/logo_full_white.png");
+}
+
+
+.header {
+    display: flex;
+    width: 100%;
+    align-items: center;
+    justify-content: center;
+    padding: var(--lumo-space-m);
+}
