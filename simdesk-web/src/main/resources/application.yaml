@@ -71,8 +71,6 @@ simdesk:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}
       password: ${SIMDESK_ADMIN_PASSWORD:#{null}}
-  cors:
-    allowed-origins: ${SIMDESK_CORS_ALLOWED_ORIGINS}
 springdoc:
   swagger-ui:
     enabled: true
