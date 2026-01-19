@@ -61,9 +61,6 @@ and [BSD 2-Clause "Simplified" License](https://github.com/pgjdbc/pgjdbc/blob/ma
 [Flyway](https://flywaydb.org/) by [Redgate](https://www.red-gate.com)
 and [Apache License 2.0](https://github.com/flyway/flyway/blob/main/LICENSE.md)
 
-[logzio-logback-appender](https://github.com/logzio/logzio-logback-appender) by [logz.io](https://logz.io/)
-and [Apache License 2.0](https://github.com/logzio/logzio-logback-appender/blob/master/LICENSE)
-
 [commons-lang](https://github.com/apache/commons-lang) by [Apache](https://apache.org/)
 and [Apache License 2.0](https://github.com/apache/commons-lang/blob/master/LICENSE.txt)
 
