@@ -1,13 +1,12 @@
 package de.sustineo.simdesk.services.weather;
 
 import de.sustineo.simdesk.configuration.SpringProfile;
+import de.sustineo.simdesk.configuration.TestRestClientConfiguration;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
-import org.springframework.core.env.Environment;
+import org.springframework.context.annotation.Import;
 import org.springframework.test.context.ActiveProfiles;
-import org.springframework.test.context.bean.override.mockito.MockitoBean;
-import org.springframework.web.client.RestTemplate;
 
 import java.util.ArrayList;
 import java.util.List;
@@ -16,19 +15,12 @@ import static org.assertj.core.api.Assertions.assertThat;
 
 @ActiveProfiles({SpringProfile.MAP})
 @SpringBootTest(classes = {
-        WeatherService.class,
-        SpringProfile.class,
-        Environment.class
+        WeatherService.class
 })
+@Import(TestRestClientConfiguration.class)
 class WeatherServiceTest {
     @Autowired
     private WeatherService weatherService;
-
-    @Autowired
-    private SpringProfile springProfile;
-
-    @MockitoBean
-    private RestTemplate restTemplate;
 
     @Test
     public void testNoRain() {

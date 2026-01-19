@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.UI;
 import com.vaadin.flow.component.page.ExtendedClientDetails;
+import com.vaadin.flow.component.page.Page;
 
 import java.time.Instant;
 import java.time.LocalDateTime;
@@ -9,6 +10,7 @@ import java.time.ZoneId;
 import java.time.ZoneOffset;
 import java.time.format.TextStyle;
 import java.util.Locale;
+import java.util.Optional;
 
 public final class BrowserTime {
     /**
@@ -17,7 +19,11 @@ public final class BrowserTime {
      * @return ZoneId, either a zone ID or a zone offset.
      */
     public static ZoneId getZoneId() {
-        final ExtendedClientDetails details = UI.getCurrent().getPage().getExtendedClientDetails();
+        final ExtendedClientDetails details = Optional.ofNullable(UI.getCurrent())
+                .map(UI::getPage)
+                .map(Page::getExtendedClientDetails)
+                .orElse(null);
+
         if (details != null) {
             if (details.getTimeZoneId() != null && !details.getTimeZoneId().isBlank()) {
                 // take into account zone ID. This is important for historical dates, to properly compute date with daylight savings.

@@ -5,15 +5,15 @@ spring:
     banner-mode: off
   flyway:
     enabled: true
-    default-schema: simdesk
-    createSchemas: true
-  jackson:
-    default-property-inclusion: NON_NULL
-    deserialization:
-      fail-on-unknown-properties: false
-      read-unknown-enum-values-as-null: true
-    serialization:
-      fail-on-empty-beans: false
+  cache:
+    type: simple
+server:
+  servlet:
+    session:
+      persistent: true
+      timeout: 24h
+  forward-headers-strategy: framework
+  shutdown: graceful
 simdesk:
   theme: ${SIMDESK_THEME:#{null}}
   community:
@@ -25,10 +25,9 @@ simdesk:
     folders: ${SIMDESK_ACC_RESULTS_FOLDERS:}
     scan-interval: ${SIMDESK_ACC_RESULTS_SCAN_INTERVAL:PT1M}
     exclude-pattern: ${SIMDESK_ACC_RESULTS_EXCLUDE_PATTERN:}
+  openweathermap:
+    api-key: ${SIMDESK_OPENWEATHERMAP_API_KEY:#{null}}
   auth:
     admin:
       username: ${SIMDESK_ADMIN_USERNAME:admin}
       password: ${SIMDESK_ADMIN_PASSWORD:admin}
-server:
-  forward-headers-strategy: framework
-  shutdown: graceful
