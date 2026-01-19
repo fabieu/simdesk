@@ -1,6 +1,6 @@
 package de.sustineo.simdesk.utils;
 
-import de.sustineo.simdesk.views.BrowserTimeZone;
+import de.sustineo.simdesk.views.BrowserTime;
 import org.apache.commons.lang3.StringUtils;
 import org.apache.commons.lang3.time.DurationFormatUtils;
 
@@ -60,7 +60,7 @@ public class FormatUtils {
             return StringUtils.EMPTY;
         }
 
-        return dateTimeFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);
+        return dateTimeFormatter.withZone(BrowserTime.getZoneId()).format(temporalAccessor);
     }
 
     public static String formatDatetimeSafe(TemporalAccessor intemporalAccessor) {
@@ -68,7 +68,7 @@ public class FormatUtils {
             return StringUtils.EMPTY;
         }
 
-        return dateTimeFormatterSafe.withZone(BrowserTimeZone.get()).format(intemporalAccessor);
+        return dateTimeFormatterSafe.withZone(BrowserTime.getZoneId()).format(intemporalAccessor);
     }
 
     public static String formatDate(TemporalAccessor temporalAccessor) {
@@ -76,6 +76,6 @@ public class FormatUtils {
             return StringUtils.EMPTY;
         }
 
-        return dateFormatter.withZone(BrowserTimeZone.get()).format(temporalAccessor);
+        return dateFormatter.withZone(BrowserTime.getZoneId()).format(temporalAccessor);
     }
 }

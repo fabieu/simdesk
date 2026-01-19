@@ -1,7 +1,6 @@
 package de.sustineo.simdesk.configuration;
 
 import com.vaadin.flow.spring.security.NavigationAccessControlConfigurer;
-import com.vaadin.flow.spring.security.VaadinAwareSecurityContextHolderStrategyConfiguration;
 import com.vaadin.flow.spring.security.VaadinSecurityConfigurer;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.filter.ApiKeyAuthenticationFilter;
@@ -11,9 +10,9 @@ import de.sustineo.simdesk.views.LoginView;
 import discord4j.common.util.Snowflake;
 import lombok.RequiredArgsConstructor;
 import lombok.extern.java.Log;
+import org.springframework.boot.security.autoconfigure.web.servlet.PathRequest;
 import org.springframework.context.annotation.Bean;
 import org.springframework.context.annotation.Configuration;
-import org.springframework.context.annotation.Import;
 import org.springframework.http.HttpStatus;
 import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
@@ -41,7 +40,6 @@ import java.util.stream.Collectors;
 @Configuration
 @EnableWebSecurity
 @EnableMethodSecurity
-@Import(VaadinAwareSecurityContextHolderStrategyConfiguration.class)
 @RequiredArgsConstructor
 public class SecurityConfiguration {
     private final String[] PUBLIC_PATHS = {
@@ -76,6 +74,7 @@ public class SecurityConfiguration {
                     configurer.loginView(LoginView.class);
                 })
                 .authorizeHttpRequests(auth -> auth
+                        .requestMatchers(PathRequest.toStaticResources().atCommonLocations()).permitAll()
                         .requestMatchers(PUBLIC_PATHS).permitAll()
                         .requestMatchers("/actuator/**").hasAuthority(UserRoleEnum.ROLE_ADMIN.name())
                 )

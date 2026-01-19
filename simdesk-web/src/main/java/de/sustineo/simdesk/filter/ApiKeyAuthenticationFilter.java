@@ -3,6 +3,7 @@ package de.sustineo.simdesk.filter;
 import de.sustineo.simdesk.entities.auth.ApiKey;
 import de.sustineo.simdesk.entities.auth.ApiKeyAuthenticationToken;
 import de.sustineo.simdesk.services.auth.ApiKeyService;
+import jakarta.annotation.Nonnull;
 import jakarta.servlet.FilterChain;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.HttpServletRequest;
@@ -16,7 +17,6 @@ import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Component;
 import org.springframework.web.filter.OncePerRequestFilter;
 
-import javax.annotation.Nonnull;
 import java.io.IOException;
 import java.util.Optional;
 

@@ -14,7 +14,6 @@ import de.sustineo.simdesk.entities.weather.OpenWeatherModel;
 import de.sustineo.simdesk.entities.weather.OpenWeatherPrecipitation;
 import de.sustineo.simdesk.services.weather.WeatherService;
 import de.sustineo.simdesk.utils.FormatUtils;
-import de.sustineo.simdesk.utils.VaadinUtils;
 import de.sustineo.simdesk.views.components.ComponentFactory;
 import org.springframework.context.annotation.Profile;
 import software.xdev.vaadin.maps.leaflet.MapContainer;
@@ -116,15 +115,10 @@ public class MapView extends BaseView {
         // Add a layer for all raceTrack markers
         LLayerGroup trackLayerGroup = new LLayerGroup(registry);
         for (RaceTrack raceTrack : RaceTracks.getAll()) {
-            // Create a new marker for each raceTrack and add it to the map
             LMarker trackMarker = new LMarker(registry, new LLatLng(registry, raceTrack.getLatitude(), raceTrack.getLongitude()));
-
-            if (!VaadinUtils.isMobileDevice()) {
-                trackMarker.bindTooltip(raceTrack.getDisplayName());
-            }
-
             trackMarker.bindPopup("<h4 style=\"color: var(--lumo-header-text-color)\">%s</h4>".formatted(raceTrack.getDisplayName()));
             trackMarker.addTo(trackLayerGroup);
+
             trackMarkers.put(raceTrack, trackMarker);
         }
 

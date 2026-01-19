@@ -1,7 +1,7 @@
 package de.sustineo.simdesk.views;
 
 import com.vaadin.flow.component.Component;
-import com.vaadin.flow.component.ScrollOptions;
+import com.vaadin.flow.component.ScrollIntoViewOption;
 import com.vaadin.flow.component.html.H2;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -23,8 +23,6 @@ public abstract class BaseView extends VerticalLayout implements BeforeEnterObse
 
     protected static final String TEXT_DELIMITER = " - ";
     protected static final String GRID_RANKING_WIDTH = "70px";
-
-    private static final ScrollOptions DEFAULT_SCROLL_OPTIONS = new ScrollOptions(ScrollOptions.Behavior.SMOOTH);
 
     protected RouteParameters routeParameters;
     protected QueryParameters queryParameters;
@@ -80,6 +78,6 @@ public abstract class BaseView extends VerticalLayout implements BeforeEnterObse
     }
 
     protected void scrollToComponent(Component component) {
-        component.scrollIntoView(DEFAULT_SCROLL_OPTIONS);
+        component.scrollIntoView(ScrollIntoViewOption.Behavior.SMOOTH);
     }
 }

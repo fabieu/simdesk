@@ -16,12 +16,12 @@ import discord4j.core.spec.MessageCreateSpec;
 import discord4j.gateway.intent.Intent;
 import discord4j.gateway.intent.IntentSet;
 import discord4j.rest.http.client.ClientException;
+import jakarta.annotation.Nonnull;
 import jakarta.annotation.PreDestroy;
 import lombok.Getter;
 import lombok.extern.java.Log;
 import org.springframework.beans.factory.annotation.Value;
 import org.springframework.context.annotation.Profile;
-import org.springframework.lang.NonNull;
 import org.springframework.stereotype.Service;
 
 import java.time.Duration;
@@ -38,8 +38,8 @@ public class DiscordService {
     private final GatewayDiscordClient client;
     private final Snowflake guildId;
 
-    public DiscordService(@NonNull @Value("${simdesk.auth.discord.guild-id}") String guildId,
-                          @NonNull @Value("${simdesk.auth.discord.token}") String token) {
+    public DiscordService(@Nonnull @Value("${simdesk.auth.discord.guild-id}") String guildId,
+                          @Nonnull @Value("${simdesk.auth.discord.token}") String token) {
         this.guildId = Snowflake.of(guildId);
         this.client = DiscordClientBuilder.create(token).build()
                 .gateway()

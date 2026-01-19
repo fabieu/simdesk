@@ -85,7 +85,7 @@ public class LeaderboardDriverDetailView extends BaseView {
                 .collect(Collectors.toMap(Session::getId, session -> session));
 
         Map<RaceTrack, List<Lap>> lapsByTrackMap = laps.stream()
-                .filter(lap -> lap.getSessionId() != null)
+                .filter(lap -> sessionByIdMap.containsKey(lap.getSessionId()))
                 .collect(Collectors.groupingBy(lap -> sessionByIdMap.get(lap.getSessionId()).getRaceTrack()));
 
         Div layout = new Div();
