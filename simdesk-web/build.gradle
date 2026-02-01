@@ -3,7 +3,7 @@ plugins {
     id "io.spring.dependency-management" version "1.1.7"
     id "org.springframework.boot" version "4.0.1"
     id 'com.vaadin' version "25.0.2"
-    id "org.flywaydb.flyway" version "11.20.0"
+    id "org.flywaydb.flyway" version "12.0.0"
 }
 
 group = "de.sustineo.simdesk"
@@ -42,7 +42,7 @@ dependencies {
 
     // Vaadin
     implementation "com.vaadin:vaadin-spring-boot-starter"
-    implementation "software.xdev.vaadin.maps-leaflet:flow:5.0.1"
+    implementation "software.xdev.vaadin.maps-leaflet:flow:6.0.0"
 
     // Cache
     implementation "org.springframework.boot:spring-boot-starter-cache"
