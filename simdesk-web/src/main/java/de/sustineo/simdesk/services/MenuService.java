@@ -8,6 +8,7 @@ import de.sustineo.simdesk.entities.menu.MenuEntity;
 import de.sustineo.simdesk.entities.menu.MenuEntityCategory;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.views.*;
+import de.sustineo.simdesk.views.stewarding.*;
 import lombok.Getter;
 import org.springframework.stereotype.Service;
 
@@ -53,6 +54,16 @@ public class MenuService {
 
         if (SpringProfile.isMapEnabled()) {
             items.add(MenuEntity.ofInternal(MenuEntityCategory.MAP, "Map", VaadinIcon.MAP_MARKER, MapView.class));
+        }
+
+        if (SpringProfile.isStewardingEnabled()) {
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Race Weekends", VaadinIcon.CALENDAR, RaceWeekendListView.class));
+
+            if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+                items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Tracks", VaadinIcon.ROAD, StewardingTrackListView.class));
+                items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Penalty Catalogs", VaadinIcon.BOOK, PenaltyCatalogListView.class));
+                items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Templates", VaadinIcon.FILE_TEXT_O, ReasoningTemplateListView.class));
+            }
         }
 
         return items;

@@ -8,6 +8,7 @@ public enum MenuEntityCategory {
     LIVE_TIMING("Live Timing"),
     ENTRYLIST("Entrylist"),
     BALANCE_OF_PERFORMANCE("Balance of Performance"),
+    STEWARDING("Stewarding"),
     MAP("Map");
 
     private final String name;
