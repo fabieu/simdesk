@@ -25,13 +25,8 @@ public class StewardingEntrylistService {
     private final StewardingEntrylistDriverMapper driverMapper;
     private final ObjectMapper objectMapper;
 
-    public StewardingEntrylist getEntrylistByWeekendId(Integer weekendId) {
-        List<StewardingEntrylist> entrylists = entrylistMapper.findByRaceWeekendId(weekendId);
-        return entrylists.isEmpty() ? null : entrylists.getFirst();
-    }
-
-    public StewardingEntrylist getEntrylistBySessionId(Integer sessionId) {
-        List<StewardingEntrylist> entrylists = entrylistMapper.findBySessionId(sessionId);
+    public StewardingEntrylist getEntrylistByRoundId(Integer roundId) {
+        List<StewardingEntrylist> entrylists = entrylistMapper.findByRoundId(roundId);
         return entrylists.isEmpty() ? null : entrylists.getFirst();
     }
 
@@ -44,8 +39,8 @@ public class StewardingEntrylistService {
     }
 
     @Transactional
-    public void uploadEntrylist(Integer weekendId, String jsonContent) {
-        deleteEntrylist(weekendId);
+    public void uploadEntrylistForRound(Integer roundId, String jsonContent) {
+        deleteEntrylistForRound(roundId);
 
         JsonNode root;
         try {
@@ -55,27 +50,7 @@ public class StewardingEntrylistService {
         }
 
         StewardingEntrylist entrylist = new StewardingEntrylist();
-        entrylist.setRaceWeekendId(weekendId);
-        entrylist.setRawJson(jsonContent);
-        entrylistMapper.insert(entrylist);
-
-        parseAndInsertEntries(root, entrylist);
-    }
-
-    @Transactional
-    public void uploadEntrylistForSession(Integer sessionId, Integer weekendId, String jsonContent) {
-        deleteEntrylistForSession(sessionId);
-
-        JsonNode root;
-        try {
-            root = objectMapper.readTree(jsonContent);
-        } catch (Exception e) {
-            throw new IllegalArgumentException("Invalid JSON content", e);
-        }
-
-        StewardingEntrylist entrylist = new StewardingEntrylist();
-        entrylist.setSessionId(sessionId);
-        entrylist.setRaceWeekendId(weekendId);
+        entrylist.setRoundId(roundId);
         entrylist.setRawJson(jsonContent);
         entrylistMapper.insert(entrylist);
 
@@ -123,28 +98,15 @@ public class StewardingEntrylistService {
     }
 
     @Transactional
-    public void deleteEntrylist(Integer weekendId) {
-        List<StewardingEntrylist> existing = entrylistMapper.findByRaceWeekendId(weekendId);
+    public void deleteEntrylistForRound(Integer roundId) {
+        List<StewardingEntrylist> existing = entrylistMapper.findByRoundId(roundId);
         for (StewardingEntrylist entrylist : existing) {
-            deleteEntrylistEntries(entrylist);
+            List<StewardingEntrylistEntry> entries = entryMapper.findByEntrylistId(entrylist.getId());
+            for (StewardingEntrylistEntry entry : entries) {
+                driverMapper.deleteByEntryId(entry.getId());
+            }
+            entryMapper.deleteByEntrylistId(entrylist.getId());
         }
-        entrylistMapper.deleteByRaceWeekendId(weekendId);
-    }
-
-    @Transactional
-    public void deleteEntrylistForSession(Integer sessionId) {
-        List<StewardingEntrylist> existing = entrylistMapper.findBySessionId(sessionId);
-        for (StewardingEntrylist entrylist : existing) {
-            deleteEntrylistEntries(entrylist);
-        }
-        entrylistMapper.deleteBySessionId(sessionId);
-    }
-
-    private void deleteEntrylistEntries(StewardingEntrylist entrylist) {
-        List<StewardingEntrylistEntry> entries = entryMapper.findByEntrylistId(entrylist.getId());
-        for (StewardingEntrylistEntry entry : entries) {
-            driverMapper.deleteByEntryId(entry.getId());
-        }
-        entryMapper.deleteByEntrylistId(entrylist.getId());
+        entrylistMapper.deleteByRoundId(roundId);
     }
 }

@@ -2,7 +2,7 @@ package de.sustineo.simdesk.services.stewarding;
 
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.*;
-import de.sustineo.simdesk.mybatis.mapper.RaceWeekendMapper;
+import de.sustineo.simdesk.mybatis.mapper.SeriesMapper;
 import lombok.extern.java.Log;
 import org.springframework.context.annotation.Profile;
 import org.springframework.http.MediaType;
@@ -25,17 +25,17 @@ public class StewardingDiscordNotificationService {
     private static final int COLOR_YELLOW = 0xF1C40F;
     private static final int COLOR_ORANGE = 0xE67E22;
 
-    private final RaceWeekendMapper weekendMapper;
+    private final SeriesMapper seriesMapper;
     private final RestClient restClient;
 
-    public StewardingDiscordNotificationService(RaceWeekendMapper weekendMapper) {
-        this.weekendMapper = weekendMapper;
+    public StewardingDiscordNotificationService(SeriesMapper seriesMapper) {
+        this.seriesMapper = seriesMapper;
         this.restClient = RestClient.create();
     }
 
     @Async
-    public void sendIncidentNotification(Integer raceWeekendId, Incident incident) {
-        String webhookUrl = getWebhookUrl(raceWeekendId);
+    public void sendIncidentNotification(Integer seriesId, Incident incident) {
+        String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
         }
@@ -55,8 +55,8 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendDecisionNotification(Integer raceWeekendId, StewardDecision decision, Incident incident, String penaltyName) {
-        String webhookUrl = getWebhookUrl(raceWeekendId);
+    public void sendDecisionNotification(Integer seriesId, StewardDecision decision, Incident incident, String penaltyName) {
+        String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
         }
@@ -80,8 +80,8 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendAppealNotification(Integer raceWeekendId, Appeal appeal) {
-        String webhookUrl = getWebhookUrl(raceWeekendId);
+    public void sendAppealNotification(Integer seriesId, Appeal appeal) {
+        String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
         }
@@ -101,8 +101,8 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendAppealReviewedNotification(Integer raceWeekendId, Appeal appeal) {
-        String webhookUrl = getWebhookUrl(raceWeekendId);
+    public void sendAppealReviewedNotification(Integer seriesId, Appeal appeal) {
+        String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
         }
@@ -124,8 +124,8 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendDecisionRevisedNotification(Integer raceWeekendId, StewardDecision oldDecision, StewardDecision newDecision) {
-        String webhookUrl = getWebhookUrl(raceWeekendId);
+    public void sendDecisionRevisedNotification(Integer seriesId, StewardDecision oldDecision, StewardDecision newDecision) {
+        String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
         }
@@ -145,12 +145,12 @@ public class StewardingDiscordNotificationService {
         sendWebhook(webhookUrl, Map.of("embeds", List.of(embed)));
     }
 
-    private String getWebhookUrl(Integer raceWeekendId) {
-        RaceWeekend weekend = weekendMapper.findById(raceWeekendId);
-        if (weekend == null || weekend.getDiscordWebhookUrl() == null || weekend.getDiscordWebhookUrl().isBlank()) {
+    private String getWebhookUrl(Integer seriesId) {
+        Series series = seriesMapper.findById(seriesId);
+        if (series == null || series.getDiscordWebhookUrl() == null || series.getDiscordWebhookUrl().isBlank()) {
             return null;
         }
-        return weekend.getDiscordWebhookUrl();
+        return series.getDiscordWebhookUrl();
     }
 
     private void sendWebhook(String webhookUrl, Map<String, Object> payload) {
