@@ -30,6 +30,11 @@ public class StewardingEntrylistService {
         return entrylists.isEmpty() ? null : entrylists.getFirst();
     }
 
+    public StewardingEntrylist getEntrylistBySessionId(Integer sessionId) {
+        List<StewardingEntrylist> entrylists = entrylistMapper.findBySessionId(sessionId);
+        return entrylists.isEmpty() ? null : entrylists.getFirst();
+    }
+
     public List<StewardingEntrylistEntry> getEntriesByEntrylistId(Integer entrylistId) {
         return entryMapper.findByEntrylistId(entrylistId);
     }
@@ -53,6 +58,31 @@ public class StewardingEntrylistService {
         entrylist.setRaceWeekendId(weekendId);
         entrylist.setRawJson(jsonContent);
         entrylistMapper.insert(entrylist);
+
+        parseAndInsertEntries(root, entrylist);
+    }
+
+    @Transactional
+    public void uploadEntrylistForSession(Integer sessionId, Integer weekendId, String jsonContent) {
+        deleteEntrylistForSession(sessionId);
+
+        JsonNode root;
+        try {
+            root = objectMapper.readTree(jsonContent);
+        } catch (Exception e) {
+            throw new IllegalArgumentException("Invalid JSON content", e);
+        }
+
+        StewardingEntrylist entrylist = new StewardingEntrylist();
+        entrylist.setSessionId(sessionId);
+        entrylist.setRaceWeekendId(weekendId);
+        entrylist.setRawJson(jsonContent);
+        entrylistMapper.insert(entrylist);
+
+        parseAndInsertEntries(root, entrylist);
+    }
+
+    private void parseAndInsertEntries(JsonNode root, StewardingEntrylist entrylist) {
 
         JsonNode entries = root.get("entries");
         if (entries == null || !entries.isArray()) {
@@ -96,12 +126,25 @@ public class StewardingEntrylistService {
     public void deleteEntrylist(Integer weekendId) {
         List<StewardingEntrylist> existing = entrylistMapper.findByRaceWeekendId(weekendId);
         for (StewardingEntrylist entrylist : existing) {
-            List<StewardingEntrylistEntry> entries = entryMapper.findByEntrylistId(entrylist.getId());
-            for (StewardingEntrylistEntry entry : entries) {
-                driverMapper.deleteByEntryId(entry.getId());
-            }
-            entryMapper.deleteByEntrylistId(entrylist.getId());
+            deleteEntrylistEntries(entrylist);
         }
         entrylistMapper.deleteByRaceWeekendId(weekendId);
+    }
+
+    @Transactional
+    public void deleteEntrylistForSession(Integer sessionId) {
+        List<StewardingEntrylist> existing = entrylistMapper.findBySessionId(sessionId);
+        for (StewardingEntrylist entrylist : existing) {
+            deleteEntrylistEntries(entrylist);
+        }
+        entrylistMapper.deleteBySessionId(sessionId);
+    }
+
+    private void deleteEntrylistEntries(StewardingEntrylist entrylist) {
+        List<StewardingEntrylistEntry> entries = entryMapper.findByEntrylistId(entrylist.getId());
+        for (StewardingEntrylistEntry entry : entries) {
+            driverMapper.deleteByEntryId(entry.getId());
+        }
+        entryMapper.deleteByEntrylistId(entrylist.getId());
     }
 }

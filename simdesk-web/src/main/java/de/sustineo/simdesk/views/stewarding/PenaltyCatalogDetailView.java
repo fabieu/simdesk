@@ -72,6 +72,11 @@ public class PenaltyCatalogDetailView extends BaseView {
 
         add(createViewHeader(catalog.getName()));
 
+        Button backButton = new Button("← Back to Penalty Catalogs", e ->
+                getUI().ifPresent(ui -> ui.navigate(PenaltyCatalogListView.class)));
+        backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        add(backButton);
+
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.setPadding(true);
         infoLayout.setSpacing(false);

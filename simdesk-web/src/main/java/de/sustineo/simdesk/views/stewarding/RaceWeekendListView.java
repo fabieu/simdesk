@@ -2,6 +2,7 @@ package de.sustineo.simdesk.views.stewarding;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.dialog.Dialog;
@@ -138,6 +139,8 @@ public class RaceWeekendListView extends BaseView {
         form.add(trackCombo);
         form.add(catalogCombo);
         form.add(webhookField, 2);
+        Checkbox videoUrlEnabledCheckbox = new Checkbox("Enable Video URL for incident reports");
+        form.add(videoUrlEnabledCheckbox, 2);
         form.add(startDatePicker);
         form.add(endDatePicker);
 
@@ -154,6 +157,7 @@ public class RaceWeekendListView extends BaseView {
                     .trackId(trackCombo.getValue() != null ? trackCombo.getValue().getId() : null)
                     .penaltyCatalogId(catalogCombo.getValue() != null ? catalogCombo.getValue().getId() : null)
                     .discordWebhookUrl(webhookField.getValue())
+                    .videoUrlEnabled(videoUrlEnabledCheckbox.getValue())
                     .startDate(startDatePicker.getValue())
                     .endDate(endDatePicker.getValue())
                     .build();

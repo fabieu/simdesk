@@ -21,6 +21,7 @@ public class RaceWeekend {
     private Integer trackId;
     private Integer penaltyCatalogId;
     private String discordWebhookUrl;
+    private Boolean videoUrlEnabled;
     private LocalDate startDate;
     private LocalDate endDate;
     private Instant createdAt;

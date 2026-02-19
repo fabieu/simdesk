@@ -2,18 +2,23 @@ package de.sustineo.simdesk.views.stewarding;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.MultiSelectComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
+import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
-import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.NumberField;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
+import com.vaadin.flow.component.upload.Upload;
+import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
@@ -21,18 +26,19 @@ import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
-import de.sustineo.simdesk.entities.stewarding.Incident;
-import de.sustineo.simdesk.entities.stewarding.IncidentStatus;
-import de.sustineo.simdesk.entities.stewarding.RaceWeekend;
-import de.sustineo.simdesk.entities.stewarding.RaceWeekendSession;
+import de.sustineo.simdesk.entities.stewarding.*;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.RaceWeekendService;
+import de.sustineo.simdesk.services.stewarding.StewardingEntrylistService;
 import de.sustineo.simdesk.services.stewarding.StewardingIncidentService;
 import de.sustineo.simdesk.views.BaseView;
 import org.springframework.context.annotation.Profile;
 
+import java.nio.charset.StandardCharsets;
 import java.util.List;
+import java.util.Set;
+import java.util.stream.Collectors;
 
 @Profile(SpringProfile.STEWARDING)
 @Route(value = "/stewarding/weekends/:weekendId/sessions/:sessionId", layout = MainLayout.class)
@@ -40,12 +46,14 @@ import java.util.List;
 public class RaceWeekendSessionDetailView extends BaseView {
     private final RaceWeekendService raceWeekendService;
     private final StewardingIncidentService incidentService;
+    private final StewardingEntrylistService entrylistService;
     private final SecurityService securityService;
 
     public RaceWeekendSessionDetailView(RaceWeekendService raceWeekendService, StewardingIncidentService incidentService,
-                                        SecurityService securityService) {
+                                        StewardingEntrylistService entrylistService, SecurityService securityService) {
         this.raceWeekendService = raceWeekendService;
         this.incidentService = incidentService;
+        this.entrylistService = entrylistService;
         this.securityService = securityService;
     }
 
@@ -87,6 +95,12 @@ public class RaceWeekendSessionDetailView extends BaseView {
 
         add(createViewHeader(session.getTitle()));
 
+        Button backButton = new Button("← Back to " + weekend.getTitle(), e ->
+                getUI().ifPresent(ui -> ui.navigate(RaceWeekendDetailView.class,
+                        new RouteParameters("weekendId", String.valueOf(weekendId)))));
+        backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        add(backButton);
+
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.setPadding(true);
         infoLayout.setSpacing(false);
@@ -106,7 +120,7 @@ public class RaceWeekendSessionDetailView extends BaseView {
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD, UserRoleEnum.ROLE_DRIVER)) {
             Button reportIncidentButton = new Button("Report Incident");
             reportIncidentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-            reportIncidentButton.addClickListener(e -> openReportIncidentDialog(sessionId, weekendId));
+            reportIncidentButton.addClickListener(e -> openReportIncidentDialog(sessionId, weekendId, weekend));
             actionLayout.add(reportIncidentButton);
         }
 
@@ -114,6 +128,28 @@ public class RaceWeekendSessionDetailView extends BaseView {
             Button quickDecisionButton = new Button("Quick Decision");
             quickDecisionButton.addThemeVariants(ButtonVariant.LUMO_CONTRAST);
             actionLayout.add(quickDecisionButton);
+
+            Button editSessionButton = new Button("Edit Session");
+            editSessionButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+            actionLayout.add(editSessionButton);
+
+            Button deleteSessionButton = new Button("Delete Session");
+            deleteSessionButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            deleteSessionButton.addClickListener(e -> {
+                ConfirmDialog confirmDialog = new ConfirmDialog();
+                confirmDialog.setHeader("Delete Session");
+                confirmDialog.setText("Are you sure you want to delete this session?");
+                confirmDialog.setCancelable(true);
+                confirmDialog.setConfirmText("Delete");
+                confirmDialog.setConfirmButtonTheme("error primary");
+                confirmDialog.addConfirmListener(ev -> {
+                    raceWeekendService.deleteSession(sessionId);
+                    getUI().ifPresent(ui -> ui.navigate(RaceWeekendDetailView.class,
+                            new RouteParameters("weekendId", String.valueOf(weekendId))));
+                });
+                confirmDialog.open();
+            });
+            actionLayout.add(deleteSessionButton);
         }
 
         if (actionLayout.getComponentCount() > 0) {
@@ -140,7 +176,51 @@ public class RaceWeekendSessionDetailView extends BaseView {
                         )))
         );
 
-        addAndExpand(grid);
+        add(grid);
+
+        // Entrylist section
+        VerticalLayout entrylistLayout = new VerticalLayout();
+        entrylistLayout.setPadding(true);
+        entrylistLayout.add(new H3("Entrylist"));
+
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
+            Upload upload = new Upload();
+            upload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
+                String json = new String(data, StandardCharsets.UTF_8);
+                try {
+                    entrylistService.uploadEntrylistForSession(sessionId, weekendId, json);
+                    getUI().ifPresent(ui -> ui.access(() -> {
+                        Notification.show("Entrylist uploaded successfully", 3000, Notification.Position.MIDDLE)
+                                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+                        ui.getPage().reload();
+                    }));
+                } catch (IllegalArgumentException ex) {
+                    getUI().ifPresent(ui -> ui.access(() ->
+                            Notification.show("Invalid entrylist JSON: " + ex.getMessage(), 5000, Notification.Position.MIDDLE)
+                                    .addThemeVariants(NotificationVariant.LUMO_ERROR)
+                    ));
+                }
+            }));
+            upload.setAcceptedFileTypes("application/json", ".json");
+            upload.setMaxFiles(1);
+            entrylistLayout.add(upload);
+        }
+
+        StewardingEntrylist entrylist = entrylistService.getEntrylistBySessionId(sessionId);
+        if (entrylist != null) {
+            List<StewardingEntrylistEntry> entries = entrylistService.getEntriesByEntrylistId(entrylist.getId());
+            Grid<StewardingEntrylistEntry> entrylistGrid = new Grid<>(StewardingEntrylistEntry.class, false);
+            entrylistGrid.addColumn(StewardingEntrylistEntry::getRaceNumber).setHeader("Race Number").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+            entrylistGrid.addColumn(StewardingEntrylistEntry::getTeamName).setHeader("Team Name").setSortable(true);
+            entrylistGrid.addColumn(StewardingEntrylistEntry::getDisplayName).setHeader("Display Name").setSortable(true);
+            entrylistGrid.setItems(entries);
+            entrylistGrid.setSelectionMode(Grid.SelectionMode.NONE);
+            entrylistGrid.setColumnReorderingAllowed(true);
+            entrylistGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+            entrylistLayout.add(entrylistGrid);
+        }
+
+        addAndExpand(entrylistLayout);
     }
 
     private HorizontalLayout createDetailRow(String label, String value) {
@@ -153,7 +233,7 @@ public class RaceWeekendSessionDetailView extends BaseView {
         return row;
     }
 
-    private void openReportIncidentDialog(Integer sessionId, Integer weekendId) {
+    private void openReportIncidentDialog(Integer sessionId, Integer weekendId, RaceWeekend weekend) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Report Incident");
         dialog.setWidth("600px");
@@ -172,25 +252,35 @@ public class RaceWeekendSessionDetailView extends BaseView {
         descriptionField.setWidthFull();
         descriptionField.setMinHeight("100px");
 
-        IntegerField lapField = new IntegerField("Lap");
-        lapField.setMin(0);
-        lapField.setWidthFull();
+        NumberField mapMarkerXField = new NumberField("Map Marker X");
+        mapMarkerXField.setWidthFull();
 
-        TextField timestampField = new TextField("Time in Session");
-        timestampField.setWidthFull();
+        NumberField mapMarkerYField = new NumberField("Map Marker Y");
+        mapMarkerYField.setWidthFull();
 
-        TextField involvedCarsField = new TextField("Involved Cars");
-        involvedCarsField.setWidthFull();
-        involvedCarsField.setPlaceholder("e.g. #001, #042");
-
-        TextField videoUrlField = new TextField("Video URL");
-        videoUrlField.setWidthFull();
+        // Populate involved cars from session entrylist
+        MultiSelectComboBox<StewardingEntrylistEntry> involvedCarsCombo = new MultiSelectComboBox<>("Involved Cars");
+        involvedCarsCombo.setWidthFull();
+        StewardingEntrylist entrylist = entrylistService.getEntrylistBySessionId(sessionId);
+        if (entrylist != null) {
+            List<StewardingEntrylistEntry> entries = entrylistService.getEntriesByEntrylistId(entrylist.getId());
+            involvedCarsCombo.setItems(entries);
+        }
+        involvedCarsCombo.setItemLabelGenerator(StewardingEntrylistEntry::getDisplayName);
 
         form.add(titleField, 2);
         form.add(descriptionField, 2);
-        form.add(lapField, timestampField);
-        form.add(involvedCarsField, 2);
-        form.add(videoUrlField, 2);
+        form.add(mapMarkerXField, mapMarkerYField);
+        form.add(involvedCarsCombo, 2);
+
+        final TextField videoUrlField;
+        if (Boolean.TRUE.equals(weekend.getVideoUrlEnabled())) {
+            videoUrlField = new TextField("Video URL");
+            videoUrlField.setWidthFull();
+            form.add(videoUrlField, 2);
+        } else {
+            videoUrlField = null;
+        }
 
         Button saveButton = new Button("Report", e -> {
             if (titleField.isEmpty()) {
@@ -199,18 +289,28 @@ public class RaceWeekendSessionDetailView extends BaseView {
                 return;
             }
 
+            Set<StewardingEntrylistEntry> selectedEntries = involvedCarsCombo.getValue();
+            String involvedCarsText = selectedEntries.stream()
+                    .map(StewardingEntrylistEntry::getDisplayName)
+                    .collect(Collectors.joining(", "));
+            List<Integer> involvedEntryIds = selectedEntries.stream()
+                    .map(StewardingEntrylistEntry::getId)
+                    .collect(Collectors.toList());
+
+            String videoUrl = videoUrlField != null ? videoUrlField.getValue() : null;
+
             Incident incident = Incident.builder()
                     .sessionId(sessionId)
                     .title(titleField.getValue())
                     .description(descriptionField.getValue())
-                    .lap(lapField.getValue())
-                    .timestampInSession(timestampField.getValue())
-                    .involvedCarsText(involvedCarsField.getValue())
-                    .videoUrl(videoUrlField.getValue())
+                    .mapMarkerX(mapMarkerXField.getValue())
+                    .mapMarkerY(mapMarkerYField.getValue())
+                    .involvedCarsText(involvedCarsText)
+                    .videoUrl(videoUrl)
                     .status(IncidentStatus.REPORTED)
                     .build();
 
-            incidentService.createIncident(incident, List.of());
+            incidentService.createIncident(incident, involvedEntryIds);
             dialog.close();
             Notification.show("Incident reported", 3000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);

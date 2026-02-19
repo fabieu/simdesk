@@ -15,6 +15,7 @@ import java.time.Instant;
 public class StewardingEntrylist {
     private Integer id;
     private Integer raceWeekendId;
+    private Integer sessionId;
     private Instant uploadedAt;
     private String rawJson;
 }

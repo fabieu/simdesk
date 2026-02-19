@@ -16,6 +16,7 @@ public interface RaceWeekendMapper {
             @Result(property = "trackId", column = "track_id"),
             @Result(property = "penaltyCatalogId", column = "penalty_catalog_id"),
             @Result(property = "discordWebhookUrl", column = "discord_webhook_url"),
+            @Result(property = "videoUrlEnabled", column = "video_url_enabled"),
             @Result(property = "startDate", column = "start_date"),
             @Result(property = "endDate", column = "end_date"),
             @Result(property = "createdAt", column = "created_at"),
@@ -33,8 +34,8 @@ public interface RaceWeekendMapper {
     List<RaceWeekend> findByTrackId(Integer trackId);
 
     @Insert("""
-            INSERT INTO stewarding_race_weekend (title, description, track_id, penalty_catalog_id, discord_webhook_url, start_date, end_date, created_at, updated_at)
-            VALUES (#{title}, #{description}, #{trackId}, #{penaltyCatalogId}, #{discordWebhookUrl}, #{startDate}, #{endDate}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO stewarding_race_weekend (title, description, track_id, penalty_catalog_id, discord_webhook_url, video_url_enabled, start_date, end_date, created_at, updated_at)
+            VALUES (#{title}, #{description}, #{trackId}, #{penaltyCatalogId}, #{discordWebhookUrl}, #{videoUrlEnabled}, #{startDate}, #{endDate}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """)
     @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(RaceWeekend weekend);
@@ -42,7 +43,7 @@ public interface RaceWeekendMapper {
     @Update("""
             UPDATE stewarding_race_weekend
             SET title = #{title}, description = #{description}, track_id = #{trackId}, penalty_catalog_id = #{penaltyCatalogId},
-                discord_webhook_url = #{discordWebhookUrl}, start_date = #{startDate}, end_date = #{endDate}, updated_at = CURRENT_TIMESTAMP
+                discord_webhook_url = #{discordWebhookUrl}, video_url_enabled = #{videoUrlEnabled}, start_date = #{startDate}, end_date = #{endDate}, updated_at = CURRENT_TIMESTAMP
             WHERE id = #{id}
             """)
     void update(RaceWeekend weekend);

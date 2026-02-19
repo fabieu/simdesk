@@ -2,7 +2,10 @@ package de.sustineo.simdesk.views.stewarding;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.checkbox.Checkbox;
 import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.confirmdialog.ConfirmDialog;
+import com.vaadin.flow.component.datepicker.DatePicker;
 import com.vaadin.flow.component.datetimepicker.DateTimePicker;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
@@ -16,9 +19,8 @@ import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
 import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
-import com.vaadin.flow.component.upload.Upload;
-import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
 import com.vaadin.flow.router.RouteParam;
@@ -29,13 +31,13 @@ import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.stewarding.*;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
+import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
 import de.sustineo.simdesk.services.stewarding.RaceWeekendService;
-import de.sustineo.simdesk.services.stewarding.StewardingEntrylistService;
 import de.sustineo.simdesk.services.stewarding.StewardingIncidentService;
+import de.sustineo.simdesk.services.stewarding.StewardingTrackService;
 import de.sustineo.simdesk.views.BaseView;
 import org.springframework.context.annotation.Profile;
 
-import java.nio.charset.StandardCharsets;
 import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
@@ -46,14 +48,17 @@ import java.util.List;
 public class RaceWeekendDetailView extends BaseView {
     private final RaceWeekendService raceWeekendService;
     private final StewardingIncidentService incidentService;
-    private final StewardingEntrylistService entrylistService;
+    private final StewardingTrackService trackService;
+    private final PenaltyCatalogService catalogService;
     private final SecurityService securityService;
 
     public RaceWeekendDetailView(RaceWeekendService raceWeekendService, StewardingIncidentService incidentService,
-                                 StewardingEntrylistService entrylistService, SecurityService securityService) {
+                                 StewardingTrackService trackService, PenaltyCatalogService catalogService,
+                                 SecurityService securityService) {
         this.raceWeekendService = raceWeekendService;
         this.incidentService = incidentService;
-        this.entrylistService = entrylistService;
+        this.trackService = trackService;
+        this.catalogService = catalogService;
         this.securityService = securityService;
     }
 
@@ -91,6 +96,11 @@ public class RaceWeekendDetailView extends BaseView {
 
         add(createViewHeader(weekend.getTitle()));
 
+        Button backButton = new Button("← Back to Race Weekends", e ->
+                getUI().ifPresent(ui -> ui.navigate(RaceWeekendListView.class)));
+        backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        add(backButton);
+
         VerticalLayout infoLayout = new VerticalLayout();
         infoLayout.setPadding(true);
         infoLayout.setSpacing(false);
@@ -106,14 +116,40 @@ public class RaceWeekendDetailView extends BaseView {
         if (weekend.getStartDate() != null && weekend.getEndDate() != null) {
             infoLayout.add(createDetailRow("Date", weekend.getStartDate() + " — " + weekend.getEndDate()));
         }
+        infoLayout.add(createDetailRow("Video URL Enabled", Boolean.TRUE.equals(weekend.getVideoUrlEnabled()) ? "Yes" : "No"));
         add(infoLayout);
+
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
+            HorizontalLayout weekendActionLayout = new HorizontalLayout();
+            Button editWeekendButton = new Button("Edit Weekend");
+            editWeekendButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            editWeekendButton.addClickListener(e -> openEditWeekendDialog(weekend));
+            weekendActionLayout.add(editWeekendButton);
+
+            Button deleteWeekendButton = new Button("Delete Weekend");
+            deleteWeekendButton.addThemeVariants(ButtonVariant.LUMO_ERROR);
+            deleteWeekendButton.addClickListener(e -> {
+                ConfirmDialog confirmDialog = new ConfirmDialog();
+                confirmDialog.setHeader("Delete Weekend");
+                confirmDialog.setText("Are you sure you want to delete this weekend?");
+                confirmDialog.setCancelable(true);
+                confirmDialog.setConfirmText("Delete");
+                confirmDialog.setConfirmButtonTheme("error primary");
+                confirmDialog.addConfirmListener(ev -> {
+                    raceWeekendService.deleteWeekend(weekendId);
+                    getUI().ifPresent(ui -> ui.navigate(RaceWeekendListView.class));
+                });
+                confirmDialog.open();
+            });
+            weekendActionLayout.add(deleteWeekendButton);
+            add(weekendActionLayout);
+        }
 
         TabSheet tabSheet = new TabSheet();
         tabSheet.setSizeFull();
 
         tabSheet.add("Sessions", createSessionsTab(weekendId));
         tabSheet.add("Incidents", createIncidentsTab(weekendId));
-        tabSheet.add("Entrylist", createEntrylistTab(weekendId));
 
         addAndExpand(tabSheet);
     }
@@ -257,50 +293,96 @@ public class RaceWeekendDetailView extends BaseView {
         return layout;
     }
 
-    private VerticalLayout createEntrylistTab(Integer weekendId) {
-        VerticalLayout layout = new VerticalLayout();
-        layout.setSizeFull();
+    private void openEditWeekendDialog(RaceWeekend weekend) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Edit Race Weekend");
+        dialog.setWidth("700px");
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
-            Upload upload = new Upload();
-            upload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
-                String json = new String(data, StandardCharsets.UTF_8);
-                try {
-                    entrylistService.uploadEntrylist(weekendId, json);
-                    getUI().ifPresent(ui -> ui.access(() -> {
-                        Notification.show("Entrylist uploaded successfully", 3000, Notification.Position.MIDDLE)
-                                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                        ui.getPage().reload();
-                    }));
-                } catch (IllegalArgumentException ex) {
-                    getUI().ifPresent(ui -> ui.access(() ->
-                            Notification.show("Invalid entrylist JSON: " + ex.getMessage(), 5000, Notification.Position.MIDDLE)
-                                    .addThemeVariants(NotificationVariant.LUMO_ERROR)
-                    ));
-                }
-            }));
-            upload.setAcceptedFileTypes("application/json", ".json");
-            upload.setMaxFiles(1);
-            layout.add(upload);
+        FormLayout form = new FormLayout();
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("600px", 2)
+        );
+
+        TextField titleField = new TextField("Title");
+        titleField.setWidthFull();
+        titleField.setRequired(true);
+        titleField.setValue(weekend.getTitle() != null ? weekend.getTitle() : "");
+
+        TextArea descriptionField = new TextArea("Description");
+        descriptionField.setWidthFull();
+        descriptionField.setValue(weekend.getDescription() != null ? weekend.getDescription() : "");
+
+        ComboBox<StewardingTrack> trackCombo = new ComboBox<>("Track");
+        List<StewardingTrack> tracks = trackService.getAllTracks();
+        trackCombo.setItems(tracks);
+        trackCombo.setItemLabelGenerator(StewardingTrack::getName);
+        trackCombo.setWidthFull();
+        if (weekend.getTrack() != null) {
+            tracks.stream().filter(t -> t.getId().equals(weekend.getTrackId())).findFirst().ifPresent(trackCombo::setValue);
         }
 
-        StewardingEntrylist entrylist = entrylistService.getEntrylistByWeekendId(weekendId);
-        if (entrylist != null) {
-            List<StewardingEntrylistEntry> entries = entrylistService.getEntriesByEntrylistId(entrylist.getId());
-            Grid<StewardingEntrylistEntry> grid = new Grid<>(StewardingEntrylistEntry.class, false);
-            grid.addColumn(StewardingEntrylistEntry::getRaceNumber).setHeader("Race Number").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-            grid.addColumn(StewardingEntrylistEntry::getTeamName).setHeader("Team Name").setSortable(true);
-            grid.addColumn(StewardingEntrylistEntry::getDisplayName).setHeader("Display Name").setSortable(true);
-            grid.setItems(entries);
-            grid.setSizeFull();
-            grid.setSelectionMode(Grid.SelectionMode.NONE);
-            grid.setColumnReorderingAllowed(true);
-            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-            layout.addAndExpand(grid);
-        } else {
-            layout.add(new H3("No entrylist uploaded yet"));
+        ComboBox<PenaltyCatalog> catalogCombo = new ComboBox<>("Penalty Catalog");
+        List<PenaltyCatalog> catalogs = catalogService.getAllCatalogs();
+        catalogCombo.setItems(catalogs);
+        catalogCombo.setItemLabelGenerator(PenaltyCatalog::getName);
+        catalogCombo.setWidthFull();
+        if (weekend.getPenaltyCatalog() != null) {
+            catalogs.stream().filter(c -> c.getId().equals(weekend.getPenaltyCatalogId())).findFirst().ifPresent(catalogCombo::setValue);
         }
 
-        return layout;
+        TextField webhookField = new TextField("Discord Webhook URL");
+        webhookField.setWidthFull();
+        webhookField.setValue(weekend.getDiscordWebhookUrl() != null ? weekend.getDiscordWebhookUrl() : "");
+
+        Checkbox videoUrlEnabledCheckbox = new Checkbox("Enable Video URL for incident reports");
+        videoUrlEnabledCheckbox.setValue(Boolean.TRUE.equals(weekend.getVideoUrlEnabled()));
+
+        DatePicker startDatePicker = new DatePicker("Start Date");
+        startDatePicker.setWidthFull();
+        startDatePicker.setValue(weekend.getStartDate());
+
+        DatePicker endDatePicker = new DatePicker("End Date");
+        endDatePicker.setWidthFull();
+        endDatePicker.setValue(weekend.getEndDate());
+
+        form.add(titleField, 2);
+        form.add(descriptionField, 2);
+        form.add(trackCombo);
+        form.add(catalogCombo);
+        form.add(webhookField, 2);
+        form.add(videoUrlEnabledCheckbox, 2);
+        form.add(startDatePicker);
+        form.add(endDatePicker);
+
+        Button saveButton = new Button("Save", e -> {
+            if (titleField.isEmpty()) {
+                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
+                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            weekend.setTitle(titleField.getValue());
+            weekend.setDescription(descriptionField.getValue());
+            weekend.setTrackId(trackCombo.getValue() != null ? trackCombo.getValue().getId() : null);
+            weekend.setPenaltyCatalogId(catalogCombo.getValue() != null ? catalogCombo.getValue().getId() : null);
+            weekend.setDiscordWebhookUrl(webhookField.getValue());
+            weekend.setVideoUrlEnabled(videoUrlEnabledCheckbox.getValue());
+            weekend.setStartDate(startDatePicker.getValue());
+            weekend.setEndDate(endDatePicker.getValue());
+
+            raceWeekendService.updateWeekend(weekend);
+            dialog.close();
+            Notification.show("Weekend updated", 3000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            getUI().ifPresent(ui -> ui.getPage().reload());
+        });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        Button cancelButton = new Button("Cancel", e -> dialog.close());
+
+        dialog.add(form);
+        dialog.getFooter().add(cancelButton, saveButton);
+        dialog.open();
     }
 }

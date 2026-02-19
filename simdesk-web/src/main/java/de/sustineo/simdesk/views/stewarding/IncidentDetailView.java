@@ -18,6 +18,8 @@ import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
 import com.vaadin.flow.router.Route;
+import com.vaadin.flow.router.RouteParam;
+import com.vaadin.flow.router.RouteParameters;
 import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
@@ -95,6 +97,16 @@ public class IncidentDetailView extends BaseView {
 
         add(createViewHeader(incident.getTitle()));
 
+        RaceWeekendSession session = raceWeekendService.getSessionById(incident.getSessionId());
+        Button backButton = new Button("← Back to " + (session != null ? session.getTitle() : "Session"), e ->
+                getUI().ifPresent(ui -> ui.navigate(RaceWeekendSessionDetailView.class,
+                        new RouteParameters(
+                                new RouteParam("weekendId", String.valueOf(weekendId)),
+                                new RouteParam("sessionId", String.valueOf(incident.getSessionId()))
+                        ))));
+        backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
+        add(backButton);
+
         // Incident details
         VerticalLayout detailsLayout = new VerticalLayout();
         detailsLayout.setPadding(true);
@@ -108,6 +120,9 @@ public class IncidentDetailView extends BaseView {
         }
         if (incident.getTimestampInSession() != null) {
             detailsLayout.add(createDetailRow("Time in Session", incident.getTimestampInSession()));
+        }
+        if (incident.getMapMarkerX() != null && incident.getMapMarkerY() != null) {
+            detailsLayout.add(createDetailRow("Map Location", String.format("X: %.2f, Y: %.2f", incident.getMapMarkerX(), incident.getMapMarkerY())));
         }
         if (incident.getInvolvedCarsText() != null) {
             detailsLayout.add(createDetailRow("Involved Cars", incident.getInvolvedCarsText()));
