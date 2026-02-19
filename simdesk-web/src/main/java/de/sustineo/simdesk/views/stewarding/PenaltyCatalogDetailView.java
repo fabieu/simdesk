@@ -6,6 +6,7 @@ import com.vaadin.flow.component.combobox.ComboBox;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
@@ -29,7 +30,7 @@ import java.util.List;
 
 @Profile(SpringProfile.STEWARDING)
 @Route(value = "/stewarding/catalogs/:catalogId", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "STEWARD"})
 public class PenaltyCatalogDetailView extends BaseView {
     private final PenaltyCatalogService catalogService;
 
@@ -52,13 +53,6 @@ public class PenaltyCatalogDetailView extends BaseView {
         String catalogIdParam = event.getRouteParameters().get("catalogId").orElse(null);
         if (catalogIdParam == null) {
             getUI().ifPresent(ui -> ui.navigate(PenaltyCatalogListView.class));
-            return;
-        }
-
-        // Handle "new" catalog creation
-        if ("new".equals(catalogIdParam)) {
-            add(createViewHeader("New Penalty Catalog"));
-            add(createNewCatalogForm());
             return;
         }
 
@@ -94,60 +88,20 @@ public class PenaltyCatalogDetailView extends BaseView {
 
         List<PenaltyDefinition> definitions = catalogService.getDefinitionsByCatalogId(catalogId);
         Grid<PenaltyDefinition> grid = new Grid<>(PenaltyDefinition.class, false);
-        grid.addColumn(PenaltyDefinition::getCode).setHeader("Code").setAutoWidth(true);
-        grid.addColumn(PenaltyDefinition::getName).setHeader("Name").setAutoWidth(true);
-        grid.addColumn(PenaltyDefinition::getCategory).setHeader("Category").setAutoWidth(true);
+        grid.addColumn(PenaltyDefinition::getCode).setHeader("Code").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(PenaltyDefinition::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(PenaltyDefinition::getCategory).setHeader("Category").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.addColumn(def -> def.getSessionType() != null ? def.getSessionType().getDescription() : "-")
-                .setHeader("Session Type").setAutoWidth(true);
-        grid.addColumn(PenaltyDefinition::getDefaultPenalty).setHeader("Default Penalty").setAutoWidth(true);
-        grid.addColumn(PenaltyDefinition::getSeverity).setHeader("Severity").setAutoWidth(true);
+                .setHeader("Session Type").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(PenaltyDefinition::getDefaultPenalty).setHeader("Default Penalty").setAutoWidth(true).setFlexGrow(0);
+        grid.addColumn(PenaltyDefinition::getSeverity).setHeader("Severity").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.setItems(definitions);
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         addAndExpand(grid);
-    }
-
-    private FormLayout createNewCatalogForm() {
-        FormLayout form = new FormLayout();
-        form.setResponsiveSteps(
-                new FormLayout.ResponsiveStep("0", 1),
-                new FormLayout.ResponsiveStep("600px", 2)
-        );
-
-        TextField nameField = new TextField("Name");
-        nameField.setRequired(true);
-        nameField.setWidthFull();
-
-        TextField descriptionField = new TextField("Description");
-        descriptionField.setWidthFull();
-
-        form.add(nameField, descriptionField);
-
-        Button saveButton = new Button("Save", e -> {
-            if (nameField.isEmpty()) {
-                Notification.show("Name is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
-                return;
-            }
-
-            PenaltyCatalog catalog = PenaltyCatalog.builder()
-                    .name(nameField.getValue())
-                    .description(descriptionField.getValue())
-                    .build();
-            catalogService.createCatalog(catalog);
-            Notification.show("Catalog created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.navigate(PenaltyCatalogListView.class));
-        });
-        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
-
-        Button cancelButton = new Button("Cancel", e ->
-                getUI().ifPresent(ui -> ui.navigate(PenaltyCatalogListView.class)));
-
-        HorizontalLayout buttonLayout = new HorizontalLayout(saveButton, cancelButton);
-        form.add(buttonLayout, 2);
-
-        return form;
     }
 
     private void openPenaltyDialog(Integer catalogId) {

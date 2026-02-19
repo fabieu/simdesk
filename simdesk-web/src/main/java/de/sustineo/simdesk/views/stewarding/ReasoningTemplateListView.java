@@ -5,6 +5,7 @@ import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
@@ -24,7 +25,7 @@ import java.util.List;
 
 @Profile(SpringProfile.STEWARDING)
 @Route(value = "/stewarding/templates", layout = MainLayout.class)
-@RolesAllowed({"ADMIN"})
+@RolesAllowed({"ADMIN", "STEWARD"})
 public class ReasoningTemplateListView extends BaseView {
     private final ReasoningTemplateService templateService;
 
@@ -57,8 +58,8 @@ public class ReasoningTemplateListView extends BaseView {
 
         List<ReasoningTemplate> templates = templateService.getAllTemplates();
         Grid<ReasoningTemplate> grid = new Grid<>(ReasoningTemplate.class, false);
-        grid.addColumn(ReasoningTemplate::getName).setHeader("Name").setAutoWidth(true);
-        grid.addColumn(ReasoningTemplate::getCategory).setHeader("Category").setAutoWidth(true);
+        grid.addColumn(ReasoningTemplate::getName).setHeader("Name").setSortable(true);
+        grid.addColumn(ReasoningTemplate::getCategory).setHeader("Category").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.addColumn(template -> {
             String text = template.getTemplateText();
             if (text != null && text.length() > 100) {
@@ -68,6 +69,9 @@ public class ReasoningTemplateListView extends BaseView {
         }).setHeader("Template Text").setAutoWidth(true);
         grid.setItems(templates);
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         addAndExpand(grid);
     }

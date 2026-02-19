@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views.stewarding;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.notification.Notification;
@@ -111,7 +112,7 @@ public class RaceWeekendDetailView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
             Button addSessionButton = new Button("Add Session");
             addSessionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             layout.add(addSessionButton);
@@ -120,12 +121,15 @@ public class RaceWeekendDetailView extends BaseView {
         List<RaceWeekendSession> sessions = raceWeekendService.getSessionsByWeekendId(weekendId);
         Grid<RaceWeekendSession> grid = new Grid<>(RaceWeekendSession.class, false);
         grid.addColumn(session -> session.getSessionType() != null ? session.getSessionType().getDescription() : "-")
-                .setHeader("Type").setAutoWidth(true);
-        grid.addColumn(RaceWeekendSession::getTitle).setHeader("Title").setAutoWidth(true);
-        grid.addColumn(RaceWeekendSession::getStartTime).setHeader("Start Time").setAutoWidth(true);
-        grid.addColumn(RaceWeekendSession::getEndTime).setHeader("End Time").setAutoWidth(true);
+                .setHeader("Type").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(RaceWeekendSession::getTitle).setHeader("Title").setSortable(true);
+        grid.addColumn(RaceWeekendSession::getStartTime).setHeader("Start Time").setAutoWidth(true).setFlexGrow(0);
+        grid.addColumn(RaceWeekendSession::getEndTime).setHeader("End Time").setAutoWidth(true).setFlexGrow(0);
         grid.setItems(sessions);
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addItemClickListener(e ->
                 getUI().ifPresent(ui -> ui.navigate(RaceWeekendSessionDetailView.class,
                         new RouteParameters(
@@ -152,13 +156,16 @@ public class RaceWeekendDetailView extends BaseView {
         grid.addColumn(incident -> {
             RaceWeekendSession session = raceWeekendService.getSessionById(incident.getSessionId());
             return session != null ? session.getTitle() : "-";
-        }).setHeader("Session").setAutoWidth(true);
-        grid.addColumn(Incident::getTitle).setHeader("Title").setAutoWidth(true);
+        }).setHeader("Session").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(Incident::getTitle).setHeader("Title").setSortable(true);
         grid.addColumn(incident -> incident.getStatus() != null ? incident.getStatus().getDescription() : "-")
-                .setHeader("Status").setAutoWidth(true);
-        grid.addColumn(Incident::getCreatedAt).setHeader("Created").setAutoWidth(true);
+                .setHeader("Status").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(Incident::getCreatedAt).setHeader("Created").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.setItems(allIncidents);
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
 
         layout.addAndExpand(grid);
         return layout;
@@ -168,7 +175,7 @@ public class RaceWeekendDetailView extends BaseView {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
             Upload upload = new Upload();
             upload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
                 String json = new String(data, StandardCharsets.UTF_8);
@@ -195,11 +202,14 @@ public class RaceWeekendDetailView extends BaseView {
         if (entrylist != null) {
             List<StewardingEntrylistEntry> entries = entrylistService.getEntriesByEntrylistId(entrylist.getId());
             Grid<StewardingEntrylistEntry> grid = new Grid<>(StewardingEntrylistEntry.class, false);
-            grid.addColumn(StewardingEntrylistEntry::getRaceNumber).setHeader("Race Number").setAutoWidth(true);
-            grid.addColumn(StewardingEntrylistEntry::getTeamName).setHeader("Team Name").setAutoWidth(true);
-            grid.addColumn(StewardingEntrylistEntry::getDisplayName).setHeader("Display Name").setAutoWidth(true);
+            grid.addColumn(StewardingEntrylistEntry::getRaceNumber).setHeader("Race Number").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+            grid.addColumn(StewardingEntrylistEntry::getTeamName).setHeader("Team Name").setSortable(true);
+            grid.addColumn(StewardingEntrylistEntry::getDisplayName).setHeader("Display Name").setSortable(true);
             grid.setItems(entries);
             grid.setSizeFull();
+            grid.setSelectionMode(Grid.SelectionMode.NONE);
+            grid.setColumnReorderingAllowed(true);
+            grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
             layout.addAndExpand(grid);
         } else {
             layout.add(new H3("No entrylist uploaded yet"));

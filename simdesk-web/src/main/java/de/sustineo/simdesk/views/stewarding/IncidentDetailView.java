@@ -121,7 +121,7 @@ public class IncidentDetailView extends BaseView {
         add(detailsLayout);
 
         // Steward Decision section (ADMIN only)
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
             add(createDecisionSection(incident, weekend));
         }
 

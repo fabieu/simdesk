@@ -3,6 +3,7 @@ package de.sustineo.simdesk.views.stewarding;
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
 import com.vaadin.flow.component.grid.Grid;
+import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
@@ -92,7 +93,7 @@ public class RaceWeekendSessionDetailView extends BaseView {
         }
         add(infoLayout);
 
-        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN)) {
+        if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
             HorizontalLayout actionLayout = new HorizontalLayout();
             Button reportIncidentButton = new Button("Report Incident");
             reportIncidentButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
@@ -104,13 +105,16 @@ public class RaceWeekendSessionDetailView extends BaseView {
 
         List<Incident> incidents = incidentService.getIncidentsBySessionId(sessionId);
         Grid<Incident> grid = new Grid<>(Incident.class, false);
-        grid.addColumn(Incident::getTitle).setHeader("Title").setAutoWidth(true);
+        grid.addColumn(Incident::getTitle).setHeader("Title").setSortable(true);
         grid.addColumn(incident -> incident.getStatus() != null ? incident.getStatus().getDescription() : "-")
-                .setHeader("Status").setAutoWidth(true);
-        grid.addColumn(Incident::getInvolvedCarsText).setHeader("Involved Cars").setAutoWidth(true);
-        grid.addColumn(Incident::getCreatedAt).setHeader("Created").setAutoWidth(true);
+                .setHeader("Status").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(Incident::getInvolvedCarsText).setHeader("Involved Cars").setAutoWidth(true).setFlexGrow(0);
+        grid.addColumn(Incident::getCreatedAt).setHeader("Created").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.setItems(incidents);
         grid.setSizeFull();
+        grid.setSelectionMode(Grid.SelectionMode.NONE);
+        grid.setColumnReorderingAllowed(true);
+        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addItemClickListener(e ->
                 getUI().ifPresent(ui -> ui.navigate(IncidentDetailView.class,
                         new RouteParameters(
