@@ -2,15 +2,21 @@ package de.sustineo.simdesk.views.stewarding;
 
 import com.vaadin.flow.component.button.Button;
 import com.vaadin.flow.component.button.ButtonVariant;
+import com.vaadin.flow.component.combobox.ComboBox;
+import com.vaadin.flow.component.datetimepicker.DateTimePicker;
+import com.vaadin.flow.component.dialog.Dialog;
+import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
-import com.vaadin.flow.component.html.Paragraph;
+import com.vaadin.flow.component.html.Span;
 import com.vaadin.flow.component.notification.Notification;
 import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
+import com.vaadin.flow.component.textfield.IntegerField;
+import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.component.upload.Upload;
 import com.vaadin.flow.server.streams.UploadHandler;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -30,6 +36,7 @@ import de.sustineo.simdesk.views.BaseView;
 import org.springframework.context.annotation.Profile;
 
 import java.nio.charset.StandardCharsets;
+import java.time.ZoneOffset;
 import java.util.ArrayList;
 import java.util.List;
 
@@ -88,13 +95,16 @@ public class RaceWeekendDetailView extends BaseView {
         infoLayout.setPadding(true);
         infoLayout.setSpacing(false);
         if (weekend.getDescription() != null && !weekend.getDescription().isEmpty()) {
-            infoLayout.add(new Paragraph(weekend.getDescription()));
+            infoLayout.add(new Span(weekend.getDescription()));
         }
         if (weekend.getTrack() != null) {
-            infoLayout.add(new Paragraph("Track: " + weekend.getTrack().getName()));
+            infoLayout.add(createDetailRow("Track", weekend.getTrack().getName()));
+        }
+        if (weekend.getPenaltyCatalog() != null) {
+            infoLayout.add(createDetailRow("Penalty Catalog", weekend.getPenaltyCatalog().getName()));
         }
         if (weekend.getStartDate() != null && weekend.getEndDate() != null) {
-            infoLayout.add(new Paragraph("Date: " + weekend.getStartDate() + " — " + weekend.getEndDate()));
+            infoLayout.add(createDetailRow("Date", weekend.getStartDate() + " — " + weekend.getEndDate()));
         }
         add(infoLayout);
 
@@ -108,6 +118,16 @@ public class RaceWeekendDetailView extends BaseView {
         addAndExpand(tabSheet);
     }
 
+    private HorizontalLayout createDetailRow(String label, String value) {
+        Span labelSpan = new Span(label + ": ");
+        labelSpan.getStyle().set("font-weight", "bold");
+        Span valueSpan = new Span(value);
+        HorizontalLayout row = new HorizontalLayout(labelSpan, valueSpan);
+        row.setSpacing(false);
+        row.getStyle().set("gap", "var(--lumo-space-xs)");
+        return row;
+    }
+
     private VerticalLayout createSessionsTab(Integer weekendId) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
@@ -115,6 +135,7 @@ public class RaceWeekendDetailView extends BaseView {
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
             Button addSessionButton = new Button("Add Session");
             addSessionButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+            addSessionButton.addClickListener(e -> openAddSessionDialog(weekendId));
             layout.add(addSessionButton);
         }
 
@@ -140,6 +161,71 @@ public class RaceWeekendDetailView extends BaseView {
 
         layout.addAndExpand(grid);
         return layout;
+    }
+
+    private void openAddSessionDialog(Integer weekendId) {
+        Dialog dialog = new Dialog();
+        dialog.setHeaderTitle("Add Session");
+        dialog.setWidth("600px");
+
+        FormLayout form = new FormLayout();
+        form.setResponsiveSteps(
+                new FormLayout.ResponsiveStep("0", 1),
+                new FormLayout.ResponsiveStep("600px", 2)
+        );
+
+        ComboBox<StewSessionType> typeCombo = new ComboBox<>("Session Type");
+        typeCombo.setItems(StewSessionType.values());
+        typeCombo.setItemLabelGenerator(StewSessionType::getDescription);
+        typeCombo.setRequired(true);
+        typeCombo.setWidthFull();
+
+        TextField titleField = new TextField("Title");
+        titleField.setRequired(true);
+        titleField.setWidthFull();
+
+        DateTimePicker startTimePicker = new DateTimePicker("Start Time");
+        startTimePicker.setWidthFull();
+
+        DateTimePicker endTimePicker = new DateTimePicker("End Time");
+        endTimePicker.setWidthFull();
+
+        IntegerField sortOrderField = new IntegerField("Sort Order");
+        sortOrderField.setMin(0);
+        sortOrderField.setValue(0);
+        sortOrderField.setWidthFull();
+
+        form.add(typeCombo, titleField, startTimePicker, endTimePicker, sortOrderField);
+
+        Button saveButton = new Button("Save", e -> {
+            if (titleField.isEmpty() || typeCombo.isEmpty()) {
+                Notification.show("Session type and title are required", 3000, Notification.Position.MIDDLE)
+                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                return;
+            }
+
+            RaceWeekendSession session = RaceWeekendSession.builder()
+                    .raceWeekendId(weekendId)
+                    .sessionType(typeCombo.getValue())
+                    .title(titleField.getValue())
+                    .startTime(startTimePicker.getValue() != null ? startTimePicker.getValue().toInstant(ZoneOffset.UTC) : null)
+                    .endTime(endTimePicker.getValue() != null ? endTimePicker.getValue().toInstant(ZoneOffset.UTC) : null)
+                    .sortOrder(sortOrderField.getValue())
+                    .build();
+
+            raceWeekendService.createSession(session);
+            dialog.close();
+            Notification.show("Session created", 3000, Notification.Position.MIDDLE)
+                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
+            getUI().ifPresent(ui -> ui.getPage().reload());
+        });
+        saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
+
+        Button cancelButton = new Button("Cancel", e -> dialog.close());
+
+        dialog.add(form);
+        dialog.getFooter().add(cancelButton, saveButton);
+        dialog.open();
     }
 
     private VerticalLayout createIncidentsTab(Integer weekendId) {

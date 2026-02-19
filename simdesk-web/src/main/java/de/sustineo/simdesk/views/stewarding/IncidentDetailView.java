@@ -101,23 +101,29 @@ public class IncidentDetailView extends BaseView {
         detailsLayout.setSpacing(false);
 
         if (incident.getDescription() != null && !incident.getDescription().isEmpty()) {
-            detailsLayout.add(new Paragraph(incident.getDescription()));
+            detailsLayout.add(new Span(incident.getDescription()));
         }
         if (incident.getLap() != null) {
-            detailsLayout.add(new Paragraph("Lap: " + incident.getLap()));
+            detailsLayout.add(createDetailRow("Lap", String.valueOf(incident.getLap())));
         }
         if (incident.getTimestampInSession() != null) {
-            detailsLayout.add(new Paragraph("Time in Session: " + incident.getTimestampInSession()));
+            detailsLayout.add(createDetailRow("Time in Session", incident.getTimestampInSession()));
         }
         if (incident.getInvolvedCarsText() != null) {
-            detailsLayout.add(new Paragraph("Involved Cars: " + incident.getInvolvedCarsText()));
+            detailsLayout.add(createDetailRow("Involved Cars", incident.getInvolvedCarsText()));
         }
         if (incident.getVideoUrl() != null && !incident.getVideoUrl().isEmpty()) {
             Anchor videoLink = new Anchor(incident.getVideoUrl(), "Video Evidence");
             videoLink.setTarget("_blank");
-            detailsLayout.add(videoLink);
+            HorizontalLayout videoRow = new HorizontalLayout();
+            Span videoLabel = new Span("Evidence: ");
+            videoLabel.getStyle().set("font-weight", "bold");
+            videoRow.setSpacing(false);
+            videoRow.getStyle().set("gap", "var(--lumo-space-xs)");
+            videoRow.add(videoLabel, videoLink);
+            detailsLayout.add(videoRow);
         }
-        detailsLayout.add(new Paragraph("Status: " + (incident.getStatus() != null ? incident.getStatus().getDescription() : "-")));
+        detailsLayout.add(createDetailRow("Status", incident.getStatus() != null ? incident.getStatus().getDescription() : "-"));
         add(detailsLayout);
 
         // Steward Decision section (ADMIN only)
@@ -280,5 +286,15 @@ public class IncidentDetailView extends BaseView {
         }
 
         return layout;
+    }
+
+    private HorizontalLayout createDetailRow(String label, String value) {
+        Span labelSpan = new Span(label + ": ");
+        labelSpan.getStyle().set("font-weight", "bold");
+        Span valueSpan = new Span(value);
+        HorizontalLayout row = new HorizontalLayout(labelSpan, valueSpan);
+        row.setSpacing(false);
+        row.getStyle().set("gap", "var(--lumo-space-xs)");
+        return row;
     }
 }
