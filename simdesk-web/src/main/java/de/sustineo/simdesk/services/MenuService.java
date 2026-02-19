@@ -57,7 +57,7 @@ public class MenuService {
         }
 
         if (SpringProfile.isStewardingEnabled()) {
-            items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Race Weekends", VaadinIcon.CALENDAR, RaceWeekendListView.class));
+            items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Series", VaadinIcon.CALENDAR, SeriesListView.class));
 
             if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
                 items.add(MenuEntity.ofInternal(MenuEntityCategory.STEWARDING, "Tracks", VaadinIcon.ROAD, StewardingTrackListView.class));

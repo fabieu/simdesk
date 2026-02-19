@@ -21,38 +21,34 @@ import com.vaadin.flow.server.auth.AnonymousAllowed;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
-import de.sustineo.simdesk.entities.stewarding.RaceWeekend;
-import de.sustineo.simdesk.entities.stewarding.StewardingTrack;
+import de.sustineo.simdesk.entities.stewarding.Series;
 import de.sustineo.simdesk.layouts.MainLayout;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
-import de.sustineo.simdesk.services.stewarding.RaceWeekendService;
-import de.sustineo.simdesk.services.stewarding.StewardingTrackService;
+import de.sustineo.simdesk.services.stewarding.SeriesService;
 import de.sustineo.simdesk.views.BaseView;
 import org.springframework.context.annotation.Profile;
 
 import java.util.List;
 
 @Profile(SpringProfile.STEWARDING)
-@Route(value = "/stewarding/weekends", layout = MainLayout.class)
+@Route(value = "/stewarding/series", layout = MainLayout.class)
 @AnonymousAllowed
-public class RaceWeekendListView extends BaseView {
-    private final RaceWeekendService raceWeekendService;
-    private final StewardingTrackService trackService;
+public class SeriesListView extends BaseView {
+    private final SeriesService seriesService;
     private final PenaltyCatalogService catalogService;
     private final SecurityService securityService;
 
-    public RaceWeekendListView(RaceWeekendService raceWeekendService, StewardingTrackService trackService,
-                               PenaltyCatalogService catalogService, SecurityService securityService) {
-        this.raceWeekendService = raceWeekendService;
-        this.trackService = trackService;
+    public SeriesListView(SeriesService seriesService, PenaltyCatalogService catalogService,
+                          SecurityService securityService) {
+        this.seriesService = seriesService;
         this.catalogService = catalogService;
         this.securityService = securityService;
     }
 
     @Override
     public String getPageTitle() {
-        return "Race Weekends";
+        return "Series";
     }
 
     @Override
@@ -68,38 +64,34 @@ public class RaceWeekendListView extends BaseView {
         headerLayout.add(createViewHeader());
 
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
-            Button newButton = new Button("New Weekend", e -> openNewWeekendDialog());
+            Button newButton = new Button("New Series", e -> openNewSeriesDialog());
             newButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
             headerLayout.add(newButton);
         }
 
         add(headerLayout);
 
-        List<RaceWeekend> weekends = raceWeekendService.getAllWeekends();
-        Grid<RaceWeekend> grid = new Grid<>(RaceWeekend.class, false);
-        grid.addColumn(RaceWeekend::getTitle).setHeader("Title").setSortable(true);
-        grid.addColumn(weekend -> {
-            var track = trackService.getTrackById(weekend.getTrackId());
-            return track != null ? track.getName() : "-";
-        }).setHeader("Track").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.addColumn(RaceWeekend::getStartDate).setHeader("Start Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.addColumn(RaceWeekend::getEndDate).setHeader("End Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.setItems(weekends);
+        List<Series> seriesList = seriesService.getAllSeries();
+        Grid<Series> grid = new Grid<>(Series.class, false);
+        grid.addColumn(Series::getTitle).setHeader("Title").setSortable(true);
+        grid.addColumn(Series::getStartDate).setHeader("Start Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.addColumn(Series::getEndDate).setHeader("End Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        grid.setItems(seriesList);
         grid.setSizeFull();
         grid.setSelectionMode(Grid.SelectionMode.NONE);
         grid.setColumnReorderingAllowed(true);
         grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
         grid.addItemClickListener(e ->
-                getUI().ifPresent(ui -> ui.navigate(RaceWeekendDetailView.class,
-                        new RouteParameters("weekendId", String.valueOf(e.getItem().getId()))))
+                getUI().ifPresent(ui -> ui.navigate(SeriesDetailView.class,
+                        new RouteParameters("seriesId", String.valueOf(e.getItem().getId()))))
         );
 
         addAndExpand(grid);
     }
 
-    private void openNewWeekendDialog() {
+    private void openNewSeriesDialog() {
         Dialog dialog = new Dialog();
-        dialog.setHeaderTitle("New Race Weekend");
+        dialog.setHeaderTitle("New Series");
         dialog.setWidth("700px");
 
         FormLayout form = new FormLayout();
@@ -115,11 +107,6 @@ public class RaceWeekendListView extends BaseView {
         TextArea descriptionField = new TextArea("Description");
         descriptionField.setWidthFull();
 
-        ComboBox<StewardingTrack> trackCombo = new ComboBox<>("Track");
-        trackCombo.setItems(trackService.getAllTracks());
-        trackCombo.setItemLabelGenerator(StewardingTrack::getName);
-        trackCombo.setWidthFull();
-
         ComboBox<PenaltyCatalog> catalogCombo = new ComboBox<>("Penalty Catalog");
         catalogCombo.setItems(catalogService.getAllCatalogs());
         catalogCombo.setItemLabelGenerator(PenaltyCatalog::getName);
@@ -127,6 +114,8 @@ public class RaceWeekendListView extends BaseView {
 
         TextField webhookField = new TextField("Discord Webhook URL");
         webhookField.setWidthFull();
+
+        Checkbox videoUrlEnabledCheckbox = new Checkbox("Enable Video URL for incident reports");
 
         DatePicker startDatePicker = new DatePicker("Start Date");
         startDatePicker.setWidthFull();
@@ -136,10 +125,8 @@ public class RaceWeekendListView extends BaseView {
 
         form.add(titleField, 2);
         form.add(descriptionField, 2);
-        form.add(trackCombo);
-        form.add(catalogCombo);
+        form.add(catalogCombo, 2);
         form.add(webhookField, 2);
-        Checkbox videoUrlEnabledCheckbox = new Checkbox("Enable Video URL for incident reports");
         form.add(videoUrlEnabledCheckbox, 2);
         form.add(startDatePicker);
         form.add(endDatePicker);
@@ -151,10 +138,9 @@ public class RaceWeekendListView extends BaseView {
                 return;
             }
 
-            RaceWeekend weekend = RaceWeekend.builder()
+            Series series = Series.builder()
                     .title(titleField.getValue())
                     .description(descriptionField.getValue())
-                    .trackId(trackCombo.getValue() != null ? trackCombo.getValue().getId() : null)
                     .penaltyCatalogId(catalogCombo.getValue() != null ? catalogCombo.getValue().getId() : null)
                     .discordWebhookUrl(webhookField.getValue())
                     .videoUrlEnabled(videoUrlEnabledCheckbox.getValue())
@@ -162,9 +148,9 @@ public class RaceWeekendListView extends BaseView {
                     .endDate(endDatePicker.getValue())
                     .build();
 
-            raceWeekendService.createWeekend(weekend);
+            seriesService.createSeries(series);
             dialog.close();
-            Notification.show("Race weekend created", 3000, Notification.Position.MIDDLE)
+            Notification.show("Series created", 3000, Notification.Position.MIDDLE)
                     .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
             getUI().ifPresent(ui -> ui.getPage().reload());
         });

@@ -33,7 +33,7 @@ import org.springframework.context.annotation.Profile;
 import java.util.List;
 
 @Profile(SpringProfile.STEWARDING)
-@Route(value = "/stewarding/weekends/:weekendId/incidents/:incidentId", layout = MainLayout.class)
+@Route(value = "/stewarding/series/:seriesId/rounds/:roundId/incidents/:incidentId", layout = MainLayout.class)
 @AnonymousAllowed
 public class IncidentDetailView extends BaseView {
     private final StewardingIncidentService incidentService;
@@ -41,20 +41,23 @@ public class IncidentDetailView extends BaseView {
     private final StewardingAppealService appealService;
     private final PenaltyCatalogService catalogService;
     private final ReasoningTemplateService templateService;
-    private final RaceWeekendService raceWeekendService;
+    private final SeriesService seriesService;
+    private final RoundService roundService;
     private final StewardingEntrylistService entrylistService;
     private final SecurityService securityService;
 
     public IncidentDetailView(StewardingIncidentService incidentService, StewardDecisionService decisionService,
                               StewardingAppealService appealService, PenaltyCatalogService catalogService,
-                              ReasoningTemplateService templateService, RaceWeekendService raceWeekendService,
-                              StewardingEntrylistService entrylistService, SecurityService securityService) {
+                              ReasoningTemplateService templateService, SeriesService seriesService,
+                              RoundService roundService, StewardingEntrylistService entrylistService,
+                              SecurityService securityService) {
         this.incidentService = incidentService;
         this.decisionService = decisionService;
         this.appealService = appealService;
         this.catalogService = catalogService;
         this.templateService = templateService;
-        this.raceWeekendService = raceWeekendService;
+        this.seriesService = seriesService;
+        this.roundService = roundService;
         this.entrylistService = entrylistService;
         this.securityService = securityService;
     }
@@ -71,38 +74,41 @@ public class IncidentDetailView extends BaseView {
         setSpacing(false);
         removeAll();
 
-        String weekendIdParam = event.getRouteParameters().get("weekendId").orElse(null);
+        String seriesIdParam = event.getRouteParameters().get("seriesId").orElse(null);
+        String roundIdParam = event.getRouteParameters().get("roundId").orElse(null);
         String incidentIdParam = event.getRouteParameters().get("incidentId").orElse(null);
-        if (weekendIdParam == null || incidentIdParam == null) {
-            getUI().ifPresent(ui -> ui.navigate(RaceWeekendListView.class));
+        if (seriesIdParam == null || roundIdParam == null || incidentIdParam == null) {
+            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
             return;
         }
 
-        Integer weekendId;
+        Integer seriesId;
+        Integer roundId;
         Integer incidentId;
         try {
-            weekendId = Integer.valueOf(weekendIdParam);
+            seriesId = Integer.valueOf(seriesIdParam);
+            roundId = Integer.valueOf(roundIdParam);
             incidentId = Integer.valueOf(incidentIdParam);
         } catch (NumberFormatException e) {
-            getUI().ifPresent(ui -> ui.navigate(RaceWeekendListView.class));
+            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
             return;
         }
 
-        RaceWeekend weekend = raceWeekendService.getWeekendById(weekendId);
+        Series series = seriesService.getSeriesById(seriesId);
+        Round round = roundService.getRoundById(roundId);
         Incident incident = incidentService.getIncidentById(incidentId);
-        if (weekend == null || incident == null) {
-            getUI().ifPresent(ui -> ui.navigate(RaceWeekendListView.class));
+        if (series == null || round == null || incident == null) {
+            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
             return;
         }
 
         add(createViewHeader(incident.getTitle()));
 
-        RaceWeekendSession session = raceWeekendService.getSessionById(incident.getSessionId());
-        Button backButton = new Button("← Back to " + (session != null ? session.getTitle() : "Session"), e ->
-                getUI().ifPresent(ui -> ui.navigate(RaceWeekendSessionDetailView.class,
+        Button backButton = new Button("← Back to " + round.getTitle(), e ->
+                getUI().ifPresent(ui -> ui.navigate(RoundDetailView.class,
                         new RouteParameters(
-                                new RouteParam("weekendId", String.valueOf(weekendId)),
-                                new RouteParam("sessionId", String.valueOf(incident.getSessionId()))
+                                new RouteParam("seriesId", String.valueOf(seriesId)),
+                                new RouteParam("roundId", String.valueOf(roundId))
                         ))));
         backButton.addThemeVariants(ButtonVariant.LUMO_TERTIARY);
         add(backButton);
@@ -143,7 +149,7 @@ public class IncidentDetailView extends BaseView {
 
         // Steward Decision section (ADMIN only)
         if (securityService.hasAnyAuthority(UserRoleEnum.ROLE_ADMIN, UserRoleEnum.ROLE_STEWARD)) {
-            add(createDecisionSection(incident, weekend));
+            add(createDecisionSection(incident, series));
         }
 
         // Decision History
@@ -153,7 +159,7 @@ public class IncidentDetailView extends BaseView {
         add(createAppealsSection(incidentId));
     }
 
-    private VerticalLayout createDecisionSection(Incident incident, RaceWeekend weekend) {
+    private VerticalLayout createDecisionSection(Incident incident, Series series) {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(true);
         layout.add(new H3("Steward Decision"));
@@ -169,29 +175,29 @@ public class IncidentDetailView extends BaseView {
             reviseButton.addClickListener(e -> {
                 layout.removeAll();
                 layout.add(new H3("Revise Decision"));
-                layout.add(createDecisionForm(incident, weekend, activeDecision.getId()));
+                layout.add(createDecisionForm(incident, series, activeDecision.getId()));
             });
             layout.add(reviseButton);
         } else {
-            layout.add(createDecisionForm(incident, weekend, null));
+            layout.add(createDecisionForm(incident, series, null));
         }
 
         return layout;
     }
 
-    private FormLayout createDecisionForm(Incident incident, RaceWeekend weekend, Integer existingDecisionId) {
+    private FormLayout createDecisionForm(Incident incident, Series series, Integer existingDecisionId) {
         FormLayout form = new FormLayout();
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
                 new FormLayout.ResponsiveStep("600px", 2)
         );
 
-        RaceWeekendSession session = raceWeekendService.getSessionById(incident.getSessionId());
+        RoundSession session = roundService.getSessionById(incident.getSessionId());
 
         ComboBox<PenaltyDefinition> penaltyCombo = new ComboBox<>("Penalty");
-        if (weekend.getPenaltyCatalogId() != null && session != null && session.getSessionType() != null) {
+        if (series.getPenaltyCatalogId() != null && session != null && session.getSessionType() != null) {
             List<PenaltyDefinition> definitions = catalogService.getDefinitionsForSessionType(
-                    weekend.getPenaltyCatalogId(), session.getSessionType().name());
+                    series.getPenaltyCatalogId(), session.getSessionType().name());
             penaltyCombo.setItems(definitions);
             penaltyCombo.setItemLabelGenerator(d -> d.getCode() + " - " + d.getName());
         }
