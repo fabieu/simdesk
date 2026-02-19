@@ -1,0 +1,67 @@
+package de.sustineo.simdesk.services.stewarding;
+
+import de.sustineo.simdesk.configuration.SpringProfile;
+import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
+import de.sustineo.simdesk.entities.stewarding.PenaltyDefinition;
+import de.sustineo.simdesk.mybatis.mapper.PenaltyCatalogMapper;
+import de.sustineo.simdesk.mybatis.mapper.PenaltyDefinitionMapper;
+import lombok.RequiredArgsConstructor;
+import org.springframework.context.annotation.Profile;
+import org.springframework.stereotype.Service;
+import org.springframework.transaction.annotation.Transactional;
+
+import java.util.List;
+
+@Profile(SpringProfile.STEWARDING)
+@Service
+@RequiredArgsConstructor
+public class PenaltyCatalogService {
+    private final PenaltyCatalogMapper catalogMapper;
+    private final PenaltyDefinitionMapper definitionMapper;
+
+    public List<PenaltyCatalog> getAllCatalogs() {
+        return catalogMapper.findAll();
+    }
+
+    public PenaltyCatalog getCatalogById(Integer id) {
+        return catalogMapper.findById(id);
+    }
+
+    @Transactional
+    public void createCatalog(PenaltyCatalog catalog) {
+        catalogMapper.insert(catalog);
+    }
+
+    @Transactional
+    public void updateCatalog(PenaltyCatalog catalog) {
+        catalogMapper.update(catalog);
+    }
+
+    @Transactional
+    public void deleteCatalog(Integer id) {
+        catalogMapper.delete(id);
+    }
+
+    public List<PenaltyDefinition> getDefinitionsByCatalogId(Integer catalogId) {
+        return definitionMapper.findByCatalogId(catalogId);
+    }
+
+    public List<PenaltyDefinition> getDefinitionsForSessionType(Integer catalogId, String sessionType) {
+        return definitionMapper.findByCatalogIdAndSessionType(catalogId, sessionType);
+    }
+
+    @Transactional
+    public void createDefinition(PenaltyDefinition definition) {
+        definitionMapper.insert(definition);
+    }
+
+    @Transactional
+    public void updateDefinition(PenaltyDefinition definition) {
+        definitionMapper.update(definition);
+    }
+
+    @Transactional
+    public void deleteDefinition(Integer id) {
+        definitionMapper.delete(id);
+    }
+}
