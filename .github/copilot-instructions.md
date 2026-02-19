@@ -57,6 +57,15 @@ simdesk/                        ← repo root
 └── docs/                        ← MkDocs documentation source
 ```
 
+## Code Standards
+
+### Required Before Every Pull Request
+
+- Always run `./gradlew :simdesk-web:test` from the repository root before raising a PR to verify that all tests pass.
+- The `compileJava` task runs with `options.deprecation = true`; fix any new deprecation warnings introduced by your changes.
+- When adding or modifying database queries, add the corresponding Flyway migration under `simdesk-web/src/main/resources/db/migration/{sqlite,postgres}/`.
+- Use Lombok annotations (`@Data`, `@Builder`, `@RequiredArgsConstructor`, etc.) consistently with the rest of the codebase.
+
 ## Build & Validation Commands
 
 Always run commands from the **repository root** unless otherwise specified.
@@ -112,8 +121,9 @@ SIMDESK_DB_PASSWORD=development
 
 | Workflow | Trigger | Key steps |
 |---|---|---|
-| `test.yml` | PR opened/synchronized/reopened targeting `main` | `./gradlew test` (5-min timeout) |
+| `test.yml` | PR opened/synchronized/reopened targeting `main` | `./gradlew :simdesk-web:test` (5-min timeout) |
 | `build-web-app.yml` | Push to `main` (when `gradle.properties` changes) or manual dispatch | tests → build jar → build Docker image → create GitHub release |
+| `copilot-setup-steps.yml` | Copilot coding agent startup / changes to the file | Sets up Java 21, Gradle, caches dependencies, pre-pulls `postgres:16-alpine` |
 
 PRs must pass the `test.yml` workflow before merging.
 
