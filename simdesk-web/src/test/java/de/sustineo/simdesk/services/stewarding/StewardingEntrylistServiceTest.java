@@ -40,8 +40,8 @@ class StewardingEntrylistServiceTest {
     private StewardingEntrylistDriverMapper entrylistDriverMapper;
 
     @Test
-    void uploadEntrylist_shouldParseValidAccJson() {
-        when(entrylistMapper.findByRaceWeekendId(1)).thenReturn(Collections.emptyList());
+    void uploadEntrylistForRound_shouldParseValidAccJson() {
+        when(entrylistMapper.findByRoundId(1)).thenReturn(Collections.emptyList());
 
         String accJson = """
                 {
@@ -86,17 +86,17 @@ class StewardingEntrylistServiceTest {
                 }
                 """;
 
-        entrylistService.uploadEntrylist(1, accJson);
+        entrylistService.uploadEntrylistForRound(1, accJson);
 
-        verify(entrylistMapper).deleteByRaceWeekendId(1);
+        verify(entrylistMapper).deleteByRoundId(1);
         verify(entrylistMapper).insert(any(StewardingEntrylist.class));
         verify(entrylistEntryMapper, times(2)).insert(any(StewardingEntrylistEntry.class));
         verify(entrylistDriverMapper, times(3)).insert(any(StewardingEntrylistDriver.class));
     }
 
     @Test
-    void uploadEntrylist_shouldHandleEmptyEntries() {
-        when(entrylistMapper.findByRaceWeekendId(1)).thenReturn(Collections.emptyList());
+    void uploadEntrylistForRound_shouldHandleEmptyEntries() {
+        when(entrylistMapper.findByRoundId(1)).thenReturn(Collections.emptyList());
 
         String accJson = """
                 {
@@ -105,9 +105,9 @@ class StewardingEntrylistServiceTest {
                 }
                 """;
 
-        entrylistService.uploadEntrylist(1, accJson);
+        entrylistService.uploadEntrylistForRound(1, accJson);
 
-        verify(entrylistMapper).deleteByRaceWeekendId(1);
+        verify(entrylistMapper).deleteByRoundId(1);
         verify(entrylistMapper).insert(any(StewardingEntrylist.class));
         verify(entrylistEntryMapper, never()).insert(any());
         verify(entrylistDriverMapper, never()).insert(any());
