@@ -14,14 +14,11 @@ import java.time.LocalDate;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RaceWeekend {
+public class Round {
     private Integer id;
-    private String title;
-    private String description;
+    private Integer seriesId;
     private Integer trackId;
-    private Integer penaltyCatalogId;
-    private String discordWebhookUrl;
-    private Boolean videoUrlEnabled;
+    private String title;
     private LocalDate startDate;
     private LocalDate endDate;
     private Instant createdAt;
@@ -29,7 +26,4 @@ public class RaceWeekend {
 
     @EqualsAndHashCode.Exclude
     private StewardingTrack track;
-
-    @EqualsAndHashCode.Exclude
-    private PenaltyCatalog penaltyCatalog;
 }

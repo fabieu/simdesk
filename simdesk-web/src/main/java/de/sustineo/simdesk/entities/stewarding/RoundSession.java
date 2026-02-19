@@ -12,9 +12,9 @@ import java.time.Instant;
 @Builder
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
-public class RaceWeekendSession {
+public class RoundSession {
     private Integer id;
-    private Integer raceWeekendId;
+    private Integer roundId;
     private StewSessionType sessionType;
     private String title;
     private Instant startTime;

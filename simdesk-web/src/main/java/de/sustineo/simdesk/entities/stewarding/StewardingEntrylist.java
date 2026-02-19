@@ -14,8 +14,7 @@ import java.time.Instant;
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardingEntrylist {
     private Integer id;
-    private Integer raceWeekendId;
-    private Integer sessionId;
+    private Integer roundId;
     private Instant uploadedAt;
     private String rawJson;
 }
