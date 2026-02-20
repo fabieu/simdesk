@@ -6,8 +6,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -16,6 +14,7 @@ import com.vaadin.flow.router.RouteParameters;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
 import de.sustineo.simdesk.views.BaseView;
 import jakarta.annotation.security.RolesAllowed;
@@ -28,9 +27,12 @@ import java.util.List;
 @RolesAllowed({"ADMIN", "STEWARD"})
 public class PenaltyCatalogListView extends BaseView {
     private final PenaltyCatalogService catalogService;
+    private final NotificationService notificationService;
+    private Grid<PenaltyCatalog> grid;
 
-    public PenaltyCatalogListView(PenaltyCatalogService catalogService) {
+    public PenaltyCatalogListView(PenaltyCatalogService catalogService, NotificationService notificationService) {
         this.catalogService = catalogService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class PenaltyCatalogListView extends BaseView {
         add(headerLayout);
 
         List<PenaltyCatalog> catalogs = catalogService.getAllCatalogs();
-        Grid<PenaltyCatalog> grid = new Grid<>(PenaltyCatalog.class, false);
+        grid = new Grid<>(PenaltyCatalog.class, false);
         grid.addColumn(PenaltyCatalog::getName).setHeader("Name").setSortable(true);
         grid.addColumn(PenaltyCatalog::getDescription).setHeader("Description").setSortable(true);
         grid.setItems(catalogs);
@@ -92,8 +94,7 @@ public class PenaltyCatalogListView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (nameField.isEmpty()) {
-                Notification.show("Name is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Name is required");
                 return;
             }
 
@@ -103,9 +104,8 @@ public class PenaltyCatalogListView extends BaseView {
                     .build();
             catalogService.createCatalog(catalog);
             dialog.close();
-            Notification.show("Catalog created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Catalog created");
+            grid.setItems(catalogService.getAllCatalogs());
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

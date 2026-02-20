@@ -6,8 +6,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -16,6 +14,7 @@ import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.ReasoningTemplate;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.stewarding.ReasoningTemplateService;
 import de.sustineo.simdesk.views.BaseView;
 import jakarta.annotation.security.RolesAllowed;
@@ -28,9 +27,12 @@ import java.util.List;
 @RolesAllowed({"ADMIN", "STEWARD"})
 public class ReasoningTemplateListView extends BaseView {
     private final ReasoningTemplateService templateService;
+    private final NotificationService notificationService;
+    private Grid<ReasoningTemplate> grid;
 
-    public ReasoningTemplateListView(ReasoningTemplateService templateService) {
+    public ReasoningTemplateListView(ReasoningTemplateService templateService, NotificationService notificationService) {
         this.templateService = templateService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -57,7 +59,7 @@ public class ReasoningTemplateListView extends BaseView {
         add(headerLayout);
 
         List<ReasoningTemplate> templates = templateService.getAllTemplates();
-        Grid<ReasoningTemplate> grid = new Grid<>(ReasoningTemplate.class, false);
+        grid = new Grid<>(ReasoningTemplate.class, false);
         grid.addColumn(ReasoningTemplate::getName).setHeader("Name").setSortable(true);
         grid.addColumn(ReasoningTemplate::getCategory).setHeader("Category").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.addColumn(template -> {
@@ -99,8 +101,7 @@ public class ReasoningTemplateListView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (nameField.isEmpty()) {
-                Notification.show("Name is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Name is required");
                 return;
             }
 
@@ -112,9 +113,8 @@ public class ReasoningTemplateListView extends BaseView {
 
             templateService.createTemplate(template);
             dialog.close();
-            Notification.show("Template created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Template created");
+            grid.setItems(templateService.getAllTemplates());
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

@@ -8,8 +8,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Paragraph;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.IntegerField;
@@ -21,6 +19,7 @@ import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
 import de.sustineo.simdesk.entities.stewarding.PenaltyDefinition;
 import de.sustineo.simdesk.entities.stewarding.PenaltySessionType;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
 import de.sustineo.simdesk.views.BaseView;
 import jakarta.annotation.security.RolesAllowed;
@@ -33,9 +32,13 @@ import java.util.List;
 @RolesAllowed({"ADMIN", "STEWARD"})
 public class PenaltyCatalogDetailView extends BaseView {
     private final PenaltyCatalogService catalogService;
+    private final NotificationService notificationService;
+    private Grid<PenaltyDefinition> grid;
+    private String catalogId;
 
-    public PenaltyCatalogDetailView(PenaltyCatalogService catalogService) {
+    public PenaltyCatalogDetailView(PenaltyCatalogService catalogService, NotificationService notificationService) {
         this.catalogService = catalogService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -56,7 +59,7 @@ public class PenaltyCatalogDetailView extends BaseView {
             return;
         }
 
-        String catalogId = catalogIdParam;
+        catalogId = catalogIdParam;
 
         PenaltyCatalog catalog = catalogService.getCatalogById(catalogId);
         if (catalog == null) {
@@ -86,7 +89,7 @@ public class PenaltyCatalogDetailView extends BaseView {
         add(actionLayout);
 
         List<PenaltyDefinition> definitions = catalogService.getDefinitionsByCatalogId(catalogId);
-        Grid<PenaltyDefinition> grid = new Grid<>(PenaltyDefinition.class, false);
+        grid = new Grid<>(PenaltyDefinition.class, false);
         grid.addColumn(PenaltyDefinition::getCode).setHeader("Code").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.addColumn(PenaltyDefinition::getName).setHeader("Name").setSortable(true);
         grid.addColumn(PenaltyDefinition::getCategory).setHeader("Category").setAutoWidth(true).setFlexGrow(0).setSortable(true);
@@ -135,8 +138,7 @@ public class PenaltyCatalogDetailView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (codeField.isEmpty() || nameField.isEmpty()) {
-                Notification.show("Code and Name are required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Code and Name are required");
                 return;
             }
 
@@ -153,9 +155,8 @@ public class PenaltyCatalogDetailView extends BaseView {
 
             catalogService.createDefinition(definition);
             dialog.close();
-            Notification.show("Penalty definition added", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Penalty definition added");
+            grid.setItems(catalogService.getDefinitionsByCatalogId(catalogId));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

@@ -6,8 +6,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextField;
 import com.vaadin.flow.router.BeforeEnterEvent;
@@ -15,6 +13,7 @@ import com.vaadin.flow.router.Route;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.StewardingTrack;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.stewarding.StewardingTrackService;
 import de.sustineo.simdesk.views.BaseView;
 import jakarta.annotation.security.RolesAllowed;
@@ -27,9 +26,12 @@ import java.util.List;
 @RolesAllowed({"ADMIN", "STEWARD"})
 public class StewardingTrackListView extends BaseView {
     private final StewardingTrackService trackService;
+    private final NotificationService notificationService;
+    private Grid<StewardingTrack> grid;
 
-    public StewardingTrackListView(StewardingTrackService trackService) {
+    public StewardingTrackListView(StewardingTrackService trackService, NotificationService notificationService) {
         this.trackService = trackService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -56,7 +58,7 @@ public class StewardingTrackListView extends BaseView {
         add(headerLayout);
 
         List<StewardingTrack> tracks = trackService.getAllTracks();
-        Grid<StewardingTrack> grid = new Grid<>(StewardingTrack.class, false);
+        grid = new Grid<>(StewardingTrack.class, false);
         grid.addColumn(StewardingTrack::getName).setHeader("Name").setSortable(true);
         grid.addColumn(StewardingTrack::getCountry).setHeader("Country").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.setItems(tracks);
@@ -93,8 +95,7 @@ public class StewardingTrackListView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (nameField.isEmpty()) {
-                Notification.show("Name is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Name is required");
                 return;
             }
 
@@ -106,9 +107,8 @@ public class StewardingTrackListView extends BaseView {
 
             trackService.createTrack(track);
             dialog.close();
-            Notification.show("Track created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Track created");
+            grid.setItems(trackService.getAllTracks());
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

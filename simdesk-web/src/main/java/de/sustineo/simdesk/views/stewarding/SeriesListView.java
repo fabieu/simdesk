@@ -9,8 +9,6 @@ import com.vaadin.flow.component.dialog.Dialog;
 import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
 import com.vaadin.flow.component.textfield.TextField;
@@ -23,6 +21,7 @@ import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
 import de.sustineo.simdesk.entities.stewarding.Series;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
 import de.sustineo.simdesk.services.stewarding.SeriesService;
@@ -38,12 +37,15 @@ public class SeriesListView extends BaseView {
     private final SeriesService seriesService;
     private final PenaltyCatalogService catalogService;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
+    private Grid<Series> grid;
 
     public SeriesListView(SeriesService seriesService, PenaltyCatalogService catalogService,
-                          SecurityService securityService) {
+                          SecurityService securityService, NotificationService notificationService) {
         this.seriesService = seriesService;
         this.catalogService = catalogService;
         this.securityService = securityService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -72,7 +74,7 @@ public class SeriesListView extends BaseView {
         add(headerLayout);
 
         List<Series> seriesList = seriesService.getAllSeries();
-        Grid<Series> grid = new Grid<>(Series.class, false);
+        grid = new Grid<>(Series.class, false);
         grid.addColumn(Series::getTitle).setHeader("Title").setSortable(true);
         grid.addColumn(Series::getStartDate).setHeader("Start Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
         grid.addColumn(Series::getEndDate).setHeader("End Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
@@ -133,8 +135,7 @@ public class SeriesListView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (titleField.isEmpty()) {
-                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Title is required");
                 return;
             }
 
@@ -150,9 +151,8 @@ public class SeriesListView extends BaseView {
 
             seriesService.createSeries(series);
             dialog.close();
-            Notification.show("Series created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Series created");
+            grid.setItems(seriesService.getAllSeries());
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

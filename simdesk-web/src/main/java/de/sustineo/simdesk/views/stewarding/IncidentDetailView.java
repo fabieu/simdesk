@@ -10,8 +10,6 @@ import com.vaadin.flow.component.html.Anchor;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Paragraph;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -25,6 +23,7 @@ import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.stewarding.*;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.*;
 import de.sustineo.simdesk.views.BaseView;
@@ -45,12 +44,16 @@ public class IncidentDetailView extends BaseView {
     private final RoundService roundService;
     private final StewardingEntrylistService entrylistService;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
+    private String seriesId;
+    private String roundId;
+    private String incidentId;
 
     public IncidentDetailView(StewardingIncidentService incidentService, StewardDecisionService decisionService,
                               StewardingAppealService appealService, PenaltyCatalogService catalogService,
                               ReasoningTemplateService templateService, SeriesService seriesService,
                               RoundService roundService, StewardingEntrylistService entrylistService,
-                              SecurityService securityService) {
+                              SecurityService securityService, NotificationService notificationService) {
         this.incidentService = incidentService;
         this.decisionService = decisionService;
         this.appealService = appealService;
@@ -60,6 +63,7 @@ public class IncidentDetailView extends BaseView {
         this.roundService = roundService;
         this.entrylistService = entrylistService;
         this.securityService = securityService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -82,9 +86,9 @@ public class IncidentDetailView extends BaseView {
             return;
         }
 
-        String seriesId = seriesIdParam;
-        String roundId = roundIdParam;
-        String incidentId = incidentIdParam;
+        seriesId = seriesIdParam;
+        roundId = roundIdParam;
+        incidentId = incidentIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         Round round = roundService.getRoundById(roundId);
@@ -235,9 +239,9 @@ public class IncidentDetailView extends BaseView {
                 decisionService.makeDecision(decision);
             }
 
-            Notification.show("Decision saved", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Decision saved");
+            getUI().ifPresent(ui -> ui.navigate(IncidentDetailView.class,
+                    new RouteParameters(new RouteParam("seriesId", seriesId), new RouteParam("roundId", roundId), new RouteParam("incidentId", incidentId))));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
         form.add(saveButton);

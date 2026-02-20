@@ -11,8 +11,6 @@ import com.vaadin.flow.component.formlayout.FormLayout;
 import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.textfield.TextArea;
@@ -29,6 +27,7 @@ import de.sustineo.simdesk.entities.stewarding.Round;
 import de.sustineo.simdesk.entities.stewarding.Series;
 import de.sustineo.simdesk.entities.stewarding.StewardingTrack;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.PenaltyCatalogService;
 import de.sustineo.simdesk.services.stewarding.RoundService;
@@ -48,15 +47,19 @@ public class SeriesDetailView extends BaseView {
     private final StewardingTrackService trackService;
     private final PenaltyCatalogService catalogService;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
+    private Grid<Round> roundsGrid;
+    private String seriesId;
 
     public SeriesDetailView(SeriesService seriesService, RoundService roundService,
                             StewardingTrackService trackService, PenaltyCatalogService catalogService,
-                            SecurityService securityService) {
+                            SecurityService securityService, NotificationService notificationService) {
         this.seriesService = seriesService;
         this.roundService = roundService;
         this.trackService = trackService;
         this.catalogService = catalogService;
         this.securityService = securityService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -77,7 +80,7 @@ public class SeriesDetailView extends BaseView {
             return;
         }
 
-        String seriesId = seriesIdParam;
+        seriesId = seriesIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         if (series == null) {
@@ -147,18 +150,18 @@ public class SeriesDetailView extends BaseView {
         add(roundsHeader);
 
         List<Round> rounds = roundService.getRoundsBySeriesId(seriesId);
-        Grid<Round> grid = new Grid<>(Round.class, false);
-        grid.addColumn(Round::getTitle).setHeader("Title").setSortable(true);
-        grid.addColumn(round -> round.getTrack() != null ? round.getTrack().getName() : "-")
+        roundsGrid = new Grid<>(Round.class, false);
+        roundsGrid.addColumn(Round::getTitle).setHeader("Title").setSortable(true);
+        roundsGrid.addColumn(round -> round.getTrack() != null ? round.getTrack().getName() : "-")
                 .setHeader("Track").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.addColumn(Round::getStartDate).setHeader("Start Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.addColumn(Round::getEndDate).setHeader("End Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
-        grid.setItems(rounds);
-        grid.setSizeFull();
-        grid.setSelectionMode(Grid.SelectionMode.NONE);
-        grid.setColumnReorderingAllowed(true);
-        grid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
-        grid.addItemClickListener(e ->
+        roundsGrid.addColumn(Round::getStartDate).setHeader("Start Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        roundsGrid.addColumn(Round::getEndDate).setHeader("End Date").setAutoWidth(true).setFlexGrow(0).setSortable(true);
+        roundsGrid.setItems(rounds);
+        roundsGrid.setSizeFull();
+        roundsGrid.setSelectionMode(Grid.SelectionMode.NONE);
+        roundsGrid.setColumnReorderingAllowed(true);
+        roundsGrid.addThemeVariants(GridVariant.LUMO_NO_BORDER);
+        roundsGrid.addItemClickListener(e ->
                 getUI().ifPresent(ui -> ui.navigate(RoundDetailView.class,
                         new RouteParameters(
                                 new RouteParam("seriesId", String.valueOf(seriesId)),
@@ -166,7 +169,7 @@ public class SeriesDetailView extends BaseView {
                         )))
         );
 
-        addAndExpand(grid);
+        addAndExpand(roundsGrid);
     }
 
     private HorizontalLayout createDetailRow(String label, String value) {
@@ -233,8 +236,7 @@ public class SeriesDetailView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (titleField.isEmpty()) {
-                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Title is required");
                 return;
             }
 
@@ -248,9 +250,8 @@ public class SeriesDetailView extends BaseView {
 
             seriesService.updateSeries(series);
             dialog.close();
-            Notification.show("Series updated", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Series updated");
+            getUI().ifPresent(ui -> ui.navigate(SeriesDetailView.class, new RouteParameters("seriesId", seriesId)));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -294,8 +295,7 @@ public class SeriesDetailView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (titleField.isEmpty()) {
-                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Title is required");
                 return;
             }
 
@@ -309,9 +309,8 @@ public class SeriesDetailView extends BaseView {
 
             roundService.createRound(round);
             dialog.close();
-            Notification.show("Round created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Round created");
+            roundsGrid.setItems(roundService.getRoundsBySeriesId(seriesId));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 

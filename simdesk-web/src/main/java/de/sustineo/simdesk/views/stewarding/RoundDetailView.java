@@ -13,8 +13,6 @@ import com.vaadin.flow.component.grid.Grid;
 import com.vaadin.flow.component.grid.GridVariant;
 import com.vaadin.flow.component.html.H3;
 import com.vaadin.flow.component.html.Span;
-import com.vaadin.flow.component.notification.Notification;
-import com.vaadin.flow.component.notification.NotificationVariant;
 import com.vaadin.flow.component.orderedlayout.HorizontalLayout;
 import com.vaadin.flow.component.orderedlayout.VerticalLayout;
 import com.vaadin.flow.component.tabs.TabSheet;
@@ -33,6 +31,7 @@ import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.auth.UserRoleEnum;
 import de.sustineo.simdesk.entities.stewarding.*;
 import de.sustineo.simdesk.layouts.MainLayout;
+import de.sustineo.simdesk.services.NotificationService;
 import de.sustineo.simdesk.services.auth.SecurityService;
 import de.sustineo.simdesk.services.stewarding.RoundService;
 import de.sustineo.simdesk.services.stewarding.SeriesService;
@@ -59,16 +58,21 @@ public class RoundDetailView extends BaseView {
     private final StewardingEntrylistService entrylistService;
     private final StewardingTrackService trackService;
     private final SecurityService securityService;
+    private final NotificationService notificationService;
+    private String seriesId;
+    private String roundId;
 
     public RoundDetailView(SeriesService seriesService, RoundService roundService,
                            StewardingIncidentService incidentService, StewardingEntrylistService entrylistService,
-                           StewardingTrackService trackService, SecurityService securityService) {
+                           StewardingTrackService trackService, SecurityService securityService,
+                           NotificationService notificationService) {
         this.seriesService = seriesService;
         this.roundService = roundService;
         this.incidentService = incidentService;
         this.entrylistService = entrylistService;
         this.trackService = trackService;
         this.securityService = securityService;
+        this.notificationService = notificationService;
     }
 
     @Override
@@ -90,8 +94,8 @@ public class RoundDetailView extends BaseView {
             return;
         }
 
-        String seriesId = seriesIdParam;
-        String roundId = roundIdParam;
+        seriesId = seriesIdParam;
+        roundId = roundIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         Round round = roundService.getRoundById(roundId);
@@ -230,8 +234,7 @@ public class RoundDetailView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (titleField.isEmpty() || typeCombo.isEmpty()) {
-                Notification.show("Session type and title are required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Session type and title are required");
                 return;
             }
 
@@ -246,9 +249,9 @@ public class RoundDetailView extends BaseView {
 
             roundService.createSession(session);
             dialog.close();
-            Notification.show("Session created", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Session created");
+            getUI().ifPresent(ui -> ui.navigate(RoundDetailView.class,
+                    new RouteParameters(new RouteParam("seriesId", seriesId), new RouteParam("roundId", roundId))));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -361,13 +364,11 @@ public class RoundDetailView extends BaseView {
 
         Button saveButton = new Button("Report", e -> {
             if (sessionCombo.isEmpty()) {
-                Notification.show("Session is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Session is required");
                 return;
             }
             if (titleField.isEmpty()) {
-                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Title is required");
                 return;
             }
 
@@ -394,9 +395,9 @@ public class RoundDetailView extends BaseView {
 
             incidentService.createIncident(incident, involvedEntryIds);
             dialog.close();
-            Notification.show("Incident reported", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Incident reported");
+            getUI().ifPresent(ui -> ui.navigate(RoundDetailView.class,
+                    new RouteParameters(new RouteParam("seriesId", seriesId), new RouteParam("roundId", roundId))));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
@@ -420,14 +421,13 @@ public class RoundDetailView extends BaseView {
                 try {
                     entrylistService.uploadEntrylistForRound(roundId, json);
                     getUI().ifPresent(ui -> ui.access(() -> {
-                        Notification.show("Entrylist uploaded successfully", 3000, Notification.Position.MIDDLE)
-                                .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-                        ui.getPage().reload();
+                        notificationService.showSuccessNotification("Entrylist uploaded successfully");
+                        ui.navigate(RoundDetailView.class,
+                                new RouteParameters(new RouteParam("seriesId", seriesId), new RouteParam("roundId", roundId)));
                     }));
                 } catch (IllegalArgumentException ex) {
                     getUI().ifPresent(ui -> ui.access(() ->
-                            Notification.show("Invalid entrylist JSON: " + ex.getMessage(), 5000, Notification.Position.MIDDLE)
-                                    .addThemeVariants(NotificationVariant.LUMO_ERROR)
+                            notificationService.showErrorNotification("Invalid entrylist JSON: " + ex.getMessage())
                     ));
                 }
             }));
@@ -493,8 +493,7 @@ public class RoundDetailView extends BaseView {
 
         Button saveButton = new Button("Save", e -> {
             if (titleField.isEmpty()) {
-                Notification.show("Title is required", 3000, Notification.Position.MIDDLE)
-                        .addThemeVariants(NotificationVariant.LUMO_ERROR);
+                notificationService.showErrorNotification("Title is required");
                 return;
             }
 
@@ -505,9 +504,9 @@ public class RoundDetailView extends BaseView {
 
             roundService.updateRound(round);
             dialog.close();
-            Notification.show("Round updated", 3000, Notification.Position.MIDDLE)
-                    .addThemeVariants(NotificationVariant.LUMO_SUCCESS);
-            getUI().ifPresent(ui -> ui.getPage().reload());
+            notificationService.showSuccessNotification("Round updated");
+            getUI().ifPresent(ui -> ui.navigate(RoundDetailView.class,
+                    new RouteParameters(new RouteParam("seriesId", seriesId), new RouteParam("roundId", roundId))));
         });
         saveButton.addThemeVariants(ButtonVariant.LUMO_PRIMARY);
 
