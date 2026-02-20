@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardingEntrylistEntry {
-    private Integer id;
-    private Integer entrylistId;
+    private String id;
+    private String entrylistId;
     private Integer raceNumber;
     private Integer carModelId;
     private String teamName;

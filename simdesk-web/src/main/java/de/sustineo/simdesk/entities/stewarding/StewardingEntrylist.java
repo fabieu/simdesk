@@ -13,8 +13,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardingEntrylist {
-    private Integer id;
-    private Integer roundId;
+    private String id;
+    private String roundId;
     private Instant uploadedAt;
     private String rawJson;
 }

@@ -11,7 +11,7 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class ReasoningTemplate {
-    private Integer id;
+    private String id;
     private String name;
     private String category;
     private String templateText;

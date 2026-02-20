@@ -13,8 +13,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Incident {
-    private Integer id;
-    private Integer sessionId;
+    private String id;
+    private String sessionId;
     private String title;
     private String description;
     private Integer lap;

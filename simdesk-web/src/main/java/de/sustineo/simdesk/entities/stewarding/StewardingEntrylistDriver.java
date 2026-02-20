@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardingEntrylistDriver {
-    private Integer id;
-    private Integer entryId;
+    private String id;
+    private String entryId;
     private String firstName;
     private String lastName;
     private String shortName;

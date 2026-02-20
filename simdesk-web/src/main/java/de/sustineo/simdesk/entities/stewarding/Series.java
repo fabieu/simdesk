@@ -15,12 +15,12 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Series {
-    private Integer id;
+    private String id;
     private String title;
     private String description;
     private String discordWebhookUrl;
     private Boolean videoUrlEnabled;
-    private Integer penaltyCatalogId;
+    private String penaltyCatalogId;
     private LocalDate startDate;
     private LocalDate endDate;
     private Instant createdAt;

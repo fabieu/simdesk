@@ -15,9 +15,9 @@ import java.time.LocalDate;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Round {
-    private Integer id;
-    private Integer seriesId;
-    private Integer trackId;
+    private String id;
+    private String seriesId;
+    private String trackId;
     private String title;
     private LocalDate startDate;
     private LocalDate endDate;

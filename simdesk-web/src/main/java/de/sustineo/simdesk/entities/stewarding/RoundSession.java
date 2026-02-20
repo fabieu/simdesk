@@ -13,8 +13,8 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class RoundSession {
-    private Integer id;
-    private Integer roundId;
+    private String id;
+    private String roundId;
     private StewSessionType sessionType;
     private String title;
     private Instant startTime;

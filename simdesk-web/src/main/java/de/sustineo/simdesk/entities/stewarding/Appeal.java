@@ -13,10 +13,10 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class Appeal {
-    private Integer id;
-    private Integer decisionId;
+    private String id;
+    private String decisionId;
     private Integer filedByUserId;
-    private Integer filedByEntryId;
+    private String filedByEntryId;
     private String reason;
     private AppealStatus status;
     private String response;

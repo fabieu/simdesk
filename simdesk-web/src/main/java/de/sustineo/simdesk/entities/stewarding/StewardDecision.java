@@ -13,18 +13,18 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardDecision {
-    private Integer id;
-    private Integer incidentId;
-    private Integer sessionId;
+    private String id;
+    private String incidentId;
+    private String sessionId;
     private Integer decidedByUserId;
-    private Integer penaltyDefinitionId;
+    private String penaltyDefinitionId;
     private String customPenalty;
     private String reasoning;
-    private Integer reasoningTemplateId;
+    private String reasoningTemplateId;
     private Boolean isNoAction;
-    private Integer penalizedEntryId;
+    private String penalizedEntryId;
     private String penalizedCarText;
     private Instant decidedAt;
-    private Integer supersededById;
+    private String supersededById;
     private Boolean isActive;
 }

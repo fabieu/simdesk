@@ -11,8 +11,8 @@ import lombok.NoArgsConstructor;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PenaltyDefinition {
-    private Integer id;
-    private Integer catalogId;
+    private String id;
+    private String catalogId;
     private String code;
     private String name;
     private String description;

@@ -13,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class PenaltyCatalog {
-    private Integer id;
+    private String id;
     private String name;
     private String description;
     private Instant createdAt;

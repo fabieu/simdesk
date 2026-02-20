@@ -13,7 +13,7 @@ import java.time.Instant;
 @NoArgsConstructor
 @AllArgsConstructor(access = AccessLevel.PRIVATE)
 public class StewardingTrack {
-    private Integer id;
+    private String id;
     private String name;
     private String country;
     private String mapImageUrl;
