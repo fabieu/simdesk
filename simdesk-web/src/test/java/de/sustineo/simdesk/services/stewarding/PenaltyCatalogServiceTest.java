@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.stewarding.PenaltyDefinition;
 import de.sustineo.simdesk.entities.stewarding.PenaltySessionType;
 import de.sustineo.simdesk.mybatis.mapper.PenaltyCatalogMapper;
 import de.sustineo.simdesk.mybatis.mapper.PenaltyDefinitionMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -33,21 +34,24 @@ class PenaltyCatalogServiceTest {
     @MockitoBean
     private PenaltyDefinitionMapper penaltyDefinitionMapper;
 
+    @MockitoBean
+    private IdGenerator idGenerator;
+
     @Test
     void getDefinitionsForSessionType_shouldReturnMatchingDefinitions() {
         PenaltyDefinition racePenalty = PenaltyDefinition.builder()
-                .id("1")
-                .catalogId("1")
+                .id("def123456789")
+                .catalogId("cat123456789")
                 .code("PEN-001")
                 .name("Causing a collision")
                 .sessionType(PenaltySessionType.RACE)
                 .defaultPenalty("5 second time penalty")
                 .build();
 
-        when(penaltyDefinitionMapper.findByCatalogIdAndSessionType("1", "RACE"))
+        when(penaltyDefinitionMapper.findByCatalogIdAndSessionType("cat123456789", "RACE"))
                 .thenReturn(List.of(racePenalty));
 
-        List<PenaltyDefinition> result = penaltyCatalogService.getDefinitionsForSessionType("1", "RACE");
+        List<PenaltyDefinition> result = penaltyCatalogService.getDefinitionsForSessionType("cat123456789", "RACE");
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getName()).isEqualTo("Causing a collision");
@@ -56,7 +60,7 @@ class PenaltyCatalogServiceTest {
     @Test
     void getAllCatalogs_shouldReturnAll() {
         PenaltyCatalog catalog = PenaltyCatalog.builder()
-                .id("1")
+                .id("cat123456789")
                 .name("2025 Season Rules")
                 .description("Standard penalty rules for 2025")
                 .build();

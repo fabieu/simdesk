@@ -8,6 +8,7 @@ import de.sustineo.simdesk.entities.stewarding.StewardingEntrylistEntry;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistDriverMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistEntryMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -39,9 +40,13 @@ class StewardingEntrylistServiceTest {
     @MockitoBean
     private StewardingEntrylistDriverMapper entrylistDriverMapper;
 
+    @MockitoBean
+    private IdGenerator idGenerator;
+
     @Test
     void uploadEntrylistForRound_shouldParseValidAccJson() {
-        when(entrylistMapper.findByRoundId("1")).thenReturn(Collections.emptyList());
+        when(entrylistMapper.findByRoundId("round1")).thenReturn(Collections.emptyList());
+        when(idGenerator.generateRandomString(12)).thenReturn("testid123456");
 
         String accJson = """
                 {
@@ -86,9 +91,9 @@ class StewardingEntrylistServiceTest {
                 }
                 """;
 
-        entrylistService.uploadEntrylistForRound("1", accJson);
+        entrylistService.uploadEntrylistForRound("round1", accJson);
 
-        verify(entrylistMapper).deleteByRoundId("1");
+        verify(entrylistMapper).deleteByRoundId("round1");
         verify(entrylistMapper).insert(any(StewardingEntrylist.class));
         verify(entrylistEntryMapper, times(2)).insert(any(StewardingEntrylistEntry.class));
         verify(entrylistDriverMapper, times(3)).insert(any(StewardingEntrylistDriver.class));
@@ -96,7 +101,8 @@ class StewardingEntrylistServiceTest {
 
     @Test
     void uploadEntrylistForRound_shouldHandleEmptyEntries() {
-        when(entrylistMapper.findByRoundId("1")).thenReturn(Collections.emptyList());
+        when(entrylistMapper.findByRoundId("round1")).thenReturn(Collections.emptyList());
+        when(idGenerator.generateRandomString(12)).thenReturn("testid123456");
 
         String accJson = """
                 {
@@ -105,9 +111,9 @@ class StewardingEntrylistServiceTest {
                 }
                 """;
 
-        entrylistService.uploadEntrylistForRound("1", accJson);
+        entrylistService.uploadEntrylistForRound("round1", accJson);
 
-        verify(entrylistMapper).deleteByRoundId("1");
+        verify(entrylistMapper).deleteByRoundId("round1");
         verify(entrylistMapper).insert(any(StewardingEntrylist.class));
         verify(entrylistEntryMapper, never()).insert(any());
         verify(entrylistDriverMapper, never()).insert(any());

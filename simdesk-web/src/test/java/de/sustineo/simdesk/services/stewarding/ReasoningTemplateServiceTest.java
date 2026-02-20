@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.stewarding;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.ReasoningTemplate;
 import de.sustineo.simdesk.mybatis.mapper.ReasoningTemplateMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import org.junit.jupiter.api.Test;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.boot.test.context.SpringBootTest;
@@ -27,6 +28,9 @@ class ReasoningTemplateServiceTest {
 
     @MockitoBean
     private ReasoningTemplateMapper reasoningTemplateMapper;
+
+    @MockitoBean
+    private IdGenerator idGenerator;
 
     @Test
     void renderTemplate_shouldReplacePlaceholders() {
@@ -65,7 +69,7 @@ class ReasoningTemplateServiceTest {
     @Test
     void getAllTemplates_shouldReturnAll() {
         ReasoningTemplate template = ReasoningTemplate.builder()
-                .id("1")
+                .id("tmpl12345678")
                 .name("Test Template")
                 .category("Contact")
                 .templateText("Template text")
@@ -83,7 +87,7 @@ class ReasoningTemplateServiceTest {
     @Test
     void getTemplatesByCategory_shouldFilterByCategory() {
         ReasoningTemplate template = ReasoningTemplate.builder()
-                .id("1")
+                .id("tmpl12345678")
                 .name("Contact Template")
                 .category("Contact")
                 .templateText("Contact template text")
