@@ -1,37 +1,38 @@
--- Stewarding module tables
+-- Stewarding module: tracks, penalty catalogs, definitions, reasoning templates,
+-- series, rounds, sessions, entrylist, incidents, decisions, appeals, roles.
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_track
 (
-    id            SERIAL PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
+    id            VARCHAR(12) PRIMARY KEY NOT NULL,
+    name          VARCHAR(255)            NOT NULL,
     country       VARCHAR(100),
     map_image_url VARCHAR(500),
     map_metadata  TEXT,
-    created_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at    TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at    TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at    TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_penalty_catalog
 (
-    id          SERIAL PRIMARY KEY,
-    name        VARCHAR(255) NOT NULL,
+    id          VARCHAR(12) PRIMARY KEY NOT NULL,
+    name        VARCHAR(255)            NOT NULL,
     description TEXT,
-    created_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at  TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP
+    created_at  TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at  TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_penalty_definition
 (
-    id              SERIAL PRIMARY KEY,
-    catalog_id      INTEGER      NOT NULL,
+    id              VARCHAR(12) PRIMARY KEY NOT NULL,
+    catalog_id      VARCHAR(12)             NOT NULL,
     code            VARCHAR(50),
-    name            VARCHAR(255) NOT NULL,
+    name            VARCHAR(255)            NOT NULL,
     description     TEXT,
     category        VARCHAR(100),
-    session_type    VARCHAR(20)  NOT NULL DEFAULT 'ALL',
+    session_type    VARCHAR(20)             NOT NULL DEFAULT 'ALL',
     default_penalty VARCHAR(255),
     severity        INTEGER,
-    sort_order      INTEGER               DEFAULT 0,
+    sort_order      INTEGER                          DEFAULT 0,
     FOREIGN KEY (catalog_id) REFERENCES simdesk.stewarding_penalty_catalog (id)
 );
 
@@ -39,63 +40,76 @@ CREATE INDEX ix_stewarding_penalty_definition_catalog_id ON simdesk.stewarding_p
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_reasoning_template
 (
-    id            SERIAL PRIMARY KEY,
-    name          VARCHAR(255) NOT NULL,
+    id            VARCHAR(12) PRIMARY KEY NOT NULL,
+    name          VARCHAR(255)            NOT NULL,
     category      VARCHAR(100),
-    template_text TEXT         NOT NULL,
-    sort_order    INTEGER               DEFAULT 0
+    template_text TEXT                    NOT NULL,
+    sort_order    INTEGER                          DEFAULT 0
 );
 
-CREATE TABLE IF NOT EXISTS simdesk.stewarding_race_weekend
+CREATE TABLE IF NOT EXISTS simdesk.stewarding_series
 (
-    id                  SERIAL PRIMARY KEY,
-    title               VARCHAR(255) NOT NULL,
+    id                  VARCHAR(12) PRIMARY KEY NOT NULL,
+    title               VARCHAR(255)            NOT NULL,
     description         TEXT,
-    track_id            INTEGER      NOT NULL,
-    penalty_catalog_id  INTEGER      NOT NULL,
     discord_webhook_url VARCHAR(500),
+    video_url_enabled   BOOLEAN                 NOT NULL DEFAULT FALSE,
+    penalty_catalog_id  VARCHAR(12),
     start_date          DATE,
     end_date            DATE,
-    created_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at          TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (track_id) REFERENCES simdesk.stewarding_track (id),
+    created_at          TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at          TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (penalty_catalog_id) REFERENCES simdesk.stewarding_penalty_catalog (id)
 );
 
-CREATE INDEX ix_stewarding_race_weekend_track_id ON simdesk.stewarding_race_weekend (track_id);
-CREATE INDEX ix_stewarding_race_weekend_penalty_catalog_id ON simdesk.stewarding_race_weekend (penalty_catalog_id);
+CREATE TABLE IF NOT EXISTS simdesk.stewarding_round
+(
+    id         VARCHAR(12) PRIMARY KEY NOT NULL,
+    series_id  VARCHAR(12),
+    track_id   VARCHAR(12),
+    title      VARCHAR(255)            NOT NULL,
+    start_date DATE,
+    end_date   DATE,
+    created_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (series_id) REFERENCES simdesk.stewarding_series (id),
+    FOREIGN KEY (track_id) REFERENCES simdesk.stewarding_track (id)
+);
+
+CREATE INDEX ix_stewarding_round_series_id ON simdesk.stewarding_round (series_id);
+CREATE INDEX ix_stewarding_round_track_id ON simdesk.stewarding_round (track_id);
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_session
 (
-    id              SERIAL PRIMARY KEY,
-    race_weekend_id INTEGER     NOT NULL,
-    session_type    VARCHAR(20) NOT NULL,
-    title           VARCHAR(255),
-    start_time      TIMESTAMP,
-    end_time        TIMESTAMP,
-    sort_order      INTEGER              DEFAULT 0,
-    created_at      TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    FOREIGN KEY (race_weekend_id) REFERENCES simdesk.stewarding_race_weekend (id)
+    id           VARCHAR(12) PRIMARY KEY NOT NULL,
+    round_id     VARCHAR(12)             NOT NULL,
+    session_type VARCHAR(20)             NOT NULL,
+    title        VARCHAR(255),
+    start_time   TIMESTAMP,
+    end_time     TIMESTAMP,
+    sort_order   INTEGER                          DEFAULT 0,
+    created_at   TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    FOREIGN KEY (round_id) REFERENCES simdesk.stewarding_round (id)
 );
 
-CREATE INDEX ix_stewarding_session_race_weekend_id ON simdesk.stewarding_session (race_weekend_id);
+CREATE INDEX ix_stewarding_session_round_id ON simdesk.stewarding_session (round_id);
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_entrylist
 (
-    id              SERIAL PRIMARY KEY,
-    race_weekend_id INTEGER   NOT NULL UNIQUE,
-    uploaded_at     TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    raw_json        TEXT,
-    FOREIGN KEY (race_weekend_id) REFERENCES simdesk.stewarding_race_weekend (id)
+    id          VARCHAR(12) PRIMARY KEY NOT NULL,
+    round_id    VARCHAR(12),
+    uploaded_at TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    raw_json    TEXT,
+    FOREIGN KEY (round_id) REFERENCES simdesk.stewarding_round (id)
 );
 
-CREATE INDEX ix_stewarding_entrylist_race_weekend_id ON simdesk.stewarding_entrylist (race_weekend_id);
+CREATE INDEX ix_stewarding_entrylist_round_id ON simdesk.stewarding_entrylist (round_id);
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_entrylist_entry
 (
-    id           SERIAL PRIMARY KEY,
-    entrylist_id INTEGER NOT NULL,
-    race_number  INTEGER NOT NULL,
+    id           VARCHAR(12) PRIMARY KEY NOT NULL,
+    entrylist_id VARCHAR(12)             NOT NULL,
+    race_number  INTEGER                 NOT NULL,
     car_model_id INTEGER,
     team_name    VARCHAR(255),
     display_name VARCHAR(255),
@@ -106,8 +120,8 @@ CREATE INDEX ix_stewarding_entrylist_entry_entrylist_id ON simdesk.stewarding_en
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_entrylist_driver
 (
-    id         SERIAL PRIMARY KEY,
-    entry_id   INTEGER NOT NULL,
+    id         VARCHAR(12) PRIMARY KEY NOT NULL,
+    entry_id   VARCHAR(12)             NOT NULL,
     first_name VARCHAR(100),
     last_name  VARCHAR(100),
     short_name VARCHAR(10),
@@ -120,9 +134,9 @@ CREATE INDEX ix_stewarding_entrylist_driver_entry_id ON simdesk.stewarding_entry
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_incident
 (
-    id                   SERIAL PRIMARY KEY,
-    session_id           INTEGER      NOT NULL,
-    title                VARCHAR(255) NOT NULL,
+    id                   VARCHAR(12) PRIMARY KEY NOT NULL,
+    session_id           VARCHAR(12)             NOT NULL,
+    title                VARCHAR(255)            NOT NULL,
     description          TEXT,
     lap                  INTEGER,
     timestamp_in_session VARCHAR(100),
@@ -130,10 +144,10 @@ CREATE TABLE IF NOT EXISTS simdesk.stewarding_incident
     map_marker_y         DOUBLE PRECISION,
     video_url            VARCHAR(500),
     involved_cars_text   VARCHAR(500),
-    status               VARCHAR(30)  NOT NULL DEFAULT 'REPORTED',
+    status               VARCHAR(30)             NOT NULL DEFAULT 'REPORTED',
     reported_by_user_id  INTEGER,
-    created_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    updated_at           TIMESTAMP    NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    created_at           TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    updated_at           TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     FOREIGN KEY (session_id) REFERENCES simdesk.stewarding_session (id)
 );
 
@@ -142,8 +156,8 @@ CREATE INDEX ix_stewarding_incident_status ON simdesk.stewarding_incident (statu
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_incident_involved_entry
 (
-    incident_id INTEGER NOT NULL,
-    entry_id    INTEGER NOT NULL,
+    incident_id VARCHAR(12) NOT NULL,
+    entry_id    VARCHAR(12) NOT NULL,
     PRIMARY KEY (incident_id, entry_id),
     FOREIGN KEY (incident_id) REFERENCES simdesk.stewarding_incident (id) ON DELETE CASCADE,
     FOREIGN KEY (entry_id) REFERENCES simdesk.stewarding_entrylist_entry (id) ON DELETE CASCADE
@@ -151,20 +165,20 @@ CREATE TABLE IF NOT EXISTS simdesk.stewarding_incident_involved_entry
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_decision
 (
-    id                      SERIAL PRIMARY KEY,
-    incident_id             INTEGER,
-    session_id              INTEGER   NOT NULL,
-    decided_by_user_id      INTEGER,
-    penalty_definition_id   INTEGER,
-    custom_penalty          VARCHAR(255),
-    reasoning               TEXT,
-    reasoning_template_id   INTEGER,
-    is_no_action            BOOLEAN   NOT NULL DEFAULT FALSE,
-    penalized_entry_id      INTEGER,
-    penalized_car_text      VARCHAR(255),
-    decided_at              TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP,
-    superseded_by_id        INTEGER,
-    is_active               BOOLEAN   NOT NULL DEFAULT TRUE,
+    id                    VARCHAR(12) PRIMARY KEY NOT NULL,
+    incident_id           VARCHAR(12),
+    session_id            VARCHAR(12)             NOT NULL,
+    decided_by_user_id    INTEGER,
+    penalty_definition_id VARCHAR(12),
+    custom_penalty        VARCHAR(255),
+    reasoning             TEXT,
+    reasoning_template_id VARCHAR(12),
+    is_no_action          BOOLEAN                 NOT NULL DEFAULT FALSE,
+    penalized_entry_id    VARCHAR(12),
+    penalized_car_text    VARCHAR(255),
+    decided_at            TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    superseded_by_id      VARCHAR(12),
+    is_active             BOOLEAN                 NOT NULL DEFAULT TRUE,
     FOREIGN KEY (incident_id) REFERENCES simdesk.stewarding_incident (id),
     FOREIGN KEY (session_id) REFERENCES simdesk.stewarding_session (id),
     FOREIGN KEY (penalty_definition_id) REFERENCES simdesk.stewarding_penalty_definition (id),
@@ -179,15 +193,15 @@ CREATE INDEX ix_stewarding_decision_is_active ON simdesk.stewarding_decision (is
 
 CREATE TABLE IF NOT EXISTS simdesk.stewarding_appeal
 (
-    id                   SERIAL PRIMARY KEY,
-    decision_id          INTEGER     NOT NULL,
+    id                   VARCHAR(12) PRIMARY KEY NOT NULL,
+    decision_id          VARCHAR(12)             NOT NULL,
     filed_by_user_id     INTEGER,
-    filed_by_entry_id    INTEGER,
-    reason               TEXT        NOT NULL,
-    status               VARCHAR(20) NOT NULL DEFAULT 'PENDING',
+    filed_by_entry_id    VARCHAR(12),
+    reason               TEXT                    NOT NULL,
+    status               VARCHAR(20)             NOT NULL DEFAULT 'PENDING',
     response             TEXT,
     responded_by_user_id INTEGER,
-    filed_at             TIMESTAMP   NOT NULL DEFAULT CURRENT_TIMESTAMP,
+    filed_at             TIMESTAMP               NOT NULL DEFAULT CURRENT_TIMESTAMP,
     responded_at         TIMESTAMP,
     FOREIGN KEY (decision_id) REFERENCES simdesk.stewarding_decision (id),
     FOREIGN KEY (filed_by_entry_id) REFERENCES simdesk.stewarding_entrylist_entry (id)
@@ -195,3 +209,10 @@ CREATE TABLE IF NOT EXISTS simdesk.stewarding_appeal
 
 CREATE INDEX ix_stewarding_appeal_decision_id ON simdesk.stewarding_appeal (decision_id);
 CREATE INDEX ix_stewarding_appeal_status ON simdesk.stewarding_appeal (status);
+
+-- Stewarding roles
+INSERT INTO simdesk.user_role (name, description)
+VALUES ('ROLE_STEWARD', 'Role with stewarding access to manage incidents, decisions and penalties');
+
+INSERT INTO simdesk.user_role (name, description)
+VALUES ('ROLE_DRIVER', 'Default role for all users with access to view decisions and file appeals');
