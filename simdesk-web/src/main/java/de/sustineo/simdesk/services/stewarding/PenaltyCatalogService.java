@@ -5,6 +5,7 @@ import de.sustineo.simdesk.entities.stewarding.PenaltyCatalog;
 import de.sustineo.simdesk.entities.stewarding.PenaltyDefinition;
 import de.sustineo.simdesk.mybatis.mapper.PenaltyCatalogMapper;
 import de.sustineo.simdesk.mybatis.mapper.PenaltyDefinitionMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class PenaltyCatalogService {
     private final PenaltyCatalogMapper catalogMapper;
     private final PenaltyDefinitionMapper definitionMapper;
+    private final IdGenerator idGenerator;
 
     public List<PenaltyCatalog> getAllCatalogs() {
         return catalogMapper.findAll();
@@ -29,6 +31,7 @@ public class PenaltyCatalogService {
 
     @Transactional
     public void createCatalog(PenaltyCatalog catalog) {
+        catalog.setId(idGenerator.generateRandomString(12));
         catalogMapper.insert(catalog);
     }
 
@@ -52,6 +55,7 @@ public class PenaltyCatalogService {
 
     @Transactional
     public void createDefinition(PenaltyDefinition definition) {
+        definition.setId(idGenerator.generateRandomString(12));
         definitionMapper.insert(definition);
     }
 

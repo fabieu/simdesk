@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.stewarding;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.ReasoningTemplate;
 import de.sustineo.simdesk.mybatis.mapper.ReasoningTemplateMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -16,6 +17,7 @@ import java.util.Map;
 @RequiredArgsConstructor
 public class ReasoningTemplateService {
     private final ReasoningTemplateMapper templateMapper;
+    private final IdGenerator idGenerator;
 
     public List<ReasoningTemplate> getAllTemplates() {
         return templateMapper.findAll();
@@ -31,6 +33,7 @@ public class ReasoningTemplateService {
 
     @Transactional
     public void createTemplate(ReasoningTemplate template) {
+        template.setId(idGenerator.generateRandomString(12));
         templateMapper.insert(template);
     }
 

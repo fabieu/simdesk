@@ -3,6 +3,7 @@ package de.sustineo.simdesk.services.stewarding;
 import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.StewardingTrack;
 import de.sustineo.simdesk.mybatis.mapper.StewardingTrackMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -15,6 +16,7 @@ import java.util.List;
 @RequiredArgsConstructor
 public class StewardingTrackService {
     private final StewardingTrackMapper trackMapper;
+    private final IdGenerator idGenerator;
 
     public List<StewardingTrack> getAllTracks() {
         return trackMapper.findAll();
@@ -26,6 +28,7 @@ public class StewardingTrackService {
 
     @Transactional
     public void createTrack(StewardingTrack track) {
+        track.setId(idGenerator.generateRandomString(12));
         trackMapper.insert(track);
     }
 

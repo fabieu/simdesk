@@ -5,6 +5,7 @@ import de.sustineo.simdesk.entities.stewarding.Incident;
 import de.sustineo.simdesk.entities.stewarding.IncidentStatus;
 import de.sustineo.simdesk.mybatis.mapper.StewardingIncidentInvolvedEntryMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingIncidentMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class StewardingIncidentService {
     private final StewardingIncidentMapper incidentMapper;
     private final StewardingIncidentInvolvedEntryMapper involvedEntryMapper;
+    private final IdGenerator idGenerator;
 
     public List<Incident> getIncidentsBySessionId(String sessionId) {
         return incidentMapper.findBySessionId(sessionId);
@@ -33,6 +35,7 @@ public class StewardingIncidentService {
 
     @Transactional
     public void createIncident(Incident incident, List<String> involvedEntryIds) {
+        incident.setId(idGenerator.generateRandomString(12));
         incidentMapper.insert(incident);
         for (String entryId : involvedEntryIds) {
             involvedEntryMapper.insert(incident.getId(), entryId);

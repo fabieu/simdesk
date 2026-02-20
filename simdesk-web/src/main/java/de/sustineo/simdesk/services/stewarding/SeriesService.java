@@ -4,6 +4,7 @@ import de.sustineo.simdesk.configuration.SpringProfile;
 import de.sustineo.simdesk.entities.stewarding.Series;
 import de.sustineo.simdesk.mybatis.mapper.PenaltyCatalogMapper;
 import de.sustineo.simdesk.mybatis.mapper.SeriesMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -17,6 +18,7 @@ import java.util.List;
 public class SeriesService {
     private final SeriesMapper seriesMapper;
     private final PenaltyCatalogMapper catalogMapper;
+    private final IdGenerator idGenerator;
 
     public List<Series> getAllSeries() {
         return seriesMapper.findAll();
@@ -32,6 +34,7 @@ public class SeriesService {
 
     @Transactional
     public void createSeries(Series series) {
+        series.setId(idGenerator.generateRandomString(12));
         seriesMapper.insert(series);
     }
 

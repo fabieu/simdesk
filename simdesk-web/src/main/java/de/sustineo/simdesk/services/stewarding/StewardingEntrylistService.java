@@ -9,6 +9,7 @@ import de.sustineo.simdesk.entities.stewarding.StewardingEntrylistEntry;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistDriverMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistEntryMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingEntrylistMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -24,6 +25,7 @@ public class StewardingEntrylistService {
     private final StewardingEntrylistEntryMapper entryMapper;
     private final StewardingEntrylistDriverMapper driverMapper;
     private final ObjectMapper objectMapper;
+    private final IdGenerator idGenerator;
 
     public StewardingEntrylist getEntrylistByRoundId(String roundId) {
         List<StewardingEntrylist> entrylists = entrylistMapper.findByRoundId(roundId);
@@ -50,6 +52,7 @@ public class StewardingEntrylistService {
         }
 
         StewardingEntrylist entrylist = new StewardingEntrylist();
+        entrylist.setId(idGenerator.generateRandomString(12));
         entrylist.setRoundId(roundId);
         entrylist.setRawJson(jsonContent);
         entrylistMapper.insert(entrylist);
@@ -76,6 +79,7 @@ public class StewardingEntrylistService {
             }
 
             StewardingEntrylistEntry entry = new StewardingEntrylistEntry();
+            entry.setId(idGenerator.generateRandomString(12));
             entry.setEntrylistId(entrylist.getId());
             entry.setRaceNumber(raceNumber);
             entry.setCarModelId(forcedCarModel);
@@ -85,6 +89,7 @@ public class StewardingEntrylistService {
             if (driversNode != null && driversNode.isArray()) {
                 for (JsonNode driverNode : driversNode) {
                     StewardingEntrylistDriver driver = new StewardingEntrylistDriver();
+                    driver.setId(idGenerator.generateRandomString(12));
                     driver.setEntryId(entry.getId());
                     driver.setFirstName(driverNode.path("firstName").asText(""));
                     driver.setLastName(driverNode.path("lastName").asText(""));

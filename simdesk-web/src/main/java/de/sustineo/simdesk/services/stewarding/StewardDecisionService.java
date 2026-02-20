@@ -5,6 +5,7 @@ import de.sustineo.simdesk.entities.stewarding.IncidentStatus;
 import de.sustineo.simdesk.entities.stewarding.StewardDecision;
 import de.sustineo.simdesk.mybatis.mapper.StewardDecisionMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingIncidentMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -18,6 +19,7 @@ import java.util.List;
 public class StewardDecisionService {
     private final StewardDecisionMapper decisionMapper;
     private final StewardingIncidentMapper incidentMapper;
+    private final IdGenerator idGenerator;
 
     public StewardDecision getDecisionById(String id) {
         return decisionMapper.findById(id);
@@ -42,6 +44,7 @@ public class StewardDecisionService {
 
     @Transactional
     public void makeDecision(StewardDecision decision) {
+        decision.setId(idGenerator.generateRandomString(12));
         decisionMapper.insert(decision);
         if (decision.getIncidentId() != null) {
             incidentMapper.updateStatus(decision.getIncidentId(), IncidentStatus.DECISION_MADE.name());
@@ -50,6 +53,7 @@ public class StewardDecisionService {
 
     @Transactional
     public void reviseDecision(String oldDecisionId, StewardDecision newDecision) {
+        newDecision.setId(idGenerator.generateRandomString(12));
         decisionMapper.deactivate(oldDecisionId);
         decisionMapper.insert(newDecision);
         decisionMapper.setSupersededBy(oldDecisionId, newDecision.getId());

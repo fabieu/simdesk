@@ -6,6 +6,7 @@ import de.sustineo.simdesk.entities.stewarding.RoundSession;
 import de.sustineo.simdesk.mybatis.mapper.RoundMapper;
 import de.sustineo.simdesk.mybatis.mapper.RoundSessionMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingTrackMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -20,6 +21,7 @@ public class RoundService {
     private final RoundMapper roundMapper;
     private final RoundSessionMapper sessionMapper;
     private final StewardingTrackMapper trackMapper;
+    private final IdGenerator idGenerator;
 
     public List<Round> getAllRounds() {
         return roundMapper.findAll();
@@ -39,6 +41,7 @@ public class RoundService {
 
     @Transactional
     public void createRound(Round round) {
+        round.setId(idGenerator.generateRandomString(12));
         roundMapper.insert(round);
     }
 
@@ -62,6 +65,7 @@ public class RoundService {
 
     @Transactional
     public void createSession(RoundSession session) {
+        session.setId(idGenerator.generateRandomString(12));
         sessionMapper.insert(session);
     }
 

@@ -8,6 +8,7 @@ import de.sustineo.simdesk.entities.stewarding.StewardDecision;
 import de.sustineo.simdesk.mybatis.mapper.StewardDecisionMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingAppealMapper;
 import de.sustineo.simdesk.mybatis.mapper.StewardingIncidentMapper;
+import de.sustineo.simdesk.services.IdGenerator;
 import lombok.RequiredArgsConstructor;
 import org.springframework.context.annotation.Profile;
 import org.springframework.stereotype.Service;
@@ -22,6 +23,7 @@ public class StewardingAppealService {
     private final StewardingAppealMapper appealMapper;
     private final StewardingIncidentMapper incidentMapper;
     private final StewardDecisionMapper decisionMapper;
+    private final IdGenerator idGenerator;
 
     public List<Appeal> getAppealsByDecisionId(String decisionId) {
         return appealMapper.findByDecisionId(decisionId);
@@ -33,6 +35,7 @@ public class StewardingAppealService {
 
     @Transactional
     public void fileAppeal(Appeal appeal) {
+        appeal.setId(idGenerator.generateRandomString(12));
         appealMapper.insert(appeal);
         StewardDecision decision = decisionMapper.findById(appeal.getDecisionId());
         if (decision != null && decision.getIncidentId() != null) {
