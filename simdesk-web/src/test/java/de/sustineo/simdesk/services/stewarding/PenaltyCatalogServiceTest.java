@@ -36,18 +36,18 @@ class PenaltyCatalogServiceTest {
     @Test
     void getDefinitionsForSessionType_shouldReturnMatchingDefinitions() {
         PenaltyDefinition racePenalty = PenaltyDefinition.builder()
-                .id(1)
-                .catalogId(1)
+                .id("1")
+                .catalogId("1")
                 .code("PEN-001")
                 .name("Causing a collision")
                 .sessionType(PenaltySessionType.RACE)
                 .defaultPenalty("5 second time penalty")
                 .build();
 
-        when(penaltyDefinitionMapper.findByCatalogIdAndSessionType(1, "RACE"))
+        when(penaltyDefinitionMapper.findByCatalogIdAndSessionType("1", "RACE"))
                 .thenReturn(List.of(racePenalty));
 
-        List<PenaltyDefinition> result = penaltyCatalogService.getDefinitionsForSessionType(1, "RACE");
+        List<PenaltyDefinition> result = penaltyCatalogService.getDefinitionsForSessionType("1", "RACE");
 
         assertThat(result).hasSize(1);
         assertThat(result.getFirst().getName()).isEqualTo("Causing a collision");
@@ -56,7 +56,7 @@ class PenaltyCatalogServiceTest {
     @Test
     void getAllCatalogs_shouldReturnAll() {
         PenaltyCatalog catalog = PenaltyCatalog.builder()
-                .id(1)
+                .id("1")
                 .name("2025 Season Rules")
                 .description("Standard penalty rules for 2025")
                 .build();

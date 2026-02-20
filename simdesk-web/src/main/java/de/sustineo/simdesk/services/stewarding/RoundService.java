@@ -25,7 +25,7 @@ public class RoundService {
         return roundMapper.findAll();
     }
 
-    public Round getRoundById(Integer id) {
+    public Round getRoundById(String id) {
         Round round = roundMapper.findById(id);
         if (round != null && round.getTrackId() != null) {
             round.setTrack(trackMapper.findById(round.getTrackId()));
@@ -33,7 +33,7 @@ public class RoundService {
         return round;
     }
 
-    public List<Round> getRoundsBySeriesId(Integer seriesId) {
+    public List<Round> getRoundsBySeriesId(String seriesId) {
         return roundMapper.findBySeriesId(seriesId);
     }
 
@@ -48,15 +48,15 @@ public class RoundService {
     }
 
     @Transactional
-    public void deleteRound(Integer id) {
+    public void deleteRound(String id) {
         roundMapper.delete(id);
     }
 
-    public List<RoundSession> getSessionsByRoundId(Integer roundId) {
+    public List<RoundSession> getSessionsByRoundId(String roundId) {
         return sessionMapper.findByRoundId(roundId);
     }
 
-    public RoundSession getSessionById(Integer id) {
+    public RoundSession getSessionById(String id) {
         return sessionMapper.findById(id);
     }
 
@@ -71,7 +71,7 @@ public class RoundService {
     }
 
     @Transactional
-    public void deleteSession(Integer id) {
+    public void deleteSession(String id) {
         sessionMapper.delete(id);
     }
 }

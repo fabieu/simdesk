@@ -23,7 +23,7 @@ public class PenaltyCatalogService {
         return catalogMapper.findAll();
     }
 
-    public PenaltyCatalog getCatalogById(Integer id) {
+    public PenaltyCatalog getCatalogById(String id) {
         return catalogMapper.findById(id);
     }
 
@@ -38,15 +38,15 @@ public class PenaltyCatalogService {
     }
 
     @Transactional
-    public void deleteCatalog(Integer id) {
+    public void deleteCatalog(String id) {
         catalogMapper.delete(id);
     }
 
-    public List<PenaltyDefinition> getDefinitionsByCatalogId(Integer catalogId) {
+    public List<PenaltyDefinition> getDefinitionsByCatalogId(String catalogId) {
         return definitionMapper.findByCatalogId(catalogId);
     }
 
-    public List<PenaltyDefinition> getDefinitionsForSessionType(Integer catalogId, String sessionType) {
+    public List<PenaltyDefinition> getDefinitionsForSessionType(String catalogId, String sessionType) {
         return definitionMapper.findByCatalogIdAndSessionType(catalogId, sessionType);
     }
 
@@ -61,7 +61,7 @@ public class PenaltyCatalogService {
     }
 
     @Transactional
-    public void deleteDefinition(Integer id) {
+    public void deleteDefinition(String id) {
         definitionMapper.delete(id);
     }
 }

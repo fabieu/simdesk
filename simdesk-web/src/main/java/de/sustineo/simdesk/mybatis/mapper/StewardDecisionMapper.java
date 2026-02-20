@@ -26,36 +26,35 @@ public interface StewardDecisionMapper {
             @Result(property = "isActive", column = "is_active"),
     })
     @Select("SELECT * FROM stewarding_decision WHERE id = #{id}")
-    StewardDecision findById(Integer id);
+    StewardDecision findById(String id);
 
     @ResultMap("stewardDecisionResultMap")
     @Select("SELECT * FROM stewarding_decision WHERE incident_id = #{incidentId} AND is_active = true")
-    List<StewardDecision> findActiveByIncidentId(Integer incidentId);
+    List<StewardDecision> findActiveByIncidentId(String incidentId);
 
     @ResultMap("stewardDecisionResultMap")
     @Select("SELECT * FROM stewarding_decision WHERE incident_id = #{incidentId} ORDER BY decided_at DESC")
-    List<StewardDecision> findByIncidentId(Integer incidentId);
+    List<StewardDecision> findByIncidentId(String incidentId);
 
     @ResultMap("stewardDecisionResultMap")
     @Select("SELECT * FROM stewarding_decision WHERE session_id = #{sessionId} AND is_active = true ORDER BY decided_at DESC")
-    List<StewardDecision> findBySessionId(Integer sessionId);
+    List<StewardDecision> findBySessionId(String sessionId);
 
     @ResultMap("stewardDecisionResultMap")
     @Select("SELECT * FROM stewarding_decision WHERE incident_id IS NULL AND session_id = #{sessionId} AND is_active = true ORDER BY decided_at DESC")
-    List<StewardDecision> findManualBySessionId(Integer sessionId);
+    List<StewardDecision> findManualBySessionId(String sessionId);
 
     @Insert("""
-            INSERT INTO stewarding_decision (incident_id, session_id, decided_by_user_id, penalty_definition_id, custom_penalty,
+            INSERT INTO stewarding_decision (id, incident_id, session_id, decided_by_user_id, penalty_definition_id, custom_penalty,
                 reasoning, reasoning_template_id, is_no_action, penalized_entry_id, penalized_car_text, decided_at, superseded_by_id, is_active)
-            VALUES (#{incidentId}, #{sessionId}, #{decidedByUserId}, #{penaltyDefinitionId}, #{customPenalty},
+            VALUES (#{id}, #{incidentId}, #{sessionId}, #{decidedByUserId}, #{penaltyDefinitionId}, #{customPenalty},
                 #{reasoning}, #{reasoningTemplateId}, #{isNoAction}, #{penalizedEntryId}, #{penalizedCarText}, CURRENT_TIMESTAMP, #{supersededById}, #{isActive})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(StewardDecision decision);
 
     @Update("UPDATE stewarding_decision SET is_active = false WHERE id = #{id}")
-    void deactivate(Integer id);
+    void deactivate(String id);
 
     @Update("UPDATE stewarding_decision SET superseded_by_id = #{supersededById} WHERE id = #{id}")
-    void setSupersededBy(Integer id, Integer supersededById);
+    void setSupersededBy(String id, String supersededById);
 }

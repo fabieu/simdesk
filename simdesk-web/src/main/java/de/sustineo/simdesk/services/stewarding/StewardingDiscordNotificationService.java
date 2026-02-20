@@ -34,7 +34,7 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendIncidentNotification(Integer seriesId, Incident incident) {
+    public void sendIncidentNotification(String seriesId, Incident incident) {
         String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
@@ -55,7 +55,7 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendDecisionNotification(Integer seriesId, StewardDecision decision, Incident incident, String penaltyName) {
+    public void sendDecisionNotification(String seriesId, StewardDecision decision, Incident incident, String penaltyName) {
         String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
@@ -80,7 +80,7 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendAppealNotification(Integer seriesId, Appeal appeal) {
+    public void sendAppealNotification(String seriesId, Appeal appeal) {
         String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
@@ -101,7 +101,7 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendAppealReviewedNotification(Integer seriesId, Appeal appeal) {
+    public void sendAppealReviewedNotification(String seriesId, Appeal appeal) {
         String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
@@ -124,7 +124,7 @@ public class StewardingDiscordNotificationService {
     }
 
     @Async
-    public void sendDecisionRevisedNotification(Integer seriesId, StewardDecision oldDecision, StewardDecision newDecision) {
+    public void sendDecisionRevisedNotification(String seriesId, StewardDecision oldDecision, StewardDecision newDecision) {
         String webhookUrl = getWebhookUrl(seriesId);
         if (webhookUrl == null) {
             return;
@@ -145,7 +145,7 @@ public class StewardingDiscordNotificationService {
         sendWebhook(webhookUrl, Map.of("embeds", List.of(embed)));
     }
 
-    private String getWebhookUrl(Integer seriesId) {
+    private String getWebhookUrl(String seriesId) {
         Series series = seriesMapper.findById(seriesId);
         if (series == null || series.getDiscordWebhookUrl() == null || series.getDiscordWebhookUrl().isBlank()) {
             return null;

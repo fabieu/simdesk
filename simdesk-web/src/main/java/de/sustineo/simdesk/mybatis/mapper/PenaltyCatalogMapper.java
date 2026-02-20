@@ -21,13 +21,12 @@ public interface PenaltyCatalogMapper {
 
     @ResultMap("penaltyCatalogResultMap")
     @Select("SELECT * FROM stewarding_penalty_catalog WHERE id = #{id}")
-    PenaltyCatalog findById(Integer id);
+    PenaltyCatalog findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_penalty_catalog (name, description, created_at, updated_at)
-            VALUES (#{name}, #{description}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO stewarding_penalty_catalog (id, name, description, created_at, updated_at)
+            VALUES (#{id}, #{name}, #{description}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(PenaltyCatalog catalog);
 
     @Update("""
@@ -38,5 +37,5 @@ public interface PenaltyCatalogMapper {
     void update(PenaltyCatalog catalog);
 
     @Delete("DELETE FROM stewarding_penalty_catalog WHERE id = #{id}")
-    void delete(Integer id);
+    void delete(String id);
 }

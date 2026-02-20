@@ -21,17 +21,16 @@ public interface ReasoningTemplateMapper {
 
     @ResultMap("reasoningTemplateResultMap")
     @Select("SELECT * FROM stewarding_reasoning_template WHERE id = #{id}")
-    ReasoningTemplate findById(Integer id);
+    ReasoningTemplate findById(String id);
 
     @ResultMap("reasoningTemplateResultMap")
     @Select("SELECT * FROM stewarding_reasoning_template WHERE category = #{category} ORDER BY sort_order")
     List<ReasoningTemplate> findByCategory(String category);
 
     @Insert("""
-            INSERT INTO stewarding_reasoning_template (name, category, template_text, sort_order)
-            VALUES (#{name}, #{category}, #{templateText}, #{sortOrder})
+            INSERT INTO stewarding_reasoning_template (id, name, category, template_text, sort_order)
+            VALUES (#{id}, #{name}, #{category}, #{templateText}, #{sortOrder})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(ReasoningTemplate template);
 
     @Update("""
@@ -42,5 +41,5 @@ public interface ReasoningTemplateMapper {
     void update(ReasoningTemplate template);
 
     @Delete("DELETE FROM stewarding_reasoning_template WHERE id = #{id}")
-    void delete(Integer id);
+    void delete(String id);
 }

@@ -19,32 +19,32 @@ public class StewardingIncidentService {
     private final StewardingIncidentMapper incidentMapper;
     private final StewardingIncidentInvolvedEntryMapper involvedEntryMapper;
 
-    public List<Incident> getIncidentsBySessionId(Integer sessionId) {
+    public List<Incident> getIncidentsBySessionId(String sessionId) {
         return incidentMapper.findBySessionId(sessionId);
     }
 
-    public Incident getIncidentById(Integer id) {
+    public Incident getIncidentById(String id) {
         return incidentMapper.findById(id);
     }
 
-    public List<Incident> getIncidentsBySessionIdAndStatus(Integer sessionId, IncidentStatus status) {
+    public List<Incident> getIncidentsBySessionIdAndStatus(String sessionId, IncidentStatus status) {
         return incidentMapper.findBySessionIdAndStatus(sessionId, status.name());
     }
 
     @Transactional
-    public void createIncident(Incident incident, List<Integer> involvedEntryIds) {
+    public void createIncident(Incident incident, List<String> involvedEntryIds) {
         incidentMapper.insert(incident);
-        for (Integer entryId : involvedEntryIds) {
+        for (String entryId : involvedEntryIds) {
             involvedEntryMapper.insert(incident.getId(), entryId);
         }
     }
 
     @Transactional
-    public void updateIncidentStatus(Integer id, IncidentStatus status) {
+    public void updateIncidentStatus(String id, IncidentStatus status) {
         incidentMapper.updateStatus(id, status.name());
     }
 
-    public List<Integer> getInvolvedEntryIds(Integer incidentId) {
+    public List<String> getInvolvedEntryIds(String incidentId) {
         return involvedEntryMapper.findEntryIdsByIncidentId(incidentId);
     }
 }

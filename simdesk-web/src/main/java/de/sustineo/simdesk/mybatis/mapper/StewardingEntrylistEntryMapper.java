@@ -18,19 +18,18 @@ public interface StewardingEntrylistEntryMapper {
             @Result(property = "displayName", column = "display_name"),
     })
     @Select("SELECT * FROM stewarding_entrylist_entry WHERE entrylist_id = #{entrylistId} ORDER BY race_number")
-    List<StewardingEntrylistEntry> findByEntrylistId(Integer entrylistId);
+    List<StewardingEntrylistEntry> findByEntrylistId(String entrylistId);
 
     @ResultMap("stewardingEntrylistEntryResultMap")
     @Select("SELECT * FROM stewarding_entrylist_entry WHERE id = #{id}")
-    StewardingEntrylistEntry findById(Integer id);
+    StewardingEntrylistEntry findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_entrylist_entry (entrylist_id, race_number, car_model_id, team_name, display_name)
-            VALUES (#{entrylistId}, #{raceNumber}, #{carModelId}, #{teamName}, #{displayName})
+            INSERT INTO stewarding_entrylist_entry (id, entrylist_id, race_number, car_model_id, team_name, display_name)
+            VALUES (#{id}, #{entrylistId}, #{raceNumber}, #{carModelId}, #{teamName}, #{displayName})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(StewardingEntrylistEntry entry);
 
     @Delete("DELETE FROM stewarding_entrylist_entry WHERE entrylist_id = #{entrylistId}")
-    void deleteByEntrylistId(Integer entrylistId);
+    void deleteByEntrylistId(String entrylistId);
 }

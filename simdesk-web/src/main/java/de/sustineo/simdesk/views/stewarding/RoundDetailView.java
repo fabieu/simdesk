@@ -90,15 +90,8 @@ public class RoundDetailView extends BaseView {
             return;
         }
 
-        Integer seriesId;
-        Integer roundId;
-        try {
-            seriesId = Integer.valueOf(seriesIdParam);
-            roundId = Integer.valueOf(roundIdParam);
-        } catch (NumberFormatException e) {
-            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
-            return;
-        }
+        String seriesId = seriesIdParam;
+        String roundId = roundIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         Round round = roundService.getRoundById(roundId);
@@ -173,7 +166,7 @@ public class RoundDetailView extends BaseView {
         return row;
     }
 
-    private VerticalLayout createSessionsTab(Integer roundId) {
+    private VerticalLayout createSessionsTab(String roundId) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
@@ -201,7 +194,7 @@ public class RoundDetailView extends BaseView {
         return layout;
     }
 
-    private void openAddSessionDialog(Integer roundId) {
+    private void openAddSessionDialog(String roundId) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Add Session");
         dialog.setWidth("600px");
@@ -266,7 +259,7 @@ public class RoundDetailView extends BaseView {
         dialog.open();
     }
 
-    private VerticalLayout createIncidentsTab(Integer seriesId, Integer roundId, Series series) {
+    private VerticalLayout createIncidentsTab(String seriesId, String roundId, Series series) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
 
@@ -310,7 +303,7 @@ public class RoundDetailView extends BaseView {
         return layout;
     }
 
-    private void openReportIncidentDialog(Integer seriesId, Integer roundId, Series series) {
+    private void openReportIncidentDialog(String seriesId, String roundId, Series series) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Report Incident");
         dialog.setWidth("600px");
@@ -382,7 +375,7 @@ public class RoundDetailView extends BaseView {
             String involvedCarsText = selectedEntries.stream()
                     .map(StewardingEntrylistEntry::getDisplayName)
                     .collect(Collectors.joining(", "));
-            List<Integer> involvedEntryIds = selectedEntries.stream()
+            List<String> involvedEntryIds = selectedEntries.stream()
                     .map(StewardingEntrylistEntry::getId)
                     .collect(Collectors.toList());
 
@@ -414,7 +407,7 @@ public class RoundDetailView extends BaseView {
         dialog.open();
     }
 
-    private VerticalLayout createEntrylistTab(Integer roundId) {
+    private VerticalLayout createEntrylistTab(String roundId) {
         VerticalLayout layout = new VerticalLayout();
         layout.setSizeFull();
         layout.setPadding(true);
@@ -460,7 +453,7 @@ public class RoundDetailView extends BaseView {
         return layout;
     }
 
-    private void openEditRoundDialog(Round round, Integer seriesId) {
+    private void openEditRoundDialog(Round round, String seriesId) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Edit Round");
         dialog.setWidth("600px");

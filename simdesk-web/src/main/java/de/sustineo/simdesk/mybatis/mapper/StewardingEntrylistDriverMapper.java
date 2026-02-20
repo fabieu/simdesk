@@ -19,19 +19,18 @@ public interface StewardingEntrylistDriverMapper {
             @Result(property = "category", column = "category"),
     })
     @Select("SELECT * FROM stewarding_entrylist_driver WHERE entry_id = #{entryId}")
-    List<StewardingEntrylistDriver> findByEntryId(Integer entryId);
+    List<StewardingEntrylistDriver> findByEntryId(String entryId);
 
     @ResultMap("stewardingEntrylistDriverResultMap")
     @Select("SELECT * FROM stewarding_entrylist_driver WHERE id = #{id}")
-    StewardingEntrylistDriver findById(Integer id);
+    StewardingEntrylistDriver findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_entrylist_driver (entry_id, first_name, last_name, short_name, steam_id, category)
-            VALUES (#{entryId}, #{firstName}, #{lastName}, #{shortName}, #{steamId}, #{category})
+            INSERT INTO stewarding_entrylist_driver (id, entry_id, first_name, last_name, short_name, steam_id, category)
+            VALUES (#{id}, #{entryId}, #{firstName}, #{lastName}, #{shortName}, #{steamId}, #{category})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(StewardingEntrylistDriver driver);
 
     @Delete("DELETE FROM stewarding_entrylist_driver WHERE entry_id = #{entryId}")
-    void deleteByEntryId(Integer entryId);
+    void deleteByEntryId(String entryId);
 }

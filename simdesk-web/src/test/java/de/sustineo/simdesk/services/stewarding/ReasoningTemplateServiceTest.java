@@ -65,7 +65,7 @@ class ReasoningTemplateServiceTest {
     @Test
     void getAllTemplates_shouldReturnAll() {
         ReasoningTemplate template = ReasoningTemplate.builder()
-                .id(1)
+                .id("1")
                 .name("Test Template")
                 .category("Contact")
                 .templateText("Template text")
@@ -83,7 +83,7 @@ class ReasoningTemplateServiceTest {
     @Test
     void getTemplatesByCategory_shouldFilterByCategory() {
         ReasoningTemplate template = ReasoningTemplate.builder()
-                .id(1)
+                .id("1")
                 .name("Contact Template")
                 .category("Contact")
                 .templateText("Contact template text")

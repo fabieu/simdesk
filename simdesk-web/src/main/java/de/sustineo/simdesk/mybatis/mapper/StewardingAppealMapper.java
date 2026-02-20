@@ -22,17 +22,16 @@ public interface StewardingAppealMapper {
             @Result(property = "respondedAt", column = "responded_at"),
     })
     @Select("SELECT * FROM stewarding_appeal WHERE decision_id = #{decisionId} ORDER BY filed_at DESC")
-    List<Appeal> findByDecisionId(Integer decisionId);
+    List<Appeal> findByDecisionId(String decisionId);
 
     @ResultMap("stewardingAppealResultMap")
     @Select("SELECT * FROM stewarding_appeal WHERE id = #{id}")
-    Appeal findById(Integer id);
+    Appeal findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_appeal (decision_id, filed_by_user_id, filed_by_entry_id, reason, status, filed_at)
-            VALUES (#{decisionId}, #{filedByUserId}, #{filedByEntryId}, #{reason}, #{status}, CURRENT_TIMESTAMP)
+            INSERT INTO stewarding_appeal (id, decision_id, filed_by_user_id, filed_by_entry_id, reason, status, filed_at)
+            VALUES (#{id}, #{decisionId}, #{filedByUserId}, #{filedByEntryId}, #{reason}, #{status}, CURRENT_TIMESTAMP)
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Appeal appeal);
 
     @Update("""
@@ -40,5 +39,5 @@ public interface StewardingAppealMapper {
             SET status = #{status}, response = #{response}, responded_by_user_id = #{respondedByUserId}, responded_at = CURRENT_TIMESTAMP
             WHERE id = #{id}
             """)
-    void updateResponse(Integer id, String status, String response, Integer respondedByUserId);
+    void updateResponse(String id, String status, String response, Integer respondedByUserId);
 }

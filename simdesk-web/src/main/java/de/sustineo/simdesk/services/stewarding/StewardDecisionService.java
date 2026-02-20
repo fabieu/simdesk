@@ -19,24 +19,24 @@ public class StewardDecisionService {
     private final StewardDecisionMapper decisionMapper;
     private final StewardingIncidentMapper incidentMapper;
 
-    public StewardDecision getDecisionById(Integer id) {
+    public StewardDecision getDecisionById(String id) {
         return decisionMapper.findById(id);
     }
 
-    public StewardDecision getActiveDecisionByIncidentId(Integer incidentId) {
+    public StewardDecision getActiveDecisionByIncidentId(String incidentId) {
         List<StewardDecision> decisions = decisionMapper.findActiveByIncidentId(incidentId);
         return decisions.isEmpty() ? null : decisions.getFirst();
     }
 
-    public List<StewardDecision> getDecisionHistory(Integer incidentId) {
+    public List<StewardDecision> getDecisionHistory(String incidentId) {
         return decisionMapper.findByIncidentId(incidentId);
     }
 
-    public List<StewardDecision> getDecisionsBySessionId(Integer sessionId) {
+    public List<StewardDecision> getDecisionsBySessionId(String sessionId) {
         return decisionMapper.findBySessionId(sessionId);
     }
 
-    public List<StewardDecision> getManualDecisionsBySessionId(Integer sessionId) {
+    public List<StewardDecision> getManualDecisionsBySessionId(String sessionId) {
         return decisionMapper.findManualBySessionId(sessionId);
     }
 
@@ -49,7 +49,7 @@ public class StewardDecisionService {
     }
 
     @Transactional
-    public void reviseDecision(Integer oldDecisionId, StewardDecision newDecision) {
+    public void reviseDecision(String oldDecisionId, StewardDecision newDecision) {
         decisionMapper.deactivate(oldDecisionId);
         decisionMapper.insert(newDecision);
         decisionMapper.setSupersededBy(oldDecisionId, newDecision.getId());

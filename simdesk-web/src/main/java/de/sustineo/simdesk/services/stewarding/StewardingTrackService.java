@@ -20,7 +20,7 @@ public class StewardingTrackService {
         return trackMapper.findAll();
     }
 
-    public StewardingTrack getTrackById(Integer id) {
+    public StewardingTrack getTrackById(String id) {
         return trackMapper.findById(id);
     }
 
@@ -35,7 +35,7 @@ public class StewardingTrackService {
     }
 
     @Transactional
-    public void deleteTrack(Integer id) {
+    public void deleteTrack(String id) {
         trackMapper.delete(id);
     }
 }

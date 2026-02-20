@@ -56,13 +56,7 @@ public class PenaltyCatalogDetailView extends BaseView {
             return;
         }
 
-        Integer catalogId;
-        try {
-            catalogId = Integer.valueOf(catalogIdParam);
-        } catch (NumberFormatException e) {
-            getUI().ifPresent(ui -> ui.navigate(PenaltyCatalogListView.class));
-            return;
-        }
+        String catalogId = catalogIdParam;
 
         PenaltyCatalog catalog = catalogService.getCatalogById(catalogId);
         if (catalog == null) {
@@ -109,7 +103,7 @@ public class PenaltyCatalogDetailView extends BaseView {
         addAndExpand(grid);
     }
 
-    private void openPenaltyDialog(Integer catalogId) {
+    private void openPenaltyDialog(String catalogId) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("Add Penalty Definition");
         dialog.setWidth("600px");

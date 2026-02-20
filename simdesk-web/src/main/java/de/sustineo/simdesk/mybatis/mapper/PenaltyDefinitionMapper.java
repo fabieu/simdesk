@@ -22,11 +22,11 @@ public interface PenaltyDefinitionMapper {
             @Result(property = "sortOrder", column = "sort_order"),
     })
     @Select("SELECT * FROM stewarding_penalty_definition WHERE catalog_id = #{catalogId} ORDER BY sort_order, name")
-    List<PenaltyDefinition> findByCatalogId(Integer catalogId);
+    List<PenaltyDefinition> findByCatalogId(String catalogId);
 
     @ResultMap("penaltyDefinitionResultMap")
     @Select("SELECT * FROM stewarding_penalty_definition WHERE id = #{id}")
-    PenaltyDefinition findById(Integer id);
+    PenaltyDefinition findById(String id);
 
     @ResultMap("penaltyDefinitionResultMap")
     @Select("""
@@ -34,17 +34,16 @@ public interface PenaltyDefinitionMapper {
             WHERE catalog_id = #{catalogId} AND (session_type = #{sessionType} OR session_type = 'ALL')
             ORDER BY sort_order, name
             """)
-    List<PenaltyDefinition> findByCatalogIdAndSessionType(Integer catalogId, String sessionType);
+    List<PenaltyDefinition> findByCatalogIdAndSessionType(String catalogId, String sessionType);
 
     @ResultMap("penaltyDefinitionResultMap")
     @Select("SELECT * FROM stewarding_penalty_definition WHERE catalog_id = #{catalogId} ORDER BY category, sort_order")
-    List<PenaltyDefinition> findByCatalogIdGroupedByCategory(Integer catalogId);
+    List<PenaltyDefinition> findByCatalogIdGroupedByCategory(String catalogId);
 
     @Insert("""
-            INSERT INTO stewarding_penalty_definition (catalog_id, code, name, description, category, session_type, default_penalty, severity, sort_order)
-            VALUES (#{catalogId}, #{code}, #{name}, #{description}, #{category}, #{sessionType}, #{defaultPenalty}, #{severity}, #{sortOrder})
+            INSERT INTO stewarding_penalty_definition (id, catalog_id, code, name, description, category, session_type, default_penalty, severity, sort_order)
+            VALUES (#{id}, #{catalogId}, #{code}, #{name}, #{description}, #{category}, #{sessionType}, #{defaultPenalty}, #{severity}, #{sortOrder})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(PenaltyDefinition definition);
 
     @Update("""
@@ -56,5 +55,5 @@ public interface PenaltyDefinitionMapper {
     void update(PenaltyDefinition definition);
 
     @Delete("DELETE FROM stewarding_penalty_definition WHERE id = #{id}")
-    void delete(Integer id);
+    void delete(String id);
 }

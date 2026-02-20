@@ -77,13 +77,7 @@ public class SeriesDetailView extends BaseView {
             return;
         }
 
-        Integer seriesId;
-        try {
-            seriesId = Integer.valueOf(seriesIdParam);
-        } catch (NumberFormatException e) {
-            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
-            return;
-        }
+        String seriesId = seriesIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         if (series == null) {
@@ -267,7 +261,7 @@ public class SeriesDetailView extends BaseView {
         dialog.open();
     }
 
-    private void openNewRoundDialog(Integer seriesId) {
+    private void openNewRoundDialog(String seriesId) {
         Dialog dialog = new Dialog();
         dialog.setHeaderTitle("New Round");
         dialog.setWidth("600px");
@@ -305,7 +299,7 @@ public class SeriesDetailView extends BaseView {
                 return;
             }
 
-            Round round = Round.builder()
+        Round round = Round.builder()
                     .seriesId(seriesId)
                     .title(titleField.getValue())
                     .trackId(trackCombo.getValue() != null ? trackCombo.getValue().getId() : null)

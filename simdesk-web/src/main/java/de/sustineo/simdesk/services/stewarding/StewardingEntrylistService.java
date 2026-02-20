@@ -25,21 +25,21 @@ public class StewardingEntrylistService {
     private final StewardingEntrylistDriverMapper driverMapper;
     private final ObjectMapper objectMapper;
 
-    public StewardingEntrylist getEntrylistByRoundId(Integer roundId) {
+    public StewardingEntrylist getEntrylistByRoundId(String roundId) {
         List<StewardingEntrylist> entrylists = entrylistMapper.findByRoundId(roundId);
         return entrylists.isEmpty() ? null : entrylists.getFirst();
     }
 
-    public List<StewardingEntrylistEntry> getEntriesByEntrylistId(Integer entrylistId) {
+    public List<StewardingEntrylistEntry> getEntriesByEntrylistId(String entrylistId) {
         return entryMapper.findByEntrylistId(entrylistId);
     }
 
-    public List<StewardingEntrylistDriver> getDriversByEntryId(Integer entryId) {
+    public List<StewardingEntrylistDriver> getDriversByEntryId(String entryId) {
         return driverMapper.findByEntryId(entryId);
     }
 
     @Transactional
-    public void uploadEntrylistForRound(Integer roundId, String jsonContent) {
+    public void uploadEntrylistForRound(String roundId, String jsonContent) {
         deleteEntrylistForRound(roundId);
 
         JsonNode root;
@@ -98,7 +98,7 @@ public class StewardingEntrylistService {
     }
 
     @Transactional
-    public void deleteEntrylistForRound(Integer roundId) {
+    public void deleteEntrylistForRound(String roundId) {
         List<StewardingEntrylist> existing = entrylistMapper.findByRoundId(roundId);
         for (StewardingEntrylist entrylist : existing) {
             List<StewardingEntrylistEntry> entries = entryMapper.findByEntrylistId(entrylist.getId());

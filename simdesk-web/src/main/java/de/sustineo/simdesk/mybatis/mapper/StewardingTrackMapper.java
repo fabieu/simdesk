@@ -23,13 +23,12 @@ public interface StewardingTrackMapper {
 
     @ResultMap("stewardingTrackResultMap")
     @Select("SELECT * FROM stewarding_track WHERE id = #{id}")
-    StewardingTrack findById(Integer id);
+    StewardingTrack findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_track (name, country, map_image_url, map_metadata, created_at, updated_at)
-            VALUES (#{name}, #{country}, #{mapImageUrl}, #{mapMetadata}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO stewarding_track (id, name, country, map_image_url, map_metadata, created_at, updated_at)
+            VALUES (#{id}, #{name}, #{country}, #{mapImageUrl}, #{mapMetadata}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(StewardingTrack track);
 
     @Update("""
@@ -40,5 +39,5 @@ public interface StewardingTrackMapper {
     void update(StewardingTrack track);
 
     @Delete("DELETE FROM stewarding_track WHERE id = #{id}")
-    void delete(Integer id);
+    void delete(String id);
 }

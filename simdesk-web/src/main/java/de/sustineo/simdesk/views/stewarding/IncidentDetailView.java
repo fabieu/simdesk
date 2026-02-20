@@ -82,17 +82,9 @@ public class IncidentDetailView extends BaseView {
             return;
         }
 
-        Integer seriesId;
-        Integer roundId;
-        Integer incidentId;
-        try {
-            seriesId = Integer.valueOf(seriesIdParam);
-            roundId = Integer.valueOf(roundIdParam);
-            incidentId = Integer.valueOf(incidentIdParam);
-        } catch (NumberFormatException e) {
-            getUI().ifPresent(ui -> ui.navigate(SeriesListView.class));
-            return;
-        }
+        String seriesId = seriesIdParam;
+        String roundId = roundIdParam;
+        String incidentId = incidentIdParam;
 
         Series series = seriesService.getSeriesById(seriesId);
         Round round = roundService.getRoundById(roundId);
@@ -185,7 +177,7 @@ public class IncidentDetailView extends BaseView {
         return layout;
     }
 
-    private FormLayout createDecisionForm(Incident incident, Series series, Integer existingDecisionId) {
+    private FormLayout createDecisionForm(Incident incident, Series series, String existingDecisionId) {
         FormLayout form = new FormLayout();
         form.setResponsiveSteps(
                 new FormLayout.ResponsiveStep("0", 1),
@@ -253,7 +245,7 @@ public class IncidentDetailView extends BaseView {
         return form;
     }
 
-    private VerticalLayout createDecisionHistorySection(Integer incidentId) {
+    private VerticalLayout createDecisionHistorySection(String incidentId) {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(true);
         layout.add(new H3("Decision History"));
@@ -280,7 +272,7 @@ public class IncidentDetailView extends BaseView {
         return layout;
     }
 
-    private VerticalLayout createAppealsSection(Integer incidentId) {
+    private VerticalLayout createAppealsSection(String incidentId) {
         VerticalLayout layout = new VerticalLayout();
         layout.setPadding(true);
         layout.add(new H3("Appeals"));

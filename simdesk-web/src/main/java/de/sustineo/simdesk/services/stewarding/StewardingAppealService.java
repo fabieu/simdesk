@@ -23,11 +23,11 @@ public class StewardingAppealService {
     private final StewardingIncidentMapper incidentMapper;
     private final StewardDecisionMapper decisionMapper;
 
-    public List<Appeal> getAppealsByDecisionId(Integer decisionId) {
+    public List<Appeal> getAppealsByDecisionId(String decisionId) {
         return appealMapper.findByDecisionId(decisionId);
     }
 
-    public Appeal getAppealById(Integer id) {
+    public Appeal getAppealById(String id) {
         return appealMapper.findById(id);
     }
 
@@ -41,7 +41,7 @@ public class StewardingAppealService {
     }
 
     @Transactional
-    public void reviewAppeal(Integer id, AppealStatus status, String response, Integer respondedByUserId) {
+    public void reviewAppeal(String id, AppealStatus status, String response, Integer respondedByUserId) {
         appealMapper.updateResponse(id, status.name(), response, respondedByUserId);
         if (status == AppealStatus.ACCEPTED || status == AppealStatus.REJECTED) {
             Appeal appeal = appealMapper.findById(id);

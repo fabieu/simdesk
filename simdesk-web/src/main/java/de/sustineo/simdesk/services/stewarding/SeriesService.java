@@ -22,7 +22,7 @@ public class SeriesService {
         return seriesMapper.findAll();
     }
 
-    public Series getSeriesById(Integer id) {
+    public Series getSeriesById(String id) {
         Series series = seriesMapper.findById(id);
         if (series != null && series.getPenaltyCatalogId() != null) {
             series.setPenaltyCatalog(catalogMapper.findById(series.getPenaltyCatalogId()));
@@ -41,7 +41,7 @@ public class SeriesService {
     }
 
     @Transactional
-    public void deleteSeries(Integer id) {
+    public void deleteSeries(String id) {
         seriesMapper.delete(id);
     }
 }

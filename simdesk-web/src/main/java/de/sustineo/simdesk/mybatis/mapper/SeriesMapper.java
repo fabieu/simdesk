@@ -26,13 +26,12 @@ public interface SeriesMapper {
 
     @ResultMap("seriesResultMap")
     @Select("SELECT * FROM stewarding_series WHERE id = #{id}")
-    Series findById(Integer id);
+    Series findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_series (title, description, discord_webhook_url, video_url_enabled, penalty_catalog_id, start_date, end_date, created_at, updated_at)
-            VALUES (#{title}, #{description}, #{discordWebhookUrl}, #{videoUrlEnabled}, #{penaltyCatalogId}, #{startDate}, #{endDate}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
+            INSERT INTO stewarding_series (id, title, description, discord_webhook_url, video_url_enabled, penalty_catalog_id, start_date, end_date, created_at, updated_at)
+            VALUES (#{id}, #{title}, #{description}, #{discordWebhookUrl}, #{videoUrlEnabled}, #{penaltyCatalogId}, #{startDate}, #{endDate}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Series series);
 
     @Update("""
@@ -45,5 +44,5 @@ public interface SeriesMapper {
     void update(Series series);
 
     @Delete("DELETE FROM stewarding_series WHERE id = #{id}")
-    void delete(Integer id);
+    void delete(String id);
 }

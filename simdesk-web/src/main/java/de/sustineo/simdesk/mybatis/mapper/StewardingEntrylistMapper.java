@@ -16,19 +16,18 @@ public interface StewardingEntrylistMapper {
             @Result(property = "rawJson", column = "raw_json"),
     })
     @Select("SELECT * FROM stewarding_entrylist WHERE round_id = #{roundId}")
-    List<StewardingEntrylist> findByRoundId(Integer roundId);
+    List<StewardingEntrylist> findByRoundId(String roundId);
 
     @ResultMap("stewardingEntrylistResultMap")
     @Select("SELECT * FROM stewarding_entrylist WHERE id = #{id}")
-    StewardingEntrylist findById(Integer id);
+    StewardingEntrylist findById(String id);
 
     @Insert("""
-            INSERT INTO stewarding_entrylist (round_id, uploaded_at, raw_json)
-            VALUES (#{roundId}, CURRENT_TIMESTAMP, #{rawJson})
+            INSERT INTO stewarding_entrylist (id, round_id, uploaded_at, raw_json)
+            VALUES (#{id}, #{roundId}, CURRENT_TIMESTAMP, #{rawJson})
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(StewardingEntrylist entrylist);
 
     @Delete("DELETE FROM stewarding_entrylist WHERE round_id = #{roundId}")
-    void deleteByRoundId(Integer roundId);
+    void deleteByRoundId(String roundId);
 }

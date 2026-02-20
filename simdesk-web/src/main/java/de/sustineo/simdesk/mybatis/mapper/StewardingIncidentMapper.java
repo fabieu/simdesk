@@ -26,27 +26,26 @@ public interface StewardingIncidentMapper {
             @Result(property = "updatedAt", column = "updated_at"),
     })
     @Select("SELECT * FROM stewarding_incident WHERE session_id = #{sessionId} ORDER BY created_at DESC")
-    List<Incident> findBySessionId(Integer sessionId);
+    List<Incident> findBySessionId(String sessionId);
 
     @ResultMap("stewardingIncidentResultMap")
     @Select("SELECT * FROM stewarding_incident WHERE id = #{id}")
-    Incident findById(Integer id);
+    Incident findById(String id);
 
     @ResultMap("stewardingIncidentResultMap")
     @Select("SELECT * FROM stewarding_incident WHERE session_id = #{sessionId} AND status = #{status} ORDER BY created_at DESC")
-    List<Incident> findBySessionIdAndStatus(Integer sessionId, String status);
+    List<Incident> findBySessionIdAndStatus(String sessionId, String status);
 
     @Insert("""
-            INSERT INTO stewarding_incident (session_id, title, description, lap, timestamp_in_session, map_marker_x, map_marker_y,
+            INSERT INTO stewarding_incident (id, session_id, title, description, lap, timestamp_in_session, map_marker_x, map_marker_y,
                 video_url, involved_cars_text, status, reported_by_user_id, created_at, updated_at)
-            VALUES (#{sessionId}, #{title}, #{description}, #{lap}, #{timestampInSession}, #{mapMarkerX}, #{mapMarkerY},
+            VALUES (#{id}, #{sessionId}, #{title}, #{description}, #{lap}, #{timestampInSession}, #{mapMarkerX}, #{mapMarkerY},
                 #{videoUrl}, #{involvedCarsText}, #{status}, #{reportedByUserId}, CURRENT_TIMESTAMP, CURRENT_TIMESTAMP)
             """)
-    @Options(useGeneratedKeys = true, keyProperty = "id", keyColumn = "id")
     void insert(Incident incident);
 
     @Update("UPDATE stewarding_incident SET status = #{status}, updated_at = CURRENT_TIMESTAMP WHERE id = #{id}")
-    void updateStatus(Integer id, String status);
+    void updateStatus(String id, String status);
 
     @Update("""
             UPDATE stewarding_incident

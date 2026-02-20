@@ -21,7 +21,7 @@ public class ReasoningTemplateService {
         return templateMapper.findAll();
     }
 
-    public ReasoningTemplate getTemplateById(Integer id) {
+    public ReasoningTemplate getTemplateById(String id) {
         return templateMapper.findById(id);
     }
 
@@ -40,7 +40,7 @@ public class ReasoningTemplateService {
     }
 
     @Transactional
-    public void deleteTemplate(Integer id) {
+    public void deleteTemplate(String id) {
         templateMapper.delete(id);
     }
 

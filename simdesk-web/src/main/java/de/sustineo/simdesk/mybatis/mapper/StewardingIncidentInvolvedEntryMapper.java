@@ -12,11 +12,11 @@ import java.util.List;
 @Mapper
 public interface StewardingIncidentInvolvedEntryMapper {
     @Select("SELECT entry_id FROM stewarding_incident_involved_entry WHERE incident_id = #{incidentId}")
-    List<Integer> findEntryIdsByIncidentId(Integer incidentId);
+    List<String> findEntryIdsByIncidentId(String incidentId);
 
     @Insert("INSERT INTO stewarding_incident_involved_entry (incident_id, entry_id) VALUES (#{incidentId}, #{entryId})")
-    void insert(Integer incidentId, Integer entryId);
+    void insert(String incidentId, String entryId);
 
     @Delete("DELETE FROM stewarding_incident_involved_entry WHERE incident_id = #{incidentId}")
-    void deleteByIncidentId(Integer incidentId);
+    void deleteByIncidentId(String incidentId);
 }
