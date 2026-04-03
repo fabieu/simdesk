@@ -30,7 +30,7 @@ jobs:
           distribution: 'temurin'
 
       - name: Set up Gradle
-        uses: gradle/actions/setup-gradle@v5
+        uses: gradle/actions/setup-gradle@v6
 
       - name: Pre-cache Gradle dependencies
         run: chmod +x gradlew && ./gradlew :simdesk-web:dependencies --no-daemon
