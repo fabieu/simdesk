@@ -7,8 +7,7 @@
     <em>Modern server leaderboard and various services for sim racing organizers.</em>
 </p>
 <p align="center">
-    <a href="https://fabieu.github.io/simdesk/"><b>Documentation</b></a> • 
-    <a href="https://simdesk.eu/"><b>Demo</b></a>
+    <a href="https://fabieu.github.io/simdesk/"><b>Documentation</b></a>
 </p>
 
 ## Features

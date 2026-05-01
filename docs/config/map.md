@@ -2,8 +2,6 @@
 
 The `map` feature enables a world map with weather information for all available tracks in Assetto Corsa Competizione.
 
-**View Demo:** [Map](https://sim2real.simdesk.eu/map)
-
 Enable the map feature by adding `map` to `SPRING_PROFILES_ACTIVE`.
 
 ## Environment Variables

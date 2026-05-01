@@ -8,9 +8,6 @@ Corsa Competizione. You can also download and share the corresponding definition
 
 The standalone BoP Editor is used to create and manipulate Assetto Corsa Competizione `bop.json` files.
 
-**View Demo:**
-[Balance of Performance - Editor](https://simdesk.eu/bop/editor)
-
 Enable the Balance of Performance features by adding `acc-bop` to `SPRING_PROFILES_ACTIVE`.
 
 ## Management Feature
