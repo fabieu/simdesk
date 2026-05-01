@@ -124,7 +124,7 @@ jobs:
     timeout-minutes: 5
     steps:
       - name: Release
-        uses: softprops/action-gh-release@v2
+        uses: softprops/action-gh-release@v3
         with:
           name: Release ${{ needs.variables.outputs.version }}
           tag_name: ${{ needs.variables.outputs.version }}
