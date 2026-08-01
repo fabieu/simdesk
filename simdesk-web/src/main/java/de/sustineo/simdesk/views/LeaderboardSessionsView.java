@@ -44,7 +44,6 @@ import lombok.extern.java.Log;
 import org.apache.commons.io.FileUtils;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.MediaType;
 
 import java.nio.file.Path;
 import java.time.Duration;
@@ -158,7 +157,7 @@ public class LeaderboardSessionsView extends BaseView {
         Upload upload = new Upload();
         upload.setI18n(configureUploadI18N());
         upload.setDropAllowed(true);
-        upload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        upload.setAcceptedFileExtensions(".json");
         upload.setMaxFileSize((int) (25 * FileUtils.ONE_MB));
         upload.setUploadHandler(UploadHandler.toFile((metadata, file) -> {
             try {

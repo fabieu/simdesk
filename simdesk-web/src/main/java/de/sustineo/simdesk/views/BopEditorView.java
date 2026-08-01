@@ -108,7 +108,7 @@ public class BopEditorView extends BaseView {
         fileUpload.setWidthFull();
         fileUpload.setI18n(configureUploadI18N());
         fileUpload.setDropAllowed(true);
-        fileUpload.setAcceptedFileTypes("application/json", ".json");
+        fileUpload.setAcceptedFileExtensions(".json");
         fileUpload.addFileRejectedListener(event -> notificationService.showErrorNotification(event.getErrorMessage()));
         fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
 

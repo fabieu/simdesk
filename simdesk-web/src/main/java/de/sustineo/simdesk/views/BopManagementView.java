@@ -493,7 +493,7 @@ public class BopManagementView extends BaseView {
         Upload fileUpload = new Upload();
         fileUpload.setWidthFull();
         fileUpload.setDropAllowed(true);
-        fileUpload.setAcceptedFileTypes("application/json", ".json");
+        fileUpload.setAcceptedFileExtensions(".json");
         fileUpload.setMaxFiles(1);
         fileUpload.setMaxFileSize((int) FileUtils.ONE_MB);
         fileUpload.setI18n(configureUploadI18N());

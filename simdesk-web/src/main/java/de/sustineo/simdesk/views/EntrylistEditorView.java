@@ -81,7 +81,6 @@ import de.sustineo.simdesk.views.renderers.EntrylistRenderer;
 import lombok.extern.java.Log;
 import org.apache.commons.lang3.EnumUtils;
 import org.springframework.context.annotation.Profile;
-import org.springframework.http.MediaType;
 
 import java.nio.charset.StandardCharsets;
 import java.time.Duration;
@@ -243,7 +242,7 @@ public class EntrylistEditorView extends BaseView {
         entrylistUpload.setUploadHandler(UploadHandler.inMemory(this::handleEntrylistUpload));
         entrylistUpload.setUploadButton(uploadButton);
         entrylistUpload.setDropAllowed(true);
-        entrylistUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        entrylistUpload.setAcceptedFileExtensions(".json");
         entrylistUpload.setMaxFiles(1);
         entrylistUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         entrylistUpload.setI18n(configureUploadI18N("entrylist.json"));
@@ -344,7 +343,7 @@ public class EntrylistEditorView extends BaseView {
                 .set("gap", "var(--lumo-space-m)");
 
         sessionResultUpload.setDropAllowed(true);
-        sessionResultUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        sessionResultUpload.setAcceptedFileExtensions(".json");
         sessionResultUpload.setMaxFiles(1);
         sessionResultUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
@@ -1162,7 +1161,7 @@ public class EntrylistEditorView extends BaseView {
                 .set("gap", "var(--lumo-space-m)");
 
         sessionResultUpload.setDropAllowed(true);
-        sessionResultUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        sessionResultUpload.setAcceptedFileExtensions(".json");
         sessionResultUpload.setMaxFiles(1);
         sessionResultUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         sessionResultUpload.setI18n(configureUploadI18N("session_result.json"));
@@ -1314,7 +1313,7 @@ public class EntrylistEditorView extends BaseView {
 
         Upload defaultCustomCarUpload = new Upload();
         defaultCustomCarUpload.setDropAllowed(true);
-        defaultCustomCarUpload.setAcceptedFileTypes(MediaType.APPLICATION_JSON_VALUE);
+        defaultCustomCarUpload.setAcceptedFileExtensions(".json");
         defaultCustomCarUpload.setMaxFileSize(MAX_FILE_SIZE_BYTES);
         defaultCustomCarUpload.setI18n(configureUploadI18N("custom_cars.json"));
         defaultCustomCarUpload.setUploadHandler(UploadHandler.inMemory((metadata, data) -> {
