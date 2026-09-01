@@ -2,6 +2,13 @@
     <img src="docs/img/logo_h_200.png" alt="SimDesk Logo">
 </p>
 
+> [!WARNING]
+> **This project is no longer maintained and is up for adoption.**
+>
+> There will be no further development, bug fixes or dependency updates.
+> If you are interested in taking over maintenance, please get in touch via
+> [GitHub](https://github.com/fabieu).
+
 <!--include-docs-start-->
 <p align="center">
     <em>Modern server leaderboard and various services for sim racing organizers.</em>
