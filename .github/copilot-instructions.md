@@ -50,10 +50,9 @@ simdesk/                        ← repo root
 │               ├── configuration/            ← Test-specific Spring config
 │               └── services/                 ← Service-layer tests
 ├── .github/
-│   ├── workflows/
-│   │   ├── test.yml             ← CI: runs tests on every PR to main
-│   │   └── build-web-app.yml   ← CI: build jar + Docker image + release on push to main
-│   └── dependabot.yml
+│   └── workflows/
+│       ├── test.yml             ← CI: runs tests on every PR to main
+│       └── build-web-app.yml   ← CI: build jar + Docker image + release on push to main
 └── docs/                        ← MkDocs documentation source
 ```
 
